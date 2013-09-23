@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IQToolkit.Data", "IQToolkit
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IQToolkit.Data.ElasticSearch", "IQToolkit.Data.ElasticSearch\IQToolkit.Data.ElasticSearch.csproj", "{726D58C5-8D00-411A-A474-D30FA3477618}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IQToolkit.Test.ElasticSearch", "IQToolkit.Test.ElasticSearch\IQToolkit.Test.ElasticSearch.csproj", "{359AEB3F-E8F0-4F49-9CF7-F6A92A8ABAC0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,10 @@ Global
 		{726D58C5-8D00-411A-A474-D30FA3477618}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{726D58C5-8D00-411A-A474-D30FA3477618}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{726D58C5-8D00-411A-A474-D30FA3477618}.Release|Any CPU.Build.0 = Release|Any CPU
+		{359AEB3F-E8F0-4F49-9CF7-F6A92A8ABAC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{359AEB3F-E8F0-4F49-9CF7-F6A92A8ABAC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{359AEB3F-E8F0-4F49-9CF7-F6A92A8ABAC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{359AEB3F-E8F0-4F49-9CF7-F6A92A8ABAC0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
