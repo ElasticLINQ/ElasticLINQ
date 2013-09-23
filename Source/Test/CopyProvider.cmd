@@ -1,0 +1,1 @@
+if exist %3..\IQToolkit.Data.%1\%2IQToolkit.Data.%1.dll xcopy /C /Y %3..\IQToolkit.Data.%1\%2IQToolkit.Data.%1.dll %3%2

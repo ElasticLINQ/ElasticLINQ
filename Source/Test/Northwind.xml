@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<map>
+  <Entity Id="Customers">
+    <Table Name="Customers" />
+    <Column Member = "CustomerId" IsPrimaryKey = "true" />
+    <Column Member = "ContactName" />
+    <Column Member = "CompanyName" />
+    <Column Member = "Phone" />
+    <Column Member = "City" DbType="NVARCHAR(20)" />
+    <Column Member = "Country" />
+    <Association Member = "Orders" KeyMembers = "CustomerID" RelatedEntityID = "Orders" RelatedKeyMembers = "CustomerID" />
+  </Entity>
+  <Entity Id="Orders">
+    <Table Name="Orders" />
+    <Column Member = "OrderID" IsPrimaryKey = "true" IsGenerated = "true"/>
+    <Column Member = "CustomerID" />
+    <Column Member = "OrderDate" />
+    <Association Member = "Customer" KeyMembers = "CustomerID" RelatedEntityID = "Customers" RelatedKeyMembers = "CustomerID" />
+    <Association Member = "Details" KeyMembers = "OrderID" RelatedEntityID = "OrderDetails" RelatedKeyMembers = "OrderID" />
+  </Entity>
+  <Entity Id="OrderDetails">
+    <Table Name="Order Details"/>
+    <Column Member = "OrderID" IsPrimaryKey = "true" />
+    <Column Member = "ProductID" IsPrimaryKey = "true" />
+  </Entity>            
+</map>
