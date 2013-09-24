@@ -6,11 +6,11 @@ using System;
 
 namespace IQToolkit.Data.ElasticSearch
 {
-    public class ElasticQueryProvider : EntityProvider
+    public class ElasticQueryProvider : ReadEntityProvider
     {
         private readonly ElasticConnection connection;
 
-        public ElasticQueryProvider(ElasticConnection connection, QueryMapping mapping, QueryPolicy policy)
+        public ElasticQueryProvider(ElasticConnection connection, QueryMapping mapping, QueryPolicy policy = null)
             : base(ElasticQueryLanguage.Default, mapping, policy)
         {
             this.connection = connection;
@@ -18,17 +18,14 @@ namespace IQToolkit.Data.ElasticSearch
 
         protected override QueryExecutor CreateExecutor()
         {
-            return new ElasticQueryExecutor(connection);
-        }
-
-        public override void DoTransacted(Action action)
-        {
-            action(); // No transaction support
+            return new ElasticQueryExecutor(this);
         }
 
         public override void DoConnected(Action action)
         {
-            action(); // No concept of open connections
+            // TODO: Open connection
+            action();
+            // TODO: Close connection
         }
 
         public override int ExecuteCommand(string commandText)

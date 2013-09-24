@@ -30,6 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
@@ -38,6 +41,7 @@
     <Compile Include="ElasticQueryExecutor.cs" />
     <Compile Include="ElasticQueryLanguage.cs" />
     <Compile Include="ElasticQueryProvider.cs" />
+    <Compile Include="Candidates\ReadEntityQueryProvider.cs" />
     <Compile Include="TypeSystem\ElasticQueryType.cs" />
     <Compile Include="TypeSystem\ElasticTypeSystem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -51,6 +55,9 @@
       <Project>{0da62a7c-3b40-456f-a4b2-b3e19ed4080e}</Project>
       <Name>IQToolkit</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -9,16 +9,16 @@ namespace IQToolkit.Data.ElasticSearch
 {
     internal class ElasticQueryExecutor : QueryExecutor
     {
-        private ElasticConnection connection;
+        private ElasticQueryProvider provider;
 
-        public ElasticQueryExecutor(ElasticConnection connection)
+        public ElasticQueryExecutor(ElasticQueryProvider provider)
         {
-            this.connection = connection;
+            this.provider = provider;
         }
 
         public override int RowsAffected
         {
-            get { throw new NotImplementedException(); }
+            get { return 0; }
         }
 
         public override object Convert(object value, Type type)

@@ -6,17 +6,17 @@ using System;
 
 namespace IQToolkit.Data.ElasticSearch.TypeSystem
 {
+    // TODO: Develop a type system
     public class ElasticTypeSystem : QueryTypeSystem
     {
         public override QueryType Parse(string typeDeclaration)
         {
-            // TODO: Develop a type system
             return new ElasticQueryType(true, 4096, 18, 0);
         }
 
         public override QueryType GetColumnType(Type type)
         {
-            throw new NotImplementedException();
+            return new ElasticQueryType(true, 4096, 18, 0);
         }
 
         public override string GetVariableDeclaration(QueryType type, bool suppressSize)
