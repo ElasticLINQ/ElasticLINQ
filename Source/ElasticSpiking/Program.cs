@@ -1,16 +1,13 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
+﻿using IQToolkit.Data.Common;
+using IQToolkit.Data.ElasticSearch;
+using IQToolkit.Data.ElasticSearch.Response;
+using IQToolkit.Data.Mapping;
+using Newtonsoft.Json;
+using System;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using IQToolkit.Data.Common;
-using IQToolkit.Data.ElasticSearch;
-using IQToolkit.Data.Mapping;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
 
 namespace ElasticSpiking
 {
@@ -48,54 +45,5 @@ namespace ElasticSpiking
         }
     }
 
-    [DebuggerDisplay("{hits.hits.Count} hits in {took} ms")]
-    class ElasticResponse
-    {
-        public int took;
-        public bool timed_out;
-        public ShardStats _shards;
-        public Hits hits;
-    }
 
-    [DebuggerDisplay("{hits.Count} hits of {total}")]
-    class Hits
-    {
-        public long total;
-        public double max_score;
-        public List<Hit> hits;
-    }
-
-    [DebuggerDisplay("{_type} in {_index} id {_id}")]
-    class Hit
-    {
-        public string _index;
-        public string _type;
-        public string _id;
-        public double _score;
-        public Source _source;
-    }
-
-    [DebuggerDisplay("{meta.id}")]
-    class Source
-    {
-        public JObject doc;
-        public Meta meta;
-    }
-
-    [DebuggerDisplay("{id} rev {rev}")]
-    class Meta
-    {
-        public string id;
-        public string rev;
-        public int? expiration;
-        public int? flags;
-    }
-
-    [DebuggerDisplay("{failed} failed, {successful} success")]
-    class ShardStats
-    {
-        public int total;
-        public int successful;
-        public int failed;
-    }
 }

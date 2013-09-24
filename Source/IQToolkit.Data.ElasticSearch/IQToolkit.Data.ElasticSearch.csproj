@@ -42,6 +42,12 @@
     <Compile Include="ElasticQueryLanguage.cs" />
     <Compile Include="ElasticQueryProvider.cs" />
     <Compile Include="Candidates\ReadEntityQueryProvider.cs" />
+    <Compile Include="Response\ElasticResponse.cs" />
+    <Compile Include="Response\Hit.cs" />
+    <Compile Include="Response\Hits.cs" />
+    <Compile Include="Response\Meta.cs" />
+    <Compile Include="Response\ShardStats.cs" />
+    <Compile Include="Response\Source.cs" />
     <Compile Include="TypeSystem\ElasticQueryType.cs" />
     <Compile Include="TypeSystem\ElasticTypeSystem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
