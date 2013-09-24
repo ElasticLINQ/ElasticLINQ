@@ -6,29 +6,29 @@ using System;
 
 namespace IQToolkit.Data.ElasticSearch
 {
-    public class ElasticSearchQueryProvider : EntityProvider
+    public class ElasticQueryProvider : EntityProvider
     {
-        private readonly Uri connection;
+        private readonly ElasticConnection connection;
 
-        public ElasticSearchQueryProvider(Uri connection, QueryMapping mapping, QueryPolicy policy)
-            : base(ElasticSearchQueryLanguage.Default, mapping, policy)
+        public ElasticQueryProvider(ElasticConnection connection, QueryMapping mapping, QueryPolicy policy)
+            : base(ElasticQueryLanguage.Default, mapping, policy)
         {
             this.connection = connection;
         }
 
         protected override QueryExecutor CreateExecutor()
         {
-            throw new NotImplementedException();
+            return new ElasticQueryExecutor(connection);
         }
 
         public override void DoTransacted(Action action)
         {
-            throw new NotImplementedException();
+            action(); // No transaction support
         }
 
         public override void DoConnected(Action action)
         {
-            throw new NotImplementedException();
+            action(); // No concept of open connections
         }
 
         public override int ExecuteCommand(string commandText)

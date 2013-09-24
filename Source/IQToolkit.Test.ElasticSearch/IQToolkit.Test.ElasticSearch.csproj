@@ -39,7 +39,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TypeSystem\ElasticSearchQueryTypeTests.cs" />
+    <Compile Include="TypeSystem\ElasticConnectionTests.cs" />
+    <Compile Include="TypeSystem\ElasticQueryTypeTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IQToolkit.Data.ElasticSearch\IQToolkit.Data.ElasticSearch.csproj">

@@ -6,12 +6,12 @@ using System;
 
 namespace IQToolkit.Data.ElasticSearch.TypeSystem
 {
-    public class ElasticSearchTypeSystem : QueryTypeSystem
+    public class ElasticTypeSystem : QueryTypeSystem
     {
         public override QueryType Parse(string typeDeclaration)
         {
             // TODO: Develop a type system
-            return new ElasticSearchQueryType(true, 4096, 18, 0);
+            return new ElasticQueryType(true, 4096, 18, 0);
         }
 
         public override QueryType GetColumnType(Type type)

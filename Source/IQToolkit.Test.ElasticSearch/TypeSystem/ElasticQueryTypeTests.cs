@@ -6,7 +6,7 @@ using Xunit;
 
 namespace IQToolkit.Test.ElasticSearch.TypeSystem
 {
-    public class ElasticSearchQueryTypeTests
+    public class ElasticQueryTypeTests
     {
         [Fact]
         public void ConstructorSetsProperties()
@@ -15,7 +15,7 @@ namespace IQToolkit.Test.ElasticSearch.TypeSystem
             const int length = 1234;
             const short precision = 18; const short scale = 9;
 
-            var actual = new ElasticSearchQueryType(notNull, length, precision, scale);
+            var actual = new ElasticQueryType(notNull, length, precision, scale);
 
             Assert.Equal(notNull, actual.NotNull);
             Assert.Equal(length, actual.Length);

@@ -5,14 +5,14 @@ using IQToolkit.Data.Common;
 
 namespace IQToolkit.Data.ElasticSearch.TypeSystem
 {
-    public class ElasticSearchQueryType : QueryType
+    public class ElasticQueryType : QueryType
     {
         private readonly bool notNull;
         private readonly int length;
         private readonly short precision;
         private readonly short scale;
 
-        public ElasticSearchQueryType(bool notNull, int length, short precision, short scale)
+        public ElasticQueryType(bool notNull, int length, short precision, short scale)
         {
             this.notNull = notNull;
             this.length = length;

@@ -34,10 +34,12 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ElasticSearchQueryLanguage.cs" />
-    <Compile Include="ElasticSearchQueryProvider.cs" />
-    <Compile Include="TypeSystem\ElasticSearchQueryType.cs" />
-    <Compile Include="TypeSystem\ElasticSearchTypeSystem.cs" />
+    <Compile Include="ElasticConnection.cs" />
+    <Compile Include="ElasticQueryExecutor.cs" />
+    <Compile Include="ElasticQueryLanguage.cs" />
+    <Compile Include="ElasticQueryProvider.cs" />
+    <Compile Include="TypeSystem\ElasticQueryType.cs" />
+    <Compile Include="TypeSystem\ElasticTypeSystem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
