@@ -25,7 +25,7 @@ namespace TestConsoleApp
             var elasticProvider = new ElasticQueryProvider(connection, new TrivialElasticMapping()) { Log = Console.Out };
 
             var query = new Query<Movie>(elasticProvider)
-                .Where(m => m.Year == "1979")
+                .Where(m => m.Year == "1979" || m.Year == "2007")
                 //.Skip(1)
                 //.Take(3)                
                 .OrderByDescending(o => o.Year)

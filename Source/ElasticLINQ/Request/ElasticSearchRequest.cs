@@ -16,10 +16,10 @@ namespace ElasticLinq.Request
         private readonly int? take;
         private readonly List<string> fields;
         private readonly List<SortOption> sortOptions;
-        private readonly Dictionary<string, IReadOnlyList<QueryCriterion>> queryCriteria;
+        private readonly Dictionary<string, string> queryCriteria;
 
         public ElasticSearchRequest(string type, int skip, int? take, List<string> fields,
-            List<SortOption> sortOptions, Dictionary<string, IReadOnlyList<QueryCriterion>> queryCriteria)
+            List<SortOption> sortOptions, Dictionary<string, string> queryCriteria)
         {
             this.type = type;
             this.skip = skip;
@@ -43,9 +43,9 @@ namespace ElasticLinq.Request
             get { return sortOptions.AsReadOnly(); }
         }
 
-        public IReadOnlyDictionary<string, IReadOnlyList<QueryCriterion>> QueryCriteria
+        public IReadOnlyDictionary<string, string> QueryCriteria
         {
-            get { return new ReadOnlyDictionary<string, IReadOnlyList<QueryCriterion>>(queryCriteria); }
+            get { return new ReadOnlyDictionary<string, string>(queryCriteria); }
         }
     }
 

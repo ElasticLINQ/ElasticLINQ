@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // This source code is made available under the terms of the Microsoft Public License (MS-PL)
 
+using System.Reflection;
 using ElasticLinq.Mapping;
 using Newtonsoft.Json.Linq;
 using System;
@@ -30,7 +31,7 @@ namespace ElasticLinq.Request.Visitors
         private int? take;
         private readonly List<string> fields = new List<string>();
         private readonly List<SortOption> sortOptions = new List<SortOption>();
-        private readonly Dictionary<string, IReadOnlyList<QueryCriterion>> queryCriteria = new Dictionary<string, IReadOnlyList<QueryCriterion>>();
+        private readonly Dictionary<string, string> queryCriteria = new Dictionary<string, string>();
 
         public ElasticQueryTranslator(IElasticMapping mapping)
         {
@@ -80,13 +81,19 @@ namespace ElasticLinq.Request.Visitors
             if (c.Value is IQueryable)
                 SetType(((IQueryable)c.Value).ElementType);
 
+            if (inWhereCondition)
+                whereConstants.Push(c);
+
             return c;
         }
 
         protected override Expression VisitMember(MemberExpression m)
         {
+            if (inWhereCondition)
+                whereMemberInfos.Push(m.Member);
+
             if (m.Expression == null || m.Expression.NodeType != ExpressionType.Parameter)
-                throw new NotSupportedException(string.Format("The member '{0}' is not supported", m.Member.Name));
+                throw new NotSupportedException(string.Format("The memberInfo '{0}' is not supported", m.Member.Name));
 
             return m;
         }
@@ -114,28 +121,42 @@ namespace ElasticLinq.Request.Visitors
             return e;
         }
 
+        private bool inWhereCondition;
+        private readonly Stack<MemberInfo> whereMemberInfos = new Stack<MemberInfo>();
+        private readonly Stack<ConstantExpression> whereConstants = new Stack<ConstantExpression>(); 
+
         private Expression VisitWhere(Expression source, Expression predicate)
         {
+            inWhereCondition = true;
+
             var lambda = (LambdaExpression)StripQuotes(predicate);
             Visit(lambda);
+
+            inWhereCondition = false;
+
             return Visit(source);
         }
 
         protected override Expression VisitBinary(BinaryExpression b)
         {
-            var express = Visit(b.Left) as MemberExpression;
-            if (express == null)
-                throw new NotSupportedException(string.Format("The left side of a binary operator '{0}' must be member", b.Left));
-
+            Visit(b.Left);
             var operation = VisitComparisonOperation(b);
-            var value = Visit(b.Right) as ConstantExpression;
-            if (value == null)
-                throw new NotSupportedException(string.Format("The right side of a binary operator '{0}' must be constant", b.Right));
+            Visit(b.Right);
 
-            var fieldName = mapping.GetFieldName(express.Member);
-            queryCriteria[fieldName] = new List<QueryCriterion> { new QueryCriterion(operation, value.Value) }.AsReadOnly();
+            if (whereMemberInfos.Any() && whereConstants.Any())
+                AddQueryCriterion(whereMemberInfos.Pop(), operation, whereConstants.Pop());
 
             return b;
+        }
+
+        private void AddQueryCriterion(MemberInfo memberInfo, string operation, object value)
+        {
+            var fieldName = mapping.GetFieldName(memberInfo);
+
+            string existingCriteria;
+            queryCriteria.TryGetValue(fieldName, out existingCriteria);
+
+            queryCriteria[fieldName] = (existingCriteria ?? "") + " " + operation + value;
         }
 
         private static string VisitComparisonOperation(BinaryExpression b)
@@ -143,14 +164,24 @@ namespace ElasticLinq.Request.Visitors
             // TODO: Make these filter or query specific
             switch (b.NodeType)
             {
-                case ExpressionType.And: return "AND";
-                case ExpressionType.Or: return "OR";
-                case ExpressionType.Equal: return "";
-                case ExpressionType.NotEqual: return "NOT";
-                case ExpressionType.LessThan: return "lt";
-                case ExpressionType.LessThanOrEqual: return "lte";
-                case ExpressionType.GreaterThan: return "gt";
-                case ExpressionType.GreaterThanOrEqual: return "gte";
+                case ExpressionType.And:
+                case ExpressionType.AndAlso:
+                    return "AND";
+                case ExpressionType.Or:
+                case ExpressionType.OrElse:
+                    return "OR";
+                case ExpressionType.Equal:
+                    return "";
+                case ExpressionType.NotEqual:
+                    return "NOT";
+                case ExpressionType.LessThan:
+                    return "lt";
+                case ExpressionType.LessThanOrEqual:
+                    return "lte";
+                case ExpressionType.GreaterThan:
+                    return "gt";
+                case ExpressionType.GreaterThanOrEqual:
+                    return "gte";
                 default:
                     throw new NotSupportedException(string.Format("The binary operator '{0}' is not supported", b.NodeType));
             }

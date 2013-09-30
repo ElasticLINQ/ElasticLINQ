@@ -87,7 +87,7 @@ namespace ElasticLinq.Request
                 yield return KeyValuePair.Create("fields", string.Join(",", searchRequest.Fields));
 
             foreach (var queryCriteria in searchRequest.QueryCriteria)
-                yield return KeyValuePair.Create("q", queryCriteria.Key + ":" + Format(queryCriteria.Value));
+                yield return KeyValuePair.Create("q", queryCriteria.Key + ":" + queryCriteria.Value);
 
             foreach (var sortOption in searchRequest.SortOptions)
                 yield return KeyValuePair.Create("sort", sortOption.Name + (sortOption.Ascending ? "" : ":desc"));
@@ -104,11 +104,6 @@ namespace ElasticLinq.Request
         private static string MakeQueryString(IEnumerable<KeyValuePair<string, string>> queryParameters)
         {
             return string.Join("&", queryParameters.Select(p => p.Key + (p.Value == null ? "" : "=" + p.Value)));
-        }
-
-        internal static string Format(IEnumerable<QueryCriterion> queryCriteria)
-        {
-            return string.Join(" ", queryCriteria.Select(v => v.Comparison + " " + FormatValue(v.Value))).Trim();
         }
 
         internal static string FormatValue(object value)
