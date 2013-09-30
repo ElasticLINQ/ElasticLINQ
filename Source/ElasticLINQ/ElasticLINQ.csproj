@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ElasticConnection.cs" />
+    <Compile Include="ElasticQuery.cs" />
     <Compile Include="ElasticQueryProvider.cs" />
     <Compile Include="Request\Visitors\ElasticQueryTranslator.cs" />
     <Compile Include="IQToolkit\PartialEvaluator.cs" />

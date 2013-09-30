@@ -18,7 +18,7 @@ namespace ElasticLinq
     /// <summary>
     /// Query provider implementation for ElasticSearch.
     /// </summary>
-    public class ElasticQueryProvider : IQueryProvider, IQueryText
+    public sealed class ElasticQueryProvider : IQueryProvider, IQueryText
     {
         private readonly ElasticConnection connection;
         private readonly IElasticMapping mapping;
@@ -39,13 +39,13 @@ namespace ElasticLinq
 
         IQueryable<T> IQueryProvider.CreateQuery<T>(Expression expression)
         {
-            return new Query<T>(this, expression);
+            return new ElasticQuery<T>(this, expression);
         }
 
         IQueryable IQueryProvider.CreateQuery(Expression expression)
         {
             var elementType = TypeHelper.GetElementType(expression.Type);
-            var queryType = typeof(Query<>).MakeGenericType(elementType);
+            var queryType = typeof(ElasticQuery<>).MakeGenericType(elementType);
             try
             {
                 return (IQueryable)Activator.CreateInstance(queryType, new object[] { this, expression });
@@ -70,7 +70,7 @@ namespace ElasticLinq
         {
             var translateResult = Translate(expression);
             var elementType = TypeHelper.GetElementType(expression.Type);
-            
+
             var log = Log ?? new NullTextWriter();
             log.WriteLine("Type is " + elementType);
 
