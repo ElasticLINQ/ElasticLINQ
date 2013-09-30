@@ -1,49 +1,62 @@
-﻿using IQToolkit.Data.Common;
-using IQToolkit.Data.ElasticSearch;
-using IQToolkit.Data.ElasticSearch.Response;
-using IQToolkit.Data.Mapping;
-using Newtonsoft.Json;
-using System;
+﻿using System;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using ElasticSpiking.BasicProvider;
+using IQToolkit.Data.Common;
+using IQToolkit.Data.ElasticSearch;
+using IQToolkit.Data.ElasticSearch.Response;
+using IQToolkit.Data.Mapping;
+using Newtonsoft.Json;
+using ElasticQueryProvider = ElasticSpiking.BasicProvider.ElasticQueryProvider;
 
 namespace ElasticSpiking
 {
-    class Program
+    internal class Program
     {
         private static readonly Uri endpoint = new Uri("http://10.81.84.12:9200/main/_search");
 
-        static void Main()
+        private static void Main()
         {
-            TestReading().Wait();
+            TestBasicElasticProvider();
 
             Console.ReadKey();
         }
 
-        static async Task TestReading()
+        private static void TestBasicElasticProvider()
         {
-            var httpClient = new HttpClient();
-            var responseStream = await httpClient.GetStreamAsync(endpoint);
-            
-            var serializer = new JsonSerializer();
-            var textReader = new JsonTextReader(new StreamReader(responseStream));
-            var elasticResponse = serializer.Deserialize<ElasticResponse>(textReader);
+            var elasticProvider = new ElasticQueryProvider(endpoint);
+            var query = new IQToolkit.Query<object>(elasticProvider);
+            PrintQuery(query);
+            foreach (var item in query.ToList())
+                Console.WriteLine(item);
         }
 
-        static void TestConnection()
+        private static void TestBasicDbProvider()
         {
-            var connection = new ElasticConnection(endpoint);
-            var provider = new ElasticQueryProvider(connection, new ImplicitMapping(), new QueryPolicy())
-            {
-                Log = Console.Out
-            };
+            const string connectionString = @"Server=(local);Database=Northwind;Trusted_Connection=True;";
 
-            var query = provider.GetTable<ElasticResponse>();
-            var results = query.ToArray();
+            using (var con = new SqlConnection(connectionString))
+            {
+                con.Open();
+                var db = new Northwind(con);
+
+                var city = "London";
+                var query = db.Customers.Where(c => c.City == city);
+
+                PrintQuery(query);
+                foreach (var item in query.ToList())
+                    Console.WriteLine("Name: {0}", item.ContactName);
+
+                PrintQuery(query.Select(c => new { A = c.ContactName }));
+            }
+        }
+
+        private static void PrintQuery<T>(IQueryable<T> query)
+        {
+            Console.WriteLine("Query:\n{0}\n", query);
         }
     }
-
-
 }
