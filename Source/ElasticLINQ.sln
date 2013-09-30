@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestConsoleApp", "TestConsoleApp\TestConsoleApp.csproj", "{876CF360-7395-44E6-9F3E-C4705856E49C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElasticLINQ", "ElasticLINQ\ElasticLINQ.csproj", "{875E1599-5B7F-4084-BBE0-0D70C3C80428}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElasticLINQ.Test", "ElasticLINQ.Test\ElasticLINQ.Test.csproj", "{752ADF39-9F6D-4FE3-8EEF-3266EF584C2A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{876CF360-7395-44E6-9F3E-C4705856E49C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{876CF360-7395-44E6-9F3E-C4705856E49C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{876CF360-7395-44E6-9F3E-C4705856E49C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{876CF360-7395-44E6-9F3E-C4705856E49C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{875E1599-5B7F-4084-BBE0-0D70C3C80428}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{875E1599-5B7F-4084-BBE0-0D70C3C80428}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{875E1599-5B7F-4084-BBE0-0D70C3C80428}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{875E1599-5B7F-4084-BBE0-0D70C3C80428}.Release|Any CPU.Build.0 = Release|Any CPU
+		{752ADF39-9F6D-4FE3-8EEF-3266EF584C2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{752ADF39-9F6D-4FE3-8EEF-3266EF584C2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{752ADF39-9F6D-4FE3-8EEF-3266EF584C2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{752ADF39-9F6D-4FE3-8EEF-3266EF584C2A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
