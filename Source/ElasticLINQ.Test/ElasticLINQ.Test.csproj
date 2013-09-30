@@ -39,7 +39,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ElasticConnectionTests.cs" />
+    <Compile Include="Mapping\TrivialElasticMappingTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utility\NullTextWriterTests.cs" />
+    <Compile Include="Utility\StaticConstructorsTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -49,6 +52,9 @@
       <Project>{875e1599-5b7f-4084-bbe0-0d70c3c80428}</Project>
       <Name>ElasticLINQ</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Visitors\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
