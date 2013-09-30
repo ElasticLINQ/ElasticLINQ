@@ -76,12 +76,12 @@ namespace ElasticLinq.Request
                 builder.Path += searchRequest.Type + "/";
 
             builder.Path += "_search";
-            builder.Query = MakeQueryString(GetSearchParameters(searchRequest));
+            builder.Query = MakeQueryString(GetSearchParameters(searchRequest, connection));
 
             return builder.Uri;
         }
 
-        private static IEnumerable<KeyValuePair<string, string>> GetSearchParameters(ElasticSearchRequest searchRequest)
+        private static IEnumerable<KeyValuePair<string, string>> GetSearchParameters(ElasticSearchRequest searchRequest, ElasticConnection connection)
         {
             if (searchRequest.Fields.Any())
                 yield return KeyValuePair.Create("fields", string.Join(",", searchRequest.Fields));
@@ -94,11 +94,24 @@ namespace ElasticLinq.Request
 
             if (searchRequest.Take.HasValue)
                 yield return KeyValuePair.Create("size", searchRequest.Take.Value.ToString(CultureInfo.InvariantCulture));
+
+            yield return KeyValuePair.Create("timeout", FormatTimespan(connection.Timeout));
         }
 
         private static string MakeQueryString(IEnumerable<KeyValuePair<string, string>> queryParameters)
         {
             return string.Join("&", queryParameters.Select(p => p.Key + (p.Value == null ? "" : "=" + p.Value)));
+        }
+
+        internal static string FormatTimespan(TimeSpan timeSpan)
+        {
+            if (timeSpan.Milliseconds != 0)
+                return timeSpan.TotalMilliseconds.ToString(CultureInfo.InvariantCulture);
+
+            if (timeSpan.Seconds != 0)
+                return timeSpan.TotalSeconds.ToString(CultureInfo.InvariantCulture) + "s";
+
+            return timeSpan.TotalMinutes.ToString(CultureInfo.InvariantCulture) + "m";
         }
     }
 }

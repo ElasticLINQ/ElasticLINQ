@@ -38,6 +38,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Request\ElasticRequestProcessorTests.cs" />
     <Compile Include="ElasticConnectionTests.cs" />
     <Compile Include="Mapping\TrivialElasticMappingTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
