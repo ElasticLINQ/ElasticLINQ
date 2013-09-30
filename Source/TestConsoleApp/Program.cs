@@ -29,7 +29,9 @@ namespace TestConsoleApp
                 .Take(3)
                 .OrderByDescending(o => o.Year)
                 .ThenBy(o => o.Title)
-                .Select(a => new Tuple<string, string, string>(a.Title, a.Title, a.Year));
+                .Select(a => a.Title);
+
+                //.Select(a => new Tuple<string, string, string>(a.Title, a.Title, a.Year));
 
             DumpQuery(query);
         }

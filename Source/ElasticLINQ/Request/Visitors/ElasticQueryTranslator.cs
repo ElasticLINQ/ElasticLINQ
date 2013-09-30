@@ -128,19 +128,13 @@ namespace ElasticLinq.Request.Visitors
 
             var selectBody = Visit(lambda.Body);
 
-            if (selectBody is NewExpression)
-                VisitSelectNew((NewExpression)selectBody);
-
-            if (selectBody is MemberExpression)
-            {
-                var fieldName = mapping.GetFieldName(((MemberExpression)selectBody).Member);
-                fields.Add(fieldName);
-            }
+            if (selectBody is NewExpression || selectBody is MemberExpression)
+                VisitSelectNew(selectBody);
 
             return Visit(source);
         }
 
-        private void VisitSelectNew(NewExpression selectBody)
+        private void VisitSelectNew(Expression selectBody)
         {
             projection = new ProjectionVisitor(projectParameter, mapping).ProjectColumns(selectBody);
         }
