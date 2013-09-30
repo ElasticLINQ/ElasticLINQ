@@ -2,6 +2,7 @@
 // This source code is made available under the terms of the Microsoft Public License (MS-PL)
 
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace ElasticLinq.Request
 {
@@ -13,16 +14,19 @@ namespace ElasticLinq.Request
         private readonly string type;
         private readonly int skip;
         private readonly int? take;
-        private readonly List<string> fields; 
+        private readonly List<string> fields;
         private readonly List<SortOption> sortOptions;
+        private readonly Dictionary<string, IReadOnlyList<QueryCriterion>> queryCriteria;
 
-        public ElasticSearchRequest(string type, int skip, int? take, List<string> fields, List<SortOption> sortOptions)
+        public ElasticSearchRequest(string type, int skip, int? take, List<string> fields,
+            List<SortOption> sortOptions, Dictionary<string, IReadOnlyList<QueryCriterion>> queryCriteria)
         {
             this.type = type;
             this.skip = skip;
             this.take = take;
             this.fields = fields;
             this.sortOptions = sortOptions;
+            this.queryCriteria = queryCriteria;
         }
 
         public long Skip { get { return skip; } }
@@ -37,6 +41,11 @@ namespace ElasticLinq.Request
         public IReadOnlyList<SortOption> SortOptions
         {
             get { return sortOptions.AsReadOnly(); }
+        }
+
+        public IReadOnlyDictionary<string, IReadOnlyList<QueryCriterion>> QueryCriteria
+        {
+            get { return new ReadOnlyDictionary<string, IReadOnlyList<QueryCriterion>>(queryCriteria); }
         }
     }
 
@@ -53,5 +62,20 @@ namespace ElasticLinq.Request
 
         public string Name { get { return name; } }
         public bool Ascending { get { return ascending; } }
+    }
+
+    internal class QueryCriterion
+    {
+        private readonly string comparison;
+        private readonly object value;
+
+        public QueryCriterion(string comparison, object value)
+        {
+            this.comparison = comparison;
+            this.value = value;
+        }
+
+        public string Comparison { get { return comparison; } }
+        public object Value { get { return value; } }
     }
 }

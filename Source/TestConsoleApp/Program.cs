@@ -25,13 +25,12 @@ namespace TestConsoleApp
             var elasticProvider = new ElasticQueryProvider(connection, new TrivialElasticMapping()) { Log = Console.Out };
 
             var query = new Query<Movie>(elasticProvider)
-                .Skip(1)
-                .Take(3)
+                .Where(m => m.Year == "1979")
+                //.Skip(1)
+                //.Take(3)                
                 .OrderByDescending(o => o.Year)
                 .ThenBy(o => o.Title)
-                .Select(a => a.Title);
-
-                //.Select(a => new Tuple<string, string, string>(a.Title, a.Title, a.Year));
+                .Select(a => new Tuple<string, string, string>(a.Title, a.Title, a.Year));
 
             DumpQuery(query);
         }

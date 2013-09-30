@@ -86,6 +86,9 @@ namespace ElasticLinq.Request
             if (searchRequest.Fields.Any())
                 yield return KeyValuePair.Create("fields", string.Join(",", searchRequest.Fields));
 
+            foreach (var queryCriteria in searchRequest.QueryCriteria)
+                yield return KeyValuePair.Create("q", queryCriteria.Key + ":" + Format(queryCriteria.Value));
+
             foreach (var sortOption in searchRequest.SortOptions)
                 yield return KeyValuePair.Create("sort", sortOption.Name + (sortOption.Ascending ? "" : ":desc"));
 
@@ -95,7 +98,7 @@ namespace ElasticLinq.Request
             if (searchRequest.Take.HasValue)
                 yield return KeyValuePair.Create("size", searchRequest.Take.Value.ToString(CultureInfo.InvariantCulture));
 
-            yield return KeyValuePair.Create("timeout", FormatTimespan(connection.Timeout));
+            yield return KeyValuePair.Create("timeout", Format(connection.Timeout));
         }
 
         private static string MakeQueryString(IEnumerable<KeyValuePair<string, string>> queryParameters)
@@ -103,7 +106,18 @@ namespace ElasticLinq.Request
             return string.Join("&", queryParameters.Select(p => p.Key + (p.Value == null ? "" : "=" + p.Value)));
         }
 
-        internal static string FormatTimespan(TimeSpan timeSpan)
+        internal static string Format(IEnumerable<QueryCriterion> queryCriteria)
+        {
+            return string.Join(" ", queryCriteria.Select(v => v.Comparison + " " + FormatValue(v.Value))).Trim();
+        }
+
+        internal static string FormatValue(object value)
+        {
+            // TODO: Look at date, time, decimal formatting etc.
+            return value.ToString();
+        }
+
+        internal static string Format(TimeSpan timeSpan)
         {
             if (timeSpan.Milliseconds != 0)
                 return timeSpan.TotalMilliseconds.ToString(CultureInfo.InvariantCulture);

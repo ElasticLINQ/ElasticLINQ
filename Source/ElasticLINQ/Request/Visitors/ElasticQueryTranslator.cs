@@ -30,6 +30,7 @@ namespace ElasticLinq.Request.Visitors
         private int? take;
         private readonly List<string> fields = new List<string>();
         private readonly List<SortOption> sortOptions = new List<SortOption>();
+        private readonly Dictionary<string, IReadOnlyList<QueryCriterion>> queryCriteria = new Dictionary<string, IReadOnlyList<QueryCriterion>>();
 
         public ElasticQueryTranslator(IElasticMapping mapping)
         {
@@ -45,6 +46,10 @@ namespace ElasticLinq.Request.Visitors
                     case "Select":
                         if (m.Arguments.Count == 2)
                             return VisitSelect(m.Arguments[0], m.Arguments[1]);
+                        break;
+                    case "Where":
+                        if (m.Arguments.Count == 2)
+                            return VisitWhere(m.Arguments[0], m.Arguments[1]);
                         break;
                     case "Skip":
                         if (m.Arguments.Count == 2)
@@ -91,13 +96,13 @@ namespace ElasticLinq.Request.Visitors
             projectParameter = Expression.Parameter(typeof(JObject), "row");
 
             Visit(e);
-            
+
             if (projection != null)
-                fields.AddRange(projection.Fields);                 
+                fields.AddRange(projection.Fields);
 
             return new ElasticTranslateResult
             {
-                SearchRequest = new ElasticSearchRequest(type, skip, take, fields, sortOptions),
+                SearchRequest = new ElasticSearchRequest(type, skip, take, fields, sortOptions, queryCriteria),
                 Projector = projection != null ? Expression.Lambda(projection.Selector, projectParameter) : null
             };
         }
@@ -107,6 +112,48 @@ namespace ElasticLinq.Request.Visitors
             while (e.NodeType == ExpressionType.Quote)
                 e = ((UnaryExpression)e).Operand;
             return e;
+        }
+
+        private Expression VisitWhere(Expression source, Expression predicate)
+        {
+            var lambda = (LambdaExpression)StripQuotes(predicate);
+            Visit(lambda);
+            return Visit(source);
+        }
+
+        protected override Expression VisitBinary(BinaryExpression b)
+        {
+            var express = Visit(b.Left) as MemberExpression;
+            if (express == null)
+                throw new NotSupportedException(string.Format("The left side of a binary operator '{0}' must be member", b.Left));
+
+            var operation = VisitComparisonOperation(b);
+            var value = Visit(b.Right) as ConstantExpression;
+            if (value == null)
+                throw new NotSupportedException(string.Format("The right side of a binary operator '{0}' must be constant", b.Right));
+
+            var fieldName = mapping.GetFieldName(express.Member);
+            queryCriteria[fieldName] = new List<QueryCriterion> { new QueryCriterion(operation, value.Value) }.AsReadOnly();
+
+            return b;
+        }
+
+        private static string VisitComparisonOperation(BinaryExpression b)
+        {
+            // TODO: Make these filter or query specific
+            switch (b.NodeType)
+            {
+                case ExpressionType.And: return "AND";
+                case ExpressionType.Or: return "OR";
+                case ExpressionType.Equal: return "";
+                case ExpressionType.NotEqual: return "NOT";
+                case ExpressionType.LessThan: return "lt";
+                case ExpressionType.LessThanOrEqual: return "lte";
+                case ExpressionType.GreaterThan: return "gt";
+                case ExpressionType.GreaterThanOrEqual: return "gte";
+                default:
+                    throw new NotSupportedException(string.Format("The binary operator '{0}' is not supported", b.NodeType));
+            }
         }
 
         private Expression VisitOrderBy(Expression source, Expression orderByExpression, bool ascending)
