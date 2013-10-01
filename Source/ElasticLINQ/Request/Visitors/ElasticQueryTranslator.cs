@@ -31,7 +31,7 @@ namespace ElasticLinq.Request.Visitors
         private int? take;
         private readonly List<string> fields = new List<string>();
         private readonly List<SortOption> sortOptions = new List<SortOption>();
-        private readonly Dictionary<string, string> queryCriteria = new Dictionary<string, string>();
+        private readonly Dictionary<string, IReadOnlyList<object>> termCriteria = new Dictionary<string, IReadOnlyList<object>>();
 
         public ElasticQueryTranslator(IElasticMapping mapping)
         {
@@ -109,7 +109,7 @@ namespace ElasticLinq.Request.Visitors
 
             return new ElasticTranslateResult
             {
-                SearchRequest = new ElasticSearchRequest(type, skip, take, fields, sortOptions, queryCriteria),
+                SearchRequest = new ElasticSearchRequest(type, skip, take, fields, sortOptions, termCriteria),
                 Projector = projection != null ? Expression.Lambda(projection.Selector, projectParameter) : null
             };
         }
@@ -144,19 +144,21 @@ namespace ElasticLinq.Request.Visitors
             Visit(b.Right);
 
             if (whereMemberInfos.Any() && whereConstants.Any())
-                AddQueryCriterion(whereMemberInfos.Pop(), operation, whereConstants.Pop());
+                AddTermCriterion(whereMemberInfos.Pop(), operation, whereConstants.Pop());
 
             return b;
         }
 
-        private void AddQueryCriterion(MemberInfo memberInfo, string operation, object value)
+        private void AddTermCriterion(MemberInfo memberInfo, string operation, ConstantExpression value)
         {
             var fieldName = mapping.GetFieldName(memberInfo);
 
-            string existingCriteria;
-            queryCriteria.TryGetValue(fieldName, out existingCriteria);
+            IReadOnlyList<object> existingCriteria;
+            termCriteria.TryGetValue(fieldName, out existingCriteria);
 
-            queryCriteria[fieldName] = (existingCriteria ?? "") + " " + operation + value;
+            termCriteria[fieldName] = new List<object>(existingCriteria ?? Enumerable.Empty<object>())
+                { value.Value }
+                .AsReadOnly();
         }
 
         private static string VisitComparisonOperation(BinaryExpression b)
@@ -194,7 +196,7 @@ namespace ElasticLinq.Request.Visitors
             if (final != null)
             {
                 var fieldName = mapping.GetFieldName(final.Member);
-                sortOptions.Add(new SortOption(fieldName, ascending));
+                sortOptions.Insert(0, new SortOption(fieldName, ascending));
             }
 
             return Visit(source);

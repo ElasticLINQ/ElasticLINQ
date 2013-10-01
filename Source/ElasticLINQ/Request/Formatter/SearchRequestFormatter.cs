@@ -3,7 +3,6 @@
 
 using System;
 using System.Globalization;
-using System.IO;
 
 namespace ElasticLinq.Request.Formatter
 {
@@ -12,7 +11,7 @@ namespace ElasticLinq.Request.Formatter
         internal static SearchRequestFormatter Create(ElasticConnection connection,
             ElasticSearchRequest searchRequest)
         {
-            var requiresPostBody = searchRequest.QueryCriteria.Count > 1;
+            var requiresPostBody = searchRequest.TermCriteria.Count > 1;
             var useGet = connection.PreferGetRequests && !requiresPostBody;
 
             return useGet

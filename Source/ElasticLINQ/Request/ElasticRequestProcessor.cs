@@ -37,19 +37,26 @@ namespace ElasticLinq.Request
         private HttpRequestMessage CreateRequestMessage(ElasticSearchRequest searchRequest)
         {
             var formatter = SearchRequestFormatter.Create(connection, searchRequest);
-
             var postFormatter = formatter as PostBodySearchRequestFormatter;
-            var requestMessage = new HttpRequestMessage(postFormatter != null ? HttpMethod.Post : HttpMethod.Get, formatter.Uri);
-            if (postFormatter != null)
-                requestMessage.Content = new StringContent(postFormatter.Body);
-            return requestMessage;
+            var isPost = postFormatter != null;
+
+            var message = new HttpRequestMessage(isPost ? HttpMethod.Post : HttpMethod.Get, formatter.Uri);
+            log.WriteLine("Request " + message.Method + " " + message.RequestUri);
+
+            if (isPost)
+            {
+                var body = postFormatter.Body;
+                message.Content = new StringContent(body);
+                log.WriteLine("Body\n" + body);
+            }
+
+            return message;
         }
 
         private async Task<HttpResponseMessage> SendRequest(HttpRequestMessage requestMessage)
         {
             using (var httpClient = new HttpClient { Timeout = connection.Timeout })
             {
-                log.WriteLine("Request " + requestMessage.Method + " " + requestMessage.RequestUri);
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
                 var response = await httpClient.SendAsync(requestMessage);

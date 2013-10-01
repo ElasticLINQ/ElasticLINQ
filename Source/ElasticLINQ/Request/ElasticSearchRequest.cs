@@ -16,17 +16,17 @@ namespace ElasticLinq.Request
         private readonly int? take;
         private readonly List<string> fields;
         private readonly List<SortOption> sortOptions;
-        private readonly Dictionary<string, string> queryCriteria;
+        private readonly Dictionary<string, IReadOnlyList<object>> termCriteria;
 
         public ElasticSearchRequest(string type, int skip, int? take, List<string> fields,
-            List<SortOption> sortOptions, Dictionary<string, string> queryCriteria)
+            List<SortOption> sortOptions, Dictionary<string, IReadOnlyList<object>> termCriteria)
         {
             this.type = type;
             this.skip = skip;
             this.take = take;
             this.fields = fields;
             this.sortOptions = sortOptions;
-            this.queryCriteria = queryCriteria;
+            this.termCriteria = termCriteria;
         }
 
         public long Skip { get { return skip; } }
@@ -43,9 +43,9 @@ namespace ElasticLinq.Request
             get { return sortOptions.AsReadOnly(); }
         }
 
-        public IReadOnlyDictionary<string, string> QueryCriteria
+        public IReadOnlyDictionary<string, IReadOnlyList<object>> TermCriteria
         {
-            get { return new ReadOnlyDictionary<string, string>(queryCriteria); }
+            get { return new ReadOnlyDictionary<string, IReadOnlyList<object>>(termCriteria); }
         }
     }
 
@@ -62,20 +62,5 @@ namespace ElasticLinq.Request
 
         public string Name { get { return name; } }
         public bool Ascending { get { return ascending; } }
-    }
-
-    internal class QueryCriterion
-    {
-        private readonly string comparison;
-        private readonly object value;
-
-        public QueryCriterion(string comparison, object value)
-        {
-            this.comparison = comparison;
-            this.value = value;
-        }
-
-        public string Comparison { get { return comparison; } }
-        public object Value { get { return value; } }
     }
 }

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // This source code is made available under the terms of the Microsoft Public License (MS-PL)
 
-using System.IO;
 using ElasticLinq.Utility;
 using System;
 using System.Collections.Generic;
@@ -27,10 +26,10 @@ namespace ElasticLinq.Request.Formatter
             if (searchRequest.Fields.Any())
                 yield return KeyValuePair.Create("fields", string.Join(",", searchRequest.Fields));
 
-            foreach (var queryCriteria in searchRequest.QueryCriteria)
-                yield return KeyValuePair.Create("q", queryCriteria.Key + ":" + queryCriteria.Value);
+            foreach (var queryCriteria in searchRequest.TermCriteria)
+                yield return KeyValuePair.Create("q", queryCriteria.Key + ":" + String.Join(" ", queryCriteria.Value));
 
-            foreach (var sortOption in searchRequest.SortOptions)
+            foreach (var sortOption in searchRequest.SortOptions.Reverse()) // ElasticSearch likes them in reverse on GET
                 yield return KeyValuePair.Create("sort", sortOption.Name + (sortOption.Ascending ? "" : ":desc"));
 
             if (searchRequest.Skip > 0)
