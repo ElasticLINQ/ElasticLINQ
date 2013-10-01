@@ -15,12 +15,14 @@ namespace ElasticLINQ.Test
             var expectedEndpoint = new Uri("http://localhost:1234/abc");
             var expectedTimeout = TimeSpan.FromSeconds(19.2);
             const string expectedIndex = "myIndex";
+            const bool expectedPreferGetRequests = true;
 
-            var connection = new ElasticConnection(expectedEndpoint, expectedTimeout, expectedIndex);
+            var connection = new ElasticConnection(expectedEndpoint, expectedTimeout, expectedIndex, expectedPreferGetRequests);
 
             Assert.Equal(expectedEndpoint, connection.Endpoint);
             Assert.Equal(expectedTimeout, connection.Timeout);
             Assert.Equal(expectedIndex, connection.Index);
+            Assert.Equal(expectedPreferGetRequests, connection.PreferGetRequests);
         }
     }
 }

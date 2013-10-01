@@ -42,6 +42,9 @@
     <Compile Include="ElasticConnection.cs" />
     <Compile Include="ElasticQuery.cs" />
     <Compile Include="ElasticQueryProvider.cs" />
+    <Compile Include="Request\Formatter\PostBodySearchRequestFormatter.cs" />
+    <Compile Include="Request\Formatter\GetQuerySearchRequestFormatter.cs" />
+    <Compile Include="Request\Formatter\SearchRequestFormatter.cs" />
     <Compile Include="Request\Visitors\ElasticQueryTranslator.cs" />
     <Compile Include="IQToolkit\PartialEvaluator.cs" />
     <Compile Include="IQToolkit\Query.cs" />

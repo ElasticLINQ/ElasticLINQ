@@ -24,13 +24,12 @@ namespace ElasticLinq.Request.Visitors
 
         private readonly ParameterExpression parameter;
         private readonly IElasticMapping mapping;
-        private readonly Projection projection;
+        private readonly Projection projection = new Projection();
 
         public ProjectionVisitor(ParameterExpression parameter, IElasticMapping mapping)
         {
             this.parameter = parameter;
             this.mapping = mapping;
-            projection = new Projection();
         }
 
         internal Projection ProjectColumns(Expression selector)

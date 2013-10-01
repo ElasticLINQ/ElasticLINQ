@@ -1,13 +1,13 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // This source code is made available under the terms of the Microsoft Public License (MS-PL)
 
-using System.Reflection;
 using ElasticLinq.Mapping;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace ElasticLinq.Request.Visitors
 {
@@ -18,7 +18,7 @@ namespace ElasticLinq.Request.Visitors
     }
 
     /// <summary>
-    /// Expression visitor to translate a query into ElasticSearch.
+    /// Expression visitor to translate a LINQ query into ElasticSearch request.
     /// </summary>
     internal class ElasticQueryTranslator : ExpressionVisitor
     {

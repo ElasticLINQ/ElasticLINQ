@@ -3,6 +3,7 @@
 
 using ElasticLinq.Mapping;
 using ElasticLinq.Request;
+using ElasticLinq.Request.Formatter;
 using ElasticLinq.Request.Visitors;
 using ElasticLinq.Response;
 using ElasticLinq.Utility;
@@ -34,7 +35,8 @@ namespace ElasticLinq
         public string GetQueryText(Expression expression)
         {
             var translateResult = Translate(expression);
-            return ElasticRequestProcessor.BuildSearchUri(translateResult.SearchRequest, connection).ToString();
+            var formatter = SearchRequestFormatter.Create(connection, translateResult.SearchRequest);
+            return formatter.Uri.ToString();
         }
 
         IQueryable<T> IQueryProvider.CreateQuery<T>(Expression expression)
