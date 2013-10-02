@@ -1,11 +1,10 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // This source code is made available under the terms of the Microsoft Public License (MS-PL)
 
-using System;
-using System.Linq;
 using ElasticLinq;
 using ElasticLinq.Mapping;
-using IQToolkit;
+using System;
+using System.Linq;
 
 namespace TestConsoleApp
 {
