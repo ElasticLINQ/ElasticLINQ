@@ -19,7 +19,7 @@ namespace ElasticLinq
     /// <summary>
     /// Query provider implementation for ElasticSearch.
     /// </summary>
-    public sealed class ElasticQueryProvider : IQueryProvider, IQueryText
+    public sealed class ElasticQueryProvider : IQueryProvider
     {
         private readonly ElasticConnection connection;
         private readonly IElasticMapping mapping;
@@ -28,47 +28,61 @@ namespace ElasticLinq
 
         public ElasticQueryProvider(ElasticConnection connection, IElasticMapping mapping)
         {
+            if (connection == null)
+                throw new ArgumentNullException("connection");
+
+            if (mapping == null)
+                throw new ArgumentNullException("mapping");
+
             this.connection = connection;
             this.mapping = mapping;
         }
 
-        public string GetQueryText(Expression expression)
+        public IQueryable<T> CreateQuery<T>(Expression expression)
         {
-            var translateResult = Translate(expression);
-            var formatter = RequestFormatter.Create(connection, translateResult.SearchRequest);
-            return formatter.Uri.ToString();
-        }
+           if (expression == null)
+                throw new ArgumentNullException("expression");
 
-        IQueryable<T> IQueryProvider.CreateQuery<T>(Expression expression)
-        {
+            if (!typeof(IQueryable<T>).IsAssignableFrom(expression.Type))
+                throw new ArgumentOutOfRangeException("expression");                
+
             return new ElasticQuery<T>(this, expression);
         }
 
-        IQueryable IQueryProvider.CreateQuery(Expression expression)
+        public IQueryable CreateQuery(Expression expression)
         {
+            if (expression == null)
+                throw new ArgumentNullException("expression");
+
             var elementType = TypeHelper.GetElementType(expression.Type);
             var queryType = typeof(ElasticQuery<>).MakeGenericType(elementType);
             try
             {
                 return (IQueryable)Activator.CreateInstance(queryType, new object[] { this, expression });
             }
-            catch (TargetInvocationException tie)
+            catch (TargetInvocationException ex)
             {
-                throw tie.InnerException;
+                throw ex.InnerException;
             }
         }
 
-        T IQueryProvider.Execute<T>(Expression expression)
+        public TResult Execute<TResult>(Expression expression)
         {
-            return (T)Execute(expression);
+            if (expression == null)
+                throw new ArgumentNullException("expression");
+
+            return (TResult)ExecuteInternal(expression);
         }
 
-        object IQueryProvider.Execute(Expression expression)
+        public object Execute(Expression expression)
         {
-            return Execute(expression);
+            if (expression == null)
+                throw new ArgumentNullException("expression");
+
+            return ExecuteInternal(expression);
         }
 
-        private object Execute(Expression expression)
+        private object ExecuteInternal(Expression expression)
         {
             var translateResult = Translate(expression);
             var elementType = TypeHelper.GetElementType(expression.Type);

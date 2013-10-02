@@ -24,7 +24,7 @@ namespace TestConsoleApp
             var connection = new ElasticConnection(new Uri("http://192.168.2.7:9200"), TimeSpan.FromSeconds(10), preferGetRequests: false);
             var elasticProvider = new ElasticQueryProvider(connection, new TrivialElasticMapping()) { Log = Console.Out };
 
-            var query = new Query<Movie>(elasticProvider)
+            var query = new ElasticQuery<Movie>(elasticProvider)
                 .Where(m => m.Year == "1962" || m.Year == "2007")
                 .Skip(1)
                 .Take(3)
