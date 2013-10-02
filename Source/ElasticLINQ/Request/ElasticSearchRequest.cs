@@ -12,25 +12,25 @@ namespace ElasticLinq.Request
     internal class ElasticSearchRequest
     {
         private readonly string type;
-        private readonly int skip;
-        private readonly int? take;
+        private readonly int @from;
+        private readonly int? size;
         private readonly List<string> fields;
         private readonly List<SortOption> sortOptions;
         private readonly Dictionary<string, IReadOnlyList<object>> termCriteria;
 
-        public ElasticSearchRequest(string type, int skip, int? take, List<string> fields,
-            List<SortOption> sortOptions, Dictionary<string, IReadOnlyList<object>> termCriteria)
+        public ElasticSearchRequest(string type, int @from = 0, int? size = null, List<string> fields = null,
+            List<SortOption> sortOptions = null, Dictionary<string, IReadOnlyList<object>> termCriteria = null)
         {
             this.type = type;
-            this.skip = skip;
-            this.take = take;
-            this.fields = fields;
-            this.sortOptions = sortOptions;
-            this.termCriteria = termCriteria;
+            this.@from = @from;
+            this.size = size;
+            this.fields = fields ?? new List<string>();
+            this.sortOptions = sortOptions ?? new List<SortOption>();
+            this.termCriteria = termCriteria ?? new Dictionary<string, IReadOnlyList<object>>();
         }
 
-        public long Skip { get { return skip; } }
-        public long? Take { get { return take; } }
+        public long @From { get { return @from; } }
+        public long? Size { get { return size; } }
         public string Type { get { return type; } }
 
         public IReadOnlyList<string> Fields

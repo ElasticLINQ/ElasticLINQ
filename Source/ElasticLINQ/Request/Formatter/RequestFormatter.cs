@@ -6,23 +6,23 @@ using System.Globalization;
 
 namespace ElasticLinq.Request.Formatter
 {
-    internal abstract class SearchRequestFormatter
+    internal abstract class RequestFormatter
     {
-        internal static SearchRequestFormatter Create(ElasticConnection connection,
+        internal static RequestFormatter Create(ElasticConnection connection,
             ElasticSearchRequest searchRequest)
         {
             var requiresPostBody = searchRequest.TermCriteria.Count > 1;
             var useGet = connection.PreferGetRequests && !requiresPostBody;
 
             return useGet
-                ? (SearchRequestFormatter) new GetQuerySearchRequestFormatter(connection, searchRequest)
-                : new PostBodySearchRequestFormatter(connection, searchRequest);
+                ? (RequestFormatter) new GetQueryRequestFormatter(connection, searchRequest)
+                : new PostBodyRequestFormatter(connection, searchRequest);
         }
 
         protected readonly ElasticConnection Connection;
         protected readonly ElasticSearchRequest SearchRequest;
 
-        protected SearchRequestFormatter(ElasticConnection connection, ElasticSearchRequest searchRequest)
+        protected RequestFormatter(ElasticConnection connection, ElasticSearchRequest searchRequest)
         {
             Connection = connection;
             SearchRequest = searchRequest;
@@ -50,12 +50,6 @@ namespace ElasticLinq.Request.Formatter
             CompleteSearchUri(builder);
 
             return builder.Uri;
-        }
-
-        internal static string FormatValue(object value)
-        {
-            // TODO: Look at date, time, decimal formatting etc.
-            return value.ToString();
         }
 
         internal static string Format(TimeSpan timeSpan)

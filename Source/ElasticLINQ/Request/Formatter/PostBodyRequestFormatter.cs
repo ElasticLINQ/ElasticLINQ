@@ -1,15 +1,15 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // This source code is made available under the terms of the Microsoft Public License (MS-PL)
 
-using System.Linq;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Linq;
 
 namespace ElasticLinq.Request.Formatter
 {
-    internal class PostBodySearchRequestFormatter : SearchRequestFormatter
+    internal class PostBodyRequestFormatter : RequestFormatter
     {
-        public PostBodySearchRequestFormatter(ElasticConnection connection, ElasticSearchRequest searchRequest)
+        public PostBodyRequestFormatter(ElasticConnection connection, ElasticSearchRequest searchRequest)
             : base(connection, searchRequest)
         {
         }
@@ -45,11 +45,11 @@ namespace ElasticLinq.Request.Formatter
                         .Select(o => o.Ascending ? (object) o.Name : new JObject(new JProperty(o.Name, "desc")))
                         .ToArray()));
 
-            if (SearchRequest.Skip > 0)
-                root.Add("from", SearchRequest.Skip);
+            if (SearchRequest.From > 0)
+                root.Add("from", SearchRequest.From);
 
-            if (SearchRequest.Take.HasValue)
-                root.Add("size", SearchRequest.Take.Value);
+            if (SearchRequest.Size.HasValue)
+                root.Add("size", SearchRequest.Size.Value);
 
             root.Add("timeout", Format(Connection.Timeout));
 

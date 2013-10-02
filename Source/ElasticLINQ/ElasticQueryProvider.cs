@@ -35,7 +35,7 @@ namespace ElasticLinq
         public string GetQueryText(Expression expression)
         {
             var translateResult = Translate(expression);
-            var formatter = SearchRequestFormatter.Create(connection, translateResult.SearchRequest);
+            var formatter = RequestFormatter.Create(connection, translateResult.SearchRequest);
             return formatter.Uri.ToString();
         }
 

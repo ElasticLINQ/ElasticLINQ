@@ -9,9 +9,9 @@ using System.Linq;
 
 namespace ElasticLinq.Request.Formatter
 {
-    internal class GetQuerySearchRequestFormatter : SearchRequestFormatter
+    internal class GetQueryRequestFormatter : RequestFormatter
     {
-        public GetQuerySearchRequestFormatter(ElasticConnection connection, ElasticSearchRequest searchRequest)
+        public GetQueryRequestFormatter(ElasticConnection connection, ElasticSearchRequest searchRequest)
             : base(connection, searchRequest)
         {
         }
@@ -32,11 +32,11 @@ namespace ElasticLinq.Request.Formatter
             foreach (var sortOption in searchRequest.SortOptions.Reverse()) // ElasticSearch likes them in reverse on GET
                 yield return KeyValuePair.Create("sort", sortOption.Name + (sortOption.Ascending ? "" : ":desc"));
 
-            if (searchRequest.Skip > 0)
-                yield return KeyValuePair.Create("from", searchRequest.Skip.ToString(CultureInfo.InvariantCulture));
+            if (searchRequest.From > 0)
+                yield return KeyValuePair.Create("from", searchRequest.From.ToString(CultureInfo.InvariantCulture));
 
-            if (searchRequest.Take.HasValue)
-                yield return KeyValuePair.Create("size", searchRequest.Take.Value.ToString(CultureInfo.InvariantCulture));
+            if (searchRequest.Size.HasValue)
+                yield return KeyValuePair.Create("size", searchRequest.Size.Value.ToString(CultureInfo.InvariantCulture));
 
             yield return KeyValuePair.Create("timeout", Format(connection.Timeout));
         }

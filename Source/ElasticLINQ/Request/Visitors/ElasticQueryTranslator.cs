@@ -52,11 +52,11 @@ namespace ElasticLinq.Request.Visitors
                         if (m.Arguments.Count == 2)
                             return VisitWhere(m.Arguments[0], m.Arguments[1]);
                         break;
-                    case "Skip":
+                    case "from":
                         if (m.Arguments.Count == 2)
                             return VisitSkip(m.Arguments[0], m.Arguments[1]);
                         break;
-                    case "Take":
+                    case "size":
                         if (m.Arguments.Count == 2)
                             return VisitTake(m.Arguments[0], m.Arguments[1]);
                         break;

@@ -1,0 +1,126 @@
+﻿// Copyright (c) Tier 3 Inc. All rights reserved.
+// This source code is made available under the terms of the Microsoft Public License (MS-PL)
+
+using ElasticLinq;
+using ElasticLinq.Request;
+using ElasticLinq.Request.Formatter;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Xunit;
+
+namespace ElasticLINQ.Test.Request.Formatter
+{
+    public class PostBodyRequestFormatterTests
+    {
+        private static readonly ElasticConnection defaultConnection = new ElasticConnection(new Uri("http://a.b.com:9000/"), TimeSpan.FromSeconds(10));
+
+        [Fact]
+        public void UrlPathContainsTypeSpecifier()
+        {
+            var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest("type1"));
+
+            Assert.Contains("type1", formatter.Uri.AbsolutePath);
+        }
+
+        [Fact]
+        public void BodyIsJsonFormattedResponse()
+        {
+            var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest("type1"));
+
+            Assert.DoesNotThrow(() => JObject.Parse(formatter.Body));
+        }
+
+        [Fact]
+        public void BodyContainsFilterTerms()
+        {
+            var desiredTerms = new Dictionary<string, IReadOnlyList<object>> { { "term1", new[] { "criteria1" }.ToList().AsReadOnly() } };
+
+            var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest("type1", termCriteria: desiredTerms));
+            var body = JObject.Parse(formatter.Body);
+
+            var result = TraverseWithAssert(body, "filter", "terms");
+            foreach (var term in desiredTerms)
+            {
+                var actualTerms = TraverseWithAssert(result, term.Key);
+                foreach (var criteria in term.Value)
+                    Assert.Contains(criteria, actualTerms.Select(t => t.ToString()).ToArray());
+            }
+        }
+
+        [Fact]
+        public void BodyContainsSortOptions()
+        {
+            var desiredSortOptions = new List<SortOption> { new SortOption("first", true), new SortOption("second", false) };
+
+            var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest("type1", sortOptions: desiredSortOptions));
+            var body = JObject.Parse(formatter.Body);
+
+            var result = TraverseWithAssert(body, "sort");
+            for (var i = 0; i < desiredSortOptions.Count; i++)
+            {
+                var actualSort = result[i];
+                var desiredSort = desiredSortOptions[i];
+                if (desiredSort.Ascending)
+                {
+                    Assert.Equal(actualSort, desiredSort.Name);
+                }
+                else
+                {
+                    var finalActualSort = actualSort[desiredSort.Name];
+                    Assert.NotNull(finalActualSort);
+                    Assert.Equal("desc", finalActualSort.ToString());
+                }
+            }
+        }
+
+        [Fact]
+        public void BodyContainsFieldSelections()
+        {
+            var desiredFields = new List<string> { "first", "second", "third" };
+
+            var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest("type1", fields: desiredFields));
+            var body = JObject.Parse(formatter.Body);
+
+            var result = TraverseWithAssert(body, "fields");
+            foreach (var field in desiredFields)
+                Assert.Contains(field, result);
+        }
+
+        [Fact]
+        public void BodyContainsFromWhenSpecified()
+        {
+            const int expectedFrom = 1024;
+
+            var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest("type1", from: expectedFrom));
+            var body = JObject.Parse(formatter.Body);
+
+            var result = TraverseWithAssert(body, "from");
+            Assert.Equal(expectedFrom, result);
+        }
+
+        [Fact]
+        public void BodyContainsSizeWhenSpecified()
+        {
+            const int expectedSize = 4096;
+
+            var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest("type1", size: expectedSize));
+            var body = JObject.Parse(formatter.Body);
+
+            var result = TraverseWithAssert(body, "size");
+            Assert.Equal(expectedSize, result);
+        }
+
+        private static JToken TraverseWithAssert(JToken token, params string[] paths)
+        {
+            foreach (var path in paths)
+            {
+                Assert.NotNull(token);
+                token = token[path];
+            }
+
+            return token;
+        }
+    }
+}

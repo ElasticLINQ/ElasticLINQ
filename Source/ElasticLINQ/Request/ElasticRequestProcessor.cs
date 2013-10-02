@@ -36,8 +36,8 @@ namespace ElasticLinq.Request
 
         private HttpRequestMessage CreateRequestMessage(ElasticSearchRequest searchRequest)
         {
-            var formatter = SearchRequestFormatter.Create(connection, searchRequest);
-            var postFormatter = formatter as PostBodySearchRequestFormatter;
+            var formatter = RequestFormatter.Create(connection, searchRequest);
+            var postFormatter = formatter as PostBodyRequestFormatter;
             var isPost = postFormatter != null;
 
             var message = new HttpRequestMessage(isPost ? HttpMethod.Post : HttpMethod.Get, formatter.Uri);

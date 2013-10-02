@@ -17,7 +17,7 @@ namespace ElasticLINQ.Test.Utility
         }
 
         [Fact]
-        public void KeyValuePairCreateProducesCorrectValues()
+        public void KeyValuePairCreateSetsCorrectValues()
         {
             const decimal expectedDecimal = 42.0m; 
             const string expectedString = "Deep Thought";
