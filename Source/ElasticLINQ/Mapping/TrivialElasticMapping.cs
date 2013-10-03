@@ -13,16 +13,25 @@ namespace ElasticLinq.Mapping
     {
         public string GetFieldName(MemberInfo memberInfo)
         {
-            return memberInfo.Name.ToLowerInvariant();
+            return MakeCamelCase(memberInfo.Name);
         }
 
         public string GetTypeName(Type type)
         {
-            // TODO: Implement better pluralizer
-            var lowered = type.Name.ToLower();
-            if (!lowered.EndsWith("s"))
-                lowered += "s";
-            return lowered;
+            return Plualize(MakeCamelCase(type.Name));
+        }
+
+        private static string MakeCamelCase(string value)
+        {
+            if (value.Length < 2) // Don't camelcase or pluralize 1 letter
+                return value.ToLower();
+
+            return value.Substring(0, 1).ToLower() + value.Substring(1);
+        }
+
+        private static string Plualize(string value)
+        {
+            return value + (value.EndsWith("s") ? "" : "s");            
         }
     }
 }
