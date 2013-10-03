@@ -29,7 +29,7 @@ namespace TestConsoleApp
                 .Skip(1)
                 .Take(i + 1)
                 .OrderByDescending(o => o.Year)
-                .ThenBy(o => o.Title)
+                .ThenByScore()
                 .Select(a => new Tuple<string, string, string>(a.Title, a.Title, a.Year));
 
             DumpQuery(query);

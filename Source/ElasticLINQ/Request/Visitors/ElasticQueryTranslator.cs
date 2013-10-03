@@ -41,39 +41,63 @@ namespace ElasticLinq.Request.Visitors
         protected override Expression VisitMethodCall(MethodCallExpression m)
         {
             if (m.Method.DeclaringType == typeof(Queryable))
+                return VisitQueryableMethodCall(m);
+
+            if (m.Method.DeclaringType == typeof(ElasticQueryExtensions))
+                return VisitElasticMethodCall(m);
+
+            throw new NotSupportedException(string.Format("The method '{0}' is not supported", m.Method.Name));
+        }
+
+        internal Expression VisitElasticMethodCall(MethodCallExpression m)
+        {
+            switch (m.Method.Name)
             {
-                switch (m.Method.Name)
-                {
-                    case "Select":
-                        if (m.Arguments.Count == 2)
-                            return VisitSelect(m.Arguments[0], m.Arguments[1]);
-                        break;
-                    case "Where":
-                        if (m.Arguments.Count == 2)
-                            return VisitWhere(m.Arguments[0], m.Arguments[1]);
-                        break;
-                    case "Skip":
-                        if (m.Arguments.Count == 2)
-                            return VisitSkip(m.Arguments[0], m.Arguments[1]);
-                        break;
-                    case "Take":
-                        if (m.Arguments.Count == 2)
-                            return VisitTake(m.Arguments[0], m.Arguments[1]);
-                        break;
-                    case "OrderBy":
-                    case "OrderByDescending":
-                        if (m.Arguments.Count == 2)
-                            return VisitOrderBy(m.Arguments[0], m.Arguments[1], m.Method.Name == "OrderBy");
-                        break;
-                    case "ThenBy":
-                    case "ThenByDescending":
-                        if (m.Arguments.Count == 2)
-                            return VisitOrderBy(m.Arguments[0], m.Arguments[1], m.Method.Name == "ThenBy");
-                        break;
-                }
+                case "OrderByScore":
+                case "OrderByScoreDescending":
+                case "ThenByScore":
+                case "ThenByScoreDecending":
+                    if (m.Arguments.Count == 1)
+                        return VisitOrderByScore(m.Arguments[0], !m.Method.Name.EndsWith("Descending"));
+                    break;
             }
 
             throw new NotSupportedException(string.Format("The method '{0}' is not supported", m.Method.Name));
+        }
+
+        internal Expression VisitQueryableMethodCall(MethodCallExpression m)
+        {
+            switch (m.Method.Name)
+            {
+                case "Select":
+                    if (m.Arguments.Count == 2)
+                        return VisitSelect(m.Arguments[0], m.Arguments[1]);
+                    break;
+                case "Where":
+                    if (m.Arguments.Count == 2)
+                        return VisitWhere(m.Arguments[0], m.Arguments[1]);
+                    break;
+                case "Skip":
+                    if (m.Arguments.Count == 2)
+                        return VisitSkip(m.Arguments[0], m.Arguments[1]);
+                    break;
+                case "Take":
+                    if (m.Arguments.Count == 2)
+                        return VisitTake(m.Arguments[0], m.Arguments[1]);
+                    break;
+                case "OrderBy":
+                case "OrderByDescending":
+                    if (m.Arguments.Count == 2)
+                        return VisitOrderBy(m.Arguments[0], m.Arguments[1], m.Method.Name == "OrderBy");
+                    break;
+                case "ThenBy":
+                case "ThenByDescending":
+                    if (m.Arguments.Count == 2)
+                        return VisitOrderBy(m.Arguments[0], m.Arguments[1], m.Method.Name == "ThenBy");
+                    break;
+            }
+
+            throw new NotSupportedException(string.Format("The method '{0}' of Queryable is not supported", m.Method.Name));
         }
 
         protected override Expression VisitConstant(ConstantExpression c)
@@ -123,7 +147,7 @@ namespace ElasticLinq.Request.Visitors
 
         private bool inWhereCondition;
         private readonly Stack<MemberInfo> whereMemberInfos = new Stack<MemberInfo>();
-        private readonly Stack<ConstantExpression> whereConstants = new Stack<ConstantExpression>(); 
+        private readonly Stack<ConstantExpression> whereConstants = new Stack<ConstantExpression>();
 
         private Expression VisitWhere(Expression source, Expression predicate)
         {
@@ -156,8 +180,7 @@ namespace ElasticLinq.Request.Visitors
             IReadOnlyList<object> existingCriteria;
             termCriteria.TryGetValue(fieldName, out existingCriteria);
 
-            termCriteria[fieldName] = new List<object>(existingCriteria ?? Enumerable.Empty<object>())
-                { value.Value }
+            termCriteria[fieldName] = new List<object>(existingCriteria ?? Enumerable.Empty<object>()) { value.Value }
                 .AsReadOnly();
         }
 
@@ -199,6 +222,12 @@ namespace ElasticLinq.Request.Visitors
                 sortOptions.Insert(0, new SortOption(fieldName, ascending));
             }
 
+            return Visit(source);
+        }
+
+        private Expression VisitOrderByScore(Expression source, bool ascending)
+        {
+            sortOptions.Insert(0, new SortOption("_score", ascending));
             return Visit(source);
         }
 
