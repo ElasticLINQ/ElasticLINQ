@@ -3,11 +3,9 @@
 
 using ElasticLinq.Mapping;
 using ElasticLinq.Request;
-using ElasticLinq.Request.Formatter;
 using ElasticLinq.Request.Visitors;
 using ElasticLinq.Response;
 using ElasticLinq.Utility;
-using IQToolkit;
 using System;
 using System.IO;
 using System.Linq;
@@ -54,7 +52,7 @@ namespace ElasticLinq
             if (expression == null)
                 throw new ArgumentNullException("expression");
 
-            var elementType = TypeHelper.GetElementType(expression.Type);
+            var elementType = TypeHelper.GetSequenceElementType(expression.Type);
             var queryType = typeof(ElasticQuery<>).MakeGenericType(elementType);
             try
             {
@@ -85,7 +83,7 @@ namespace ElasticLinq
         private object ExecuteInternal(Expression expression)
         {
             var translateResult = Translate(expression);
-            var elementType = TypeHelper.GetElementType(expression.Type);
+            var elementType = TypeHelper.GetSequenceElementType(expression.Type);
 
             var log = Log ?? new NullTextWriter();
             log.WriteLine("Type is " + elementType);
@@ -99,7 +97,6 @@ namespace ElasticLinq
 
         private ElasticTranslateResult Translate(Expression expression)
         {
-            expression = PartialEvaluator.Eval(expression, exp => PartialEvaluator.CanBeEvaluatedLocally(exp, this));
             return new ElasticQueryTranslator(mapping).Translate(expression);
         }
     }

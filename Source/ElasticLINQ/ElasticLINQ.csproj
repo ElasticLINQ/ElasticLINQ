@@ -46,8 +46,7 @@
     <Compile Include="Request\Formatter\GetQueryRequestFormatter.cs" />
     <Compile Include="Request\Formatter\RequestFormatter.cs" />
     <Compile Include="Request\Visitors\ElasticQueryTranslator.cs" />
-    <Compile Include="IQToolkit\PartialEvaluator.cs" />
-    <Compile Include="IQToolkit\TypeHelper.cs" />
+    <Compile Include="Utility\TypeHelper.cs" />
     <Compile Include="Mapping\IElasticMapping.cs" />
     <Compile Include="Mapping\TrivialElasticMapping.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

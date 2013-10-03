@@ -23,10 +23,11 @@ namespace TestConsoleApp
             var connection = new ElasticConnection(new Uri("http://192.168.2.7:9200"), TimeSpan.FromSeconds(10), preferGetRequests: false);
             var elasticProvider = new ElasticQueryProvider(connection, new TrivialElasticMapping()) { Log = Console.Out };
 
+            var i = 7;
             var query = new ElasticQuery<Movie>(elasticProvider)
                 .Where(m => m.Year == "1962" || m.Year == "2007")
                 .Skip(1)
-                .Take(3)
+                .Take(i + 1)
                 .OrderByDescending(o => o.Year)
                 .ThenBy(o => o.Title)
                 .Select(a => new Tuple<string, string, string>(a.Title, a.Title, a.Year));
