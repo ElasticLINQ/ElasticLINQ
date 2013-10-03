@@ -216,7 +216,7 @@ namespace ElasticLinq.Request.Visitors
 
         private void VisitSelectNew(Expression selectBody)
         {
-            projection = new ProjectionVisitor(projectParameter, mapping).ProjectColumns(selectBody);
+            projection = ProjectionVisitor.ProjectColumns(projectParameter, mapping, selectBody);
         }
 
         private Expression VisitSkip(Expression source, Expression skipExpression)

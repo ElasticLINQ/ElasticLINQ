@@ -26,16 +26,17 @@ namespace ElasticLinq.Request.Visitors
         private readonly IElasticMapping mapping;
         private readonly Projection projection = new Projection();
 
-        public ProjectionVisitor(ParameterExpression parameter, IElasticMapping mapping)
+        private ProjectionVisitor(ParameterExpression parameter, IElasticMapping mapping)
         {
             this.parameter = parameter;
             this.mapping = mapping;
         }
 
-        internal Projection ProjectColumns(Expression selector)
+        internal static Projection ProjectColumns(ParameterExpression parameter, IElasticMapping mapping, Expression selector)
         {
-            projection.Selector = Visit(selector);
-            return projection;
+            var projectionVisitor = new ProjectionVisitor(parameter, mapping);
+            projectionVisitor.projection.Selector = projectionVisitor.Visit(selector);
+            return projectionVisitor.projection;
         }
 
         protected override Expression VisitMember(MemberExpression m)
