@@ -68,7 +68,8 @@ namespace ElasticLinq.Request.Formatter
 
         private JObject BuildTermsFilter(TermFilter filter)
         {
-            return new JObject(new JProperty(filter.Name, new JObject(new JProperty(filter.Field, new JArray(filter.Values.ToArray())))));
+            var value = filter.Values.Count == 1 ? filter.Values[0] : new JArray(filter.Values.ToArray());
+            return new JObject(new JProperty(filter.Name, new JObject(new JProperty(filter.Field, value))));
         }
 
         private JObject BuildCompoundFilter(CompoundFilter filter)

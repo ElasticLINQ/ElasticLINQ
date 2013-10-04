@@ -98,15 +98,20 @@ namespace ElasticLinq.Request
         }
 
         public OrFilter(IEnumerable<Filter> filters)
-            : base ("or", filters)
+            : this(filters.ToArray())
         {            
         }
     }
 
     internal class AndFilter : CompoundFilter
     {
-        public AndFilter(IEnumerable<Filter> filters)
+        public AndFilter(params Filter[] filters)
             : base("and", filters)
+        {
+        }
+
+        public AndFilter(IEnumerable<Filter> filters)
+            : this(filters.ToArray())
         {            
         }
     }

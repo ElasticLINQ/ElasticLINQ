@@ -190,12 +190,26 @@ namespace ElasticLinq.Request.Visitors
                 case ExpressionType.OrElse:
                     return VisitOrElse(b);
 
+                case ExpressionType.AndAlso:
+                    return VisitAndAlso(b);
+
                 case ExpressionType.Equal:
                     return VisitComparisonBinary(b);
 
                 default:
                     throw new NotImplementedException(String.Format("Don't yet know {0}", b.NodeType));
             }
+        }
+
+        private Expression VisitAndAlso(BinaryExpression b)
+        {
+            var left = Visit(b.Left) as FilterExpression;
+            var right = Visit(b.Right) as FilterExpression;
+
+            if (left == null || right == null)
+                throw new NotImplementedException("Unknown binary expressions");
+
+            return filterExpression = new FilterExpression(new AndFilter(left.Filter, right.Filter));
         }
 
         private Expression VisitOrElse(BinaryExpression b)
@@ -223,7 +237,10 @@ namespace ElasticLinq.Request.Visitors
                         if (haveMemberAndConstant)
                         {
                             var field = mapping.GetFieldName(whereMemberInfos.Pop());
-                            return new FilterExpression(new TermFilter(field, whereConstants.Pop().Value));
+                            var expression = new FilterExpression(new TermFilter(field, whereConstants.Pop().Value));
+                            if (filterExpression == null)
+                                filterExpression = expression;
+                            return expression;
                         }
                         break;
                     }
