@@ -43,6 +43,7 @@
     <Compile Include="ElasticQuery.cs" />
     <Compile Include="ElasticQueryExtensions.cs" />
     <Compile Include="ElasticQueryProvider.cs" />
+    <Compile Include="Request\Filters.cs" />
     <Compile Include="Request\Formatter\PostBodyRequestFormatter.cs" />
     <Compile Include="Request\Formatter\GetQueryRequestFormatter.cs" />
     <Compile Include="Request\Formatter\RequestFormatter.cs" />

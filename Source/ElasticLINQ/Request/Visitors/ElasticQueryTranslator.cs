@@ -31,11 +31,28 @@ namespace ElasticLinq.Request.Visitors
         private int? take;
         private readonly List<string> fields = new List<string>();
         private readonly List<SortOption> sortOptions = new List<SortOption>();
-        private readonly Dictionary<string, IReadOnlyList<object>> termCriteria = new Dictionary<string, IReadOnlyList<object>>();
+
+        private readonly Stack<Filter> filters = new Stack<Filter>();
 
         public ElasticQueryTranslator(IElasticMapping mapping)
         {
             this.mapping = mapping;
+        }
+
+        internal ElasticTranslateResult Translate(Expression e)
+        {
+            projectParameter = Expression.Parameter(typeof(JObject), "row");
+
+            Visit(e);
+
+            if (projection != null)
+                fields.AddRange(projection.Fields);
+
+            return new ElasticTranslateResult
+            {
+                SearchRequest = new ElasticSearchRequest(type, skip, take, fields, sortOptions, filters.FirstOrDefault()),
+                Projector = projection != null ? Expression.Lambda(projection.Selector, projectParameter) : null
+            };
         }
 
         protected override Expression VisitMethodCall(MethodCallExpression m)
@@ -122,22 +139,6 @@ namespace ElasticLinq.Request.Visitors
             return m;
         }
 
-        internal ElasticTranslateResult Translate(Expression e)
-        {
-            projectParameter = Expression.Parameter(typeof(JObject), "row");
-
-            Visit(e);
-
-            if (projection != null)
-                fields.AddRange(projection.Fields);
-
-            return new ElasticTranslateResult
-            {
-                SearchRequest = new ElasticSearchRequest(type, skip, take, fields, sortOptions, termCriteria),
-                Projector = projection != null ? Expression.Lambda(projection.Selector, projectParameter) : null
-            };
-        }
-
         private static Expression StripQuotes(Expression e)
         {
             while (e.NodeType == ExpressionType.Quote)
@@ -164,52 +165,40 @@ namespace ElasticLinq.Request.Visitors
         protected override Expression VisitBinary(BinaryExpression b)
         {
             Visit(b.Left);
-            var operation = VisitComparisonOperation(b);
             Visit(b.Right);
 
-            if (whereMemberInfos.Any() && whereConstants.Any())
-                AddTermCriterion(whereMemberInfos.Pop(), operation, whereConstants.Pop());
+            switch (b.NodeType)
+            {
+                case ExpressionType.Equal:
+                    if (whereMemberInfos.Any() && whereConstants.Any())
+                        AddTermFilter(mapping.GetFieldName(whereMemberInfos.Pop()), whereConstants.Pop());
+                    break;
+            }
 
             return b;
         }
 
-        private void AddTermCriterion(MemberInfo memberInfo, string operation, ConstantExpression value)
+        private void AddTermFilter(string field, ConstantExpression constantExpression)
         {
-            var fieldName = mapping.GetFieldName(memberInfo);
+            var lastTermFilter = filters.Count > 0
+                ? filters.Peek() as TermFilter
+                : null;
 
-            IReadOnlyList<object> existingCriteria;
-            termCriteria.TryGetValue(fieldName, out existingCriteria);
-
-            termCriteria[fieldName] = new List<object>(existingCriteria ?? Enumerable.Empty<object>()) { value.Value }
-                .AsReadOnly();
+            if (lastTermFilter != null && lastTermFilter.Field == field)
+            {
+                filters.Pop();
+                AddFilter(new TermFilter(field, lastTermFilter.Values.Concat(new [] { constantExpression.Value })));
+            }
+            else
+            {
+                AddFilter(new TermFilter(field, constantExpression.Value));
+            }
         }
 
-        private static string VisitComparisonOperation(BinaryExpression b)
+        private void AddFilter(Filter filter)
         {
-            // TODO: Make these filter or query specific
-            switch (b.NodeType)
-            {
-                case ExpressionType.And:
-                case ExpressionType.AndAlso:
-                    return "AND";
-                case ExpressionType.Or:
-                case ExpressionType.OrElse:
-                    return "OR";
-                case ExpressionType.Equal:
-                    return "";
-                case ExpressionType.NotEqual:
-                    return "NOT";
-                case ExpressionType.LessThan:
-                    return "lt";
-                case ExpressionType.LessThanOrEqual:
-                    return "lte";
-                case ExpressionType.GreaterThan:
-                    return "gt";
-                case ExpressionType.GreaterThanOrEqual:
-                    return "gte";
-                default:
-                    throw new NotSupportedException(string.Format("The binary operator '{0}' is not supported", b.NodeType));
-            }
+            // TODO: restructures
+            filters.Push(filter);
         }
 
         private Expression VisitOrderBy(Expression source, Expression orderByExpression, bool ascending)

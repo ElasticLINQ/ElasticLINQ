@@ -11,7 +11,7 @@ namespace ElasticLinq.Request.Formatter
         internal static RequestFormatter Create(ElasticConnection connection,
             ElasticSearchRequest searchRequest)
         {
-            var requiresPostBody = searchRequest.TermCriteria.Count > 1;
+            var requiresPostBody = true; // TODO: Determine what requires a post body
             var useGet = connection.PreferGetRequests && !requiresPostBody;
 
             return useGet

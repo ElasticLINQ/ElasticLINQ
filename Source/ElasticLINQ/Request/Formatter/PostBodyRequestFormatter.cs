@@ -30,14 +30,7 @@ namespace ElasticLinq.Request.Formatter
             if (SearchRequest.Fields.Any())
                 root.Add("fields", new JArray(SearchRequest.Fields));
 
-            if (SearchRequest.TermCriteria.Any())
-            {
-                root.Add("filter", new JObject(
-                    new JProperty("terms", new JObject(
-                        SearchRequest.TermCriteria
-                            .Select(c => new JProperty(c.Key, new JArray(c.Value.ToArray())
-                            ))))));
-            }
+            AddFilters(SearchRequest.Filter, root);
 
             if (SearchRequest.SortOptions.Any())
                 root.Add("sort", new JArray(
@@ -54,6 +47,33 @@ namespace ElasticLinq.Request.Formatter
             root.Add("timeout", Format(Connection.Timeout));
 
             return root;
+        }
+
+        private void AddFilters(Filter topFilter, JObject root)
+        {
+            if (topFilter != null)
+                root.Add("filter", BuildFilter(topFilter));
+        }
+
+        private JObject BuildFilter(Filter filter)
+        {
+            if (filter is CompoundFilter)
+                return BuildCompoundFilter((CompoundFilter) filter);
+
+            if (filter is TermFilter)
+                return BuildTermsFilter((TermFilter)filter);
+
+            throw new InvalidOperationException(String.Format("Unknown filter type {0}", filter.GetType()));
+        }
+
+        private JObject BuildTermsFilter(TermFilter filter)
+        {
+            return new JObject(new JProperty(filter.Name, new JObject(new JProperty(filter.Field, new JArray(filter.Values.ToArray())))));
+        }
+
+        private JObject BuildCompoundFilter(CompoundFilter filter)
+        {
+            return new JObject(new JProperty(filter.Name), filter.Filters.Select(BuildFilter).ToList());
         }
     }
 }

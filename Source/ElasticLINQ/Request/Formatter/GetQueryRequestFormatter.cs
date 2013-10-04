@@ -26,9 +26,6 @@ namespace ElasticLinq.Request.Formatter
             if (searchRequest.Fields.Any())
                 yield return KeyValuePair.Create("fields", string.Join(",", searchRequest.Fields));
 
-            foreach (var queryCriteria in searchRequest.TermCriteria)
-                yield return KeyValuePair.Create("q", queryCriteria.Key + ":" + String.Join(" ", queryCriteria.Value));
-
             foreach (var sortOption in searchRequest.SortOptions.Reverse()) // ElasticSearch likes them in reverse on GET
                 yield return KeyValuePair.Create("sort", sortOption.Name + (sortOption.Ascending ? "" : ":desc"));
 

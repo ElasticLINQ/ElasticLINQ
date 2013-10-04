@@ -2,7 +2,6 @@
 // This source code is made available under the terms of the Microsoft Public License (MS-PL)
 
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
 namespace ElasticLinq.Request
 {
@@ -16,17 +15,17 @@ namespace ElasticLinq.Request
         private readonly int? size;
         private readonly List<string> fields;
         private readonly List<SortOption> sortOptions;
-        private readonly Dictionary<string, IReadOnlyList<object>> termCriteria;
+        private readonly Filter filter;
 
         public ElasticSearchRequest(string type, int @from = 0, int? size = null, List<string> fields = null,
-            List<SortOption> sortOptions = null, Dictionary<string, IReadOnlyList<object>> termCriteria = null)
+            List<SortOption> sortOptions = null, Filter filter = null)
         {
             this.type = type;
             this.@from = @from;
             this.size = size;
             this.fields = fields ?? new List<string>();
             this.sortOptions = sortOptions ?? new List<SortOption>();
-            this.termCriteria = termCriteria ?? new Dictionary<string, IReadOnlyList<object>>();
+            this.filter = filter;
         }
 
         public long @From { get { return @from; } }
@@ -43,9 +42,9 @@ namespace ElasticLinq.Request
             get { return sortOptions.AsReadOnly(); }
         }
 
-        public IReadOnlyDictionary<string, IReadOnlyList<object>> TermCriteria
+        public Filter Filter
         {
-            get { return new ReadOnlyDictionary<string, IReadOnlyList<object>>(termCriteria); }
+            get { return filter; }
         }
     }
 
