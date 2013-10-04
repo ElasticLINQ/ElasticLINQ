@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // This source code is made available under the terms of the Microsoft Public License (MS-PL)
 
-using System.Runtime.CompilerServices;
 using ElasticLinq.Mapping;
 using Newtonsoft.Json.Linq;
 using System;
@@ -207,20 +206,7 @@ namespace ElasticLinq.Request.Visitors
             if (left == null || right == null)
                 throw new NotImplementedException("Unknown binary expressions");
 
-            filterExpression = CombineTermsWherePossible(left, right);
-
-            return filterExpression;
-        }
-
-        private FilterExpression CombineTermsWherePossible(FilterExpression left, FilterExpression right)
-        {
-            var leftTermFilter = left.Filter as TermFilter;
-            var rightTermFilter = right.Filter as TermFilter;
-            
-            if (leftTermFilter != null && rightTermFilter != null && leftTermFilter.Field == rightTermFilter.Field)
-                return new FilterExpression(new TermFilter(leftTermFilter.Field, leftTermFilter.Values.Concat(rightTermFilter.Values)));
-            
-            return new FilterExpression(new OrFilter(left.Filter, right.Filter));
+            return filterExpression = new FilterExpression(OrFilter.Combine(left.Filter, right.Filter));
         }
 
         private Expression VisitComparisonBinary(BinaryExpression b)
