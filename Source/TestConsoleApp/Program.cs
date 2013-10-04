@@ -25,12 +25,13 @@ namespace TestConsoleApp
 
             var i = 7;
             var query = new ElasticQuery<Movie>(elasticProvider)
-                .Where(m => m.Year == "1962" || "2007" == m.Year || m.Year == "1963" || m.Year == "1962")
-                .Skip(1)
-                .Take(i + 1)
-                .OrderByDescending(o => o.Year)
-                .ThenByScore()
-                .Select(a => new Tuple<string, string, string>(a.Title, a.Title, a.Year));
+                .Where(m => (m.Year == "1962" && m.Director == "Robert Mulligan") || (m.Year == "1972"))
+                //.Skip(1)
+                //.Take(i + 1)
+                //.OrderByDescending(o => o.Year)
+                //.ThenByScore()
+                //.Select(a => new Tuple<string, string, string>(a.Title, a.Title, a.Year));
+                ;
 
             DumpQuery(query);
         }
@@ -56,7 +57,7 @@ namespace TestConsoleApp
 
         public override string ToString()
         {
-            return string.Format("{0} ({1})", Title, Year);
+            return string.Format("{0} ({1}), {2}", Title, Year, Director);
         }
     }
 }

@@ -173,7 +173,7 @@ namespace ElasticLinq.Request.Visitors
 
         private Expression VisitWhere(Expression source, Expression predicate)
         {
-            inWhereCondition = true;
+            inWhereCondition = true; // TODO: Replace with context-sensitive stack
 
             var lambda = (LambdaExpression)StripQuotes(predicate);
             Visit(lambda);
@@ -209,7 +209,8 @@ namespace ElasticLinq.Request.Visitors
             if (left == null || right == null)
                 throw new NotImplementedException("Unknown binary expressions");
 
-            return filterExpression = new FilterExpression(new AndFilter(left.Filter, right.Filter));
+            filterExpression = new FilterExpression(new AndFilter(left.Filter, right.Filter));
+            return filterExpression;
         }
 
         private Expression VisitOrElse(BinaryExpression b)
@@ -220,7 +221,8 @@ namespace ElasticLinq.Request.Visitors
             if (left == null || right == null)
                 throw new NotImplementedException("Unknown binary expressions");
 
-            return filterExpression = new FilterExpression(OrFilter.Combine(left.Filter, right.Filter));
+            filterExpression = new FilterExpression(OrFilter.Combine(left.Filter, right.Filter));
+            return filterExpression;
         }
 
         private Expression VisitComparisonBinary(BinaryExpression b)

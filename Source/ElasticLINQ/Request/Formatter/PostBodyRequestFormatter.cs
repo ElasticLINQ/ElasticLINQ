@@ -49,13 +49,13 @@ namespace ElasticLinq.Request.Formatter
             return root;
         }
 
-        private void AddFilters(Filter topFilter, JObject root)
+        private static void AddFilters(Filter topFilter, JObject root)
         {
             if (topFilter != null)
                 root.Add("filter", BuildFilter(topFilter));
         }
 
-        private JObject BuildFilter(Filter filter)
+        private static JObject BuildFilter(Filter filter)
         {
             if (filter is CompoundFilter)
                 return BuildCompoundFilter((CompoundFilter) filter);
@@ -66,13 +66,13 @@ namespace ElasticLinq.Request.Formatter
             throw new InvalidOperationException(String.Format("Unknown filter type {0}", filter.GetType()));
         }
 
-        private JObject BuildTermsFilter(TermFilter filter)
+        private static JObject BuildTermsFilter(TermFilter filter)
         {
             var value = filter.Values.Count == 1 ? filter.Values[0] : new JArray(filter.Values.ToArray());
             return new JObject(new JProperty(filter.Name, new JObject(new JProperty(filter.Field, value))));
         }
 
-        private JObject BuildCompoundFilter(CompoundFilter filter)
+        private static JObject BuildCompoundFilter(CompoundFilter filter)
         {
             return new JObject(new JProperty(filter.Name, new JArray(filter.Filters.Select(BuildFilter).ToList())));
         }
