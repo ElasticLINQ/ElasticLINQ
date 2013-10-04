@@ -73,7 +73,7 @@ namespace ElasticLinq.Request.Formatter
 
         private JObject BuildCompoundFilter(CompoundFilter filter)
         {
-            return new JObject(new JProperty(filter.Name), filter.Filters.Select(BuildFilter).ToList());
+            return new JObject(new JProperty(filter.Name, new JArray(filter.Filters.Select(BuildFilter).ToList())));
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // This source code is made available under the terms of the Microsoft Public License (MS-PL)
 
+using System.Runtime.CompilerServices;
 using ElasticLinq.Mapping;
 using Newtonsoft.Json.Linq;
 using System;
@@ -17,6 +18,28 @@ namespace ElasticLinq.Request.Visitors
         public LambdaExpression Projector;
     }
 
+    internal class FilterExpression : Expression
+    {
+        private readonly Filter filter;
+
+        public FilterExpression(Filter filter)
+        {
+            this.filter = filter;
+        }
+
+        public Filter Filter { get { return filter; } }
+
+        public override ExpressionType NodeType
+        {
+            get { return (ExpressionType)10000; }
+        }
+
+        public override Type Type
+        {
+            get { return typeof (bool); }
+        }
+    }
+
     /// <summary>
     /// Expression visitor to translate a LINQ query into ElasticSearch request.
     /// </summary>
@@ -26,13 +49,12 @@ namespace ElasticLinq.Request.Visitors
         private Projection projection;
         private ParameterExpression projectParameter;
 
+        private readonly List<string> fields = new List<string>();
+        private readonly List<SortOption> sortOptions = new List<SortOption>();
         private string type;
         private int skip;
         private int? take;
-        private readonly List<string> fields = new List<string>();
-        private readonly List<SortOption> sortOptions = new List<SortOption>();
-
-        private readonly Stack<Filter> filters = new Stack<Filter>();
+        private FilterExpression filterExpression;
 
         public ElasticQueryTranslator(IElasticMapping mapping)
         {
@@ -50,7 +72,7 @@ namespace ElasticLinq.Request.Visitors
 
             return new ElasticTranslateResult
             {
-                SearchRequest = new ElasticSearchRequest(type, skip, take, fields, sortOptions, filters.FirstOrDefault()),
+                SearchRequest = new ElasticSearchRequest(type, skip, take, fields, sortOptions, filterExpression.Filter),
                 Projector = projection != null ? Expression.Lambda(projection.Selector, projectParameter) : null
             };
         }
@@ -164,41 +186,67 @@ namespace ElasticLinq.Request.Visitors
 
         protected override Expression VisitBinary(BinaryExpression b)
         {
+            switch (b.NodeType)
+            {
+                case ExpressionType.OrElse:
+                    return VisitOrElse(b);
+
+                case ExpressionType.Equal:
+                    return VisitComparisonBinary(b);
+
+                default:
+                    throw new NotImplementedException(String.Format("Don't yet know {0}", b.NodeType));
+            }
+        }
+
+        private Expression VisitOrElse(BinaryExpression b)
+        {
+            var left = Visit(b.Left) as FilterExpression;
+            var right = Visit(b.Right) as FilterExpression;
+
+            if (left == null || right == null)
+                throw new NotImplementedException("Unknown binary expressions");
+
+            filterExpression = CombineTermsWherePossible(left, right);
+
+            return filterExpression;
+        }
+
+        private FilterExpression CombineTermsWherePossible(FilterExpression left, FilterExpression right)
+        {
+            var leftTermFilter = left.Filter as TermFilter;
+            var rightTermFilter = right.Filter as TermFilter;
+            
+            if (leftTermFilter != null && rightTermFilter != null && leftTermFilter.Field == rightTermFilter.Field)
+                return new FilterExpression(new TermFilter(leftTermFilter.Field, leftTermFilter.Values.Concat(rightTermFilter.Values)));
+            
+            return new FilterExpression(new OrFilter(left.Filter, right.Filter));
+        }
+
+        private Expression VisitComparisonBinary(BinaryExpression b)
+        {
             Visit(b.Left);
             Visit(b.Right);
+
+            var haveMemberAndConstant = whereMemberInfos.Any() && whereConstants.Any();
 
             switch (b.NodeType)
             {
                 case ExpressionType.Equal:
-                    if (whereMemberInfos.Any() && whereConstants.Any())
-                        AddTermFilter(mapping.GetFieldName(whereMemberInfos.Pop()), whereConstants.Pop());
-                    break;
+                    {
+                        if (haveMemberAndConstant)
+                        {
+                            var field = mapping.GetFieldName(whereMemberInfos.Pop());
+                            return new FilterExpression(new TermFilter(field, whereConstants.Pop().Value));
+                        }
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException(String.Format("Don't yet know {0}", b.NodeType));
             }
 
             return b;
-        }
-
-        private void AddTermFilter(string field, ConstantExpression constantExpression)
-        {
-            var lastTermFilter = filters.Count > 0
-                ? filters.Peek() as TermFilter
-                : null;
-
-            if (lastTermFilter != null && lastTermFilter.Field == field)
-            {
-                filters.Pop();
-                AddFilter(new TermFilter(field, lastTermFilter.Values.Concat(new [] { constantExpression.Value })));
-            }
-            else
-            {
-                AddFilter(new TermFilter(field, constantExpression.Value));
-            }
-        }
-
-        private void AddFilter(Filter filter)
-        {
-            // TODO: restructures
-            filters.Push(filter);
         }
 
         private Expression VisitOrderBy(Expression source, Expression orderByExpression, bool ascending)

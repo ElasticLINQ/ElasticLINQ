@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ElasticLinq.Request
 {
@@ -30,6 +31,11 @@ namespace ElasticLinq.Request
         public IReadOnlyList<Filter> Filters
         {
             get { return filters.AsReadOnly(); }
+        }
+
+        public override string ToString()
+        {
+            return string.Format(" {0} ({1})", Name, String.Join(" ", Filters.Select(f => f.ToString()).ToArray()));
         }
     }
 
@@ -62,6 +68,32 @@ namespace ElasticLinq.Request
         public override string Name
         {
             get { return Values.Count == 1 ? "term" : "terms"; }
+        }
+
+        public override string ToString()
+        {
+            return String.Format("{0} [{1}]", Name, String.Join(",", values.ToArray()));
+        }
+    }
+
+    internal class OrFilter : CompoundFilter
+    {
+        public OrFilter(params Filter[] filters)
+            : base("or", filters)
+        {
+        }
+
+        public OrFilter(IEnumerable<Filter> filters)
+            : base ("or", filters)
+        {            
+        }
+    }
+
+    internal class AndFilter : CompoundFilter
+    {
+        public AndFilter(IEnumerable<Filter> filters)
+            : base("and", filters)
+        {            
         }
     }
 

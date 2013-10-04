@@ -25,7 +25,7 @@ namespace TestConsoleApp
 
             var i = 7;
             var query = new ElasticQuery<Movie>(elasticProvider)
-                .Where(m => m.Year == "1962" || m.Year == "2007")
+                .Where(m => m.Year == "1962" || "2007" == m.Year)
                 .Skip(1)
                 .Take(i + 1)
                 .OrderByDescending(o => o.Year)
