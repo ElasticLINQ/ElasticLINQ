@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // This source code is made available under the terms of the Microsoft Public License (MS-PL)
 
-using System.Collections;
 using ElasticLinq.Mapping;
 using ElasticLinq.Utility;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -104,6 +104,9 @@ namespace ElasticLinq.Request.Visitors
                     if (TypeHelper.FindIEnumerable(m.Method.DeclaringType) != null)
                         return VisitEnumerableContainsMethodCall(m.Object, m.Arguments[0]);
                     break;
+
+                case "Create":
+                    return m;
             }
 
             throw new NotSupportedException(string.Format("The method '{0}' is not supported", m.Method.Name));
@@ -279,7 +282,7 @@ namespace ElasticLinq.Request.Visitors
                 if ((expression as T) == null)
                     throw new NotImplementedException(string.Format("Unknown binary expression {0}", expression));
                 else
-                    yield return (T) expression;
+                    yield return (T)expression;
         }
 
         private Expression VisitComparisonBinary(BinaryExpression b)
@@ -335,10 +338,9 @@ namespace ElasticLinq.Request.Visitors
         private Expression VisitSelect(Expression source, Expression selectExpression)
         {
             var lambda = (LambdaExpression)StripQuotes(selectExpression);
-
             var selectBody = Visit(lambda.Body);
 
-            if (selectBody is NewExpression || selectBody is MemberExpression)
+            if (selectBody is NewExpression || selectBody is MemberExpression || selectBody is MethodCallExpression)
                 VisitSelectNew(selectBody);
 
             return Visit(source);

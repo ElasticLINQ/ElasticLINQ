@@ -84,7 +84,8 @@ namespace ElasticLinq.Request
                 throw new ArgumentNullException("filters");
 
             var termFilters = filters.OfType<TermFilter>().ToArray();
-            var areAllSameTerm = filters.Length > 0 && termFilters.Length == filters.Length && termFilters.Select(f => f.Field).Distinct().Count() == 1;
+            var areAllSameTerm = filters.Length > 0 && termFilters.Length == filters.Length
+                && termFilters.Select(f => f.Field).Distinct().Count() == 1;
 
             if (areAllSameTerm)
                 return new TermFilter(termFilters[0].Field, termFilters.SelectMany(f => f.Values).Distinct());

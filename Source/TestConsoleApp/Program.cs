@@ -24,18 +24,17 @@ namespace TestConsoleApp
             var connection = new ElasticConnection(new Uri("http://192.168.2.7:9200"), TimeSpan.FromSeconds(10), preferGetRequests: false);
             var elasticProvider = new ElasticQueryProvider(connection, new TrivialElasticMapping()) { Log = Console.Out };
 
-            var z = new [] { "1962", "1963", "1964" };
-            var y = new List<string> { "1962", "1972", "1972", "1980" };
+            var y = new List<int> { 1962, 1972, 1972, 1980 };
 
             var i = 7;
             var query = new ElasticQuery<Movie>(elasticProvider)
                 //.Where(m => (m.Year == "1962" && m.Director == "Robert Mulligan") || (m.Year.Equals("1972")))
-                .Where(m => y.Contains(m.Year) || string.Equals(m.Year, "1962") || m.Year == "1961")
+                .Where(m => (new [] { 1960, 1963, 1964 }).Contains(m.Year) || int.Equals(m.Year, 1962) || m.Year == 1961)
                 //.Skip(1)
                 .Take(i + 1)
                 .OrderByDescending(o => o.Year)
                 .ThenByScore()
-                .Select(a => new Tuple<string, string, string>(a.Title, a.Title, a.Year))
+                .Select(a => Tuple.Create(a.Title, a.Title, a.Year))
                 ;
 
             DumpQuery(query);
@@ -58,7 +57,7 @@ namespace TestConsoleApp
     {
         public string Title;
         public string Director;
-        public string Year;
+        public int Year;
 
         public override string ToString()
         {
