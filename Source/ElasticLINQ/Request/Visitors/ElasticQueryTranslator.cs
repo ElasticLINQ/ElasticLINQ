@@ -94,7 +94,10 @@ namespace ElasticLinq.Request.Visitors
             {
                 case "Equals":
                     if (m.Arguments.Count == 1)
-                        return VisitEqualsMethodCall(m);
+                        return VisitEqualsMethodCall(m.Object, m.Arguments[0]) ?? m;
+                    if (m.Arguments.Count == 2)
+                        return VisitEqualsMethodCall(m.Arguments[0], m.Arguments[1]) ?? m;
+
                     break;
 
                 case "Contains":
@@ -116,7 +119,7 @@ namespace ElasticLinq.Request.Visitors
                     break;
             }
 
-            throw new NotSupportedException(string.Format("The Enumerable method '{0}' is not supported", m.Method.Name));            
+            throw new NotSupportedException(string.Format("The Enumerable method '{0}' is not supported", m.Method.Name));
         }
 
         private Expression VisitEnumerableContainsMethodCall(Expression source, Expression match)
@@ -127,7 +130,7 @@ namespace ElasticLinq.Request.Visitors
             if (constantSource != null)
             {
                 var field = mapping.GetFieldName(whereMemberInfos.Pop());
-                var values = new List<object>(((IEnumerable) constantSource.Value).Cast<object>());
+                var values = new List<object>(((IEnumerable)constantSource.Value).Cast<object>());
                 filterExpression = new FilterExpression(new TermFilter(field, values.Distinct().ToArray()));
                 return filterExpression;
             }
@@ -135,11 +138,11 @@ namespace ElasticLinq.Request.Visitors
             throw new NotImplementedException("Unknown source for Contains");
         }
 
-        internal Expression VisitEqualsMethodCall(MethodCallExpression m)
+        internal Expression VisitEqualsMethodCall(Expression left, Expression right)
         {
-            Visit(m.Arguments[0]);
-            Visit(m.Object);
-            return MakeEquals(m);
+            Visit(left);
+            Visit(right);
+            return MakeEquals();
         }
 
         internal Expression VisitElasticMethodCall(MethodCallExpression m)
@@ -204,7 +207,7 @@ namespace ElasticLinq.Request.Visitors
             return c;
         }
 
-        protected override Expression VisitMember(MemberExpression m)               
+        protected override Expression VisitMember(MemberExpression m)
         {
             if (inWhereCondition)
                 whereMemberInfos.Push(m.Member);
@@ -258,26 +261,25 @@ namespace ElasticLinq.Request.Visitors
 
         private Expression VisitAndAlso(BinaryExpression b)
         {
-            var left = Visit(b.Left) as FilterExpression;
-            var right = Visit(b.Right) as FilterExpression;
-
-            if (left == null || right == null)
-                throw new NotImplementedException("Unknown binary expressions");
-
-            filterExpression = new FilterExpression(new AndFilter(left.Filter, right.Filter));
+            var filters = AssertExpressionsOfType<FilterExpression>(b.Left, b.Right).Select(f => f.Filter).ToArray();
+            filterExpression = new FilterExpression(new AndFilter(filters));
             return filterExpression;
         }
 
         private Expression VisitOrElse(BinaryExpression b)
         {
-            var left = Visit(b.Left) as FilterExpression;
-            var right = Visit(b.Right) as FilterExpression;
-
-            if (left == null || right == null)
-                throw new NotImplementedException("Unknown binary expressions");
-
-            filterExpression = new FilterExpression(OrFilter.Combine(left.Filter, right.Filter));
+            var filters = AssertExpressionsOfType<FilterExpression>(b.Left, b.Right).Select(f => f.Filter).ToArray();
+            filterExpression = new FilterExpression(OrFilter.Combine(filters));
             return filterExpression;
+        }
+
+        private IEnumerable<T> AssertExpressionsOfType<T>(params Expression[] expressions) where T : Expression
+        {
+            foreach (var expression in expressions.Select(Visit))
+                if ((expression as T) == null)
+                    throw new NotImplementedException(string.Format("Unknown binary expression {0}", expression));
+                else
+                    yield return (T) expression;
         }
 
         private Expression VisitComparisonBinary(BinaryExpression b)
@@ -288,14 +290,14 @@ namespace ElasticLinq.Request.Visitors
             switch (b.NodeType)
             {
                 case ExpressionType.Equal:
-                    return MakeEquals(b);
+                    return MakeEquals() ?? b;
 
                 default:
                     throw new NotImplementedException(String.Format("Don't yet know {0}", b.NodeType));
             }
         }
 
-        private Expression MakeEquals(Expression e)
+        private Expression MakeEquals()
         {
             var haveMemberAndConstant = whereMemberInfos.Any() && whereConstants.Any();
 
@@ -308,7 +310,7 @@ namespace ElasticLinq.Request.Visitors
                 return expression;
             }
 
-            return e;
+            return null;
         }
 
         private Expression VisitOrderBy(Expression source, Expression orderByExpression, bool ascending)
