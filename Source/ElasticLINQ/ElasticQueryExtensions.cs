@@ -12,15 +12,15 @@ namespace ElasticLinq
     {
         public static IOrderedQueryable<TSource> OrderByScore<TSource>(this IQueryable<TSource> source)
         {
-            return A(source, (MethodInfo)MethodBase.GetCurrentMethod());
+            return OrderBy(source, (MethodInfo)MethodBase.GetCurrentMethod());
         }
 
         public static IOrderedQueryable<TSource> OrderByScoreDescending<TSource>(this IQueryable<TSource> source)
         {
-            return A(source, (MethodInfo)MethodBase.GetCurrentMethod());
+            return OrderBy(source, (MethodInfo)MethodBase.GetCurrentMethod());
         }
 
-        private static IOrderedQueryable<TSource> A<TSource>(IQueryable<TSource> source, MethodInfo method)
+        private static IOrderedQueryable<TSource> OrderBy<TSource>(IQueryable<TSource> source, MethodInfo method)
         {
             if (source == null)
                 throw new ArgumentNullException("source");
@@ -31,15 +31,15 @@ namespace ElasticLinq
 
         public static IOrderedQueryable<TSource> ThenByScore<TSource>(this IOrderedQueryable<TSource> source)
         {
-            return A(source, (MethodInfo)MethodBase.GetCurrentMethod());
+            return ThenBy(source, (MethodInfo)MethodBase.GetCurrentMethod());
         }
 
         public static IOrderedQueryable<TSource> ThenByScoreDescending<TSource>(this IOrderedQueryable<TSource> source)
         {
-            return A(source, (MethodInfo)MethodBase.GetCurrentMethod());
+            return ThenBy(source, (MethodInfo)MethodBase.GetCurrentMethod());
         }
 
-        private static IOrderedQueryable<TSource> A<TSource>(IOrderedQueryable<TSource> source, MethodInfo method)
+        private static IOrderedQueryable<TSource> ThenBy<TSource>(IOrderedQueryable<TSource> source, MethodInfo method)
         {
             if (source == null)
                 throw new ArgumentNullException("source");
