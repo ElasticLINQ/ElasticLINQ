@@ -1,5 +1,5 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
-// This source code is made available under the terms of the Microsoft Public License (MS-PL)
+// Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
 using System;
 using System.Collections.Generic;
