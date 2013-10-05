@@ -9,8 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElasticLINQ.Test", "Elastic
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{99B0D181-5D19-4E30-96EA-F8E42C81F8E6}"
 	ProjectSection(SolutionItems) = preProject
-		LICENCE.txt = LICENCE.txt
-		README.md = README.md
+		..\LICENCE.txt = ..\LICENCE.txt
+		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
 Global
