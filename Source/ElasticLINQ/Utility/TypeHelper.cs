@@ -17,7 +17,7 @@ namespace ElasticLinq.Utility
                 : elementType.GetGenericArguments()[0];
         }
 
-        private static Type FindIEnumerable(Type sequenceType)
+        public static Type FindIEnumerable(Type sequenceType)
         {
             while (true)
             {

@@ -2,12 +2,14 @@
 // This source code is made available under the terms of the Microsoft Public License (MS-PL)
 
 using System;
+using System.Diagnostics;
 
 namespace ElasticLinq
 {
     /// <summary>
     /// Details of a connection to ElasticSearch.
     /// </summary>
+    [DebuggerDisplay("{Endpoint.ToString(),nq}{Index,nq}")]
     public class ElasticConnection
     {
         private readonly Uri endpoint;
@@ -19,7 +21,7 @@ namespace ElasticLinq
         {
             this.endpoint = endpoint;
             this.timeout = timeout;
-            this.index = index;
+            this.index = index ?? "";
             this.preferGetRequests = preferGetRequests;
         }
 

@@ -1,7 +1,9 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // This source code is made available under the terms of the Microsoft Public License (MS-PL)
 
+using System.Collections;
 using ElasticLinq.Mapping;
+using ElasticLinq.Utility;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -35,7 +37,7 @@ namespace ElasticLinq.Request.Visitors
 
         public override Type Type
         {
-            get { return typeof (bool); }
+            get { return typeof(bool); }
         }
     }
 
@@ -62,8 +64,9 @@ namespace ElasticLinq.Request.Visitors
 
         internal ElasticTranslateResult Translate(Expression e)
         {
-            projectParameter = Expression.Parameter(typeof(JObject), "row");
+            projectParameter = Expression.Parameter(typeof(JObject), "r");
 
+            e = PartialEvaluator.Evaluate(e);
             Visit(e);
 
             if (projection != null)
@@ -81,10 +84,62 @@ namespace ElasticLinq.Request.Visitors
             if (m.Method.DeclaringType == typeof(Queryable))
                 return VisitQueryableMethodCall(m);
 
+            if (m.Method.DeclaringType == typeof(Enumerable))
+                return VisitEnumerableMethodCall(m);
+
             if (m.Method.DeclaringType == typeof(ElasticQueryExtensions))
                 return VisitElasticMethodCall(m);
 
+            switch (m.Method.Name)
+            {
+                case "Equals":
+                    if (m.Arguments.Count == 1)
+                        return VisitEqualsMethodCall(m);
+                    break;
+
+                case "Contains":
+                    if (TypeHelper.FindIEnumerable(m.Method.DeclaringType) != null)
+                        return VisitEnumerableContainsMethodCall(m.Object, m.Arguments[0]);
+                    break;
+            }
+
             throw new NotSupportedException(string.Format("The method '{0}' is not supported", m.Method.Name));
+        }
+
+        private Expression VisitEnumerableMethodCall(MethodCallExpression m)
+        {
+            switch (m.Method.Name)
+            {
+                case "Contains":
+                    if (m.Arguments.Count == 2)
+                        return VisitEnumerableContainsMethodCall(m.Arguments[0], m.Arguments[1]);
+                    break;
+            }
+
+            throw new NotSupportedException(string.Format("The Enumerable method '{0}' is not supported", m.Method.Name));            
+        }
+
+        private Expression VisitEnumerableContainsMethodCall(Expression source, Expression match)
+        {
+            Visit(match);
+
+            var constantSource = source as ConstantExpression;
+            if (constantSource != null)
+            {
+                var field = mapping.GetFieldName(whereMemberInfos.Pop());
+                var values = new List<object>(((IEnumerable) constantSource.Value).Cast<object>());
+                filterExpression = new FilterExpression(new TermFilter(field, values.Distinct().ToArray()));
+                return filterExpression;
+            }
+
+            throw new NotImplementedException("Unknown source for Contains");
+        }
+
+        internal Expression VisitEqualsMethodCall(MethodCallExpression m)
+        {
+            Visit(m.Arguments[0]);
+            Visit(m.Object);
+            return MakeEquals(m);
         }
 
         internal Expression VisitElasticMethodCall(MethodCallExpression m)
@@ -100,7 +155,7 @@ namespace ElasticLinq.Request.Visitors
                     break;
             }
 
-            throw new NotSupportedException(string.Format("The method '{0}' is not supported", m.Method.Name));
+            throw new NotSupportedException(string.Format("The ElasticQuery method '{0}' is not supported", m.Method.Name));
         }
 
         internal Expression VisitQueryableMethodCall(MethodCallExpression m)
@@ -135,7 +190,7 @@ namespace ElasticLinq.Request.Visitors
                     break;
             }
 
-            throw new NotSupportedException(string.Format("The method '{0}' of Queryable is not supported", m.Method.Name));
+            throw new NotSupportedException(string.Format("The Queryable method '{0}' is not supported", m.Method.Name));
         }
 
         protected override Expression VisitConstant(ConstantExpression c)
@@ -149,7 +204,7 @@ namespace ElasticLinq.Request.Visitors
             return c;
         }
 
-        protected override Expression VisitMember(MemberExpression m)
+        protected override Expression VisitMember(MemberExpression m)               
         {
             if (inWhereCondition)
                 whereMemberInfos.Push(m.Member);
@@ -230,28 +285,30 @@ namespace ElasticLinq.Request.Visitors
             Visit(b.Left);
             Visit(b.Right);
 
-            var haveMemberAndConstant = whereMemberInfos.Any() && whereConstants.Any();
-
             switch (b.NodeType)
             {
                 case ExpressionType.Equal:
-                    {
-                        if (haveMemberAndConstant)
-                        {
-                            var field = mapping.GetFieldName(whereMemberInfos.Pop());
-                            var expression = new FilterExpression(new TermFilter(field, whereConstants.Pop().Value));
-                            if (filterExpression == null)
-                                filterExpression = expression;
-                            return expression;
-                        }
-                        break;
-                    }
+                    return MakeEquals(b);
 
                 default:
                     throw new NotImplementedException(String.Format("Don't yet know {0}", b.NodeType));
             }
+        }
 
-            return b;
+        private Expression MakeEquals(Expression e)
+        {
+            var haveMemberAndConstant = whereMemberInfos.Any() && whereConstants.Any();
+
+            if (haveMemberAndConstant)
+            {
+                var field = mapping.GetFieldName(whereMemberInfos.Pop());
+                var expression = new FilterExpression(new TermFilter(field, whereConstants.Pop().Value));
+                if (filterExpression == null)
+                    filterExpression = expression;
+                return expression;
+            }
+
+            return e;
         }
 
         private Expression VisitOrderBy(Expression source, Expression orderByExpression, bool ascending)

@@ -48,6 +48,7 @@
     <Compile Include="Request\Formatter\GetQueryRequestFormatter.cs" />
     <Compile Include="Request\Formatter\RequestFormatter.cs" />
     <Compile Include="Request\Visitors\ElasticQueryTranslator.cs" />
+    <Compile Include="Request\Visitors\PartialEvaluator.cs" />
     <Compile Include="Utility\TypeHelper.cs" />
     <Compile Include="Mapping\IElasticMapping.cs" />
     <Compile Include="Mapping\TrivialElasticMapping.cs" />

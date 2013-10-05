@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // This source code is made available under the terms of the Microsoft Public License (MS-PL)
 
+using System.Collections.Generic;
 using ElasticLinq;
 using ElasticLinq.Mapping;
 using System;
@@ -23,9 +24,13 @@ namespace TestConsoleApp
             var connection = new ElasticConnection(new Uri("http://192.168.2.7:9200"), TimeSpan.FromSeconds(10), preferGetRequests: false);
             var elasticProvider = new ElasticQueryProvider(connection, new TrivialElasticMapping()) { Log = Console.Out };
 
+            var z = new [] { "1962", "1963", "1964" };
+            var y = new List<string> { "1962", "1972", "1972", "1980" };
+
             var i = 7;
             var query = new ElasticQuery<Movie>(elasticProvider)
-                .Where(m => (m.Year == "1962" && m.Director == "Robert Mulligan") || (m.Year == "1972"))
+                //.Where(m => (m.Year == "1962" && m.Director == "Robert Mulligan") || (m.Year.Equals("1972")))
+                .Where(m => y.Contains(m.Year))
                 //.Skip(1)
                 //.Take(i + 1)
                 //.OrderByDescending(o => o.Year)
