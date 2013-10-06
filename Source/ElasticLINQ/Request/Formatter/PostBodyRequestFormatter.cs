@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
+using ElasticLinq.Request.Filters;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Linq;
@@ -35,7 +36,7 @@ namespace ElasticLinq.Request.Formatter
             if (SearchRequest.SortOptions.Any())
                 root.Add("sort", new JArray(
                     SearchRequest.SortOptions
-                        .Select(o => o.Ascending ? (object) o.Name : new JObject(new JProperty(o.Name, "desc")))
+                        .Select(o => o.Ascending ? (object)o.Name : new JObject(new JProperty(o.Name, "desc")))
                         .ToArray()));
 
             if (SearchRequest.From > 0)
@@ -49,21 +50,30 @@ namespace ElasticLinq.Request.Formatter
             return root;
         }
 
-        private static void AddFilters(Filter topFilter, JObject root)
+        private static void AddFilters(IFilter topFilter, JObject root)
         {
             if (topFilter != null)
                 root.Add("filter", BuildFilter(topFilter));
         }
 
-        private static JObject BuildFilter(Filter filter)
+        private static JObject BuildFilter(IFilter filter)
         {
-            if (filter is CompoundFilter)
-                return BuildCompoundFilter((CompoundFilter) filter);
+            if (filter is RangeFilter)
+                return BuildRangeFilter((RangeFilter)filter);
 
             if (filter is TermFilter)
                 return BuildTermsFilter((TermFilter)filter);
 
+            if (filter is CompoundFilter)
+                return BuildCompoundFilter((CompoundFilter)filter);
+
             throw new InvalidOperationException(String.Format("Unknown filter type {0}", filter.GetType()));
+        }
+
+        private static JObject BuildRangeFilter(RangeFilter filter)
+        {
+            return new JObject(new JProperty(filter.Name, new JObject(new JProperty(filter.Field,
+                   new JObject(filter.Specifications.Select(s => new JProperty(s.Name, s.Value)).ToList())))));
         }
 
         private static JObject BuildTermsFilter(TermFilter filter)

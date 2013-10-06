@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
 using ElasticLinq.Mapping;
+using ElasticLinq.Request.Filters;
 using ElasticLinq.Utility;
 using Newtonsoft.Json.Linq;
 using System;
@@ -21,14 +22,14 @@ namespace ElasticLinq.Request.Visitors
 
     internal class FilterExpression : Expression
     {
-        private readonly Filter filter;
+        private readonly IFilter filter;
 
-        public FilterExpression(Filter filter)
+        public FilterExpression(IFilter filter)
         {
             this.filter = filter;
         }
 
-        public Filter Filter { get { return filter; } }
+        public IFilter Filter { get { return filter; } }
 
         public override ExpressionType NodeType
         {
@@ -255,6 +256,10 @@ namespace ElasticLinq.Request.Visitors
                     return VisitAndAlso(b);
 
                 case ExpressionType.Equal:
+                case ExpressionType.GreaterThan:
+                case ExpressionType.GreaterThanOrEqual:
+                case ExpressionType.LessThan:
+                case ExpressionType.LessThanOrEqual:
                     return VisitComparisonBinary(b);
 
                 default:
@@ -295,9 +300,48 @@ namespace ElasticLinq.Request.Visitors
                 case ExpressionType.Equal:
                     return MakeEquals() ?? b;
 
+                case ExpressionType.GreaterThan:
+                case ExpressionType.GreaterThanOrEqual:
+                case ExpressionType.LessThan:
+                case ExpressionType.LessThanOrEqual:
+                    return MakeRange(b.NodeType) ?? b;
+
                 default:
                     throw new NotImplementedException(String.Format("Don't yet know {0}", b.NodeType));
             }
+        }
+
+        private Expression MakeRange(ExpressionType t)
+        {
+            var haveMemberAndConstant = whereMemberInfos.Any() && whereConstants.Any();
+
+            if (haveMemberAndConstant)
+            {
+                var field = mapping.GetFieldName(whereMemberInfos.Pop());
+                var specification = new RangeSpecificationFilter(ExpressionTypeToRangeType(t), whereConstants.Pop().Value);
+                var expression = new FilterExpression(new RangeFilter(field, specification));
+                filterExpression = expression;
+                return expression;
+            }
+
+            return null;
+        }
+
+        private static string ExpressionTypeToRangeType(ExpressionType t)
+        {
+            switch (t)
+            {
+                case ExpressionType.GreaterThan:
+                    return "gt";
+                case ExpressionType.GreaterThanOrEqual:
+                    return "gte";
+                case ExpressionType.LessThan:
+                    return "lt";
+                case ExpressionType.LessThanOrEqual:
+                    return "lte";
+            }
+
+            throw new ArgumentOutOfRangeException("t");
         }
 
         private Expression MakeEquals()

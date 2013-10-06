@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
 using System.Collections.Generic;
+using ElasticLinq.Request.Filters;
 
 namespace ElasticLinq.Request
 {
@@ -15,10 +16,10 @@ namespace ElasticLinq.Request
         private readonly int? size;
         private readonly List<string> fields;
         private readonly List<SortOption> sortOptions;
-        private readonly Filter filter;
+        private readonly IFilter filter;
 
         public ElasticSearchRequest(string type, int @from = 0, int? size = null, List<string> fields = null,
-            List<SortOption> sortOptions = null, Filter filter = null)
+            List<SortOption> sortOptions = null, IFilter filter = null)
         {
             this.type = type;
             this.@from = @from;
@@ -42,7 +43,7 @@ namespace ElasticLinq.Request
             get { return sortOptions.AsReadOnly(); }
         }
 
-        public Filter Filter
+        public IFilter Filter
         {
             get { return filter; }
         }

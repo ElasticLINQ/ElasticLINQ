@@ -43,7 +43,13 @@
     <Compile Include="ElasticQuery.cs" />
     <Compile Include="ElasticQueryExtensions.cs" />
     <Compile Include="ElasticQueryProvider.cs" />
-    <Compile Include="Request\Filters.cs" />
+    <Compile Include="Request\Filters\MustFilter.cs" />
+    <Compile Include="Request\Filters\AndFilter.cs" />
+    <Compile Include="Request\Filters\CompoundFilter.cs" />
+    <Compile Include="Request\Filters\IFilter.cs" />
+    <Compile Include="Request\Filters\OrFilter.cs" />
+    <Compile Include="Request\Filters\RangeFilter.cs" />
+    <Compile Include="Request\Filters\TermFilter.cs" />
     <Compile Include="Request\Formatter\PostBodyRequestFormatter.cs" />
     <Compile Include="Request\Formatter\GetQueryRequestFormatter.cs" />
     <Compile Include="Request\Formatter\RequestFormatter.cs" />

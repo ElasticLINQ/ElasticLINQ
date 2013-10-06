@@ -3,6 +3,7 @@
 
 using ElasticLinq;
 using ElasticLinq.Request;
+using ElasticLinq.Request.Filters;
 using ElasticLinq.Request.Formatter;
 using System;
 using System.Collections.Generic;
