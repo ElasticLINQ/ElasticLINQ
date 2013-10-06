@@ -10,38 +10,38 @@ namespace ElasticLINQ.Test.Mapping
     public class TrivialElasticMappingTests
     {
         [Fact]
-        public void GetFieldNameLowersMemberName()
+        public void GetFieldNameCamelCasesMemberName()
         {
             var memberInfo = MethodBase.GetCurrentMethod();
 
             var mapping = new TrivialElasticMapping();
             var actual = mapping.GetFieldName(memberInfo);
 
-            Assert.Equal(memberInfo.Name.ToLowerInvariant(), actual);
+            Assert.Equal("getFieldNameCamelCasesMemberName", actual);
         }
 
         [Fact]
-        public void GetTypeNameLowersAndPluralizesSingularTypeName()
+        public void GetTypeNameCamelCasesAndPluralizesSingularTypeName()
         {
             var type = typeof(SingularTypeName);
 
             var mapping = new TrivialElasticMapping();
             var actual = mapping.GetTypeName(type);
 
-            Assert.Equal(type.Name.ToLowerInvariant() + "s", actual);
+            Assert.Equal("singularTypeNames", actual);
         }
 
         private class SingularTypeName { }
 
         [Fact]
-        public void GetTypeNameLowersPluralTypeName()
+        public void GetTypeNameCamelCasesPluralTypeName()
         {
             var type = typeof(SingularTypeNames);
 
             var mapping = new TrivialElasticMapping();
             var actual = mapping.GetTypeName(type);
 
-            Assert.Equal(type.Name.ToLowerInvariant(), actual);
+            Assert.Equal("singularTypeNames", actual);
         }
 
         private class SingularTypeNames { }

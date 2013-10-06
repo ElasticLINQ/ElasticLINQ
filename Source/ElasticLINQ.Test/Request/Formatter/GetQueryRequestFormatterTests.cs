@@ -33,9 +33,7 @@ namespace ElasticLINQ.Test.Request.Formatter
             return new ElasticSearchRequest("type1", 20, 10,
                 new List<string> { "field1" },
                 new List<SortOption> { new SortOption("sort1", false) },
-                new Dictionary<string, IReadOnlyList<object>> {
-                    { "term1", new List<object> { "criteria1" }.AsReadOnly() }
-                });
+                new TermFilter("term1", "criteria"));
         }
     }
 }

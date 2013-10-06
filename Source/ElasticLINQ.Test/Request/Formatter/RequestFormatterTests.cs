@@ -42,31 +42,6 @@ namespace ElasticLINQ.Test.Request.Formatter
         }
 
         [Fact]
-        public void CreateReturnsGetQueryRequestFormatterWhenPreferredAndPossible()
-        {
-            var connection = new ElasticConnection(new Uri("http://a.b.com/d"), TimeSpan.FromSeconds(1), preferGetRequests:true);
-            
-            var formatter = RequestFormatter.Create(connection, new ElasticSearchRequest("R-Type"));
-
-            Assert.IsType<GetQueryRequestFormatter>(formatter);
-        }
-
-        [Fact]
-        public void CreateReturnsPostBodyRequestFormatterWhenPreferredButNotPossible()
-        {
-            var connection = new ElasticConnection(new Uri("http://a.b.com/d"), TimeSpan.FromSeconds(1), preferGetRequests: true);
-            var terms = new Dictionary<string, IReadOnlyList<object>>
-            {
-                { "firstTerm", new [] { "1st" }.ToList().AsReadOnly() },
-                { "secondTerm", new [] { "2nd" }.ToList().AsReadOnly() },
-            };
-
-            var formatter = RequestFormatter.Create(connection, new ElasticSearchRequest("R-Type", termCriteria: terms));
-
-            Assert.IsType<PostBodyRequestFormatter>(formatter);
-        }
-
-        [Fact]
         public void CreateReturnsGetPostBodyRequestFormatterByDefault()
         {
             var connection = new ElasticConnection(new Uri("http://a.b.com/d"), TimeSpan.FromSeconds(1));

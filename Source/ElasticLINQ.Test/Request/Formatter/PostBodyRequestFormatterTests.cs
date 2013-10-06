@@ -35,18 +35,15 @@ namespace ElasticLINQ.Test.Request.Formatter
         [Fact]
         public void BodyContainsFilterTerms()
         {
-            var desiredTerms = new Dictionary<string, IReadOnlyList<object>> { { "term1", new[] { "criteria1" }.ToList().AsReadOnly() } };
+            var filter = new TermFilter("term1", new [] { "criteria1", "criteria2" });
 
-            var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest("type1", termCriteria: desiredTerms));
+            var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest("type1", filter: filter));
             var body = JObject.Parse(formatter.Body);
 
             var result = TraverseWithAssert(body, "filter", "terms");
-            foreach (var term in desiredTerms)
-            {
-                var actualTerms = TraverseWithAssert(result, term.Key);
-                foreach (var criteria in term.Value)
-                    Assert.Contains(criteria, actualTerms.Select(t => t.ToString()).ToArray());
-            }
+            var actualTerms = TraverseWithAssert(result, filter.Field);
+            foreach (var criteria in filter.Values)
+                Assert.Contains(criteria, actualTerms.Select(t => t.ToString()).ToArray());
         }
 
         [Fact]
