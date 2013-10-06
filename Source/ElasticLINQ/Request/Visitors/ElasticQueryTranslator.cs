@@ -270,7 +270,7 @@ namespace ElasticLinq.Request.Visitors
         private Expression VisitAndAlso(BinaryExpression b)
         {
             var filters = AssertExpressionsOfType<FilterExpression>(b.Left, b.Right).Select(f => f.Filter).ToArray();
-            filterExpression = new FilterExpression(new AndFilter(filters));
+            filterExpression = new FilterExpression(AndFilter.Combine(filters));
             return filterExpression;
         }
 

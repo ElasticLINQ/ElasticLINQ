@@ -14,14 +14,22 @@ namespace ElasticLinq.Request.Filters
             if (filters == null)
                 throw new ArgumentNullException("filters");
 
-            var termFilters = filters.OfType<TermFilter>().ToArray();
-            var areAllSameTerm = filters.Length > 0 && termFilters.Length == filters.Length
-                && termFilters.Select(f => f.Field).Distinct().Count() == 1;
+            return CombineTerms(filters) ?? new OrFilter(filters);
+        }
 
-            if (areAllSameTerm)
-                return new TermFilter(termFilters[0].Field, termFilters.SelectMany(f => f.Values).Distinct());
+        private static IFilter CombineTerms(ICollection<IFilter> filters)
+        {
+            if (filters.Count > 1)
+            {
+                var termFilters = filters.OfType<TermFilter>().ToArray();
+                var areAllSameTerm = termFilters.Length == filters.Count
+                                     && termFilters.Select(f => f.Field).Distinct().Count() == 1;
 
-            return new OrFilter(filters);
+                if (areAllSameTerm)
+                    return new TermFilter(termFilters[0].Field, termFilters.SelectMany(f => f.Values).Distinct());
+            }
+
+            return null;
         }
 
         public OrFilter(params IFilter[] filters)
