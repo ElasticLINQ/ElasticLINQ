@@ -1,8 +1,10 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace ElasticLinq.Request.Filters
 {
@@ -26,6 +28,11 @@ namespace ElasticLinq.Request.Filters
         public string Name { get { return "range"; } }
         public string Field { get { return field; } }
         public IReadOnlyList<RangeSpecificationFilter> Specifications { get { return specifications; } }
+
+        public override string ToString()
+        {
+            return "range: " + field + "(" + String.Join(",", specifications.Select(s => s.ToString())) + ")";
+        }
     }
 
     [DebuggerDisplay("{name,nq} {value}")]
@@ -42,5 +49,10 @@ namespace ElasticLinq.Request.Filters
 
         public string Name { get { return name; } }
         public object Value { get { return value; } }
+
+        public override string ToString()
+        {
+            return name + " " + value;
+        }
     }
 }

@@ -9,7 +9,7 @@ namespace ElasticLinq.Request.Filters
 {
     internal class AndFilter : CompoundFilter
     {
-        public static IFilter Combine(IFilter[] filters)
+        public static IFilter Combine(params IFilter[] filters)
         {
             if (filters == null)
                 throw new ArgumentNullException("filters");

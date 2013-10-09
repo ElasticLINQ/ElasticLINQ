@@ -40,6 +40,11 @@ namespace ElasticLinq.Request.Visitors
         {
             get { return typeof(bool); }
         }
+
+        public override string ToString()
+        {
+            return filter.ToString();
+        }
     }
 
     /// <summary>
@@ -56,7 +61,7 @@ namespace ElasticLinq.Request.Visitors
         private string type;
         private int skip;
         private int? take;
-        private FilterExpression filterExpression;
+        private IFilter filter;
 
         public ElasticQueryTranslator(IElasticMapping mapping)
         {
@@ -67,17 +72,18 @@ namespace ElasticLinq.Request.Visitors
         {
             projectParameter = Expression.Parameter(typeof(JObject), "r");
 
-            e = PartialEvaluator.Evaluate(e);
-            Visit(e);
+            Visit(PartialEvaluator.Evaluate(e));
+
+            var result = new ElasticTranslateResult();
 
             if (projection != null)
-                fields.AddRange(projection.Fields);
-
-            return new ElasticTranslateResult
             {
-                SearchRequest = new ElasticSearchRequest(type, skip, take, fields, sortOptions, filterExpression.Filter),
-                Projector = projection != null ? Expression.Lambda(projection.Selector, projectParameter) : null
-            };
+                result.Projector = Expression.Lambda(projection.Selector, projectParameter);
+                fields.AddRange(projection.Fields);
+            }
+
+            result.SearchRequest = new ElasticSearchRequest(type, skip, take, fields, sortOptions, filter);
+            return result;
         }
 
         protected override Expression VisitMethodCall(MethodCallExpression m)
@@ -130,13 +136,12 @@ namespace ElasticLinq.Request.Visitors
         {
             Visit(match);
 
-            var constantSource = source as ConstantExpression;
-            if (constantSource != null)
+            if (source is ConstantExpression)
             {
                 var field = mapping.GetFieldName(whereMemberInfos.Pop());
-                var values = new List<object>(((IEnumerable)constantSource.Value).Cast<object>());
-                filterExpression = new FilterExpression(new TermFilter(field, values.Distinct().ToArray()));
-                return filterExpression;
+                var containsSource = ((IEnumerable) ((ConstantExpression) source).Value).Cast<object>();
+                var values = new List<object>(containsSource);
+                return new FilterExpression(new TermFilter(field, values.Distinct().ToArray()));
             }
 
             throw new NotImplementedException("Unknown source for Contains");
@@ -238,11 +243,27 @@ namespace ElasticLinq.Request.Visitors
             inWhereCondition = true; // TODO: Replace with context-sensitive stack
 
             var lambda = (LambdaExpression)StripQuotes(predicate);
-            Visit(lambda);
+            var criteriaExpression = Visit(lambda.Body);
+
+            if (criteriaExpression is FilterExpression)            
+                filter = MakeNextFilter(((FilterExpression) criteriaExpression).Filter);
+            else
+                throw new NotSupportedException(String.Format("Unknown where predicate {0}", criteriaExpression));
 
             inWhereCondition = false;
 
             return Visit(source);
+        }
+
+        private IFilter MakeNextFilter(IFilter thisFilter)
+        {
+            if (filter == null)
+                return thisFilter;
+
+            if (filter is AndFilter)
+                return AndFilter.Combine(((AndFilter) filter).Filters.Concat(new[] { thisFilter }).ToArray());
+
+            return AndFilter.Combine(filter, thisFilter);
         }
 
         protected override Expression VisitBinary(BinaryExpression b)
@@ -270,15 +291,13 @@ namespace ElasticLinq.Request.Visitors
         private Expression VisitAndAlso(BinaryExpression b)
         {
             var filters = AssertExpressionsOfType<FilterExpression>(b.Left, b.Right).Select(f => f.Filter).ToArray();
-            filterExpression = new FilterExpression(AndFilter.Combine(filters));
-            return filterExpression;
+            return new FilterExpression(AndFilter.Combine(filters));
         }
 
         private Expression VisitOrElse(BinaryExpression b)
         {
             var filters = AssertExpressionsOfType<FilterExpression>(b.Left, b.Right).Select(f => f.Filter).ToArray();
-            filterExpression = new FilterExpression(OrFilter.Combine(filters));
-            return filterExpression;
+            return new FilterExpression(OrFilter.Combine(filters));
         }
 
         private IEnumerable<T> AssertExpressionsOfType<T>(params Expression[] expressions) where T : Expression
@@ -319,9 +338,7 @@ namespace ElasticLinq.Request.Visitors
             {
                 var field = mapping.GetFieldName(whereMemberInfos.Pop());
                 var specification = new RangeSpecificationFilter(ExpressionTypeToRangeType(t), whereConstants.Pop().Value);
-                var expression = new FilterExpression(new RangeFilter(field, specification));
-                filterExpression = expression;
-                return expression;
+                return new FilterExpression(new RangeFilter(field, specification));
             }
 
             return null;
@@ -351,10 +368,7 @@ namespace ElasticLinq.Request.Visitors
             if (haveMemberAndConstant)
             {
                 var field = mapping.GetFieldName(whereMemberInfos.Pop());
-                var expression = new FilterExpression(new TermFilter(field, whereConstants.Pop().Value));
-                if (filterExpression == null)
-                    filterExpression = expression;
-                return expression;
+                return new FilterExpression(new TermFilter(field, whereConstants.Pop().Value));
             }
 
             return null;
