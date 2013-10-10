@@ -30,18 +30,11 @@ namespace ElasticLinq.Response
 
         internal static List<T> Materialize<T>(ElasticResponse response, Func<JObject, T> projector)
         {
-            Func<Hit, T> func;
-            if (projector == null)
-                func = h => h._source.ToObject<T>();
-            else
-                func = h => projector(h.fields);           
+            var func = projector != null
+                ? (Func<Hit, T>) (h => projector(h.fields))
+                : (h => h._source.ToObject<T>()) ;
 
-            var materialized = response
-                .hits.hits
-                .Select(func)
-                .ToList();
-
-            return materialized;
+            return response.hits.hits.Select(func).ToList();
         }
     }
 }

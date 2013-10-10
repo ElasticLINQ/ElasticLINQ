@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
+using System.Runtime.InteropServices;
 using ElasticLinq.Mapping;
 using ElasticLinq.Request.Expressions;
 using ElasticLinq.Request.Filters;
@@ -27,7 +28,7 @@ namespace ElasticLinq.Request.Visitors
     {
         private readonly IElasticMapping mapping;
         private Projection projection;
-        private ParameterExpression projectionParameter;
+        private readonly ParameterExpression projectionParameter = Expression.Parameter(typeof(JObject), "r");
 
         private readonly List<string> fields = new List<string>();
         private readonly List<SortOption> sortOptions = new List<SortOption>();
@@ -36,18 +37,21 @@ namespace ElasticLinq.Request.Visitors
         private int? take;
         private IFilter topFilter;
 
-        public ElasticQueryTranslator(IElasticMapping mapping)
+        private ElasticQueryTranslator(IElasticMapping mapping)
         {
             this.mapping = mapping;
         }
 
-        internal ElasticTranslateResult Translate(Expression e)
+        internal static ElasticTranslateResult Translate(IElasticMapping mapping, Expression e)
         {
-            projectionParameter = Expression.Parameter(typeof(JObject), "r");
+            return new ElasticQueryTranslator(mapping).Translate(e);
+        }
 
-            Visit(e);
-
+        private ElasticTranslateResult Translate(Expression e)
+        {
+            Visit(e);            
             var result = new ElasticTranslateResult();
+
             if (projection != null)
             {
                 result.Projector = Expression.Lambda(projection.Selector, projectionParameter);
@@ -390,14 +394,9 @@ namespace ElasticLinq.Request.Visitors
             var selectBody = Visit(lambda.Body);
 
             if (selectBody is NewExpression || selectBody is MemberExpression || selectBody is MethodCallExpression)
-                VisitSelectNew(selectBody);
+                projection = ProjectionVisitor.ProjectColumns(projectionParameter, mapping, selectBody);
 
             return Visit(source);
-        }
-
-        private void VisitSelectNew(Expression selectBody)
-        {
-            projection = ProjectionVisitor.ProjectColumns(projectionParameter, mapping, selectBody);
         }
 
         private Expression VisitSkip(Expression source, Expression skipExpression)

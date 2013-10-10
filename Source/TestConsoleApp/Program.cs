@@ -35,7 +35,7 @@ namespace TestConsoleApp
                 //.Take(i + 1)
                 //.OrderByDescending(o => o.Year)
                 //.ThenByScore()
-                //.Select(a => Tuple.Create(a.Title, a.Title, a.Year))
+                .Select(a => Tuple.Create(a.Title, a.Title, a.Year))
                 ;
 
             DumpQuery(query);

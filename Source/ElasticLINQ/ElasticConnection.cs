@@ -19,6 +19,11 @@ namespace ElasticLinq
 
         public ElasticConnection(Uri endpoint, TimeSpan timeout, string index = null, bool preferGetRequests = false)
         {
+            if (endpoint == null)
+                throw new ArgumentNullException("endpoint");
+            if (timeout == null)
+                throw new ArgumentNullException("timeout");
+
             this.endpoint = endpoint;
             this.timeout = timeout;
             this.index = index ?? "";
