@@ -101,9 +101,9 @@ namespace ElasticLinq.Request.Visitors
             {
                 case "Equals":
                     if (m.Arguments.Count == 1)
-                        return VisitEqualsMethodCall(m.Object, m.Arguments[0]) ?? m;
+                        return VisitEquals(Visit(m.Object), Visit(m.Arguments[0]));
                     if (m.Arguments.Count == 2)
-                        return VisitEqualsMethodCall(m.Arguments[0], m.Arguments[1]) ?? m;
+                        return VisitEquals(Visit(m.Arguments[0]), Visit(m.Arguments[1]));
 
                     break;
 
@@ -134,24 +134,17 @@ namespace ElasticLinq.Request.Visitors
 
         private Expression VisitEnumerableContainsMethodCall(Expression source, Expression match)
         {
-            Visit(match);
+            var matched = Visit(match);
 
-            if (source is ConstantExpression)
+            if (source is ConstantExpression && matched is MemberExpression)
             {
-                var field = mapping.GetFieldName(whereMemberInfos.Pop());
-                var containsSource = ((IEnumerable) ((ConstantExpression) source).Value).Cast<object>();
+                var field = mapping.GetFieldName(((MemberExpression)matched).Member);
+                var containsSource = ((IEnumerable)((ConstantExpression)source).Value).Cast<object>();
                 var values = new List<object>(containsSource);
                 return new FilterExpression(new TermFilter(field, values.Distinct().ToArray()));
             }
 
             throw new NotImplementedException("Unknown source for Contains");
-        }
-
-        internal Expression VisitEqualsMethodCall(Expression left, Expression right)
-        {
-            Visit(left);
-            Visit(right);
-            return MakeEquals();
         }
 
         internal Expression VisitElasticMethodCall(MethodCallExpression m)
@@ -210,17 +203,19 @@ namespace ElasticLinq.Request.Visitors
             if (c.Value is IQueryable)
                 SetType(((IQueryable)c.Value).ElementType);
 
-            if (inWhereCondition)
-                whereConstants.Push(c);
-
             return c;
+        }
+
+        protected override Expression VisitUnary(UnaryExpression node)
+        {
+            if (node.NodeType == ExpressionType.Convert)
+                return node.Operand;
+
+            return base.VisitUnary(node);
         }
 
         protected override Expression VisitMember(MemberExpression m)
         {
-            if (inWhereCondition)
-                whereMemberInfos.Push(m.Member);
-
             if (m.Expression == null || m.Expression.NodeType != ExpressionType.Parameter)
                 throw new NotSupportedException(string.Format("The memberInfo '{0}' is not supported", m.Member.Name));
 
@@ -234,23 +229,15 @@ namespace ElasticLinq.Request.Visitors
             return e;
         }
 
-        private bool inWhereCondition;
-        private readonly Stack<MemberInfo> whereMemberInfos = new Stack<MemberInfo>();
-        private readonly Stack<ConstantExpression> whereConstants = new Stack<ConstantExpression>();
-
         private Expression VisitWhere(Expression source, Expression predicate)
         {
-            inWhereCondition = true; // TODO: Replace with context-sensitive stack
-
             var lambda = (LambdaExpression)StripQuotes(predicate);
             var criteriaExpression = Visit(lambda.Body);
 
-            if (criteriaExpression is FilterExpression)            
-                filter = MakeNextFilter(((FilterExpression) criteriaExpression).Filter);
+            if (criteriaExpression is FilterExpression)
+                filter = MakeNextFilter(((FilterExpression)criteriaExpression).Filter);
             else
                 throw new NotSupportedException(String.Format("Unknown where predicate {0}", criteriaExpression));
-
-            inWhereCondition = false;
 
             return Visit(source);
         }
@@ -261,7 +248,7 @@ namespace ElasticLinq.Request.Visitors
                 return thisFilter;
 
             if (filter is AndFilter)
-                return AndFilter.Combine(((AndFilter) filter).Filters.Concat(new[] { thisFilter }).ToArray());
+                return AndFilter.Combine(((AndFilter)filter).Filters.Concat(new[] { thisFilter }).ToArray());
 
             return AndFilter.Combine(filter, thisFilter);
         }
@@ -311,35 +298,46 @@ namespace ElasticLinq.Request.Visitors
 
         private Expression VisitComparisonBinary(BinaryExpression b)
         {
-            Visit(b.Left);
-            Visit(b.Right);
+            var left = Visit(b.Left);
+            var right = Visit(b.Right);
 
             switch (b.NodeType)
             {
                 case ExpressionType.Equal:
-                    return MakeEquals() ?? b;
+                    return VisitEquals(left, right);
 
                 case ExpressionType.GreaterThan:
                 case ExpressionType.GreaterThanOrEqual:
                 case ExpressionType.LessThan:
                 case ExpressionType.LessThanOrEqual:
-                    return MakeRange(b.NodeType) ?? b;
+                    return VisitRange(b.NodeType, left, right);
 
                 default:
                     throw new NotImplementedException(String.Format("Don't yet know {0}", b.NodeType));
             }
         }
 
-        private Expression MakeRange(ExpressionType t)
+        private Expression VisitRange(ExpressionType t, Expression left, Expression right)
         {
-            var haveMemberAndConstant = whereMemberInfos.Any() && whereConstants.Any();
+            var o = OrganizeConstantAndMember(left, right);
 
-            if (haveMemberAndConstant)
+            if (o != null)
             {
-                var field = mapping.GetFieldName(whereMemberInfos.Pop());
-                var specification = new RangeSpecificationFilter(ExpressionTypeToRangeType(t), whereConstants.Pop().Value);
+                var field = mapping.GetFieldName(o.Item2.Member);
+                var specification = new RangeSpecificationFilter(ExpressionTypeToRangeType(t), o.Item1.Value);
                 return new FilterExpression(new RangeFilter(field, specification));
             }
+
+            throw new NotSupportedException("A range expression must consist of a constant and a member");
+        }
+
+        private static Tuple<ConstantExpression, MemberExpression> OrganizeConstantAndMember(Expression a, Expression b)
+        {
+            if (a is ConstantExpression && b is MemberExpression)
+                return Tuple.Create((ConstantExpression)a, (MemberExpression)b);
+
+            if (b is ConstantExpression && a is MemberExpression)
+                return Tuple.Create((ConstantExpression)b, (MemberExpression)a);
 
             return null;
         }
@@ -361,17 +359,13 @@ namespace ElasticLinq.Request.Visitors
             throw new ArgumentOutOfRangeException("t");
         }
 
-        private Expression MakeEquals()
+        private Expression VisitEquals(Expression left, Expression right)
         {
-            var haveMemberAndConstant = whereMemberInfos.Any() && whereConstants.Any();
+            var o = OrganizeConstantAndMember(left, right);
+            if (o != null)
+                return new FilterExpression(new TermFilter(mapping.GetFieldName(o.Item2.Member), o.Item1.Value));
 
-            if (haveMemberAndConstant)
-            {
-                var field = mapping.GetFieldName(whereMemberInfos.Pop());
-                return new FilterExpression(new TermFilter(field, whereConstants.Pop().Value));
-            }
-
-            return null;
+            throw new NotSupportedException("Equality must be between a Member and a Constant");
         }
 
         private Expression VisitOrderBy(Expression source, Expression orderByExpression, bool ascending)
