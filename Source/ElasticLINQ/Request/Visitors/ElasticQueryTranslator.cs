@@ -180,8 +180,19 @@ namespace ElasticLinq.Request.Visitors
 
         protected override Expression VisitUnary(UnaryExpression node)
         {
-            if (node.NodeType == ExpressionType.Convert)
-                return node.Operand;
+            switch (node.NodeType)
+            {
+                case ExpressionType.Convert:
+                    return node.Operand;
+
+                case ExpressionType.Not:
+                {
+                    var subExpression = Visit(node.Operand) as FilterExpression;
+                    if (subExpression != null)
+                        return new FilterExpression(new NotFilter(subExpression.Filter));
+                    break;
+                }
+            }
 
             return base.VisitUnary(node);
         }
