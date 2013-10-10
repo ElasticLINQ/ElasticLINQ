@@ -9,13 +9,16 @@ namespace ElasticLinq.Request.Filters
 {
     internal class AndFilter : CompoundFilter
     {
+        private static readonly AndFilter empty = new AndFilter();
+        public static AndFilter Empty { get { return empty; } }
+
         public static IFilter Combine(params IFilter[] filters)
         {
             if (filters == null)
                 throw new ArgumentNullException("filters");
 
             var combinedFilters = new List<IFilter>(filters);
-            
+
             CombineRanges(combinedFilters);
 
             return new AndFilter(combinedFilters);

@@ -35,7 +35,7 @@ namespace ElasticLinq.Request.Visitors
         private string type;
         private int skip;
         private int? take;
-        private IFilter topFilter;
+        private IFilter topFilter = AndFilter.Empty;
 
         private ElasticQueryTranslator(IElasticMapping mapping)
         {
@@ -49,7 +49,7 @@ namespace ElasticLinq.Request.Visitors
 
         private ElasticTranslateResult Translate(Expression e)
         {
-            Visit(e);            
+            Visit(e);
             var result = new ElasticTranslateResult();
 
             if (projection != null)
@@ -190,12 +190,12 @@ namespace ElasticLinq.Request.Visitors
                     return node.Operand;
 
                 case ExpressionType.Not:
-                {
-                    var subExpression = Visit(node.Operand) as FilterExpression;
-                    if (subExpression != null)
-                        return new FilterExpression(new NotFilter(subExpression.Filter));
-                    break;
-                }
+                    {
+                        var subExpression = Visit(node.Operand) as FilterExpression;
+                        if (subExpression != null)
+                            return new FilterExpression(new NotFilter(subExpression.Filter));
+                        break;
+                    }
             }
 
             return base.VisitUnary(node);
@@ -219,21 +219,18 @@ namespace ElasticLinq.Request.Visitors
         private Expression VisitWhere(Expression source, Expression predicate)
         {
             var lambda = (LambdaExpression)StripQuotes(predicate);
-            var criteriaExpression = Visit(lambda.Body);
+            var body = Visit(BooleanMemberAccessBecomesEquals(lambda.Body));
 
-            if (criteriaExpression is FilterExpression)
-                topFilter = CombineFilter(((FilterExpression)criteriaExpression).Filter);
+            if (body is FilterExpression)
+                topFilter = CombineFilter(((FilterExpression)body).Filter);
             else
-                throw new NotSupportedException(String.Format("Unknown where predicate {0}", criteriaExpression));
+                throw new NotSupportedException(String.Format("Unknown where predicate {0}", body));
 
             return Visit(source);
         }
 
         private IFilter CombineFilter(IFilter thisFilter)
         {
-            if (topFilter == null)
-                return thisFilter;
-
             if (topFilter is AndFilter)
                 return AndFilter.Combine(((AndFilter)topFilter).Filters.Concat(new[] { thisFilter }).ToArray());
 
@@ -277,11 +274,23 @@ namespace ElasticLinq.Request.Visitors
 
         private IEnumerable<T> AssertExpressionsOfType<T>(params Expression[] expressions) where T : Expression
         {
-            foreach (var expression in expressions.Select(Visit))
+            foreach (var expression in expressions.Select(e => Visit(BooleanMemberAccessBecomesEquals(e))))
                 if ((expression as T) == null)
                     throw new NotImplementedException(string.Format("Unknown binary expression {0}", expression));
                 else
                     yield return (T)expression;
+        }
+
+        private Expression BooleanMemberAccessBecomesEquals(Expression e)
+        {
+            var test = e.NodeType != ExpressionType.Not;
+            if (e is UnaryExpression)
+                e = Visit(((UnaryExpression) e).Operand);
+
+            if (e is MemberExpression && e.Type == typeof(bool))
+                return Expression.Equal(e, Expression.Constant(test));
+
+            return e;
         }
 
         private Expression VisitComparisonBinary(BinaryExpression b)
@@ -312,7 +321,7 @@ namespace ElasticLinq.Request.Visitors
         {
             var o = OrganizeConstantAndMember(left, right);
 
-            if (o != null) 
+            if (o != null)
                 return new FilterExpression(new NotFilter(new TermFilter(mapping.GetFieldName(o.Item2.Member), o.Item1.Value)));
 
             throw new NotSupportedException("A NotEqual Expression must consist of a constant and a member");

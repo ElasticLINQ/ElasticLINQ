@@ -28,14 +28,15 @@ namespace TestConsoleApp
 
             var i = 7;
             var query = new ElasticQuery<Movie>(elasticProvider)
-                .Where(m => (m.Year == 1962 && m.Director == "Robert Mulligan") || (!m.Year.Equals(1972)))
+                .Where(m => !m.Awesome)
+                //.Where(m => (m.Year == 1962 && m.Director == "Robert Mulligan") || m.Year < DateTime.Now.Year)
                 //.Where(m => y.Contains(m.Year) || int.Equals(m.Year, 1962) || m.Year != 1961)
                 //.Where(m => m.Year >= 1960 && m.Year <= 1980)
                 //.Skip(1)
                 //.Take(i + 1)
                 //.OrderByDescending(o => o.Year)
-                //.ThenByScore()
-                .Select(a => Tuple.Create(a.Title, a.Title, a.Year))
+                //.OrderByScore()
+                //.Select(a => Tuple.Create(a.Title, a.Title, a.Year))
                 ;
 
             DumpQuery(query);
@@ -59,6 +60,7 @@ namespace TestConsoleApp
         public string Title;
         public string Director;
         public int Year;
+        public bool Awesome;
 
         public override string ToString()
         {
