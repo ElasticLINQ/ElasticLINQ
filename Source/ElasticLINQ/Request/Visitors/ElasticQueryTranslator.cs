@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
 using ElasticLinq.Mapping;
+using ElasticLinq.Request.Expressions;
 using ElasticLinq.Request.Filters;
 using ElasticLinq.Utility;
 using Newtonsoft.Json.Linq;
@@ -10,7 +11,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 
 namespace ElasticLinq.Request.Visitors
 {
@@ -20,33 +20,6 @@ namespace ElasticLinq.Request.Visitors
         public LambdaExpression Projector;
     }
 
-    internal class FilterExpression : Expression
-    {
-        private readonly IFilter filter;
-
-        public FilterExpression(IFilter filter)
-        {
-            this.filter = filter;
-        }
-
-        public IFilter Filter { get { return filter; } }
-
-        public override ExpressionType NodeType
-        {
-            get { return (ExpressionType)10000; }
-        }
-
-        public override Type Type
-        {
-            get { return typeof(bool); }
-        }
-
-        public override string ToString()
-        {
-            return filter.ToString();
-        }
-    }
-
     /// <summary>
     /// Expression visitor to translate a LINQ query into ElasticSearch request.
     /// </summary>
@@ -54,14 +27,14 @@ namespace ElasticLinq.Request.Visitors
     {
         private readonly IElasticMapping mapping;
         private Projection projection;
-        private ParameterExpression projectParameter;
+        private ParameterExpression projectionParameter;
 
         private readonly List<string> fields = new List<string>();
         private readonly List<SortOption> sortOptions = new List<SortOption>();
         private string type;
         private int skip;
         private int? take;
-        private IFilter filter;
+        private IFilter topFilter;
 
         public ElasticQueryTranslator(IElasticMapping mapping)
         {
@@ -70,19 +43,16 @@ namespace ElasticLinq.Request.Visitors
 
         internal ElasticTranslateResult Translate(Expression e)
         {
-            projectParameter = Expression.Parameter(typeof(JObject), "r");
-
-            Visit(PartialEvaluator.Evaluate(e));
+            projectionParameter = Expression.Parameter(typeof(JObject), "r");
 
             var result = new ElasticTranslateResult();
-
             if (projection != null)
             {
-                result.Projector = Expression.Lambda(projection.Selector, projectParameter);
+                result.Projector = Expression.Lambda(projection.Selector, projectionParameter);
                 fields.AddRange(projection.Fields);
             }
 
-            result.SearchRequest = new ElasticSearchRequest(type, skip, take, fields, sortOptions, filter);
+            result.SearchRequest = new ElasticSearchRequest(type, skip, take, fields, sortOptions, topFilter);
             return result;
         }
 
@@ -235,22 +205,22 @@ namespace ElasticLinq.Request.Visitors
             var criteriaExpression = Visit(lambda.Body);
 
             if (criteriaExpression is FilterExpression)
-                filter = MakeNextFilter(((FilterExpression)criteriaExpression).Filter);
+                topFilter = CombineFilter(((FilterExpression)criteriaExpression).Filter);
             else
                 throw new NotSupportedException(String.Format("Unknown where predicate {0}", criteriaExpression));
 
             return Visit(source);
         }
 
-        private IFilter MakeNextFilter(IFilter thisFilter)
+        private IFilter CombineFilter(IFilter thisFilter)
         {
-            if (filter == null)
+            if (topFilter == null)
                 return thisFilter;
 
-            if (filter is AndFilter)
-                return AndFilter.Combine(((AndFilter)filter).Filters.Concat(new[] { thisFilter }).ToArray());
+            if (topFilter is AndFilter)
+                return AndFilter.Combine(((AndFilter)topFilter).Filters.Concat(new[] { thisFilter }).ToArray());
 
-            return AndFilter.Combine(filter, thisFilter);
+            return AndFilter.Combine(topFilter, thisFilter);
         }
 
         protected override Expression VisitBinary(BinaryExpression b)
@@ -264,6 +234,7 @@ namespace ElasticLinq.Request.Visitors
                     return VisitAndAlso(b);
 
                 case ExpressionType.Equal:
+                case ExpressionType.NotEqual:
                 case ExpressionType.GreaterThan:
                 case ExpressionType.GreaterThanOrEqual:
                 case ExpressionType.LessThan:
@@ -306,6 +277,9 @@ namespace ElasticLinq.Request.Visitors
                 case ExpressionType.Equal:
                     return VisitEquals(left, right);
 
+                case ExpressionType.NotEqual:
+                    return VisitNotEqual(left, right);
+
                 case ExpressionType.GreaterThan:
                 case ExpressionType.GreaterThanOrEqual:
                 case ExpressionType.LessThan:
@@ -315,6 +289,16 @@ namespace ElasticLinq.Request.Visitors
                 default:
                     throw new NotImplementedException(String.Format("Don't yet know {0}", b.NodeType));
             }
+        }
+
+        private Expression VisitNotEqual(Expression left, Expression right)
+        {
+            var o = OrganizeConstantAndMember(left, right);
+
+            if (o != null) 
+                return new FilterExpression(new NotFilter(new TermFilter(mapping.GetFieldName(o.Item2.Member), o.Item1.Value)));
+
+            throw new NotSupportedException("A NotEqual Expression must consist of a constant and a member");
         }
 
         private Expression VisitRange(ExpressionType t, Expression left, Expression right)
@@ -328,7 +312,7 @@ namespace ElasticLinq.Request.Visitors
                 return new FilterExpression(new RangeFilter(field, specification));
             }
 
-            throw new NotSupportedException("A range expression must consist of a constant and a member");
+            throw new NotSupportedException("A range must consist of a constant and a member");
         }
 
         private static Tuple<ConstantExpression, MemberExpression> OrganizeConstantAndMember(Expression a, Expression b)
@@ -400,7 +384,7 @@ namespace ElasticLinq.Request.Visitors
 
         private void VisitSelectNew(Expression selectBody)
         {
-            projection = ProjectionVisitor.ProjectColumns(projectParameter, mapping, selectBody);
+            projection = ProjectionVisitor.ProjectColumns(projectionParameter, mapping, selectBody);
         }
 
         private Expression VisitSkip(Expression source, Expression skipExpression)

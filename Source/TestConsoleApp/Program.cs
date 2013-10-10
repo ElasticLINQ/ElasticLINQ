@@ -29,7 +29,7 @@ namespace TestConsoleApp
             var i = 7;
             var query = new ElasticQuery<Movie>(elasticProvider)
                 .Where(m => (m.Year == 1962 && m.Director == "Robert Mulligan") || (m.Year.Equals(1972)))
-                .Where(m => y.Contains(m.Year) || int.Equals(m.Year, 1962) || m.Year == 1961)
+                .Where(m => y.Contains(m.Year) || int.Equals(m.Year, 1962) || m.Year != 1961)
                 .Where(m => m.Year >= 1960 && m.Year <= 1980)
                 .Skip(1)
                 .Take(i + 1)

@@ -15,7 +15,7 @@ namespace ElasticLinq.Request.Formatter
             var useGet = connection.PreferGetRequests && !requiresPostBody;
 
             return useGet
-                ? (RequestFormatter) new GetQueryRequestFormatter(connection, searchRequest)
+                ? (RequestFormatter)new GetQueryRequestFormatter(connection, searchRequest)
                 : new PostBodyRequestFormatter(connection, searchRequest);
         }
 
@@ -28,7 +28,7 @@ namespace ElasticLinq.Request.Formatter
             SearchRequest = searchRequest;
         }
 
-        protected abstract void CompleteSearchUri(UriBuilder builder);             
+        protected abstract void CompleteSearchUri(UriBuilder builder);
 
         public Uri Uri
         {
@@ -62,5 +62,5 @@ namespace ElasticLinq.Request.Formatter
 
             return timeSpan.TotalMinutes.ToString(CultureInfo.InvariantCulture) + "m";
         }
-   }
+    }
 }

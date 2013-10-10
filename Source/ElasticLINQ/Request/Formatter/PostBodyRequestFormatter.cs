@@ -64,10 +64,18 @@ namespace ElasticLinq.Request.Formatter
             if (filter is TermFilter)
                 return BuildTermsFilter((TermFilter)filter);
 
+            if (filter is NotFilter)
+                return BuildNotFilter((NotFilter)filter);
+
             if (filter is CompoundFilter)
                 return BuildCompoundFilter((CompoundFilter)filter);
 
             throw new InvalidOperationException(String.Format("Unknown filter type {0}", filter.GetType()));
+        }
+
+        private static JObject BuildNotFilter(NotFilter filter)
+        {
+            return new JObject(new JProperty(filter.Name, BuildFilter(filter.SubFilter)));
         }
 
         private static JObject BuildRangeFilter(RangeFilter filter)
