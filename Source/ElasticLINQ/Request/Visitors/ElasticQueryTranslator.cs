@@ -45,6 +45,8 @@ namespace ElasticLinq.Request.Visitors
         {
             projectionParameter = Expression.Parameter(typeof(JObject), "r");
 
+            Visit(e);
+
             var result = new ElasticTranslateResult();
             if (projection != null)
             {
