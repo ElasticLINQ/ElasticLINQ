@@ -80,19 +80,23 @@ namespace ElasticLinq.Request.Formatter
 
         private static JObject BuildRangeFilter(RangeFilter filter)
         {
+            // Range filters can be combined by field
             return new JObject(new JProperty(filter.Name, new JObject(new JProperty(filter.Field,
                    new JObject(filter.Specifications.Select(s => new JProperty(s.Name, s.Value)).ToList())))));
         }
 
         private static JObject BuildTermsFilter(TermFilter filter)
         {
+            // Terms filter with one item is a single term filter
             var value = filter.Values.Count == 1 ? filter.Values[0] : new JArray(filter.Values.ToArray());
             return new JObject(new JProperty(filter.Name, new JObject(new JProperty(filter.Field, value))));
         }
 
         private static JObject BuildCompoundFilter(CompoundFilter filter)
         {
-            return new JObject(new JProperty(filter.Name, new JArray(filter.Filters.Select(BuildFilter).ToList())));
+            return filter.Filters.Count == 1    // A compound filter with one item can be collapsed
+                ? BuildFilter(filter.Filters.First())
+                : new JObject(new JProperty(filter.Name, new JArray(filter.Filters.Select(BuildFilter).ToList())));
         }
     }
 }

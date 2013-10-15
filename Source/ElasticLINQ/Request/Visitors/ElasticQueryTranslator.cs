@@ -35,7 +35,7 @@ namespace ElasticLinq.Request.Visitors
         private Type type;
         private int skip;
         private int? take;
-        private IFilter topFilter = AndFilter.Empty;
+        private IFilter topFilter;
 
         private ElasticQueryTranslator(IElasticMapping mapping)
         {
@@ -220,15 +220,18 @@ namespace ElasticLinq.Request.Visitors
             var body = Visit(BooleanMemberAccessBecomesEquals(lambda.Body));
 
             if (body is FilterExpression)
-                topFilter = CombineFilter(((FilterExpression)body).Filter);
+                topFilter = AddFilter(((FilterExpression)body).Filter);
             else
                 throw new NotSupportedException(String.Format("Unknown where predicate {0}", body));
 
             return Visit(source);
         }
 
-        private IFilter CombineFilter(IFilter thisFilter)
+        private IFilter AddFilter(IFilter thisFilter)
         {
+            if (topFilter == null)
+                return thisFilter;
+
             if (topFilter is AndFilter)
                 return AndFilter.Combine(((AndFilter)topFilter).Filters.Concat(new[] { thisFilter }).ToArray());
 
@@ -261,6 +264,9 @@ namespace ElasticLinq.Request.Visitors
         private Expression VisitAndAlso(BinaryExpression b)
         {
             var filters = AssertExpressionsOfType<FilterExpression>(b.Left, b.Right).Select(f => f.Filter).ToArray();
+
+
+
             return new FilterExpression(AndFilter.Combine(filters));
         }
 
