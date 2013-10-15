@@ -2,11 +2,9 @@
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
 using ElasticLinq.Response.Model;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 
 namespace ElasticLinq.Response
@@ -19,22 +17,16 @@ namespace ElasticLinq.Response
         private static readonly MethodInfo materializer = typeof(ElasticResponseMaterializer)
             .GetMethod("Materialize", BindingFlags.NonPublic | BindingFlags.Static);
 
-        public object Materialize(ElasticResponse elasticResponse, Type elementType, LambdaExpression projectionExpression)
+        public object Materialize(ElasticResponse elasticResponse, Type elementType, Func<Hit, object> projector)
         {
-            var projector = projectionExpression == null ? null : projectionExpression.Compile();
-
             return materializer
                 .MakeGenericMethod(elementType)
                 .Invoke(this, new object[] { elasticResponse, projector });
         }
 
-        internal static List<T> Materialize<T>(ElasticResponse response, Func<JObject, T> projector)
+        internal static List<T> Materialize<T>(ElasticResponse response, Func<Hit, object> projector)
         {
-            var func = projector != null
-                ? (Func<Hit, T>) (h => projector(h.fields))
-                : (h => h._source.ToObject<T>()) ;
-
-            return response.hits.hits.Select(func).ToList();
+            return response.hits.hits.Select(projector).Cast<T>().ToList();
         }
     }
 }

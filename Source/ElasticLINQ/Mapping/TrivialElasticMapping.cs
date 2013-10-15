@@ -3,6 +3,8 @@
 
 using System;
 using System.Reflection;
+using ElasticLinq.Response.Model;
+using Newtonsoft.Json.Linq;
 
 namespace ElasticLinq.Mapping
 {
@@ -19,6 +21,11 @@ namespace ElasticLinq.Mapping
         public string GetTypeName(Type type)
         {
             return Plualize(MakeCamelCase(type.Name));
+        }
+
+        public JToken GetObjectSource(Type type, Hit hit)
+        {
+            return hit._source;
         }
 
         private static string MakeCamelCase(string value)

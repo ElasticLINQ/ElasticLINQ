@@ -12,7 +12,7 @@ namespace ElasticLinq.Request.Visitors
     internal class Projection
     {
         internal readonly HashSet<string> Fields = new HashSet<string>();
-        internal Expression Selector;
+        internal Expression MaterializationExpression;
     }
 
     /// <summary>
@@ -35,7 +35,7 @@ namespace ElasticLinq.Request.Visitors
         internal static Projection ProjectColumns(ParameterExpression parameter, IElasticMapping mapping, Expression selector)
         {
             var projectionVisitor = new ProjectionVisitor(parameter, mapping);
-            projectionVisitor.projection.Selector = projectionVisitor.Visit(selector);
+            projectionVisitor.projection.MaterializationExpression = projectionVisitor.Visit(selector);
             return projectionVisitor.projection;
         }
 

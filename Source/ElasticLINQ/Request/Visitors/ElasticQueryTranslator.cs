@@ -1,10 +1,10 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
-using System.Runtime.InteropServices;
 using ElasticLinq.Mapping;
 using ElasticLinq.Request.Expressions;
 using ElasticLinq.Request.Filters;
+using ElasticLinq.Response.Model;
 using ElasticLinq.Utility;
 using Newtonsoft.Json.Linq;
 using System;
@@ -18,7 +18,7 @@ namespace ElasticLinq.Request.Visitors
     internal class ElasticTranslateResult
     {
         public ElasticSearchRequest SearchRequest;
-        public LambdaExpression Projector;
+        public Func<Hit, object> Projector;
     }
 
     /// <summary>
@@ -27,12 +27,12 @@ namespace ElasticLinq.Request.Visitors
     internal class ElasticQueryTranslator : ExpressionVisitor
     {
         private readonly IElasticMapping mapping;
-        private Projection projection;
         private readonly ParameterExpression projectionParameter = Expression.Parameter(typeof(JObject), "r");
-
         private readonly List<string> fields = new List<string>();
         private readonly List<SortOption> sortOptions = new List<SortOption>();
-        private string type;
+
+        private Func<Hit, Object> projector;
+        private Type type;
         private int skip;
         private int? take;
         private IFilter topFilter = AndFilter.Empty;
@@ -50,15 +50,13 @@ namespace ElasticLinq.Request.Visitors
         private ElasticTranslateResult Translate(Expression e)
         {
             Visit(e);
-            var result = new ElasticTranslateResult();
-
-            if (projection != null)
+            var result = new ElasticTranslateResult
             {
-                result.Projector = Expression.Lambda(projection.Selector, projectionParameter);
-                fields.AddRange(projection.Fields);
-            }
+                Projector = projector ?? (hit => mapping.GetObjectSource(type, hit).ToObject(type))
+            };
 
-            result.SearchRequest = new ElasticSearchRequest(type, skip, take, fields, sortOptions, topFilter);
+            var mappedTypeName = mapping.GetTypeName(type);
+            result.SearchRequest = new ElasticSearchRequest(mappedTypeName, skip, take, fields, sortOptions, topFilter);
             return result;
         }
 
@@ -403,7 +401,12 @@ namespace ElasticLinq.Request.Visitors
             var selectBody = Visit(lambda.Body);
 
             if (selectBody is NewExpression || selectBody is MemberExpression || selectBody is MethodCallExpression)
-                projection = ProjectionVisitor.ProjectColumns(projectionParameter, mapping, selectBody);
+            {
+                var projection = ProjectionVisitor.ProjectColumns(projectionParameter, mapping, selectBody);
+                fields.AddRange(projection.Fields);
+                var compiled = Expression.Lambda(projection.MaterializationExpression, projectionParameter).Compile();
+                projector = h => compiled.DynamicInvoke(h.fields);
+            }
 
             return Visit(source);
         }
@@ -426,7 +429,7 @@ namespace ElasticLinq.Request.Visitors
 
         private void SetType(Type elementType)
         {
-            type = elementType == typeof(object) ? null : mapping.GetTypeName(elementType);
+            type = elementType;
         }
     }
 }

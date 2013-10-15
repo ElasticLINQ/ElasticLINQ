@@ -21,22 +21,22 @@ namespace TestConsoleApp
 
         private static void TestBasicElasticProvider()
         {
-            var connection = new ElasticConnection(new Uri("http://192.168.2.8:9200"), TimeSpan.FromSeconds(10), preferGetRequests: false);
+            var connection = new ElasticConnection(new Uri("http://192.168.2.12:9200"), TimeSpan.FromSeconds(10), preferGetRequests: false);
             var elasticProvider = new ElasticQueryProvider(connection, new TrivialElasticMapping()) { Log = Console.Out };
 
             var y = new List<int> { 1962, 1972, 1972, 1980 };
 
             var i = 7;
             var query = new ElasticQuery<Movie>(elasticProvider)
-                .Where(m => !m.Awesome)
+                //.Where(m => !m.Awesome)
                 //.Where(m => (m.Year == 1962 && m.Director == "Robert Mulligan") || m.Year < DateTime.Now.Year)
                 //.Where(m => y.Contains(m.Year) || int.Equals(m.Year, 1962) || m.Year != 1961)
-                //.Where(m => m.Year >= 1960 && m.Year <= 1980)
+                .Where(m => m.Year >= 1960 && m.Year <= 1980)
                 //.Skip(1)
                 //.Take(i + 1)
                 //.OrderByDescending(o => o.Year)
                 //.OrderByScore()
-                //.Select(a => Tuple.Create(a.Title, a.Title, a.Year))
+                .Select(a => Tuple.Create(a.Title, a.Title, a.Year))
                 ;
 
             DumpQuery(query);

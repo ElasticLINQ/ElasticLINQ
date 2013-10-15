@@ -3,6 +3,8 @@
 
 using System;
 using System.Reflection;
+using ElasticLinq.Response.Model;
+using Newtonsoft.Json.Linq;
 
 namespace ElasticLinq.Mapping
 {
@@ -13,5 +15,6 @@ namespace ElasticLinq.Mapping
     {
         string GetFieldName(MemberInfo memberInfo);
         string GetTypeName(Type type);
+        JToken GetObjectSource(Type type, Hit hit);
     }
 }
