@@ -43,6 +43,8 @@
     <Compile Include="ElasticQuery.cs" />
     <Compile Include="ElasticQueryExtensions.cs" />
     <Compile Include="ElasticQueryProvider.cs" />
+    <Compile Include="Mapping\CouchbaseElasticMapping.cs" />
+    <Compile Include="Mapping\MappingHelpers.cs" />
     <Compile Include="Request\Filters\AndFilter.cs" />
     <Compile Include="Request\Filters\CompoundFilter.cs" />
     <Compile Include="Request\Filters\IFilter.cs" />

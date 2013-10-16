@@ -1,11 +1,9 @@
-﻿// Copyright (c) Tier 3 Inc. All rights reserved.
-// Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
-
-using System.Collections.Generic;
-using ElasticLinq;
+﻿using ElasticLinq;
 using ElasticLinq.Mapping;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using TestConsoleApp.Models;
 
 namespace TestConsoleApp
 {
@@ -13,21 +11,34 @@ namespace TestConsoleApp
     {
         private static void Main()
         {
-            TestBasicElasticProvider();
+            TestTier3Queries();
 
             Console.Write("\n\nComplete.");
             Console.ReadKey();
         }
 
+        private static void TestTier3Queries()
+        {
+            var connection = new ElasticConnection(new Uri("http://192.168.2.12:9200"), TimeSpan.FromSeconds(10), "tier3");
+            var provider = new ElasticQueryProvider(connection, new CouchbaseElasticMapping()) { Log = Console.Out };
+
+            var query1 = new ElasticQuery<AccountSubscription>(provider)
+                .Where(s => s.AccountAlias == "t3n")
+                .Where(s => s.SubscriptionId == "T3N-SOFT-SHAREENT-SAL-LAB-T3N")
+                .OrderByDescending(s => s.CreateDate);
+
+            DumpQuery(query1);
+        }
+
         private static void TestBasicElasticProvider()
         {
-            var connection = new ElasticConnection(new Uri("http://192.168.2.12:9200"), TimeSpan.FromSeconds(10), preferGetRequests: false);
-            var elasticProvider = new ElasticQueryProvider(connection, new TrivialElasticMapping()) { Log = Console.Out };
+            var connection = new ElasticConnection(new Uri("http://192.168.2.12:9200"), TimeSpan.FromSeconds(10));
+            var provider = new ElasticQueryProvider(connection, new TrivialElasticMapping()) { Log = Console.Out };
 
             var y = new List<int> { 1962, 1972, 1972, 1980 };
 
             var i = 7;
-            var query = new ElasticQuery<Movie>(elasticProvider)
+            var query = new ElasticQuery<Movie>(provider)
                 //.Where(m => !m.Awesome)
                 //.Where(m => (m.Year == 1962 && m.Director == "Robert Mulligan") || m.Year < DateTime.Now.Year)
                 //.Where(m => y.Contains(m.Year) || int.Equals(m.Year, 1962) || m.Year != 1961)
@@ -46,25 +57,10 @@ namespace TestConsoleApp
         {
             Console.WriteLine(query);
 
-            var results = query.ToList();
-
             Console.WriteLine("\nResults:");
 
-            foreach (var item in results)
+            foreach (var item in query)
                 Console.WriteLine(item);
-        }
-    }
-
-    public class Movie
-    {
-        public string Title;
-        public string Director;
-        public int Year;
-        public bool Awesome;
-
-        public override string ToString()
-        {
-            return string.Format("{0} ({1}), {2}", Title, Year, Director);
         }
     }
 }
