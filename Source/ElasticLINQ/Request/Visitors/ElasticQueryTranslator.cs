@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
+using System.Net.Mail;
 using System.Reflection;
 using ElasticLinq.Mapping;
 using ElasticLinq.Request.Expressions;
@@ -13,6 +14,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using Newtonsoft.Json.Schema;
 
 namespace ElasticLinq.Request.Visitors
 {
@@ -327,16 +329,18 @@ namespace ElasticLinq.Request.Visitors
             }
         }
 
-        private Expression CreateExists(ConstantMemberPair cm, bool positive)
+        private Expression CreateExists(ConstantMemberPair cm, bool shouldHaveValue)
         {
             var fieldName = mapping.GetFieldName(UnwrapNullableMethodExpression(cm.MemberExpression));
 
             var existsFilter = new ExistsFilter(fieldName);
 
-            if (cm.ConstantExpression.Value.Equals(positive))
+            var value = cm.ConstantExpression.Value ?? shouldHaveValue;
+
+            if (value.Equals(shouldHaveValue))
                 return new FilterExpression(existsFilter);
 
-            if (cm.ConstantExpression.Value.Equals(!positive))
+            if (value.Equals(!shouldHaveValue))
                 return new FilterExpression(new NotFilter(existsFilter));
 
             throw new NotSupportedException("A null test Expression must consist of a constant and a member and be compared to a bool");
@@ -490,9 +494,19 @@ namespace ElasticLinq.Request.Visitors
             {
                 get
                 {
-                    return memberExpression.Member.Name == "HasValue"
+                    // someProperty.HasValue
+                    if (memberExpression.Member.Name == "HasValue"
                            && constantExpression.Type == typeof(bool)
-                           && TypeHelper.IsNullableType(memberExpression.Member.DeclaringType);
+                           && TypeHelper.IsNullableType(memberExpression.Member.DeclaringType))
+                        return true;
+
+                    // someProperty == null
+                    if (TypeHelper.IsNullableType(memberExpression.Type)
+                        && constantExpression.Type == memberExpression.Type
+                        && constantExpression.Value == null)
+                        return true;
+
+                    return false;
                 }
             }
         }
