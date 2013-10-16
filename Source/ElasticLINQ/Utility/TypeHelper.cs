@@ -44,5 +44,10 @@ namespace ElasticLinq.Utility
                 sequenceType = sequenceType.BaseType;
             }
         }
+
+        public static bool IsNullableType(Type type)
+        {
+            return type != null && type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
+        }
     }
 }

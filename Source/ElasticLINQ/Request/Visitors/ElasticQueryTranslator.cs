@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
+using System.Reflection;
 using ElasticLinq.Mapping;
 using ElasticLinq.Request.Expressions;
 using ElasticLinq.Request.Filters;
@@ -201,10 +202,18 @@ namespace ElasticLinq.Request.Visitors
 
         protected override Expression VisitMember(MemberExpression m)
         {
-            if (m.Expression == null || m.Expression.NodeType != ExpressionType.Parameter)
-                throw new NotSupportedException(string.Format("The memberInfo '{0}' is not supported", m.Member.Name));
+            switch (m.Expression.NodeType)
+            {
+                case ExpressionType.Parameter:
+                    return m;
 
-            return m;
+                case ExpressionType.MemberAccess:
+                    if (m.Member.Name == "HasValue" && TypeHelper.IsNullableType(m.Member.DeclaringType))
+                        return m;
+                    break;
+            }
+
+            throw new NotSupportedException(String.Format("The MemberInfo '{0}' is not supported", m.Member.Name));
         }
 
         private static Expression StripQuotes(Expression e)
@@ -222,7 +231,7 @@ namespace ElasticLinq.Request.Visitors
             if (body is FilterExpression)
                 topFilter = AddFilter(((FilterExpression)body).Filter);
             else
-                throw new NotSupportedException(String.Format("Unknown where predicate {0}", body));
+                throw new NotSupportedException(String.Format("Unknown where predicate '{0}'", body));
 
             return Visit(source);
         }
@@ -264,9 +273,6 @@ namespace ElasticLinq.Request.Visitors
         private Expression VisitAndAlso(BinaryExpression b)
         {
             var filters = AssertExpressionsOfType<FilterExpression>(b.Left, b.Right).Select(f => f.Filter).ToArray();
-
-
-
             return new FilterExpression(AndFilter.Combine(filters));
         }
 
@@ -289,7 +295,7 @@ namespace ElasticLinq.Request.Visitors
         {
             var test = e.NodeType != ExpressionType.Not;
             if (e is UnaryExpression)
-                e = Visit(((UnaryExpression) e).Operand);
+                e = Visit(((UnaryExpression)e).Operand);
 
             if (e is MemberExpression && e.Type == typeof(bool))
                 return Expression.Equal(e, Expression.Constant(test));
@@ -321,37 +327,74 @@ namespace ElasticLinq.Request.Visitors
             }
         }
 
+        private Expression CreateExists(ConstantMemberPair cm, bool positive)
+        {
+            var fieldName = mapping.GetFieldName(UnwrapNullableMethodExpression(cm.MemberExpression));
+
+            var existsFilter = new ExistsFilter(fieldName);
+
+            if (cm.ConstantExpression.Value.Equals(positive))
+                return new FilterExpression(existsFilter);
+
+            if (cm.ConstantExpression.Value.Equals(!positive))
+                return new FilterExpression(new NotFilter(existsFilter));
+
+            throw new NotSupportedException("A null test Expression must consist of a constant and a member and be compared to a bool");
+        }
+
+        private Expression VisitEquals(Expression left, Expression right)
+        {
+            var cm = PairConstantAndMember(left, right);
+
+            if (cm != null)
+                return cm.IsNullTest
+                    ? CreateExists(cm, true)
+                    : new FilterExpression(new TermFilter(mapping.GetFieldName(cm.MemberExpression.Member), cm.ConstantExpression.Value));
+
+            throw new NotSupportedException("Equality must be between a Member and a Constant");
+        }
+
+        private static MemberInfo UnwrapNullableMethodExpression(MemberExpression m)
+        {
+            if (m.Expression is MemberExpression)
+               return ((MemberExpression) (m.Expression)).Member;
+
+            return m.Member;
+        }
+
         private Expression VisitNotEqual(Expression left, Expression right)
         {
-            var o = OrganizeConstantAndMember(left, right);
+            var cm = PairConstantAndMember(left, right);
 
-            if (o != null)
-                return new FilterExpression(new NotFilter(new TermFilter(mapping.GetFieldName(o.Item2.Member), o.Item1.Value)));
+            if (cm != null)
+                return cm.IsNullTest
+                    ? CreateExists(cm, false)
+                    : new FilterExpression(new NotFilter(new TermFilter(mapping.GetFieldName(cm.MemberExpression.Member), cm.ConstantExpression.Value)));
 
             throw new NotSupportedException("A NotEqual Expression must consist of a constant and a member");
         }
 
         private Expression VisitRange(ExpressionType t, Expression left, Expression right)
         {
-            var o = OrganizeConstantAndMember(left, right);
+            var o = PairConstantAndMember(left, right);
 
             if (o != null)
             {
-                var field = mapping.GetFieldName(o.Item2.Member);
-                var specification = new RangeSpecificationFilter(ExpressionTypeToRangeType(t), o.Item1.Value);
+                var field = mapping.GetFieldName(o.MemberExpression.Member);
+                var specification = new RangeSpecificationFilter(ExpressionTypeToRangeType(t), o.ConstantExpression.Value);
                 return new FilterExpression(new RangeFilter(field, specification));
             }
 
             throw new NotSupportedException("A range must consist of a constant and a member");
         }
 
-        private static Tuple<ConstantExpression, MemberExpression> OrganizeConstantAndMember(Expression a, Expression b)
+        private static ConstantMemberPair PairConstantAndMember(Expression a, Expression b)
         {
             if (a is ConstantExpression && b is MemberExpression)
-                return Tuple.Create((ConstantExpression)a, (MemberExpression)b);
+                return new ConstantMemberPair((ConstantExpression)a, (MemberExpression)b);
 
             if (b is ConstantExpression && a is MemberExpression)
-                return Tuple.Create((ConstantExpression)b, (MemberExpression)a);
+                return new ConstantMemberPair((ConstantExpression)b, (MemberExpression)a);
 
             return null;
         }
@@ -371,15 +414,6 @@ namespace ElasticLinq.Request.Visitors
             }
 
             throw new ArgumentOutOfRangeException("t");
-        }
-
-        private Expression VisitEquals(Expression left, Expression right)
-        {
-            var o = OrganizeConstantAndMember(left, right);
-            if (o != null)
-                return new FilterExpression(new TermFilter(mapping.GetFieldName(o.Item2.Member), o.Item1.Value));
-
-            throw new NotSupportedException("Equality must be between a Member and a Constant");
         }
 
         private Expression VisitOrderBy(Expression source, Expression orderByExpression, bool ascending)
@@ -436,6 +470,31 @@ namespace ElasticLinq.Request.Visitors
         private void SetType(Type elementType)
         {
             type = elementType;
+        }
+
+        class ConstantMemberPair
+        {
+            private readonly ConstantExpression constantExpression;
+            private readonly MemberExpression memberExpression;
+
+            public ConstantMemberPair(ConstantExpression constantExpression, MemberExpression memberExpression)
+            {
+                this.constantExpression = constantExpression;
+                this.memberExpression = memberExpression;
+            }
+
+            public ConstantExpression ConstantExpression { get { return constantExpression; } }
+            public MemberExpression MemberExpression { get { return memberExpression; } }
+
+            public bool IsNullTest
+            {
+                get
+                {
+                    return memberExpression.Member.Name == "HasValue"
+                           && constantExpression.Type == typeof(bool)
+                           && TypeHelper.IsNullableType(memberExpression.Member.DeclaringType);
+                }
+            }
         }
     }
 }

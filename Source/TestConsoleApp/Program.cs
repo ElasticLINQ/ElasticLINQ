@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TestConsoleApp.Models;
+using TestConsoleApp.Utility;
 
 namespace TestConsoleApp
 {
@@ -24,10 +25,11 @@ namespace TestConsoleApp
 
             var query1 = new ElasticQuery<AccountSubscription>(provider)
                 .Where(s => s.AccountAlias == "t3n")
-                .Where(s => s.SubscriptionId == "T3N-SOFT-SHAREENT-SAL-LAB-T3N")
-                .OrderByDescending(s => s.CreateDate);
+                .Where(s => s.EndDate.HasValue)
+                //.OrderByDescending(s => s.CreateDate)
+                ;
 
-            DumpQuery(query1);
+            Dump.Query(query1);
         }
 
         private static void TestBasicElasticProvider()
@@ -50,17 +52,7 @@ namespace TestConsoleApp
                 .Select(a => Tuple.Create(a.Title, a.Title, a.Year))
                 ;
 
-            DumpQuery(query);
-        }
-
-        private static void DumpQuery<T>(IQueryable<T> query)
-        {
-            Console.WriteLine(query);
-
-            Console.WriteLine("\nResults:");
-
-            foreach (var item in query)
-                Console.WriteLine(item);
+            Dump.Query(query);
         }
     }
 }
