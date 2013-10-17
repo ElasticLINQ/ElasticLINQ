@@ -192,7 +192,7 @@ namespace ElasticLinq.Request.Visitors
                     {
                         var subExpression = Visit(node.Operand) as FilterExpression;
                         if (subExpression != null)
-                            return new FilterExpression(new NotFilter(subExpression.Filter));
+                            return new FilterExpression(NotFilter.Create(subExpression.Filter));
                         break;
                     }
             }
@@ -302,7 +302,7 @@ namespace ElasticLinq.Request.Visitors
                 return Expression.Equal(e, Expression.Constant(!wasNegative));
 
             if (wasNegative && e is FilterExpression)
-                return new FilterExpression(new NotFilter(((FilterExpression) e).Filter));
+                return new FilterExpression(NotFilter.Create(((FilterExpression) e).Filter));
 
             return e;
         }
@@ -343,7 +343,7 @@ namespace ElasticLinq.Request.Visitors
                 return new FilterExpression(existsFilter);
 
             if (value.Equals(!positiveTest))
-                return new FilterExpression(new NotFilter(existsFilter));
+                return new FilterExpression(NotFilter.Create(existsFilter));
 
             throw new NotSupportedException("A null test Expression must consist a member and be compared to a bool or null");
         }
@@ -375,7 +375,7 @@ namespace ElasticLinq.Request.Visitors
             if (cm != null)
                 return cm.IsNullTest
                     ? CreateExists(cm, false)
-                    : new FilterExpression(new NotFilter(new TermFilter(mapping.GetFieldName(cm.MemberExpression.Member), cm.ConstantExpression.Value)));
+                    : new FilterExpression(NotFilter.Create(new TermFilter(mapping.GetFieldName(cm.MemberExpression.Member), cm.ConstantExpression.Value)));
 
             throw new NotSupportedException("A NotEqual Expression must consist of a constant and a member");
         }

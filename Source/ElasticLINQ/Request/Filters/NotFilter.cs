@@ -7,7 +7,16 @@ namespace ElasticLinq.Request.Filters
     {
         private readonly IFilter subFilter;
 
-        public NotFilter(IFilter subFilter)
+        public static IFilter Create(IFilter subFilter)
+        {
+            // Unwrap nots inside nots
+            if (subFilter is NotFilter)
+                return ((NotFilter) subFilter).SubFilter;
+
+            return new NotFilter(subFilter);
+        }
+
+        private NotFilter(IFilter subFilter)
         {
             this.subFilter = subFilter;
         }
