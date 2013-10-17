@@ -20,7 +20,7 @@ namespace TestConsoleApp
 
         private static void TestTier3Queries()
         {
-            var connection = new ElasticConnection(new Uri("http://192.168.2.12:9200"), TimeSpan.FromSeconds(10), "tier3");
+            var connection = new ElasticConnection(new Uri("http://192.168.2.12:9200?pretty=true"), TimeSpan.FromSeconds(10), "tier3");
             var provider = new ElasticQueryProvider(connection, new CouchbaseElasticMapping()) { Log = Console.Out };
 
             var query1 = new ElasticQuery<AccountSubscription>(provider)

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
-using System.Net.Mail;
-using System.Reflection;
 using ElasticLinq.Mapping;
 using ElasticLinq.Request.Expressions;
 using ElasticLinq.Request.Filters;
@@ -14,7 +12,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using Newtonsoft.Json.Schema;
+using System.Reflection;
 
 namespace ElasticLinq.Request.Visitors
 {
@@ -228,7 +226,7 @@ namespace ElasticLinq.Request.Visitors
         private Expression VisitWhere(Expression source, Expression predicate)
         {
             var lambda = (LambdaExpression)StripQuotes(predicate);
-            var body = Visit(BooleanMemberAccessBecomesEquals(lambda.Body));
+            var body = BooleanMemberAccessBecomesEquals(Visit(lambda.Body));
 
             if (body is FilterExpression)
                 topFilter = AddFilter(((FilterExpression)body).Filter);
@@ -295,12 +293,16 @@ namespace ElasticLinq.Request.Visitors
 
         private Expression BooleanMemberAccessBecomesEquals(Expression e)
         {
-            var test = e.NodeType != ExpressionType.Not;
+            var wasNegative = e.NodeType == ExpressionType.Not;
+
             if (e is UnaryExpression)
                 e = Visit(((UnaryExpression)e).Operand);
 
             if (e is MemberExpression && e.Type == typeof(bool))
-                return Expression.Equal(e, Expression.Constant(test));
+                return Expression.Equal(e, Expression.Constant(!wasNegative));
+
+            if (wasNegative && e is FilterExpression)
+                return new FilterExpression(new NotFilter(((FilterExpression) e).Filter));
 
             return e;
         }
@@ -329,21 +331,21 @@ namespace ElasticLinq.Request.Visitors
             }
         }
 
-        private Expression CreateExists(ConstantMemberPair cm, bool shouldHaveValue)
+        private Expression CreateExists(ConstantMemberPair cm, bool positiveTest)
         {
             var fieldName = mapping.GetFieldName(UnwrapNullableMethodExpression(cm.MemberExpression));
 
             var existsFilter = new ExistsFilter(fieldName);
 
-            var value = cm.ConstantExpression.Value ?? shouldHaveValue;
+            var value = cm.ConstantExpression.Value ?? false;
 
-            if (value.Equals(shouldHaveValue))
+            if (value.Equals(positiveTest))
                 return new FilterExpression(existsFilter);
 
-            if (value.Equals(!shouldHaveValue))
+            if (value.Equals(!positiveTest))
                 return new FilterExpression(new NotFilter(existsFilter));
 
-            throw new NotSupportedException("A null test Expression must consist of a constant and a member and be compared to a bool");
+            throw new NotSupportedException("A null test Expression must consist a member and be compared to a bool or null");
         }
 
         private Expression VisitEquals(Expression left, Expression right)
