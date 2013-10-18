@@ -6,7 +6,6 @@ using ElasticLinq.Request.Expressions;
 using ElasticLinq.Request.Filters;
 using ElasticLinq.Response.Model;
 using ElasticLinq.Utility;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -28,7 +27,7 @@ namespace ElasticLinq.Request.Visitors
     internal class ElasticQueryTranslator : ExpressionVisitor
     {
         private readonly IElasticMapping mapping;
-        private readonly ParameterExpression projectionParameter = Expression.Parameter(typeof(JObject), "r");
+        private readonly ParameterExpression projectionParameter = Expression.Parameter(typeof(Hit), "h");
         private readonly List<string> fields = new List<string>();
         private readonly List<SortOption> sortOptions = new List<SortOption>();
 
@@ -40,7 +39,7 @@ namespace ElasticLinq.Request.Visitors
 
         private ElasticQueryTranslator(IElasticMapping mapping)
         {
-            this.mapping = mapping;
+            this.mapping = new ElasticFieldsMappingWrapper(mapping);
         }
 
         internal static ElasticTranslateResult Translate(IElasticMapping mapping, Expression e)
@@ -48,9 +47,22 @@ namespace ElasticLinq.Request.Visitors
             return new ElasticQueryTranslator(mapping).Translate(e);
         }
 
+        private static bool IsCandidateForPartialEvaluation(Expression e)
+        {
+            if (e.NodeType == ExpressionType.Parameter)
+                return false;
+
+            var me = e as MemberExpression;
+            if (me != null && me.Member.DeclaringType == typeof(ElasticFields))
+                return false;
+
+            return true;
+        }
+
         private ElasticTranslateResult Translate(Expression e)
         {
-            Visit(e);
+            Visit(PartialEvaluator.Evaluate(e, IsCandidateForPartialEvaluation));
+
             var result = new ElasticTranslateResult
             {
                 Projector = projector ?? (hit => mapping.GetObjectSource(type, hit).ToObject(type))
@@ -202,6 +214,9 @@ namespace ElasticLinq.Request.Visitors
 
         protected override Expression VisitMember(MemberExpression m)
         {
+            if (m.Member.DeclaringType == typeof(ElasticFields))
+                return m;
+
             switch (m.Expression.NodeType)
             {
                 case ExpressionType.Parameter:
@@ -302,7 +317,7 @@ namespace ElasticLinq.Request.Visitors
                 return Expression.Equal(e, Expression.Constant(!wasNegative));
 
             if (wasNegative && e is FilterExpression)
-                return new FilterExpression(NotFilter.Create(((FilterExpression) e).Filter));
+                return new FilterExpression(NotFilter.Create(((FilterExpression)e).Filter));
 
             return e;
         }
@@ -363,7 +378,7 @@ namespace ElasticLinq.Request.Visitors
         private static MemberInfo UnwrapNullableMethodExpression(MemberExpression m)
         {
             if (m.Expression is MemberExpression)
-               return ((MemberExpression) (m.Expression)).Member;
+                return ((MemberExpression)(m.Expression)).Member;
 
             return m.Member;
         }
@@ -449,9 +464,9 @@ namespace ElasticLinq.Request.Visitors
             if (selectBody is NewExpression || selectBody is MemberExpression || selectBody is MethodCallExpression)
             {
                 var projection = ProjectionVisitor.ProjectColumns(projectionParameter, mapping, selectBody);
-                fields.AddRange(projection.Fields);
+                fields.AddRange(projection.FieldNames);
                 var compiled = Expression.Lambda(projection.MaterializationExpression, projectionParameter).Compile();
-                projector = h => compiled.DynamicInvoke(h.fields);
+                projector = h => compiled.DynamicInvoke(h);
             }
 
             return Visit(source);

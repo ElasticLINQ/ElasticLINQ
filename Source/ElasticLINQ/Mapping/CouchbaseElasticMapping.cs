@@ -23,7 +23,6 @@ namespace ElasticLinq.Mapping
         public string GetFieldName(MemberInfo memberInfo)
         {
             return string.Join(".",
-                typeName,
                 "doc",
                 GetDocTypeName(memberInfo.ReflectedType),
                 memberInfo.Name.ToCamelCase());

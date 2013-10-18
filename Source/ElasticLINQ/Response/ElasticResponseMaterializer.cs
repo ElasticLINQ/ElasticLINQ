@@ -14,8 +14,8 @@ namespace ElasticLinq.Response
     /// </summary>
     public class ElasticResponseMaterializer
     {
-        private static readonly MethodInfo materializer = typeof(ElasticResponseMaterializer)
-            .GetMethod("Materialize", BindingFlags.NonPublic | BindingFlags.Static);
+        private static readonly MethodInfo materializer =
+            typeof(ElasticResponseMaterializer).GetMethod("Materialize", BindingFlags.NonPublic | BindingFlags.Static);
 
         public object Materialize(ElasticResponse elasticResponse, Type elementType, Func<Hit, object> projector)
         {

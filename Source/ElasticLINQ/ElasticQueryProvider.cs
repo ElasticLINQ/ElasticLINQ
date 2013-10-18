@@ -97,8 +97,7 @@ namespace ElasticLinq
 
         private ElasticTranslateResult Translate(Expression expression)
         {
-            var partiallyEvaluated = PartialEvaluator.Evaluate(expression);
-            return ElasticQueryTranslator.Translate(mapping, partiallyEvaluated);
+            return ElasticQueryTranslator.Translate(mapping, expression);
         }
     }
 }

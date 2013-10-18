@@ -11,16 +11,17 @@ namespace ElasticLinq.Request.Visitors
 {
     internal class Projection
     {
-        internal readonly HashSet<string> Fields = new HashSet<string>();
+        internal readonly HashSet<string> FieldNames = new HashSet<string>();
         internal Expression MaterializationExpression;
     }
 
     /// <summary>
-    /// Visitor that rewrites projections to bind to JObject.
+    /// Visitor that rewrites projections to bind to JObject and captures field names
+    /// to be specifically requested.
     /// </summary>
     internal class ProjectionVisitor : ExpressionVisitor
     {
-        private static readonly MethodInfo getValueMethod = typeof(JObject).GetMethod("GetValue", new[] { typeof(string) });
+        private static readonly MethodInfo getFieldMethod = typeof(JObject).GetMethod("GetValue", new[] { typeof(string) });
 
         private readonly ParameterExpression parameter;
         private readonly IElasticMapping mapping;
@@ -41,14 +42,25 @@ namespace ElasticLinq.Request.Visitors
 
         protected override Expression VisitMember(MemberExpression m)
         {
+            if (m.Member.DeclaringType == typeof(ElasticFields))
+                return VisitFieldSelection(m, true);
+
             if (m.Expression == null || m.Expression.NodeType != ExpressionType.Parameter)
                 return base.VisitMember(m);
 
-            var fieldName = mapping.GetFieldName(m.Member);
-            projection.Fields.Add(fieldName);
+            return VisitFieldSelection(m, false);
+        }
 
-            var methodCall = Expression.Call(parameter, getValueMethod, Expression.Constant(fieldName));
-            return Expression.Convert(methodCall, m.Type);
+        private Expression VisitFieldSelection(MemberExpression m, bool isOnHit)
+        {
+            var fieldName = mapping.GetFieldName(m.Member);
+            projection.FieldNames.Add(fieldName);
+
+            if (isOnHit)
+                return Expression.Convert(Expression.PropertyOrField(parameter, fieldName), m.Type);
+
+            return Expression.Convert(
+                Expression.Call(Expression.PropertyOrField(parameter, "fields"), getFieldMethod, Expression.Constant(fieldName)), m.Type);
         }
     }
 }
