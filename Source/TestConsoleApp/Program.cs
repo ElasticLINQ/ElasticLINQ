@@ -25,7 +25,7 @@ namespace TestConsoleApp
 
             var query1 = new ElasticQuery<AccountSubscription>(provider)
                 .Where(s => s.AccountAlias == "t3n")
-                .Where(s => s.EndDate != null)
+                .Where(s => s.EndDate > DateTime.Now)
                 //.OrderByDescending(s => s.CreateDate)
                 //.OrderByDescending(s => ElasticFields.Score)
                 .OrderBy(s => ElasticFields.Score)

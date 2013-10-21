@@ -57,6 +57,7 @@
     <Compile Include="Request\Formatter\PostBodyRequestFormatterTests.cs" />
     <Compile Include="Request\Formatter\GetQueryRequestFormatterTests.cs" />
     <Compile Include="Request\Formatter\RequestFormatterTests.cs" />
+    <Compile Include="Request\Visitors\PartialEvaluatorTests.cs" />
     <Compile Include="Utility\NullTextWriterTests.cs" />
     <Compile Include="Utility\StaticConstructorsTests.cs" />
   </ItemGroup>
@@ -69,9 +70,7 @@
       <Name>ElasticLINQ</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Visitors\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

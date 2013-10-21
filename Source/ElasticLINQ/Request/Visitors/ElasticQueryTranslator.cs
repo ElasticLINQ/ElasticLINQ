@@ -47,7 +47,7 @@ namespace ElasticLinq.Request.Visitors
             return new ElasticQueryTranslator(mapping).Translate(e);
         }
 
-        private static bool IsCandidateForPartialEvaluation(Expression e)
+        private static bool ShouldEvaluate(Expression e)
         {
             if (e.NodeType == ExpressionType.Parameter)
                 return false;
@@ -61,7 +61,8 @@ namespace ElasticLinq.Request.Visitors
 
         private ElasticTranslateResult Translate(Expression e)
         {
-            Visit(PartialEvaluator.Evaluate(e, IsCandidateForPartialEvaluation));
+            var chosenForEvaluation = BranchSelectExpressionVisitor.Select(e, ShouldEvaluate);
+            Visit(EvaluatingExpressionVisitor.Evaluate(e, chosenForEvaluation));
 
             var result = new ElasticTranslateResult
             {
