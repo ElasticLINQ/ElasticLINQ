@@ -9,6 +9,13 @@ using System.Linq;
 
 namespace ElasticLinq.Request.Formatter
 {
+    /// <summary>
+    /// Formats an ElasticSearchRequest into URL GET parameters.
+    /// </summary>
+    /// <remarks>
+    /// The GET command parameter syntax is not capable of expressing many of
+    /// the possible query operations that ElasticSearch supports.
+    /// </remarks>
     internal class GetQueryRequestFormatter : RequestFormatter
     {
         public GetQueryRequestFormatter(ElasticConnection connection, ElasticSearchRequest searchRequest)

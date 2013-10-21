@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace ElasticLinq.Request
 {
     /// <summary>
-    /// Sends ElasticSearch requests and ensures the response is materialized.
+    /// Sends ElasticSearch requests via HTTP and ensures the response is materialized.
     /// </summary>
     internal class ElasticRequestProcessor
     {

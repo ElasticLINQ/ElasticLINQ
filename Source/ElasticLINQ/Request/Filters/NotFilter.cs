@@ -1,31 +1,41 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
+using ElasticLinq.Utility;
+
 namespace ElasticLinq.Request.Filters
 {
+    /// <summary>
+    /// Filter that inverts the logic of it's child filter.
+    /// </summary>
     internal class NotFilter : IFilter
     {
-        private readonly IFilter subFilter;
+        private readonly IFilter childFilter;
 
-        public static IFilter Create(IFilter subFilter)
+        public static IFilter Create(IFilter childFilter)
         {
-            // Unwrap nots inside nots
-            if (subFilter is NotFilter)
-                return ((NotFilter) subFilter).SubFilter;
+            Argument.EnsureNotNull("childFilter", childFilter);
 
-            return new NotFilter(subFilter);
+            // Not inside a not cancels out
+            if (childFilter is NotFilter)
+                return ((NotFilter) childFilter).ChildFilter;
+
+            return new NotFilter(childFilter);
         }
 
-        private NotFilter(IFilter subFilter)
+        private NotFilter(IFilter childFilter)
         {
-            this.subFilter = subFilter;
+            this.childFilter = childFilter;
         }
 
-        public string Name { get { return "not"; } }
-
-        public IFilter SubFilter
+        public string Name
         {
-            get { return subFilter; }
+            get { return "not"; }
+        }
+
+        public IFilter ChildFilter
+        {
+            get { return childFilter; }
         }
     }
 }

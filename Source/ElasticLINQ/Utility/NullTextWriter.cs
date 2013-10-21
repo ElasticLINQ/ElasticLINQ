@@ -7,7 +7,7 @@ using System.Text;
 namespace ElasticLinq.Utility
 {
     /// <summary>
-    /// TextWriter that doesn't actually write to avoid null handling.
+    /// TextWriter that doesn't actually write but avoids null handling.
     /// </summary>
     internal class NullTextWriter : TextWriter
     {

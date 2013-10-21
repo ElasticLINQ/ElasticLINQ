@@ -7,6 +7,10 @@ using System.Linq;
 
 namespace ElasticLinq.Utility
 {
+    /// <summary>
+    /// Various methods to make reflection and type handling a little
+    /// easier.
+    /// </summary>
     internal static class TypeHelper
     {
         public static Type GetSequenceElementType(Type sequenceType)

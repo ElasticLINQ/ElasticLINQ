@@ -6,9 +6,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using ElasticLinq.Utility;
 
 namespace ElasticLinq
 {
+    /// <summary>
+    /// ElasticSearch query object used to start LINQ queries.
+    /// </summary>
+    /// <typeparam name="T">Element type being queried.</typeparam>
     public class ElasticQuery<T> : IOrderedQueryable<T>
     {
         private readonly ElasticQueryProvider provider;
@@ -16,8 +21,7 @@ namespace ElasticLinq
 
         public ElasticQuery(ElasticQueryProvider provider)
         {
-            if (provider == null)
-                throw new ArgumentNullException("provider");
+            Argument.EnsureNotNull("provider", provider);
 
             this.provider = provider;
             expression = Expression.Constant(this);
@@ -25,11 +29,8 @@ namespace ElasticLinq
 
         public ElasticQuery(ElasticQueryProvider provider, Expression expression)
         {
-            if (provider == null)
-                throw new ArgumentNullException("provider");
-
-            if (expression == null)
-                throw new ArgumentNullException("expression");
+            Argument.EnsureNotNull("provider", provider);
+            Argument.EnsureNotNull("expression", expression);
 
             if (!typeof(IQueryable<T>).IsAssignableFrom(expression.Type))
                 throw new ArgumentOutOfRangeException("expression");

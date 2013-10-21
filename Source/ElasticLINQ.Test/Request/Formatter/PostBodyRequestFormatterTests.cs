@@ -36,7 +36,7 @@ namespace ElasticLINQ.Test.Request.Formatter
         [Fact]
         public void BodyContainsFilterTerms()
         {
-            var filter = new TermFilter("term1", new [] { "criteria1", "criteria2" });
+            var filter = new TermFilter("term1", "criteria1", "criteria2");
 
             var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest("type1", filter: filter));
             var body = JObject.Parse(formatter.Body);

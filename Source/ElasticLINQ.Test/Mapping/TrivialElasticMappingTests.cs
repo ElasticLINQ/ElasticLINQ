@@ -9,6 +9,9 @@ namespace ElasticLINQ.Test.Mapping
 {
     public class TrivialElasticMappingTests
     {
+        private class SingularTypeName { }
+        private class PluralTypeNames { }
+
         [Fact]
         public void GetFieldNameCamelCasesMemberName()
         {
@@ -31,19 +34,15 @@ namespace ElasticLINQ.Test.Mapping
             Assert.Equal("singularTypeNames", actual);
         }
 
-        private class SingularTypeName { }
-
         [Fact]
         public void GetTypeNameCamelCasesPluralTypeName()
         {
-            var type = typeof(SingularTypeNames);
+            var type = typeof(PluralTypeNames);
 
             var mapping = new TrivialElasticMapping();
             var actual = mapping.GetTypeName(type);
 
-            Assert.Equal("singularTypeNames", actual);
+            Assert.Equal("pluralTypeNames", actual);
         }
-
-        private class SingularTypeNames { }
     }
 }

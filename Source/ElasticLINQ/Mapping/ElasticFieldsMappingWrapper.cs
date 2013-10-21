@@ -8,6 +8,10 @@ using System.Reflection;
 
 namespace ElasticLinq.Mapping
 {
+    /// <summary>
+    /// Wraps an elastic mapping with one that also handles the built-in
+    /// ElasticFields class that contains properties for _score etc.
+    /// </summary>
     internal class ElasticFieldsMappingWrapper : IElasticMapping
     {
         private readonly IElasticMapping wrapped;
@@ -19,10 +23,9 @@ namespace ElasticLinq.Mapping
 
         public string GetFieldName(MemberInfo memberInfo)
         {
-            if (memberInfo.DeclaringType == typeof(ElasticFields))
-                return ElasticFieldName(memberInfo);
-
-            return wrapped.GetFieldName(memberInfo);
+            return memberInfo.DeclaringType == typeof(ElasticFields)
+                ? ElasticFieldName(memberInfo) 
+                : wrapped.GetFieldName(memberInfo);
         }
 
         private static string ElasticFieldName(MemberInfo memberInfo)

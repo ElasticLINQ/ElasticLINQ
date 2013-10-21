@@ -8,6 +8,10 @@ using System.Linq;
 
 namespace ElasticLinq.Request.Formatter
 {
+    /// <summary>
+    /// Formats an ElasticSearchRequest into a JSON POST body to be sent
+    /// to ElasticSearch for querying.
+    /// </summary>
     internal class PostBodyRequestFormatter : RequestFormatter
     {
         public PostBodyRequestFormatter(ElasticConnection connection, ElasticSearchRequest searchRequest)
@@ -83,7 +87,7 @@ namespace ElasticLinq.Request.Formatter
 
         private static JObject BuildNotFilter(NotFilter filter)
         {
-            return new JObject(new JProperty(filter.Name, BuildFilter(filter.SubFilter)));
+            return new JObject(new JProperty(filter.Name, BuildFilter(filter.ChildFilter)));
         }
 
         private static JObject BuildRangeFilter(RangeFilter filter)

@@ -7,7 +7,7 @@ using ElasticLinq.Request.Filters;
 namespace ElasticLinq.Request
 {
     /// <summary>
-    /// Represents a search request to ElasticSearch.
+    /// Represents a search request to be sent to ElasticSearch.
     /// </summary>
     internal class ElasticSearchRequest
     {

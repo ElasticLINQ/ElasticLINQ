@@ -5,6 +5,9 @@ using System;
 
 namespace ElasticLinq
 {
+    /// <summary>
+    /// Class with properties that stand in for special fields in ElasticSearch.
+    /// </summary>
     public static class ElasticFields
     {
         public static double Score

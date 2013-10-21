@@ -4,24 +4,33 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ElasticLinq.Utility;
 
 namespace ElasticLinq.Request.Filters
 {
+    /// <summary>
+    /// Contains a number of child filters all of which must be
+    /// true for a document to be selected by this filter.
+    /// </summary>
     internal class AndFilter : CompoundFilter
     {
-        private static readonly AndFilter empty = new AndFilter();
-        public static AndFilter Empty { get { return empty; } }
-
-        public static IFilter Combine(params IFilter[] filters)
+        public AndFilter(params IFilter[] filters)
+            : base(filters)
         {
-            if (filters == null)
-                throw new ArgumentNullException("filters");
+        }
+
+        public override string Name
+        {
+            get { return "and"; }
+        }
+
+        public static AndFilter Combine(params IFilter[] filters)
+        {
+            Argument.EnsureNotNull("filters", filters);
 
             var combinedFilters = new List<IFilter>(filters);
-
             CombineRanges(combinedFilters);
-
-            return new AndFilter(combinedFilters);
+            return new AndFilter(combinedFilters.ToArray());
         }
 
         private static void CombineRanges(ICollection<IFilter> filters)
@@ -34,17 +43,5 @@ namespace ElasticLinq.Request.Filters
                 filters.Add(new RangeFilter(range.Key, range.SelectMany(r => r.Specifications)));
             }
         }
-
-        public AndFilter(params IFilter[] filters)
-            : base(filters)
-        {
-        }
-
-        public AndFilter(IEnumerable<IFilter> filters)
-            : this(filters.ToArray())
-        {
-        }
-
-        public override string Name { get { return "and"; } }
     }
 }

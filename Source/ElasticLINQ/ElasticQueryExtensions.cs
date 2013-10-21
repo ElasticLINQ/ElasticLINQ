@@ -5,9 +5,17 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using ElasticLinq.Utility;
 
 namespace ElasticLinq
 {
+    /// <summary>
+    /// Various extension methods that extend LINQ functionality for ElasticSearch queries.
+    /// </summary>
+    /// <remarks>
+    /// These can not extend ElasticQuery as Queryable extends and returns IQueryable.
+    /// Using these against any other provider will fail.
+    /// </remarks>
     public static class ElasticQueryExtensions
     {
         public static IOrderedQueryable<TSource> OrderByScore<TSource>(this IQueryable<TSource> source)
@@ -22,11 +30,10 @@ namespace ElasticLinq
 
         private static IOrderedQueryable<TSource> OrderBy<TSource>(IQueryable<TSource> source, MethodInfo method)
         {
-            if (source == null)
-                throw new ArgumentNullException("source");
+            Argument.EnsureNotNull("source", source);
 
-            return (IOrderedQueryable<TSource>) source.Provider.CreateQuery<TSource>(
-                Expression.Call(null, method.MakeGenericMethod(typeof (TSource)), new[] { source.Expression }));
+            return (IOrderedQueryable<TSource>)source.Provider.CreateQuery<TSource>(
+                Expression.Call(null, method.MakeGenericMethod(typeof(TSource)), new[] { source.Expression }));
         }
 
         public static IOrderedQueryable<TSource> ThenByScore<TSource>(this IOrderedQueryable<TSource> source)
@@ -41,8 +48,7 @@ namespace ElasticLinq
 
         private static IOrderedQueryable<TSource> ThenBy<TSource>(IOrderedQueryable<TSource> source, MethodInfo method)
         {
-            if (source == null)
-                throw new ArgumentNullException("source");
+            Argument.EnsureNotNull("source", source);
 
             return (IOrderedQueryable<TSource>)source.Provider.CreateQuery<TSource>(
                 Expression.Call(null, method.MakeGenericMethod(typeof(TSource)), new[] { source.Expression }));

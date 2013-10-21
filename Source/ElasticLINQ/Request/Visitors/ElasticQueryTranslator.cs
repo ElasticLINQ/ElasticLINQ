@@ -128,7 +128,7 @@ namespace ElasticLinq.Request.Visitors
                 var field = mapping.GetFieldName(((MemberExpression)matched).Member);
                 var containsSource = ((IEnumerable)((ConstantExpression)source).Value).Cast<object>();
                 var values = new List<object>(containsSource);
-                return new FilterExpression(new TermFilter(field, values.Distinct().ToArray()));
+                return new FilterExpression(TermFilter.FromIEnumerable(field, values.Distinct()));
             }
 
             throw new NotImplementedException("Unknown source for Contains");
@@ -402,8 +402,7 @@ namespace ElasticLinq.Request.Visitors
             if (o != null)
             {
                 var field = mapping.GetFieldName(o.MemberExpression.Member);
-                var specification = new RangeSpecificationFilter(ExpressionTypeToRangeType(t), o.ConstantExpression.Value);
-                return new FilterExpression(new RangeFilter(field, specification));
+                return new FilterExpression(new RangeFilter(field, ExpressionTypeToRangeType(t), o.ConstantExpression.Value));
             }
 
             throw new NotSupportedException("A range must consist of a constant and a member");
@@ -420,18 +419,18 @@ namespace ElasticLinq.Request.Visitors
             return null;
         }
 
-        private static string ExpressionTypeToRangeType(ExpressionType t)
+        private static RangeComparison ExpressionTypeToRangeType(ExpressionType t)
         {
             switch (t)
             {
                 case ExpressionType.GreaterThan:
-                    return "gt";
+                    return RangeComparison.GreaterThan;
                 case ExpressionType.GreaterThanOrEqual:
-                    return "gte";
+                    return RangeComparison.GreaterThanOrEqual;
                 case ExpressionType.LessThan:
-                    return "lt";
+                    return RangeComparison.LessThan;
                 case ExpressionType.LessThanOrEqual:
-                    return "lte";
+                    return RangeComparison.LessThanOrEqual;
             }
 
             throw new ArgumentOutOfRangeException("t");

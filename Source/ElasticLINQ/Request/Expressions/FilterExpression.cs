@@ -7,6 +7,9 @@ using System.Linq.Expressions;
 
 namespace ElasticLinq.Request.Expressions
 {
+    /// <summary>
+    /// An expression tree that represents a converted Elastic Search filter.
+    /// </summary>
     internal class FilterExpression : Expression
     {
         private readonly IFilter filter;

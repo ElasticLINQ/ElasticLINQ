@@ -26,11 +26,8 @@ namespace ElasticLinq
 
         public ElasticQueryProvider(ElasticConnection connection, IElasticMapping mapping)
         {
-            if (connection == null)
-                throw new ArgumentNullException("connection");
-
-            if (mapping == null)
-                throw new ArgumentNullException("mapping");
+            Argument.EnsureNotNull("connection", connection);
+            Argument.EnsureNotNull("mapping", mapping);
 
             this.connection = connection;
             this.mapping = mapping;
@@ -38,19 +35,17 @@ namespace ElasticLinq
 
         public IQueryable<T> CreateQuery<T>(Expression expression)
         {
-           if (expression == null)
-                throw new ArgumentNullException("expression");
+            Argument.EnsureNotNull("expresssion", expression);
 
             if (!typeof(IQueryable<T>).IsAssignableFrom(expression.Type))
-                throw new ArgumentOutOfRangeException("expression");                
+                throw new ArgumentOutOfRangeException("expression");
 
             return new ElasticQuery<T>(this, expression);
         }
 
         public IQueryable CreateQuery(Expression expression)
         {
-            if (expression == null)
-                throw new ArgumentNullException("expression");
+            Argument.EnsureNotNull("expresssion", expression);
 
             var elementType = TypeHelper.GetSequenceElementType(expression.Type);
             var queryType = typeof(ElasticQuery<>).MakeGenericType(elementType);
@@ -66,16 +61,14 @@ namespace ElasticLinq
 
         public TResult Execute<TResult>(Expression expression)
         {
-            if (expression == null)
-                throw new ArgumentNullException("expression");
+            Argument.EnsureNotNull("expresssion", expression);
 
             return (TResult)ExecuteInternal(expression);
         }
 
         public object Execute(Expression expression)
         {
-            if (expression == null)
-                throw new ArgumentNullException("expression");
+            Argument.EnsureNotNull("expresssion", expression);
 
             return ExecuteInternal(expression);
         }

@@ -28,7 +28,7 @@ namespace ElasticLinq.Mapping
                 memberInfo.Name.ToCamelCase());
         }
 
-        private string GetDocTypeName(Type type)
+        private static string GetDocTypeName(Type type)
         {
             return type.Name.ToCamelCase();
         }

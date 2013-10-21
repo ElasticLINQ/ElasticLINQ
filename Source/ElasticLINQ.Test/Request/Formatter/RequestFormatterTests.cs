@@ -5,9 +5,7 @@ using ElasticLinq;
 using ElasticLinq.Request;
 using ElasticLinq.Request.Formatter;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using Xunit;
 
 namespace ElasticLINQ.Test.Request.Formatter

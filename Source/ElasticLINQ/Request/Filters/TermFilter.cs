@@ -1,25 +1,37 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
+using ElasticLinq.Utility;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ElasticLinq.Request.Filters
 {
+    /// <summary>
+    /// Filter that specifies one or more possible values that a
+    /// field must match in order to select a document.
+    /// </summary>
     internal class TermFilter : IFilter
     {
         private readonly string field;
-        private readonly List<object> values;
+        private readonly HashSet<object> values;
 
-        public TermFilter(string field, IEnumerable<object> values)
+        public static TermFilter FromIEnumerable(string field, IEnumerable<object> values)
         {
-            this.field = field;
-            this.values = new List<object>(values);
+            return new TermFilter(field, values);
         }
 
-        public TermFilter(string field, object value)
-            : this(field, new[] { value })
+        public TermFilter(string field, params object[] values)
+            : this(field, values.AsEnumerable())
         {
+        }
+
+        private TermFilter(string field, IEnumerable<object> values)
+        {
+            Argument.EnsureNotNull("value", values);
+            this.field = field;
+            this.values = new HashSet<object>(values);            
         }
 
         public string Field
@@ -29,7 +41,7 @@ namespace ElasticLinq.Request.Filters
 
         public IReadOnlyList<Object> Values
         {
-            get { return values.AsReadOnly(); }
+            get { return values.ToList().AsReadOnly(); }
         }
 
         public string Name

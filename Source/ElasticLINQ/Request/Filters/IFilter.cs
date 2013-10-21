@@ -3,6 +3,10 @@
 
 namespace ElasticLinq.Request.Filters
 {
+    /// <summary>
+    /// Interface that all Filters must implement to be part of
+    /// the filtering tree for ElasticSearch.
+    /// </summary>
     internal interface IFilter
     {
         string Name { get; }

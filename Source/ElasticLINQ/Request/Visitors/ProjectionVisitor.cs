@@ -16,8 +16,8 @@ namespace ElasticLinq.Request.Visitors
     }
 
     /// <summary>
-    /// Visitor that rewrites projections to bind to JObject and captures field names
-    /// to be specifically requested.
+    /// Rewrites select projections to bind to JObject and captures the field names
+    /// in order to only select from ElasticSearch those required.
     /// </summary>
     internal class ProjectionVisitor : ExpressionVisitor
     {

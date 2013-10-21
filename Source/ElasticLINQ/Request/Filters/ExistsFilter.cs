@@ -2,15 +2,22 @@
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
 using System;
+using ElasticLinq.Utility;
 
 namespace ElasticLinq.Request.Filters
 {
+    /// <summary>
+    /// Filter that selects documents if they have any value
+    /// in the specified field.
+    /// </summary>
     internal class ExistsFilter : IFilter
     {
         private readonly string field;
 
         public ExistsFilter(string field)
         {
+            Argument.EnsureNotBlank("field", field);
+
             this.field = field;
         }
 

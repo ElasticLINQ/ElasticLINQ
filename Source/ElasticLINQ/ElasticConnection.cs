@@ -3,11 +3,12 @@
 
 using System;
 using System.Diagnostics;
+using ElasticLinq.Utility;
 
 namespace ElasticLinq
 {
     /// <summary>
-    /// Details of a connection to ElasticSearch.
+    /// Specifies connection parameters for ElasticSearch.
     /// </summary>
     [DebuggerDisplay("{Endpoint.ToString(),nq}{Index,nq}")]
     public class ElasticConnection
@@ -19,10 +20,8 @@ namespace ElasticLinq
 
         public ElasticConnection(Uri endpoint, TimeSpan timeout, string index = null, bool preferGetRequests = false)
         {
-            if (endpoint == null)
-                throw new ArgumentNullException("endpoint");
-            if (timeout == null)
-                throw new ArgumentNullException("timeout");
+            Argument.EnsureNotNull("endpoint", endpoint);
+            Argument.EnsureNotNull("timeout", timeout);
 
             this.endpoint = endpoint;
             this.timeout = timeout;

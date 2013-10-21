@@ -4,19 +4,26 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ElasticLinq.Utility;
 
 namespace ElasticLinq.Request.Filters
 {
+    /// <summary>
+    /// Base class for any filter wanting to have child filters such
+    /// as AndFilter or OrFilter.
+    /// </summary>
     internal abstract class CompoundFilter : IFilter
     {
         private readonly List<IFilter> filters;
 
         protected CompoundFilter(IEnumerable<IFilter> filters)
         {
+            Argument.EnsureNotNull("filters", filters);
+
             this.filters = new List<IFilter>(filters);
         }
 
-        public abstract string Name { get;  }        
+        public abstract string Name { get; }
 
         public IReadOnlyList<IFilter> Filters
         {
