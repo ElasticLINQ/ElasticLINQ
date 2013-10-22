@@ -315,7 +315,7 @@ namespace ElasticLinq.Request.Visitors
                 e = Visit(((UnaryExpression)e).Operand);
 
             if (e is MemberExpression && e.Type == typeof(bool))
-                return Expression.Equal(e, Expression.Constant(!wasNegative));
+                return Visit(Expression.Equal(e, Expression.Constant(!wasNegative)));
 
             if (wasNegative && e is FilterExpression)
                 return new FilterExpression(NotFilter.Create(((FilterExpression)e).Filter));
