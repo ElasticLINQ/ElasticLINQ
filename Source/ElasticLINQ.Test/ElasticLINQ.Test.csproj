@@ -43,6 +43,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ElasticFieldsTests.cs" />
+    <Compile Include="ElasticQueryExtensionsTests.cs" />
+    <Compile Include="ElasticQueryTests.cs" />
     <Compile Include="Mapping\CouchbaseElasticMappingTests.cs" />
     <Compile Include="Request\ElasticRequestProcessorTests.cs" />
     <Compile Include="ElasticConnectionTests.cs" />
@@ -62,8 +64,12 @@
     <Compile Include="Request\Visitors\BranchSelectExpressionVisitorTests.cs" />
     <Compile Include="Request\Visitors\EvaluatingExpressionVisitorTests.cs" />
     <Compile Include="Response\ElasticResponseMaterializerTests.cs" />
+    <Compile Include="TestSupport\FakeQuery.cs" />
+    <Compile Include="TestSupport\FakeQueryProvider.cs" />
+    <Compile Include="Utility\ArgumentTests.cs" />
     <Compile Include="Utility\NullTextWriterTests.cs" />
     <Compile Include="Utility\StaticConstructorsTests.cs" />
+    <Compile Include="Utility\TypeHelperTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

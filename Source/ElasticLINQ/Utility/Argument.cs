@@ -5,6 +5,9 @@ using System;
 
 namespace ElasticLinq.Utility
 {
+    /// <summary>
+    /// Argument validation.
+    /// </summary>
     public static class Argument
     {
         public static void EnsureNotNull(string paramName, object value)
@@ -20,10 +23,10 @@ namespace ElasticLinq.Utility
                 throw new ArgumentException("Cannot be a blank string.", paramName);
         }
 
-        public static void EnsureIsAssignable<T>(string paramName, Type type)
+        public static void EnsureIsAssignableFrom<T>(string paramName, Type type)
         {
             if (!typeof(T).IsAssignableFrom(type))
-                throw new ArgumentOutOfRangeException(paramName);
+                throw new ArgumentException(string.Format("Type {0} must be assignable from {1}", type.Name, typeof(T).Name), paramName);
         }
 
         public static void EnsureIsDefinedEnum<T>(string paramName, T value) where T : struct

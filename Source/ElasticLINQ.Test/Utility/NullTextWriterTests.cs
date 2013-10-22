@@ -11,7 +11,7 @@ namespace ElasticLINQ.Test.Utility
         [Fact]
         public void WriteLineDoesNothing()
         {
-            new NullTextWriter().WriteLine("Don't crash");
+            Assert.DoesNotThrow(() => new NullTextWriter().WriteLine("Don't crash"));
         }
     }
 }

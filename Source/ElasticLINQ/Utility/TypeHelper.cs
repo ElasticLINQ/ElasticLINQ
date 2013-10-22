@@ -23,14 +23,14 @@ namespace ElasticLinq.Utility
 
         public static Type FindIEnumerable(Type sequenceType)
         {
+            if (sequenceType == null || sequenceType == typeof(string))
+                return null;
+
+            if (sequenceType.IsArray)
+                return typeof(IEnumerable<>).MakeGenericType(sequenceType.GetElementType());
+
             while (true)
             {
-                if (sequenceType == null || sequenceType == typeof(string))
-                    return null;
-
-                if (sequenceType.IsArray)
-                    return typeof(IEnumerable<>).MakeGenericType(sequenceType.GetElementType());
-
                 foreach (var argument in sequenceType.GetGenericArguments())
                 {
                     var candidateIEnumerable = typeof(IEnumerable<>).MakeGenericType(argument);

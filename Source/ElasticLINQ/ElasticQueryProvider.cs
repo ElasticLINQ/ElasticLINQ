@@ -75,23 +75,18 @@ namespace ElasticLinq
 
         private object ExecuteInternal(Expression expression)
         {
-            var translateResult = Translate(expression);
+            var translation = ElasticQueryTranslator.Translate(mapping, expression);
             var elementType = TypeHelper.GetSequenceElementType(expression.Type);
 
             var log = Log ?? new NullTextWriter();
             log.WriteLine("Type is " + elementType);
 
             var response = new ElasticRequestProcessor(connection, log)
-                .Search(translateResult.SearchRequest)
+                .Search(translation.SearchRequest)
                 .GetAwaiter().GetResult();
 
             return ElasticResponseMaterializer
-                .Materialize(response.hits.hits, elementType, translateResult.Projector);
-        }
-
-        private ElasticTranslateResult Translate(Expression expression)
-        {
-            return ElasticQueryTranslator.Translate(mapping, expression);
+                .Materialize(response.hits.hits, elementType, translation.Projector);
         }
     }
 }
