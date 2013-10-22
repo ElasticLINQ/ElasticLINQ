@@ -51,9 +51,12 @@
     <Compile Include="Request\Filters\CompoundFilter.cs" />
     <Compile Include="Request\Filters\ExistsFilter.cs" />
     <Compile Include="Request\Filters\IFilter.cs" />
+    <Compile Include="Request\Filters\INegatableFilter.cs" />
+    <Compile Include="Request\Filters\MissingFilter.cs" />
     <Compile Include="Request\Filters\NotFilter.cs" />
     <Compile Include="Request\Filters\OrFilter.cs" />
     <Compile Include="Request\Filters\RangeFilter.cs" />
+    <Compile Include="Request\Filters\SingleFieldFilter.cs" />
     <Compile Include="Request\Filters\TermFilter.cs" />
     <Compile Include="Request\Formatter\PostBodyRequestFormatter.cs" />
     <Compile Include="Request\Formatter\GetQueryRequestFormatter.cs" />

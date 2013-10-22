@@ -4,24 +4,24 @@
 namespace ElasticLinq.Request.Filters
 {
     /// <summary>
-    /// Filter that selects documents if they have any value
+    /// Filter that selects documents if they do not have a value
     /// in the specified field.
     /// </summary>
-    internal class ExistsFilter : SingleFieldFilter, INegatableFilter
+    internal class MissingFilter : SingleFieldFilter, INegatableFilter
     {
-        public ExistsFilter(string field)
+        public MissingFilter(string field)
             : base(field)
         {
         }
 
         public override string Name
         {
-            get { return "exists"; }
+            get { return "missing"; }
         }
 
         public IFilter Negate()
         {
-            return new MissingFilter(Field);
+            return new ExistsFilter(Field);
         }
     }
 }

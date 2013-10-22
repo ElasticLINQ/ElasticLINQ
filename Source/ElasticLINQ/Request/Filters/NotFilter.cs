@@ -8,7 +8,7 @@ namespace ElasticLinq.Request.Filters
     /// <summary>
     /// Filter that inverts the logic of it's child filter.
     /// </summary>
-    internal class NotFilter : IFilter
+    internal class NotFilter : IFilter, INegatableFilter
     {
         private readonly IFilter childFilter;
 
@@ -16,9 +16,9 @@ namespace ElasticLinq.Request.Filters
         {
             Argument.EnsureNotNull("childFilter", childFilter);
 
-            // Not inside a not cancels out
-            if (childFilter is NotFilter)
-                return ((NotFilter) childFilter).ChildFilter;
+            // Allow some filters to provide their own negation
+            if (childFilter is INegatableFilter)
+                return ((INegatableFilter) childFilter).Negate();
 
             return new NotFilter(childFilter);
         }
@@ -36,6 +36,11 @@ namespace ElasticLinq.Request.Filters
         public IFilter ChildFilter
         {
             get { return childFilter; }
+        }
+
+        public IFilter Negate()
+        {
+            return childFilter;
         }
     }
 }
