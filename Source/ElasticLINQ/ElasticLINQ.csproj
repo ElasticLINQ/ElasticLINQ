@@ -62,6 +62,7 @@
     <Compile Include="Request\Visitors\ElasticQueryTranslator.cs" />
     <Compile Include="Request\Expressions\FilterExpression.cs" />
     <Compile Include="Request\Visitors\EvaluatingExpressionVisitor.cs" />
+    <Compile Include="Request\Visitors\FlatteningExpressionVisitor.cs" />
     <Compile Include="Utility\Argument.cs" />
     <Compile Include="Utility\TypeHelper.cs" />
     <Compile Include="Mapping\IElasticMapping.cs" />

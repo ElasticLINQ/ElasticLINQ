@@ -57,7 +57,8 @@
     <Compile Include="Request\Formatter\PostBodyRequestFormatterTests.cs" />
     <Compile Include="Request\Formatter\GetQueryRequestFormatterTests.cs" />
     <Compile Include="Request\Formatter\RequestFormatterTests.cs" />
-    <Compile Include="Request\Visitors\PartialEvaluatorTests.cs" />
+    <Compile Include="Request\Visitors\BranchSelectExpressionVisitorTests.cs" />
+    <Compile Include="Request\Visitors\EvaluatingExpressionVisitorTests.cs" />
     <Compile Include="Utility\NullTextWriterTests.cs" />
     <Compile Include="Utility\StaticConstructorsTests.cs" />
   </ItemGroup>
