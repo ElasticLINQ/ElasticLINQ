@@ -29,7 +29,7 @@ namespace TestConsoleApp
                 //.OrderByDescending(s => s.CreateDate)
                 //.OrderByDescending(s => ElasticFields.Score)
  //               .OrderBy(s => ElasticFields.Score)
-                .Select(s => new { s.Name, ElasticFields.Score });
+                //.Select(s => new { s.Name, ElasticFields.Score });
                 ;
 
             Dump.Query(query1);

@@ -85,7 +85,7 @@ namespace ElasticLinq
                 .Search(translateResult.SearchRequest)
                 .GetAwaiter().GetResult();
 
-            return new ElasticResponseMaterializer()
+            return ElasticResponseMaterializer
                 .Materialize(response.hits.hits, elementType, translateResult.Projector);
         }
 

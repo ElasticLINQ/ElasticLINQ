@@ -42,6 +42,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ElasticFieldsTests.cs" />
     <Compile Include="Mapping\CouchbaseElasticMappingTests.cs" />
     <Compile Include="Request\ElasticRequestProcessorTests.cs" />
     <Compile Include="ElasticConnectionTests.cs" />

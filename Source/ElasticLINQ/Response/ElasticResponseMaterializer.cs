@@ -17,14 +17,14 @@ namespace ElasticLinq.Response
         private static readonly MethodInfo materializer =
             typeof(ElasticResponseMaterializer).GetMethod("Materialize", BindingFlags.NonPublic | BindingFlags.Static);
 
-        public object Materialize(IEnumerable<Hit> hits, Type elementType, Func<Hit, object> projector)
+        public static object Materialize(IEnumerable<Hit> hits, Type elementType, Func<Hit, object> projector)
         {
             return materializer
                 .MakeGenericMethod(elementType)
-                .Invoke(this, new object[] { hits, projector });
+                .Invoke(null, new object[] { hits, projector });
         }
 
-        internal static List<T> Materialize<T>(IEnumerable<Hit> hits, Func<Hit, T> projector)
+        internal static List<T> Materialize<T>(IEnumerable<Hit> hits, Func<Hit, object> projector)
         {
             return hits.Select(projector).Cast<T>().ToList();
         }
