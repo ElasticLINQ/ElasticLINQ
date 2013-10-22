@@ -77,7 +77,7 @@
     <Compile Include="Response\Model\ShardStatistics.cs" />
     <Compile Include="Utility\NullTextWriter.cs" />
     <Compile Include="Utility\StaticConstructors.cs" />
-    <Compile Include="Request\Visitors\ProjectionVisitor.cs" />
+    <Compile Include="Request\Visitors\ProjectionExpressionVisitor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

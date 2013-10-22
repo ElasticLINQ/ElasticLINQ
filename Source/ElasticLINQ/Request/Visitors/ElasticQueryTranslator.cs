@@ -463,9 +463,9 @@ namespace ElasticLinq.Request.Visitors
 
             if (selectBody is NewExpression || selectBody is MemberExpression || selectBody is MethodCallExpression)
             {
-                var projection = ProjectionVisitor.ProjectColumns(projectionParameter, mapping, selectBody);
+                var projection = ProjectionExpressionVisitor.ProjectColumns(projectionParameter, mapping, selectBody);
                 fields.AddRange(projection.FieldNames);
-                var compiled = Expression.Lambda(projection.MaterializationExpression, projectionParameter).Compile();
+                var compiled = Expression.Lambda(projection.Materialization, projectionParameter).Compile();
                 projector = h => compiled.DynamicInvoke(h);
             }
 
