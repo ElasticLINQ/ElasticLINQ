@@ -23,6 +23,7 @@ namespace ElasticLINQ.Test.Mapping
             mapping.GetTypeName(type);
 
             Assert.Single(fakeMapping.GetTypeNames, type);
+            Assert.Equal(1, fakeMapping.GetTypeNames.Count);
         }
 
         [Fact]
@@ -36,6 +37,7 @@ namespace ElasticLINQ.Test.Mapping
             mapping.GetObjectSource(type, hit);
 
             Assert.Single(fakeMapping.GetObjectSources, Tuple.Create(type, hit));
+            Assert.Equal(1, fakeMapping.GetObjectSources.Count);
         }
 
         [Fact]
@@ -48,6 +50,7 @@ namespace ElasticLINQ.Test.Mapping
             mapping.GetFieldName(memberInfo);
 
             Assert.Single(fakeMapping.GetFieldNames, memberInfo);
+            Assert.Equal(1, fakeMapping.GetFieldNames.Count);
         }
 
         [Fact]
@@ -62,6 +65,5 @@ namespace ElasticLINQ.Test.Mapping
             Assert.Equal("_score", fieldName);
             Assert.Empty(fakeMapping.GetFieldNames);
         }
-
     }
 }

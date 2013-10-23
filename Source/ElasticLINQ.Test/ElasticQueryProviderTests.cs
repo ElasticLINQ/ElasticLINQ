@@ -13,8 +13,8 @@ namespace ElasticLINQ.Test
     public class ElasticQueryProviderTests
     {
         private static readonly ElasticConnection connection = new ElasticConnection(new Uri("http://localhost"), TimeSpan.FromSeconds(10));
-        private static readonly ElasticQueryProvider sharedProvider = new ElasticQueryProvider(connection, new TrivialElasticMapping());
         private static readonly IElasticMapping mapping = new TrivialElasticMapping();
+        private static readonly ElasticQueryProvider sharedProvider = new ElasticQueryProvider(connection, mapping);
         private static readonly Expression validExpression = Expression.Constant(new ElasticQuery<Sample>(sharedProvider));
 
         private class Sample { };

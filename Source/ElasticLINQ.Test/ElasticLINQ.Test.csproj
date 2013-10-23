@@ -65,6 +65,7 @@
     <Compile Include="Request\Formatter\GetQueryRequestFormatterTests.cs" />
     <Compile Include="Request\Formatter\RequestFormatterTests.cs" />
     <Compile Include="Request\Visitors\BranchSelectExpressionVisitorTests.cs" />
+    <Compile Include="Request\Visitors\ElasticQueryTranslationTests.cs" />
     <Compile Include="Request\Visitors\EvaluatingExpressionVisitorTests.cs" />
     <Compile Include="Request\Visitors\ProjectionExpressionVisitorTests.cs" />
     <Compile Include="Response\ElasticResponseMaterializerTests.cs" />

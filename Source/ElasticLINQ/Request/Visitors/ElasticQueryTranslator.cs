@@ -62,7 +62,9 @@ namespace ElasticLinq.Request.Visitors
         private ElasticTranslateResult Translate(Expression e)
         {
             var chosenForEvaluation = BranchSelectExpressionVisitor.Select(e, ShouldEvaluate);
-            Visit(EvaluatingExpressionVisitor.Evaluate(e, chosenForEvaluation));
+            var evaluated = EvaluatingExpressionVisitor.Evaluate(e, chosenForEvaluation);
+
+            Visit(evaluated);
 
             var result = new ElasticTranslateResult
             {
@@ -142,7 +144,7 @@ namespace ElasticLinq.Request.Visitors
                 case "OrderByScore":
                 case "OrderByScoreDescending":
                 case "ThenByScore":
-                case "ThenByScoreDecending":
+                case "ThenByScoreDescending":
                     if (m.Arguments.Count == 1)
                         return VisitOrderByScore(m.Arguments[0], !m.Method.Name.EndsWith("Descending"));
                     break;

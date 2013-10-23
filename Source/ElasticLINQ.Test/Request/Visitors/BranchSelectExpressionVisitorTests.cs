@@ -18,6 +18,7 @@ namespace ElasticLINQ.Test.Request.Visitors
             var selectedBranches = BranchSelectExpressionVisitor.Select(expression, e => e.NodeType == ExpressionType.MemberAccess);
 
             Assert.Single(selectedBranches, s => s.NodeType == ExpressionType.MemberAccess);
+            Assert.Equal(1, selectedBranches.Count);
         }
 
         [Fact]
@@ -28,6 +29,7 @@ namespace ElasticLINQ.Test.Request.Visitors
             var selectedBranches = BranchSelectExpressionVisitor.Select(expression, e => e.NodeType != ExpressionType.Parameter);
 
             Assert.Single(selectedBranches, s => s.NodeType == ExpressionType.MemberAccess);
+            Assert.Equal(1, selectedBranches.Count);
         }
     }
 }
