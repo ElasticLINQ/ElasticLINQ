@@ -36,7 +36,7 @@ namespace ElasticLINQ.Test
         {
             var firstConstructor = new ElasticQuery<Sample>(provider);
             var secondConstructor = new ElasticQuery<Sample>(provider);
-            
+
             Assert.Same(provider, firstConstructor.Provider);
             Assert.Same(provider, secondConstructor.Provider);
         }

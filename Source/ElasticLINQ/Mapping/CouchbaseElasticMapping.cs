@@ -28,11 +28,6 @@ namespace ElasticLinq.Mapping
                 memberInfo.Name.ToCamelCase());
         }
 
-        private static string GetDocTypeName(Type type)
-        {
-            return type.Name.ToCamelCase();
-        }
-
         public string GetTypeName(Type type)
         {
             return typeName;
@@ -41,6 +36,11 @@ namespace ElasticLinq.Mapping
         public JToken GetObjectSource(Type type, Hit hit)
         {
             return hit._source["doc"][GetDocTypeName(type)];
+        }
+
+        private static string GetDocTypeName(Type type)
+        {
+            return type.Name.ToCamelCase();
         }
     }
 }
