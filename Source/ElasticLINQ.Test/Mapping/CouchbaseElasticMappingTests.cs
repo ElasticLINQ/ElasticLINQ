@@ -1,8 +1,11 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
+using System;
 using ElasticLinq.Mapping;
 using System.Reflection;
+using ElasticLinq.Response.Model;
+using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace ElasticLINQ.Test.Mapping
@@ -40,6 +43,48 @@ namespace ElasticLINQ.Test.Mapping
             var actual = mapping.GetFieldName(memberInfo);
 
             Assert.Equal(DefaultPrefix + "getFieldNamePrefixesAndCamelCasesMemberName", actual);
+        }
+
+        [Fact]
+        public void GetFieldNameThrowsArgumentNullExceptionWhenMemberInfoIsNull()
+        {
+            var mapping = new CouchbaseElasticMapping();
+
+            Assert.Throws<ArgumentNullException>(() => mapping.GetFieldName(null));
+        }
+
+        [Fact]
+        public void GetObjectSourceReturnsCorrectObjectFromHitSource()
+        {
+            var expected = new JObject(new JProperty("ThisIs", "MyDocument"));
+            var hit = new Hit
+            {
+                _source = new JObject(
+                    new JProperty("doc", new JObject(
+                    new JProperty("sample", expected))))
+            };
+
+            var actual = new CouchbaseElasticMapping().GetObjectSource(typeof(Sample), hit);
+
+            Assert.Same(expected, actual);
+        }
+
+        private class Sample { };
+
+        [Fact]
+        public void GetObjectSourceThrowsArgumentNullExceptionWhenTypeIsNull()
+        {
+            var mapping = new CouchbaseElasticMapping();
+
+            Assert.Throws<ArgumentNullException>(() => mapping.GetObjectSource(null, new Hit()));
+        }
+
+        [Fact]
+        public void GetObjectSourceThrowsArgumentNullExceptionWhenHitIsNull()
+        {
+            var mapping = new CouchbaseElasticMapping();
+
+            Assert.Throws<ArgumentNullException>(() => mapping.GetObjectSource(typeof(Hit), null));
         }
     }
 }

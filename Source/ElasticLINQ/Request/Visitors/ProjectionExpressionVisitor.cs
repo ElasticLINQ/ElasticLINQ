@@ -3,6 +3,7 @@
 
 using System.Linq;
 using ElasticLinq.Mapping;
+using ElasticLinq.Utility;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -46,7 +47,12 @@ namespace ElasticLinq.Request.Visitors
 
         internal static Projection ProjectColumns(ParameterExpression parameter, IElasticMapping mapping, Expression selector)
         {
+            Argument.EnsureNotNull("parameter", parameter);
+            Argument.EnsureNotNull("mapping", mapping);
+            Argument.EnsureNotNull("selector", selector);
+
             var visitor = new ProjectionExpressionVisitor(parameter, mapping);
+
             var materialization = visitor.Visit(selector);
             return new Projection(visitor.fieldNames, materialization);
         }

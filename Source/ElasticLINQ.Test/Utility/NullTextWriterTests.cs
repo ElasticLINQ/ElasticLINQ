@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
 using ElasticLinq.Utility;
+using System.Text;
 using Xunit;
 
 namespace ElasticLINQ.Test.Utility
@@ -11,7 +12,15 @@ namespace ElasticLINQ.Test.Utility
         [Fact]
         public void WriteLineDoesNothing()
         {
-            Assert.DoesNotThrow(() => new NullTextWriter().WriteLine("Don't crash"));
+            var writer = new NullTextWriter();
+            Assert.DoesNotThrow(() => writer.WriteLine("Don't crash"));
+        }
+
+        [Fact]
+        public void EncodingIsUTF8()
+        {
+            var writer = new NullTextWriter();
+            Assert.Equal(Encoding.UTF8, writer.Encoding);
         }
     }
 }

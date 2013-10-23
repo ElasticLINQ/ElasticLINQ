@@ -15,6 +15,6 @@ namespace ElasticLinq.Mapping
     {
         string GetFieldName(MemberInfo memberInfo);
         string GetTypeName(Type type);
-        JToken GetObjectSource(Type type, Hit hit);
+        JToken GetObjectSource(Type docType, Hit hit);
     }
 }

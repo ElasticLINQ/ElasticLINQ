@@ -4,6 +4,7 @@
 using System;
 using System.Reflection;
 using ElasticLinq.Response.Model;
+using ElasticLinq.Utility;
 using Newtonsoft.Json.Linq;
 
 namespace ElasticLinq.Mapping
@@ -22,6 +23,8 @@ namespace ElasticLinq.Mapping
 
         public string GetFieldName(MemberInfo memberInfo)
         {
+            Argument.EnsureNotNull("memberInfo", memberInfo);
+
             return string.Join(".",
                 "doc",
                 GetDocTypeName(memberInfo.ReflectedType),
@@ -33,9 +36,12 @@ namespace ElasticLinq.Mapping
             return typeName;
         }
 
-        public JToken GetObjectSource(Type type, Hit hit)
+        public JToken GetObjectSource(Type docType, Hit hit)
         {
-            return hit._source["doc"][GetDocTypeName(type)];
+            Argument.EnsureNotNull("type", docType);
+            Argument.EnsureNotNull("hit", hit);
+
+            return hit._source["doc"][GetDocTypeName(docType)];
         }
 
         private static string GetDocTypeName(Type type)

@@ -43,9 +43,9 @@ namespace ElasticLinq.Mapping
             return wrapped.GetTypeName(type);
         }
 
-        public JToken GetObjectSource(Type type, Hit hit)
+        public JToken GetObjectSource(Type docType, Hit hit)
         {
-            return wrapped.GetObjectSource(type, hit);
+            return wrapped.GetObjectSource(docType, hit);
         }
     }
 }

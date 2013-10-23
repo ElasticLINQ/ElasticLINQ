@@ -28,11 +28,11 @@ namespace ElasticLINQ.Test.TestSupport
             return type.Name;
         }
 
-        public JToken GetObjectSource(Type type, Hit hit)
+        public JToken GetObjectSource(Type docType, Hit hit)
         {
-            getObjectSources.Add(Tuple.Create(type, hit));
+            getObjectSources.Add(Tuple.Create(docType, hit));
             return new JObject(
-                new JProperty("type", type.Name),
+                new JProperty("type", docType.Name),
                 new JProperty("hit", hit._id));
         }
 
