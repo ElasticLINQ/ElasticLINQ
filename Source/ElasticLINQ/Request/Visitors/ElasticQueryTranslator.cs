@@ -47,13 +47,19 @@ namespace ElasticLinq.Request.Visitors
             return new ElasticQueryTranslator(mapping).Translate(e);
         }
 
+        private static readonly Type[] doNotEvaluateMethodsDeclaredOn = { typeof(Enumerable), typeof(ElasticQueryExtensions), typeof(Queryable) };
+
         private static bool ShouldEvaluate(Expression e)
         {
-            if (e.NodeType == ExpressionType.Parameter)
+            if (e.NodeType == ExpressionType.Parameter || e.NodeType == ExpressionType.Lambda)
                 return false;
 
             var me = e as MemberExpression;
             if (me != null && me.Member.DeclaringType == typeof(ElasticFields))
+                return false;
+
+            var mc = e as MethodCallExpression;
+            if (mc != null && doNotEvaluateMethodsDeclaredOn.Contains(mc.Method.DeclaringType))
                 return false;
 
             return true;

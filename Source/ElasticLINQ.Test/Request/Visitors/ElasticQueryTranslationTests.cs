@@ -18,11 +18,7 @@ namespace ElasticLINQ.Test.Request.Visitors
 
         private static IQueryable<Employee> Employees
         {
-            get
-            {
-                return new ElasticQuery<Employee>(sharedProvider)
-                    .Where(e => e.Id != null); // TODO: Stop the partial evaluator being too agressive with skip/take
-            }
+            get { return new ElasticQuery<Employee>(sharedProvider); }
         }
 
         private class Employee
