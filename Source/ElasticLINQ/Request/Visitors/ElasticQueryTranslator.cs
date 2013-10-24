@@ -15,12 +15,6 @@ using System.Reflection;
 
 namespace ElasticLinq.Request.Visitors
 {
-    internal class ElasticTranslateResult
-    {
-        public ElasticSearchRequest SearchRequest;
-        public Func<Hit, object> Projector;
-    }
-
     /// <summary>
     /// Expression visitor to translate a LINQ query into ElasticSearch request.
     /// </summary>
@@ -47,39 +41,12 @@ namespace ElasticLinq.Request.Visitors
             return new ElasticQueryTranslator(mapping).Translate(e);
         }
 
-        private static readonly Type[] doNotEvaluateMethodsDeclaredOn = { typeof(Enumerable), typeof(ElasticQueryExtensions), typeof(Queryable) };
-
-        private static bool ShouldEvaluate(Expression e)
-        {
-            if (e.NodeType == ExpressionType.Parameter || e.NodeType == ExpressionType.Lambda)
-                return false;
-
-            var me = e as MemberExpression;
-            if (me != null && me.Member.DeclaringType == typeof(ElasticFields))
-                return false;
-
-            var mc = e as MethodCallExpression;
-            if (mc != null && doNotEvaluateMethodsDeclaredOn.Contains(mc.Method.DeclaringType))
-                return false;
-
-            return true;
-        }
-
         private ElasticTranslateResult Translate(Expression e)
         {
-            var chosenForEvaluation = BranchSelectExpressionVisitor.Select(e, ShouldEvaluate);
-            var evaluated = EvaluatingExpressionVisitor.Evaluate(e, chosenForEvaluation);
-
+            var evaluated = PartialEvaluator.Evaluate(e);
             Visit(evaluated);
-
-            var result = new ElasticTranslateResult
-            {
-                Projector = projector ?? (hit => mapping.GetObjectSource(type, hit).ToObject(type))
-            };
-
-            var mappedTypeName = mapping.GetTypeName(type);
-            result.SearchRequest = new ElasticSearchRequest(mappedTypeName, skip, take, fields, sortOptions, topFilter);
-            return result;
+            var searchRequest = new ElasticSearchRequest(mapping.GetTypeName(type), skip, take, fields, sortOptions, topFilter);
+            return new ElasticTranslateResult(searchRequest, projector ?? DefaultProjector);
         }
 
         protected override Expression VisitMethodCall(MethodCallExpression m)
@@ -374,7 +341,7 @@ namespace ElasticLinq.Request.Visitors
 
         private Expression VisitEquals(Expression left, Expression right)
         {
-            var cm = PairConstantAndMember(left, right);
+            var cm = ConstantMemberPair.Create(left, right);
 
             if (cm != null)
                 return cm.IsNullTest
@@ -394,7 +361,7 @@ namespace ElasticLinq.Request.Visitors
 
         private Expression VisitNotEqual(Expression left, Expression right)
         {
-            var cm = PairConstantAndMember(left, right);
+            var cm = ConstantMemberPair.Create(left, right);
 
             if (cm != null)
                 return cm.IsNullTest
@@ -406,7 +373,7 @@ namespace ElasticLinq.Request.Visitors
 
         private Expression VisitRange(ExpressionType t, Expression left, Expression right)
         {
-            var o = PairConstantAndMember(left, right);
+            var o = ConstantMemberPair.Create(left, right);
 
             if (o != null)
             {
@@ -415,17 +382,6 @@ namespace ElasticLinq.Request.Visitors
             }
 
             throw new NotSupportedException("A range must consist of a constant and a member");
-        }
-
-        private static ConstantMemberPair PairConstantAndMember(Expression a, Expression b)
-        {
-            if (a is ConstantExpression && b is MemberExpression)
-                return new ConstantMemberPair((ConstantExpression)a, (MemberExpression)b);
-
-            if (b is ConstantExpression && a is MemberExpression)
-                return new ConstantMemberPair((ConstantExpression)b, (MemberExpression)a);
-
-            return null;
         }
 
         private static RangeComparison ExpressionTypeToRangeType(ExpressionType t)
@@ -496,44 +452,14 @@ namespace ElasticLinq.Request.Visitors
             return Visit(source);
         }
 
+        private Func<Hit, Object> DefaultProjector
+        {
+            get { return hit => mapping.GetObjectSource(type, hit).ToObject(type); }
+        }
+
         private void SetType(Type elementType)
         {
             type = elementType;
-        }
-
-        class ConstantMemberPair
-        {
-            private readonly ConstantExpression constantExpression;
-            private readonly MemberExpression memberExpression;
-
-            public ConstantMemberPair(ConstantExpression constantExpression, MemberExpression memberExpression)
-            {
-                this.constantExpression = constantExpression;
-                this.memberExpression = memberExpression;
-            }
-
-            public ConstantExpression ConstantExpression { get { return constantExpression; } }
-            public MemberExpression MemberExpression { get { return memberExpression; } }
-
-            public bool IsNullTest
-            {
-                get
-                {
-                    // someProperty.HasValue
-                    if (memberExpression.Member.Name == "HasValue"
-                           && constantExpression.Type == typeof(bool)
-                           && TypeHelper.IsNullableType(memberExpression.Member.DeclaringType))
-                        return true;
-
-                    // someProperty == null
-                    if (TypeHelper.IsNullableType(memberExpression.Type)
-                        && constantExpression.Type == memberExpression.Type
-                        && constantExpression.Value == null)
-                        return true;
-
-                    return false;
-                }
-            }
         }
     }
 }

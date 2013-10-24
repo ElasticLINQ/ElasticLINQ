@@ -1,8 +1,8 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
-using System.Collections.Generic;
 using ElasticLinq.Request.Filters;
+using System.Collections.Generic;
 
 namespace ElasticLinq.Request
 {
