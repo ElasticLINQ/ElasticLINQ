@@ -23,13 +23,20 @@ namespace ElasticLinq.Request.Filters
             get { return "and"; }
         }
 
-        public static AndFilter Combine(params IFilter[] filters)
+        public static IFilter Combine(params IFilter[] filters)
         {
             Argument.EnsureNotNull("filters", filters);
+            if (filters.Length == 0)
+                return null;
+            if (filters.Length == 1)
+                return filters[0];
 
             var combinedFilters = new List<IFilter>(filters);
             CombineRanges(combinedFilters);
-            return new AndFilter(combinedFilters.ToArray());
+
+            return combinedFilters.Count == 1
+                ? combinedFilters[0]
+                : new AndFilter(combinedFilters.ToArray());
         }
 
         private static void CombineRanges(ICollection<IFilter> filters)

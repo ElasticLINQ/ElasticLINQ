@@ -56,6 +56,7 @@
     <Compile Include="Request\ElasticSearchRequestTests.cs" />
     <Compile Include="Request\Expressions\FilterExpressionTests.cs" />
     <Compile Include="Request\Filters\AndFilterTests.cs" />
+    <Compile Include="Request\Filters\MissingFilterTests.cs" />
     <Compile Include="Request\Filters\RangeFilterTests.cs" />
     <Compile Include="Request\Filters\OrFilterTests.cs" />
     <Compile Include="Request\Filters\NotFilterTests.cs" />
@@ -66,7 +67,10 @@
     <Compile Include="Request\Formatter\RequestFormatterTests.cs" />
     <Compile Include="Request\Visitors\BranchSelectExpressionVisitorTests.cs" />
     <Compile Include="Request\Visitors\ConstantMemberPairTests.cs" />
-    <Compile Include="Request\Visitors\ElasticQueryTranslationTests.cs" />
+    <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationTestsBase.cs" />
+    <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationOrderByTests.cs" />
+    <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationTests.cs" />
+    <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationWhereTests.cs" />
     <Compile Include="Request\Visitors\ElasticTranslateResultTests.cs" />
     <Compile Include="Request\Visitors\EvaluatingExpressionVisitorTests.cs" />
     <Compile Include="Request\Visitors\FlatteningExpressionVisitorTests.cs" />

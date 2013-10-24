@@ -38,33 +38,60 @@ namespace ElasticLINQ.Test.Request.Filters
         }
 
         [Fact]
-        public void CombineWithEmptyListReturnsEmptyAnd()
+        public void CombineWithEmptyListReturnsNull()
         {
             var filter = AndFilter.Combine(new IFilter[] { });
 
-            Assert.NotNull(filter);
-            Assert.Empty(filter.Filters);
+            Assert.Null(filter);
         }
 
         [Fact]
-        public void CombineWithFiltersCombines()
+        public void CombineWithOneFilterReturnsThatfilter()
+        {
+            var originalFilter = new RangeFilter("field", RangeComparison.LessThan, 1);
+            var filter = AndFilter.Combine(originalFilter);
+
+            Assert.Same(originalFilter, filter);
+        }
+
+        [Fact]
+        public void CombineWithFiltersCombinesIntoAndFilter()
         {
             var filter = AndFilter.Combine(sampleFilter1, sampleFilter2);
 
-            Assert.Contains(sampleFilter1, filter.Filters);
-            Assert.Contains(sampleFilter2, filter.Filters);
-            Assert.Equal(2, filter.Filters.Count);
+            Assert.IsType<AndFilter>(filter);
+            var andFilter = (AndFilter)filter;
+            Assert.Contains(sampleFilter1, andFilter.Filters);
+            Assert.Contains(sampleFilter2, andFilter.Filters);
+            Assert.Equal(2, andFilter.Filters.Count);
         }
 
         [Fact]
-        public void CombineWithRangeFiltersCombinesRanges()
+        public void CombineWithSameFieldRangeFiltersCombinesIntoSingleRangeFilter()
+        {
+            var lowerFirstRange = new RangeFilter("first", RangeComparison.GreaterThan, "lower");
+            var upperFirstRange = new RangeFilter("first", RangeComparison.LessThanOrEqual, "upper");
+
+            var filter = AndFilter.Combine(lowerFirstRange, upperFirstRange);
+
+            Assert.IsType<RangeFilter>(filter);
+            var rangeFilter = (RangeFilter)filter;
+            Assert.Equal(rangeFilter.Field, lowerFirstRange.Field);
+            Assert.Single(rangeFilter.Specifications, s => s.Comparison == lowerFirstRange.Specifications.First().Comparison);
+            Assert.Single(rangeFilter.Specifications, s => s.Comparison == upperFirstRange.Specifications.First().Comparison);
+        }
+
+        [Fact]
+        public void CombineWithDifferentFieldRangeFiltersCombinesRangesIntoAndAndFilter()
         {
             var lowerFirstRange = new RangeFilter("first", RangeComparison.GreaterThan, "lower");
             var upperFirstRange = new RangeFilter("first", RangeComparison.LessThanOrEqual, "upper");
             var secondRange = new RangeFilter("second", RangeComparison.GreaterThanOrEqual, "lower2");
 
-            var andFilter = AndFilter.Combine(lowerFirstRange, secondRange, upperFirstRange);
+            var filter = AndFilter.Combine(lowerFirstRange, secondRange, upperFirstRange);
 
+            Assert.IsType<AndFilter>(filter);
+            var andFilter = (AndFilter)filter;
             Assert.Equal(2, andFilter.Filters.Count);
             Assert.Contains(secondRange, andFilter.Filters);
 
