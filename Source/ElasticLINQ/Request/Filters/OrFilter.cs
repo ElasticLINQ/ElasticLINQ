@@ -24,10 +24,25 @@ namespace ElasticLinq.Request.Filters
 
         public static IFilter Combine(params IFilter[] filters)
         {
-            return CombineTerms(filters) ?? new OrFilter(filters);
+            // Combines ((a || b) || c) from expression tree into (a || b || c)
+            filters = UnwrapOrSubfilters(filters).ToArray();
+
+            return CombineTermsForSameField(filters) ?? new OrFilter(filters);
         }
 
-        private static IFilter CombineTerms(ICollection<IFilter> filters)
+        private static IEnumerable<IFilter> UnwrapOrSubfilters(IEnumerable<IFilter> filters)
+        {
+            foreach (var filter in filters)
+            {
+                if (filter is OrFilter)
+                    foreach (var subFilter in ((OrFilter)filter).Filters)
+                        yield return subFilter;
+                else
+                    yield return filter;
+            }
+        }
+
+        private static IFilter CombineTermsForSameField(ICollection<IFilter> filters)
         {
             if (filters.Count <= 1) return null;
 

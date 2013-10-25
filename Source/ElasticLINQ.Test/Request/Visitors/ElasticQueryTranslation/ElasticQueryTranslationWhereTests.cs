@@ -5,7 +5,6 @@ using ElasticLinq.Request.Filters;
 using ElasticLinq.Request.Visitors;
 using System;
 using System.Linq;
-using Newtonsoft.Json.Bson;
 using Xunit;
 
 namespace ElasticLINQ.Test.Request.Visitors.ElasticQueryTranslation
@@ -559,6 +558,37 @@ namespace ElasticLINQ.Test.Request.Visitors.ElasticQueryTranslation
             var missingFilter = (MissingFilter)filter;
             Assert.Equal("missing", missingFilter.Name);
             Assert.Equal("zone", missingFilter.Field);
+        }
+
+        [Fact]
+        public void OrOperatorGeneratesOrFilter()
+        {
+            var where = Robots.Where(e => e.Name == "IG-88" || e.Cost > 1);
+            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+
+            Assert.IsType<OrFilter>(filter);
+            var orFilter = (OrFilter)filter;
+            Assert.Equal("or", orFilter.Name);
+            Assert.Single(orFilter.Filters, f => f.Name == "term");
+            Assert.Single(orFilter.Filters, f => f.Name == "range");
+            Assert.Equal(2, orFilter.Filters.Count);
+        }
+
+        [Fact]
+        public void OrOperatorGeneratesFlattenedOrFilter()
+        {
+            var possibleIds = new[] { 1, 2, 3, 4 };
+            var where = Robots.Where(e => e.Name == "IG-88" || e.Cost > 1 || e.Zone.HasValue || possibleIds.Contains(e.Id));
+            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+
+            Assert.IsType<OrFilter>(filter);
+            var orFilter = (OrFilter)filter;
+            Assert.Equal("or", orFilter.Name);
+            Assert.Single(orFilter.Filters, f => f.Name == "term");
+            Assert.Single(orFilter.Filters, f => f.Name == "range");
+            Assert.Single(orFilter.Filters, f => f.Name == "exists");
+            Assert.Single(orFilter.Filters, f => f.Name == "terms");
+            Assert.Equal(4, orFilter.Filters.Count);
         }
     }
 }
