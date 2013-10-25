@@ -33,6 +33,7 @@ namespace ElasticLinq.Mapping
             switch (memberInfo.Name)
             {
                 case "Score": return "_score";
+                case "Id":    return "_id";
                 default:
                     throw new ArgumentOutOfRangeException("memberInfo", String.Format("Unknown member {0} on ElasticFields", memberInfo.Name));
             }

@@ -10,12 +10,16 @@ namespace ElasticLinq
     /// </summary>
     public static class ElasticFields
     {
+        private static readonly Exception exception = new InvalidOperationException("This property is for mapping queries to ElasticSearch and should not be evaluated directly.");
+
         public static double Score
         {
-            get
-            {
-                throw new InvalidOperationException("This property is for mapping queries to ElasticSearch and should not be evaluated directly.");
-            }            
+            get { throw exception; } 
+        }
+
+        public static string Id
+        {
+            get { throw exception; }
         }
     }
 }
