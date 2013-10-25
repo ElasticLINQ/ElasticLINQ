@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using Xunit;
 
-namespace ElasticLINQ.Test.Request.Formatter
+namespace ElasticLinq.Test.Request.Formatter
 {
     public class GetQueryRequestFormatterTests
     {

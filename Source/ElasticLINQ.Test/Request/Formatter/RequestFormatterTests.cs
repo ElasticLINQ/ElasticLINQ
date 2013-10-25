@@ -8,7 +8,7 @@ using System;
 using System.Globalization;
 using Xunit;
 
-namespace ElasticLINQ.Test.Request.Formatter
+namespace ElasticLinq.Test.Request.Formatter
 {
     public class RequestFormatterTests
     {

@@ -1,14 +1,15 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
-using System;
 using ElasticLinq.Mapping;
-using System.Reflection;
 using ElasticLinq.Response.Model;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using Xunit;
 
-namespace ElasticLINQ.Test.Mapping
+namespace ElasticLinq.Test.Mapping
 {
     public class CouchbaseElasticMappingTests
     {
@@ -46,6 +47,7 @@ namespace ElasticLINQ.Test.Mapping
         }
 
         [Fact]
+        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void GetFieldNameThrowsArgumentNullExceptionWhenMemberInfoIsNull()
         {
             var mapping = new CouchbaseElasticMapping();
@@ -72,6 +74,7 @@ namespace ElasticLINQ.Test.Mapping
         private class Sample { };
 
         [Fact]
+        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void GetObjectSourceThrowsArgumentNullExceptionWhenTypeIsNull()
         {
             var mapping = new CouchbaseElasticMapping();
@@ -80,6 +83,7 @@ namespace ElasticLINQ.Test.Mapping
         }
 
         [Fact]
+        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void GetObjectSourceThrowsArgumentNullExceptionWhenHitIsNull()
         {
             var mapping = new CouchbaseElasticMapping();

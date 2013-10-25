@@ -8,7 +8,7 @@ using System;
 using System.Linq.Expressions;
 using Xunit;
 
-namespace ElasticLINQ.Test
+namespace ElasticLinq.Test
 {
     public class ElasticQueryProviderTests
     {

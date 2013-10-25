@@ -13,7 +13,7 @@ namespace ElasticLinq.Request.Filters
     /// Filter that specifies a range of desired values for a given
     /// field that need to be satisfied to select a document.
     /// </summary>
-    [DebuggerDisplay("{field}")]
+    [DebuggerDisplay("{Field}")]
     internal class RangeFilter : IFilter
     {
         private readonly string field;
@@ -62,7 +62,7 @@ namespace ElasticLinq.Request.Filters
         LessThanOrEqual
     }
 
-    [DebuggerDisplay("{name,nq} {value}")]
+    [DebuggerDisplay("{Name,nq} {Value}")]
     internal class RangeSpecificationFilter : IFilter
     {
         private readonly Dictionary<RangeComparison, string> rangeComparisonValues = new Dictionary<RangeComparison, string>

@@ -1,13 +1,14 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
+using System.Collections.Generic;
 using ElasticLinq.Request.Filters;
 using ElasticLinq.Request.Visitors;
 using System;
 using System.Linq;
 using Xunit;
 
-namespace ElasticLINQ.Test.Request.Visitors.ElasticQueryTranslation
+namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 {
     public class ElasticQueryTranslationWhereTests : ElasticQueryTranslationTestsBase
     {
@@ -147,7 +148,7 @@ namespace ElasticLINQ.Test.Request.Visitors.ElasticQueryTranslation
         }
 
         [Fact]
-        public void StringArrayContainsGeneratesTermsFilter()
+        public void StringArrayExistingContainsGeneratesTermsFilter()
         {
             var expectedNames = new[] { "Robbie", "Kryten", "IG-88", "Marvin" };
             var where = Robots.Where(e => expectedNames.Contains(e.Name));
@@ -158,6 +159,54 @@ namespace ElasticLINQ.Test.Request.Visitors.ElasticQueryTranslation
             Assert.Equal("terms", termFilter.Name);
             Assert.Equal("name", termFilter.Field);
             Assert.Equal(expectedNames.Length, termFilter.Values.Count);
+            foreach (var term in expectedNames)
+                Assert.Contains(term, termFilter.Values);
+        }
+
+        [Fact]
+        public void StringArrayInlineContainsGeneratesTermsFilter()
+        {
+            var expectedNames = new[] { "Robbie", "Kryten", "IG-88", "Marvin" };
+            var where = Robots.Where(e => new[] { "Robbie", "Kryten", "IG-88", "Marvin" }.Contains(e.Name));
+            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+
+            Assert.IsType<TermFilter>(filter);
+            var termFilter = (TermFilter)filter;
+            Assert.Equal("terms", termFilter.Name);
+            Assert.Equal("name", termFilter.Field);
+            Assert.Equal(expectedNames.Length, termFilter.Values.Count);
+            foreach (var term in expectedNames)
+                Assert.Contains(term, termFilter.Values);
+        }
+
+        [Fact]
+        public void StringListExistingContainsGeneratesTermsFilter()
+        {
+            var expectedNames = new List<string> { "Robbie", "Kryten", "IG-88", "Marvin" };
+            var where = Robots.Where(e => expectedNames.Contains(e.Name));
+            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+
+            Assert.IsType<TermFilter>(filter);
+            var termFilter = (TermFilter)filter;
+            Assert.Equal("terms", termFilter.Name);
+            Assert.Equal("name", termFilter.Field);
+            Assert.Equal(expectedNames.Count, termFilter.Values.Count);
+            foreach (var term in expectedNames)
+                Assert.Contains(term, termFilter.Values);
+        }
+
+        [Fact]
+        public void StringListInlineContainsGeneratesTermsFilter()
+        {
+            var expectedNames = new List<string> { "Robbie", "Kryten", "IG-88", "Marvin" };
+            var where = Robots.Where(e => new List<string> { "Robbie", "Kryten", "IG-88", "Marvin" }.Contains(e.Name));
+            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+
+            Assert.IsType<TermFilter>(filter);
+            var termFilter = (TermFilter)filter;
+            Assert.Equal("terms", termFilter.Name);
+            Assert.Equal("name", termFilter.Field);
+            Assert.Equal(expectedNames.Count, termFilter.Values.Count);
             foreach (var term in expectedNames)
                 Assert.Contains(term, termFilter.Values);
         }

@@ -123,7 +123,7 @@ namespace ElasticLinq.Request.Visitors
                     break;
             }
 
-            throw new NotSupportedException(string.Format("The ElasticQuery method '{0}' is not supported", m.Method.Name));
+            throw new NotSupportedException(string.Format("The ElasticQuery method '{0}' is not supported", typeof(ElasticQuery<>).Name, m.Method.Name));
         }
 
         internal Expression VisitQueryableMethodCall(MethodCallExpression m)

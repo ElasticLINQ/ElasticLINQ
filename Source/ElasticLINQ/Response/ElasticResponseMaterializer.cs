@@ -12,7 +12,7 @@ namespace ElasticLinq.Response
     /// <summary>
     /// Materializes responses from ElasticSearch.
     /// </summary>
-    public class ElasticResponseMaterializer
+    public static class ElasticResponseMaterializer
     {
         private static readonly MethodInfo materializer =
             typeof(ElasticResponseMaterializer).GetMethod("Materialize", BindingFlags.NonPublic | BindingFlags.Static);

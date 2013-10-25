@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
-using System;
-using System.Reflection;
 using ElasticLinq.Response.Model;
 using ElasticLinq.Utility;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Reflection;
 
 namespace ElasticLinq.Mapping
 {
@@ -16,9 +16,14 @@ namespace ElasticLinq.Mapping
     {
         private readonly string typeName;
 
-        public CouchbaseElasticMapping(string typeName = null)
+        public CouchbaseElasticMapping()
         {
-            this.typeName = typeName ?? "couchbaseDocument";
+            typeName = "couchbaseDocument";
+        }
+
+        public CouchbaseElasticMapping(string typeName)
+        {
+            this.typeName = typeName;
         }        
 
         public string GetFieldName(MemberInfo memberInfo)

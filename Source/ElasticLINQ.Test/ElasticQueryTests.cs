@@ -4,10 +4,11 @@
 using ElasticLinq;
 using ElasticLinq.Mapping;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using Xunit;
 
-namespace ElasticLINQ.Test
+namespace ElasticLinq.Test
 {
     public class ElasticQueryTests
     {
@@ -18,6 +19,7 @@ namespace ElasticLINQ.Test
         private class Sample { };
 
         [Fact]
+        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void ConstructorsThrowsArgumentNullExceptionWhenProviderIsNull()
         {
             Assert.Throws<ArgumentNullException>(() => new ElasticQuery<Sample>(null));
@@ -25,6 +27,7 @@ namespace ElasticLINQ.Test
         }
 
         [Fact]
+        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void ConstructorsThrowsArgumentOutOfRangeExceptionWhenExpressionIsNotAssignableFromIQueryableT()
         {
             var unassignableExpression = Expression.Constant(1);

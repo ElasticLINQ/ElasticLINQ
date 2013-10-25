@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
-namespace ElasticLINQ.Test.Request.Filters
+namespace ElasticLinq.Test.Request.Filters
 {
     public class TermFilterTests
     {

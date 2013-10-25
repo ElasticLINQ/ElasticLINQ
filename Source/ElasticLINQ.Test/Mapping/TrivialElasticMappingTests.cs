@@ -5,10 +5,11 @@ using ElasticLinq.Mapping;
 using ElasticLinq.Response.Model;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Xunit;
 
-namespace ElasticLINQ.Test.Mapping
+namespace ElasticLinq.Test.Mapping
 {
     public class TrivialElasticMappingTests
     {
@@ -27,6 +28,7 @@ namespace ElasticLINQ.Test.Mapping
         }
 
         [Fact]
+        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void GetFieldNameThrowsArgumentNullExceptionWhenMemberInfoIsNull()
         {
             var mapping = new TrivialElasticMapping();
@@ -57,6 +59,7 @@ namespace ElasticLINQ.Test.Mapping
         }
 
         [Fact]
+        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void GetTypeNameThrowsArgumentNullExceptionWhenMemberInfoIsNull()
         {
             var mapping = new TrivialElasticMapping();
@@ -77,6 +80,7 @@ namespace ElasticLINQ.Test.Mapping
         }
 
         [Fact]
+        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void GetObjectSourceThrowsArgumentNullExceptionWhenHitIsNull()
         {
             var mapping = new TrivialElasticMapping();

@@ -5,7 +5,7 @@ using ElasticLinq.Request.Expressions;
 using ElasticLinq.Request.Filters;
 using Xunit;
 
-namespace ElasticLINQ.Test.Request.Expressions
+namespace ElasticLinq.Test.Request.Expressions
 {
     public class FilterExpressionTests
     {

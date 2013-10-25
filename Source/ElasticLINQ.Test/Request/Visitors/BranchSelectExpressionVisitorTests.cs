@@ -6,7 +6,7 @@ using System;
 using System.Linq.Expressions;
 using Xunit;
 
-namespace ElasticLINQ.Test.Request.Visitors
+namespace ElasticLinq.Test.Request.Visitors
 {
     public class BranchSelectExpressionVisitorTests
     {

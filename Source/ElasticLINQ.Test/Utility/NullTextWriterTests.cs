@@ -5,7 +5,7 @@ using ElasticLinq.Utility;
 using System.Text;
 using Xunit;
 
-namespace ElasticLINQ.Test.Utility
+namespace ElasticLinq.Test.Utility
 {
     public class NullTextWriterTests
     {

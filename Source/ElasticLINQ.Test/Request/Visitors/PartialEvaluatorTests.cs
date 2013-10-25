@@ -3,13 +3,13 @@
 
 using ElasticLinq;
 using ElasticLinq.Request.Visitors;
-using ElasticLINQ.Test.TestSupport;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
+using ElasticLinq.Test.TestSupport;
 using Xunit;
 
-namespace ElasticLINQ.Test.Request.Visitors
+namespace ElasticLinq.Test.Request.Visitors
 {
     public class PartialEvaluatorTests
     {

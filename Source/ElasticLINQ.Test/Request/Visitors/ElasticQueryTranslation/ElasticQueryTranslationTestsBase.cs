@@ -6,7 +6,7 @@ using ElasticLinq.Mapping;
 using System;
 using System.Linq;
 
-namespace ElasticLINQ.Test.Request.Visitors.ElasticQueryTranslation
+namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 {
     public class ElasticQueryTranslationTestsBase
     {

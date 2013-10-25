@@ -8,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace ElasticLINQ.Test.TestSupport
+namespace ElasticLinq.Test.TestSupport
 {
     public class FakeElasticMapping : IElasticMapping
     {

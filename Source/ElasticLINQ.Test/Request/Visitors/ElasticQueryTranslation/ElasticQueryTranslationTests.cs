@@ -6,7 +6,7 @@ using System;
 using System.Linq;
 using Xunit;
 
-namespace ElasticLINQ.Test.Request.Visitors.ElasticQueryTranslation
+namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 {
     public class ElasticQueryTranslationTests : ElasticQueryTranslationTestsBase
     {

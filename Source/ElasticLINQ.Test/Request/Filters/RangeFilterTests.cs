@@ -3,10 +3,11 @@
 
 using ElasticLinq.Request.Filters;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Xunit;
 
-namespace ElasticLINQ.Test.Request.Filters
+namespace ElasticLinq.Test.Request.Filters
 {
     public class RangeFilterTests
     {
@@ -46,30 +47,35 @@ namespace ElasticLINQ.Test.Request.Filters
         }
 
         [Fact]
+        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void ConstructorThrowsArgumentNullExceptionWhenFieldIsNull()
         {
             Assert.Throws<ArgumentNullException>(() => new RangeFilter(null, RangeComparison.GreaterThan, 1));
         }
 
         [Fact]
+        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void ConstructorThrowsArgumentExceptionWhenFieldIsBlank()
         {
             Assert.Throws<ArgumentException>(() => new RangeFilter(" ", RangeComparison.GreaterThan, 1));
         }
 
         [Fact]
+        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void ConstructorThrowsArgumentNullExceptionWhenComparisonsIsNull()
         {
             Assert.Throws<ArgumentNullException>(() => new RangeFilter("field", null));
         }
 
         [Fact]
+        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void ConstructorThrowsArgumentOutOfRangeExceptionWhenRangeComparisonIsNotDefined()
         {
             Assert.Throws<ArgumentOutOfRangeException>(() => new RangeFilter(" ", (RangeComparison)99, 1));
         }
 
         [Fact]
+        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void ConstructorThrowsArgumentNullExceptionWhenValueIsNull()
         {
             Assert.Throws<ArgumentNullException>(() => new RangeFilter("field", RangeComparison.GreaterThan, null));

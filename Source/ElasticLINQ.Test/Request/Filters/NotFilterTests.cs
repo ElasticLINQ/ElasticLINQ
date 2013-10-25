@@ -3,9 +3,10 @@
 
 using ElasticLinq.Request.Filters;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Xunit;
 
-namespace ElasticLINQ.Test.Request.Filters
+namespace ElasticLinq.Test.Request.Filters
 {
     public class NotFilterTests
     {
@@ -38,6 +39,7 @@ namespace ElasticLINQ.Test.Request.Filters
         }
 
         [Fact]
+        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void ConstructorThrowsArgumentNullExceptionWhenFieldIsNull()
         {
             Assert.Throws<ArgumentNullException>(() => NotFilter.Create(null));

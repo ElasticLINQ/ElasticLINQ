@@ -4,12 +4,12 @@
 using ElasticLinq;
 using ElasticLinq.Mapping;
 using ElasticLinq.Response.Model;
-using ElasticLINQ.Test.TestSupport;
 using System;
 using System.Reflection;
+using ElasticLinq.Test.TestSupport;
 using Xunit;
 
-namespace ElasticLINQ.Test.Mapping
+namespace ElasticLinq.Test.Mapping
 {
     public class ElasticFieldsMappingWrapperTests
     {

@@ -4,7 +4,7 @@
 using ElasticLinq.Request;
 using Xunit;
 
-namespace ElasticLINQ.Test.Request
+namespace ElasticLinq.Test.Request
 {
     public class ElasticSearchRequestTests
     {

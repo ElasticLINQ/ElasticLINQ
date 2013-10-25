@@ -2,13 +2,14 @@
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
 using ElasticLinq;
-using ElasticLINQ.Test.TestSupport;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
+using ElasticLinq.Test.TestSupport;
 using Xunit;
 
-namespace ElasticLINQ.Test
+namespace ElasticLinq.Test
 {
     public class ElasticQueryExtensionsTests
     {
@@ -37,6 +38,7 @@ namespace ElasticLINQ.Test
         }
 
         [Fact]
+        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void OrderByScoreDescendingThrowArgumentNullExceptionIfSourceIsNull()
         {
             Assert.Throws<ArgumentNullException>(() => ElasticQueryExtensions.OrderByScoreDescending<Sample>(null));
@@ -50,6 +52,7 @@ namespace ElasticLINQ.Test
         }
 
         [Fact]
+        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void ThenByScoreThrowArgumentNullExceptionIfSourceIsNull()
         {
             Assert.Throws<ArgumentNullException>(() => ElasticQueryExtensions.ThenByScore<Sample>(null));
@@ -63,6 +66,7 @@ namespace ElasticLINQ.Test
         }
 
         [Fact]
+        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void ThenByScoreDescendingThrowArgumentNullExceptionIfSourceIsNull()
         {
             Assert.Throws<ArgumentNullException>(() => ElasticQueryExtensions.ThenByScoreDescending<Sample>(null));

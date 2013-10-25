@@ -3,9 +3,10 @@
 
 using ElasticLinq.Mapping;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Xunit;
 
-namespace ElasticLINQ.Test.Mapping
+namespace ElasticLinq.Test.Mapping
 {
     public class MappingHelpersTests
     {
@@ -58,6 +59,7 @@ namespace ElasticLINQ.Test.Mapping
         }
 
         [Fact]
+        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void ToCamelCaseWithNullThrowsArgumentNullException()
         {
             Assert.Throws<ArgumentNullException>(() => ((string)null).ToCamelCase());
@@ -88,6 +90,7 @@ namespace ElasticLINQ.Test.Mapping
         }
 
         [Fact]
+        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void ToPluralWithNullThrowsArgumentNullException()
         {
             Assert.Throws<ArgumentNullException>(() => ((string)null).ToPlural());

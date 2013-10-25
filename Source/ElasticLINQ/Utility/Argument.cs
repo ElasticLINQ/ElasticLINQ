@@ -10,29 +10,29 @@ namespace ElasticLinq.Utility
     /// </summary>
     public static class Argument
     {
-        public static void EnsureNotNull(string paramName, object value)
+        public static void EnsureNotNull(string parameterName, object value)
         {
             if (value == null)
-                throw new ArgumentNullException(paramName);
+                throw new ArgumentNullException(parameterName);
         }
 
-        public static void EnsureNotBlank(string paramName, string value)
+        public static void EnsureNotBlank(string parameterName, string value)
         {
-            EnsureNotNull(paramName, value);
+            EnsureNotNull(parameterName, value);
             if (String.IsNullOrWhiteSpace(value))
-                throw new ArgumentException("Cannot be a blank string.", paramName);
+                throw new ArgumentException("Cannot be a blank string.", parameterName);
         }
 
-        public static void EnsureIsAssignableFrom<T>(string paramName, Type type)
+        public static void EnsureIsAssignableFrom<T>(string parameterName, Type type)
         {
             if (!typeof(T).IsAssignableFrom(type))
-                throw new ArgumentException(string.Format("Type {0} must be assignable from {1}", type.Name, typeof(T).Name), paramName);
+                throw new ArgumentException(string.Format("Type {0} must be assignable from {1}", type.Name, typeof(T).Name), parameterName);
         }
 
-        public static void EnsureIsDefinedEnum<T>(string paramName, T value) where T : struct
+        public static void EnsureIsDefinedEnum<T>(string parameterName, T value) where T : struct
         {
             if (!Enum.IsDefined(typeof(T), value))
-                throw new ArgumentOutOfRangeException(paramName, string.Format("Must be a defined {0} enum value.", typeof(T)));
+                throw new ArgumentOutOfRangeException(parameterName, string.Format("Must be a defined {0} enum value.", typeof(T)));
         }
     }
 }

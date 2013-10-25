@@ -1,16 +1,17 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
-using System.Collections.Generic;
-using System.Diagnostics;
 using ElasticLinq;
 using ElasticLinq.Utility;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace ElasticLINQ.Test.TestSupport
+namespace ElasticLinq.Test.TestSupport
 {
+    [ExcludeFromCodeCoverage] // Fake for tests
     internal class FakeQueryProvider : IQueryProvider
     {
         public IQueryable CreateQuery(Expression expression)

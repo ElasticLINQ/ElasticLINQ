@@ -3,10 +3,11 @@
 
 using ElasticLinq.Request.Filters;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Xunit;
 
-namespace ElasticLINQ.Test.Request.Filters
+namespace ElasticLinq.Test.Request.Filters
 {
     public class AndFilterTests
     {
@@ -32,6 +33,7 @@ namespace ElasticLINQ.Test.Request.Filters
         }
 
         [Fact]
+        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void CombineThrowArgumentNullExceptionWhenFiltersIsNull()
         {
             Assert.Throws<ArgumentNullException>(() => AndFilter.Combine(null));

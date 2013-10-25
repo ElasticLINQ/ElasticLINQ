@@ -5,7 +5,7 @@ using ElasticLinq;
 using System;
 using Xunit;
 
-namespace ElasticLINQ.Test
+namespace ElasticLinq.Test
 {
     public class ElasticConnectionTests
     {

@@ -1,16 +1,18 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
+using ElasticLinq.Utility;
 using System;
 using System.Collections.Generic;
-using ElasticLinq.Utility;
+using System.Diagnostics.CodeAnalysis;
 using Xunit;
 
-namespace ElasticLINQ.Test.Utility
+namespace ElasticLinq.Test.Utility
 {
     public class ArgumentTests
     {
         [Fact]
+        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void EnsureNotNullThrowsArgumentNullExceptionWhenValueIsNull()
         {
             Assert.Throws<ArgumentNullException>(() => Argument.EnsureNotNull("a", null));
@@ -23,18 +25,21 @@ namespace ElasticLINQ.Test.Utility
         }
 
         [Fact]
+        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void EnsureNotBlankThrowsArgumentExceptionWhenValueIsWhitespace()
         {
             Assert.Throws<ArgumentException>(() => Argument.EnsureNotBlank("a", "   "));
         }
 
         [Fact]
+        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void EnsureNotBlankThrowsArgumentExceptionWhenValueIsEmptyString()
         {
             Assert.Throws<ArgumentException>(() => Argument.EnsureNotBlank("a", String.Empty));
         }
 
         [Fact]
+        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void EnsureNotBlankThrowsArgumentNullExceptionWhenValueIsNull()
         {
             Assert.Throws<ArgumentNullException>(() => Argument.EnsureNotBlank("a", null));
@@ -47,6 +52,7 @@ namespace ElasticLINQ.Test.Utility
         }
 
         [Fact]
+        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void EnsureIsDefinedEnumThrowsArgumentOutOfRangeExceptionWhenValueIsNotDefinedEnum()
         {
             Assert.Throws<ArgumentOutOfRangeException>(() => Argument.EnsureIsDefinedEnum("a", ((TestEnum)9)));
@@ -59,6 +65,7 @@ namespace ElasticLINQ.Test.Utility
         }
 
         [Fact]
+        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void EnsureIsAssignableThrowsArgumentExceptionWhenTypeIsNotAssignable()
         {
             Assert.Throws<ArgumentException>(() => Argument.EnsureIsAssignableFrom<List<object>>("a", typeof(List<int>)));

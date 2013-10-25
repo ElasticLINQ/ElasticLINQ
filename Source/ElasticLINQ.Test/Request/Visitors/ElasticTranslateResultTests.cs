@@ -7,7 +7,7 @@ using ElasticLinq.Response.Model;
 using System;
 using Xunit;
 
-namespace ElasticLINQ.Test.Request.Visitors
+namespace ElasticLinq.Test.Request.Visitors
 {
     public class ElasticTranslateResultTests
     {
@@ -15,7 +15,7 @@ namespace ElasticLINQ.Test.Request.Visitors
         public void ConstructorSetsProperties()
         {
             var expectedSearch = new ElasticSearchRequest("someType");
-            Func<Hit, object> expectedProjector = h => h;
+            Func<Hit, object> expectedProjector = h => null;
 
             var result = new ElasticTranslateResult(expectedSearch, expectedProjector);
 

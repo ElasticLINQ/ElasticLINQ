@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
-namespace ElasticLINQ.Test.Response
+namespace ElasticLinq.Test.Response
 {
     public class ElasticResponseMaterializerTests
     {

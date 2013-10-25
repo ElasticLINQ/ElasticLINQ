@@ -7,8 +7,8 @@
     <ProjectGuid>{752ADF39-9F6D-4FE3-8EEF-3266EF584C2A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ElasticLINQ.Test</RootNamespace>
-    <AssemblyName>ElasticLINQ.Test</AssemblyName>
+    <RootNamespace>ElasticLinq.Test</RootNamespace>
+    <AssemblyName>ElasticLinq.Test</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
