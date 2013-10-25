@@ -14,18 +14,19 @@ namespace ElasticLINQ.Test.Request.Visitors.ElasticQueryTranslation
         protected static readonly IElasticMapping Mapping = new TrivialElasticMapping();
         protected static readonly ElasticQueryProvider SharedProvider = new ElasticQueryProvider(Connection, Mapping);
 
-        protected static IQueryable<Employee> Employees
+        protected static IQueryable<Robot> Robots
         {
-            get { return new ElasticQuery<Employee>(SharedProvider); }
+            get { return new ElasticQuery<Robot>(SharedProvider); }
         }
 
-        protected class Employee
+        protected class Robot
         {
             public Int32 Id { get; set; }
             public string Name { get; set; }
-            public DateTime Hired { get; set; }
-            public decimal HourlyWage { get; set; }
-            public double Efficiency { get; set; }
+            public DateTime Started { get; set; }
+            public decimal Cost { get; set; }
+            public double EnergyUse { get; set; }
+            public int? Zone { get; set; }
         }
     }
 }

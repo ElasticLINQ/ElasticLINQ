@@ -275,11 +275,14 @@ namespace ElasticLinq.Request.Visitors
 
         private IEnumerable<T> AssertExpressionsOfType<T>(params Expression[] expressions) where T : Expression
         {
-            foreach (var expression in expressions.Select(e => Visit(BooleanMemberAccessBecomesEquals(e))))
-                if ((expression as T) == null)
-                    throw new NotImplementedException(string.Format("Unknown binary expression {0}", expression));
-                else
-                    yield return (T)expression;
+            foreach (var expression in expressions.Select(BooleanMemberAccessBecomesEquals))
+            {
+                var reducedExpression = expression is FilterExpression ? expression : Visit(expression);
+                if ((reducedExpression as T) == null)
+                    throw new NotImplementedException(string.Format("Unknown binary expression {0}", reducedExpression));
+                
+                yield return (T)reducedExpression;
+            }
         }
 
         private Expression BooleanMemberAccessBecomesEquals(Expression e)
@@ -326,15 +329,13 @@ namespace ElasticLinq.Request.Visitors
         {
             var fieldName = mapping.GetFieldName(UnwrapNullableMethodExpression(cm.MemberExpression));
 
-            var existsFilter = new ExistsFilter(fieldName);
-
             var value = cm.ConstantExpression.Value ?? false;
 
             if (value.Equals(positiveTest))
-                return new FilterExpression(existsFilter);
+                return new FilterExpression(new ExistsFilter(fieldName));
 
             if (value.Equals(!positiveTest))
-                return new FilterExpression(NotFilter.Create(existsFilter));
+                return new FilterExpression(new MissingFilter(fieldName));
 
             throw new NotSupportedException("A null test Expression must consist a member and be compared to a bool or null");
         }

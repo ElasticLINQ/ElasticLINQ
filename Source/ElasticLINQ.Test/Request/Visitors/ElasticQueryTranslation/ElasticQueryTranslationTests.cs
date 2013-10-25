@@ -13,10 +13,9 @@ namespace ElasticLINQ.Test.Request.Visitors.ElasticQueryTranslation
         [Fact]
         public void TypeIsSetFromType()
         {
-            var actual = Mapping.GetTypeName(typeof(Employee));
+            var actual = Mapping.GetTypeName(typeof(Robot));
 
-            var query = Employees;
-            var translation = ElasticQueryTranslator.Translate(Mapping, query.Expression);
+            var translation = ElasticQueryTranslator.Translate(Mapping, Robots.Expression);
 
             Assert.Equal(actual, translation.SearchRequest.Type);
         }
@@ -26,7 +25,7 @@ namespace ElasticLINQ.Test.Request.Visitors.ElasticQueryTranslation
         {
             const int actual = 325;
 
-            var skipped = Employees.Skip(actual);
+            var skipped = Robots.Skip(actual);
             var translation = ElasticQueryTranslator.Translate(Mapping, skipped.Expression);
 
             Assert.Equal(actual, translation.SearchRequest.From);
@@ -37,7 +36,7 @@ namespace ElasticLINQ.Test.Request.Visitors.ElasticQueryTranslation
         {
             const int actual = 73;
 
-            var taken = Employees.Take(actual);
+            var taken = Robots.Take(actual);
             var translation = ElasticQueryTranslator.Translate(Mapping, taken.Expression);
 
             Assert.Equal(actual, translation.SearchRequest.Size);
@@ -46,32 +45,32 @@ namespace ElasticLINQ.Test.Request.Visitors.ElasticQueryTranslation
         [Fact]
         public void SelectAnonymousProjectionTranslatesToFields()
         {
-            var selected = Employees.Select(e => new { e.Id, e.HourlyWage });
+            var selected = Robots.Select(e => new { e.Id, e.Cost });
             var fields = ElasticQueryTranslator.Translate(Mapping, selected.Expression).SearchRequest.Fields;
 
             Assert.NotNull(fields);
             Assert.Contains("id", fields);
-            Assert.Contains("hourlyWage", fields);
+            Assert.Contains("cost", fields);
             Assert.Equal(2, fields.Count);
         }
 
         [Fact]
         public void SelectAnonymousProjectionWithSomeIdentifiersTranslatesToFields()
         {
-            var selected = Employees.Select(e => new { First = e.Id, Second = e.Hired, e.HourlyWage });
+            var selected = Robots.Select(e => new { First = e.Id, Second = e.Started, e.Cost });
             var fields = ElasticQueryTranslator.Translate(Mapping, selected.Expression).SearchRequest.Fields;
 
             Assert.NotNull(fields);
             Assert.Contains("id", fields);
-            Assert.Contains("hired", fields);
-            Assert.Contains("hourlyWage", fields);
+            Assert.Contains("started", fields);
+            Assert.Contains("cost", fields);
             Assert.Equal(3, fields.Count);
         }
 
         [Fact]
         public void SelectTupleProjectionWithIdentifiersTranslatesToFields()
         {
-            var selected = Employees.Select(e => Tuple.Create(e.Id, e.Name));
+            var selected = Robots.Select(e => Tuple.Create(e.Id, e.Name));
             var fields = ElasticQueryTranslator.Translate(Mapping, selected.Expression).SearchRequest.Fields;
 
             Assert.NotNull(fields);
@@ -83,7 +82,7 @@ namespace ElasticLINQ.Test.Request.Visitors.ElasticQueryTranslation
         [Fact]
         public void SelectSingleFieldTranslatesToField()
         {
-            var selected = Employees.Select(e => e.Id);
+            var selected = Robots.Select(e => e.Id);
             var fields = ElasticQueryTranslator.Translate(Mapping, selected.Expression).SearchRequest.Fields;
 
             Assert.NotNull(fields);

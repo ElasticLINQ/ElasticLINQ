@@ -13,7 +13,7 @@ namespace ElasticLINQ.Test.Request.Visitors.ElasticQueryTranslation
         [Fact]
         public void OrderByTranslatesToSortAscending()
         {
-            var ordered = Employees.OrderBy(e => e.Id);
+            var ordered = Robots.OrderBy(e => e.Id);
             var sortOptions = ElasticQueryTranslator.Translate(Mapping, ordered.Expression).SearchRequest.SortOptions;
 
             Assert.Single(sortOptions, o => o.Ascending && o.Name == "id");
@@ -23,7 +23,7 @@ namespace ElasticLINQ.Test.Request.Visitors.ElasticQueryTranslation
         [Fact]
         public void OrderByScoreFieldTranslatesToScoreSortAscending()
         {
-            var ordered = Employees.OrderBy(e => ElasticFields.Score);
+            var ordered = Robots.OrderBy(e => ElasticFields.Score);
             var sortOptions = ElasticQueryTranslator.Translate(Mapping, ordered.Expression).SearchRequest.SortOptions;
 
             Assert.Single(sortOptions, o => o.Ascending && o.Name == "_score");
@@ -33,7 +33,7 @@ namespace ElasticLINQ.Test.Request.Visitors.ElasticQueryTranslation
         [Fact]
         public void OrderByDescendingTranslatesToSortDescending()
         {
-            var ordered = Employees.OrderByDescending(e => e.Name);
+            var ordered = Robots.OrderByDescending(e => e.Name);
             var sortOptions = ElasticQueryTranslator.Translate(Mapping, ordered.Expression).SearchRequest.SortOptions;
 
             Assert.Single(sortOptions, o => !o.Ascending && o.Name == "name");
@@ -43,7 +43,7 @@ namespace ElasticLINQ.Test.Request.Visitors.ElasticQueryTranslation
         [Fact]
         public void OrderByDescendingScoreFieldTranslatesToScoreSortDescending()
         {
-            var ordered = Employees.OrderByDescending(e => ElasticFields.Score);
+            var ordered = Robots.OrderByDescending(e => ElasticFields.Score);
             var sortOptions = ElasticQueryTranslator.Translate(Mapping, ordered.Expression).SearchRequest.SortOptions;
 
             Assert.Single(sortOptions, o => !o.Ascending && o.Name == "_score");
@@ -53,7 +53,7 @@ namespace ElasticLINQ.Test.Request.Visitors.ElasticQueryTranslation
         [Fact]
         public void OrderByScoreTranslatesToScoreSortAscending()
         {
-            var ordered = Employees.OrderByScore();
+            var ordered = Robots.OrderByScore();
             var sortOptions = ElasticQueryTranslator.Translate(Mapping, ordered.Expression).SearchRequest.SortOptions;
 
             Assert.Single(sortOptions, o => o.Ascending && o.Name == "_score");
@@ -63,7 +63,7 @@ namespace ElasticLINQ.Test.Request.Visitors.ElasticQueryTranslation
         [Fact]
         public void OrderByScoreDescendingTranslatesToScoreSortDescending()
         {
-            var ordered = Employees.OrderByScoreDescending();
+            var ordered = Robots.OrderByScoreDescending();
             var sortOptions = ElasticQueryTranslator.Translate(Mapping, ordered.Expression).SearchRequest.SortOptions;
 
             Assert.Single(sortOptions, o => !o.Ascending && o.Name == "_score");
@@ -73,7 +73,7 @@ namespace ElasticLINQ.Test.Request.Visitors.ElasticQueryTranslation
         [Fact]
         public void ThenByTranslatesToSecondSortAscending()
         {
-            var ordered = Employees.OrderBy(e => e.Id).ThenBy(e => e.Name);
+            var ordered = Robots.OrderBy(e => e.Id).ThenBy(e => e.Name);
             var sortOptions = ElasticQueryTranslator.Translate(Mapping, ordered.Expression).SearchRequest.SortOptions;
 
             Assert.NotNull(sortOptions);
@@ -85,7 +85,7 @@ namespace ElasticLINQ.Test.Request.Visitors.ElasticQueryTranslation
         [Fact]
         public void ThenByScoreFieldTranslatesToSecondScoreSortAscending()
         {
-            var ordered = Employees.OrderBy(e => e.Id).ThenBy(e => ElasticFields.Score);
+            var ordered = Robots.OrderBy(e => e.Id).ThenBy(e => ElasticFields.Score);
             var sortOptions = ElasticQueryTranslator.Translate(Mapping, ordered.Expression).SearchRequest.SortOptions;
 
             Assert.NotNull(sortOptions);
@@ -97,7 +97,7 @@ namespace ElasticLINQ.Test.Request.Visitors.ElasticQueryTranslation
         [Fact]
         public void ThenByDescendingTranslatesToSecondSortDescending()
         {
-            var ordered = Employees.OrderBy(e => e.Id).ThenByDescending(e => e.Name);
+            var ordered = Robots.OrderBy(e => e.Id).ThenByDescending(e => e.Name);
             var sortOptions = ElasticQueryTranslator.Translate(Mapping, ordered.Expression).SearchRequest.SortOptions;
 
             Assert.NotNull(sortOptions);
@@ -109,7 +109,7 @@ namespace ElasticLINQ.Test.Request.Visitors.ElasticQueryTranslation
         [Fact]
         public void ThenByDescendingScoreFieldTranslatesToSecondScoreSortDescending()
         {
-            var ordered = Employees.OrderBy(e => e.Id).ThenByDescending(e => ElasticFields.Score);
+            var ordered = Robots.OrderBy(e => e.Id).ThenByDescending(e => ElasticFields.Score);
             var sortOptions = ElasticQueryTranslator.Translate(Mapping, ordered.Expression).SearchRequest.SortOptions;
 
             Assert.NotNull(sortOptions);
@@ -121,7 +121,7 @@ namespace ElasticLINQ.Test.Request.Visitors.ElasticQueryTranslation
         [Fact]
         public void ThenByScoreTranslatesToSortAscending()
         {
-            var ordered = Employees.OrderBy(o => o.Id).ThenByScore();
+            var ordered = Robots.OrderBy(o => o.Id).ThenByScore();
             var sortOptions = ElasticQueryTranslator.Translate(Mapping, ordered.Expression).SearchRequest.SortOptions;
 
             Assert.True(sortOptions[0].Ascending && sortOptions[0].Name == "id");
@@ -132,7 +132,7 @@ namespace ElasticLINQ.Test.Request.Visitors.ElasticQueryTranslation
         [Fact]
         public void ThenByScoreDescendingTranslatesToSortDescending()
         {
-            var ordered = Employees.OrderBy(o => o.Id).ThenByScoreDescending();
+            var ordered = Robots.OrderBy(o => o.Id).ThenByScoreDescending();
             var sortOptions = ElasticQueryTranslator.Translate(Mapping, ordered.Expression).SearchRequest.SortOptions;
 
             Assert.True(sortOptions[0].Ascending && sortOptions[0].Name == "id");
@@ -143,13 +143,13 @@ namespace ElasticLINQ.Test.Request.Visitors.ElasticQueryTranslation
         [Fact]
         public void OrderByWithThenByTwiceTranslatesToThreeSorts()
         {
-            var ordered = Employees.OrderBy(e => e.Id).ThenByScore().ThenBy(e => e.HourlyWage);
+            var ordered = Robots.OrderBy(e => e.Id).ThenByScore().ThenBy(e => e.Cost);
             var sortOptions = ElasticQueryTranslator.Translate(Mapping, ordered.Expression).SearchRequest.SortOptions;
 
             Assert.NotNull(sortOptions);
             Assert.True(sortOptions[0].Ascending && sortOptions[0].Name == "id");
             Assert.True(sortOptions[1].Ascending && sortOptions[1].Name == "_score");
-            Assert.True(sortOptions[2].Ascending && sortOptions[2].Name == "hourlyWage");
+            Assert.True(sortOptions[2].Ascending && sortOptions[2].Name == "cost");
             Assert.Equal(3, sortOptions.Count);
         } 
     }

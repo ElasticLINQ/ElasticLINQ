@@ -41,11 +41,9 @@ namespace ElasticLinq.Request.Visitors
                        && TypeHelper.IsNullableType(memberExpression.Member.DeclaringType))
                     return true;
 
-                // someProperty == null
-                if (TypeHelper.IsNullableType(memberExpression.Type)
-                    && constantExpression.Type == memberExpression.Type
-                    && constantExpression.Value == null)
-                    return true;
+                // something == null (for reference types or Nullable<T>
+                if (constantExpression.Value == null)
+                    return !memberExpression.Type.IsValueType || TypeHelper.IsNullableType(memberExpression.Type);
 
                 return false;
             }
