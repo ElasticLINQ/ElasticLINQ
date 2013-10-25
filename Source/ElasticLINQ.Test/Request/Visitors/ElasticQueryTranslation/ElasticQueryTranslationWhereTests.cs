@@ -502,6 +502,18 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         }
 
         [Fact]
+        public void StringEqualsNullNegatedGeneratesExistsFilter()
+        {
+            var where = Robots.Where(e => !(e.Name == null));
+            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+
+            Assert.IsType<ExistsFilter>(filter);
+            var missingFilter = (ExistsFilter)filter;
+            Assert.Equal("exists", missingFilter.Name);
+            Assert.Equal("name", missingFilter.Field);
+        }
+
+        [Fact]
         public void StringStaticEqualsNullMethodGeneratesMissingFilter()
         {
             var where = Robots.Where(e => String.Equals(e.Name, null));
@@ -523,6 +535,18 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var existsFilter = (ExistsFilter)filter;
             Assert.Equal("exists", existsFilter.Name);
             Assert.Equal("name", existsFilter.Field);
+        }
+
+        [Fact]
+        public void StringNotEqualsNullNegatedGeneratesMissingFilter()
+        {
+            var where = Robots.Where(e => !(e.Name != null));
+            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+
+            Assert.IsType<MissingFilter>(filter);
+            var missingFilter = (MissingFilter)filter;
+            Assert.Equal("missing", missingFilter.Name);
+            Assert.Equal("name", missingFilter.Field);
         }
 
         [Fact]
@@ -638,6 +662,20 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             Assert.Single(orFilter.Filters, f => f.Name == "exists");
             Assert.Single(orFilter.Filters, f => f.Name == "terms");
             Assert.Equal(4, orFilter.Filters.Count);
+        }
+
+        [Fact]
+        public void AndOperatorGeneratesAndFilter()
+        {
+            var where = Robots.Where(e => e.Name == "IG-88" && e.Cost > 1);
+            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+
+            Assert.IsType<AndFilter>(filter);
+            var orFilter = (AndFilter)filter;
+            Assert.Equal("and", orFilter.Name);
+            Assert.Single(orFilter.Filters, f => f.Name == "term");
+            Assert.Single(orFilter.Filters, f => f.Name == "range");
+            Assert.Equal(2, orFilter.Filters.Count);
         }
     }
 }

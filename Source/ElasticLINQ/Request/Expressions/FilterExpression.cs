@@ -8,7 +8,7 @@ using System.Linq.Expressions;
 namespace ElasticLinq.Request.Expressions
 {
     /// <summary>
-    /// An expression tree that represents a converted Elastic Search filter.
+    /// An expression node that represents a converted ElasticSearch filter.
     /// </summary>
     internal class FilterExpression : Expression
     {
@@ -29,6 +29,11 @@ namespace ElasticLinq.Request.Expressions
         public override Type Type
         {
             get { return typeof(bool); }
+        }
+
+        public override bool CanReduce
+        {
+            get { return false; }
         }
 
         public override string ToString()
