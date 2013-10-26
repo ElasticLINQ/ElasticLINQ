@@ -112,5 +112,35 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             Assert.Contains("_id", fields);
             Assert.Equal(2, fields.Count);
         }
+
+        [Fact]
+        public void SelectTupleScoreAndIdTranslatesToFields()
+        {
+            var selected = Robots.Select(r => Tuple.Create(ElasticFields.Id, ElasticFields.Score));
+            var fields = ElasticQueryTranslator.Translate(Mapping, selected.Expression).SearchRequest.Fields;
+
+            Assert.NotNull(fields);
+            Assert.Contains("_score", fields);
+            Assert.Contains("_id", fields);
+            Assert.Equal(2, fields.Count);
+        }
+
+        [Fact]
+        public void SelectAnonymousEntityDoesNotTranslateToFields()
+        {
+            var selected = Robots.Select(r => new { Robot = r, ElasticFields.Score });
+            var translation = ElasticQueryTranslator.Translate(Mapping, selected.Expression);
+
+            Assert.Empty(translation.SearchRequest.Fields);
+        }
+
+        [Fact]
+        public void SelectTupleEntityDoesNotTranslateToFields()
+        {
+            var selected = Robots.Select(r => Tuple.Create(r, ElasticFields.Score));
+            var translation = ElasticQueryTranslator.Translate(Mapping, selected.Expression);
+
+            Assert.Empty(translation.SearchRequest.Fields);
+        }
     }
 }

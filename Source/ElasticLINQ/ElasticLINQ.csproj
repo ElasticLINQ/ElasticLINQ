@@ -64,6 +64,7 @@
     <Compile Include="Request\Formatter\RequestFormatter.cs" />
     <Compile Include="Request\Visitors\BranchSelectExpressionVisitor.cs" />
     <Compile Include="Request\Visitors\ConstantMemberPair.cs" />
+    <Compile Include="Request\Visitors\ElasticFieldsProjectionExpressionVisitor.cs" />
     <Compile Include="Request\Visitors\ElasticQueryTranslator.cs" />
     <Compile Include="Request\Expressions\FilterExpression.cs" />
     <Compile Include="Request\Visitors\ElasticTranslateResult.cs" />

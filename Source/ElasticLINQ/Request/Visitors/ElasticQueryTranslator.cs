@@ -67,7 +67,6 @@ namespace ElasticLinq.Request.Visitors
                         return VisitEquals(Visit(m.Object), Visit(m.Arguments[0]));
                     if (m.Arguments.Count == 2)
                         return VisitEquals(Visit(m.Arguments[0]), Visit(m.Arguments[1]));
-
                     break;
 
                 case "Contains":
@@ -280,7 +279,7 @@ namespace ElasticLinq.Request.Visitors
                 var reducedExpression = expression is FilterExpression ? expression : Visit(expression);
                 if ((reducedExpression as T) == null)
                     throw new NotImplementedException(string.Format("Unknown binary expression {0}", reducedExpression));
-                
+
                 yield return (T)reducedExpression;
             }
         }
@@ -426,15 +425,70 @@ namespace ElasticLinq.Request.Visitors
             var lambda = (LambdaExpression)StripQuotes(selectExpression);
             var selectBody = Visit(lambda.Body);
 
-            if (selectBody is NewExpression || selectBody is MemberExpression || selectBody is MethodCallExpression)
-            {
-                var projection = ProjectionExpressionVisitor.ProjectColumns(projectionParameter, mapping, selectBody);
-                fields.AddRange(projection.FieldNames);
-                var compiled = Expression.Lambda(projection.Materialization, projectionParameter).Compile();
-                projector = h => compiled.DynamicInvoke(h);
-            }
+            if (selectBody is MemberExpression)
+                return VisitSelectMember(source, (MemberExpression)selectBody);
+
+            if (selectBody is NewExpression)
+                return VisitSelectNew(source, (NewExpression)selectBody, lambda.Parameters);
+
+            if (selectBody is MethodCallExpression)
+                return VisitSelectMethodCall(source, (MethodCallExpression)selectBody, lambda.Parameters);
 
             return Visit(source);
+        }
+
+        private Expression VisitSelectMember(Expression source, MemberExpression selectExpression)
+        {
+            RebindPropertiesAndElasticFields(selectExpression);
+            return Visit(source);
+        }
+
+        private Expression VisitSelectMethodCall(Expression source, MethodCallExpression selectExpression, IEnumerable<ParameterExpression> parameters)
+        {
+            var entityParameter = selectExpression.Arguments.SingleOrDefault(parameters.Contains) as ParameterExpression;
+            if (entityParameter == null)
+                RebindPropertiesAndElasticFields(selectExpression);
+            else
+                RebindElasticFieldsAndChainProjector(selectExpression, entityParameter);
+
+            return Visit(source);
+        }
+
+        private Expression VisitSelectNew(Expression source, NewExpression selectExpression, IEnumerable<ParameterExpression> parameters)
+        {
+            var entityParameter = selectExpression.Arguments.SingleOrDefault(parameters.Contains) as ParameterExpression;
+            if (entityParameter == null)
+                RebindPropertiesAndElasticFields(selectExpression);
+            else
+                RebindElasticFieldsAndChainProjector(selectExpression, entityParameter);
+
+            return Visit(source);
+        }
+
+        /// <summary>
+        /// We are using the whole entity in a new select projection. REbind any ElasticField references to JObject
+        /// and ensure the entity parameter is a freshly materialized entity object from our default materializer.
+        /// </summary>
+        /// <param name="selectExpression">Select expression to rebind.</param>
+        /// <param name="entityParameter">Parameter that references the whole entity.</param>
+        private void RebindElasticFieldsAndChainProjector(Expression selectExpression, ParameterExpression entityParameter)
+        {
+            var projection = ElasticFieldsProjectionExpressionVisitor.Rebind(projectionParameter, mapping, selectExpression);
+            var compiled = Expression.Lambda(projection, entityParameter, projectionParameter).Compile();
+            projector = h => compiled.DynamicInvoke(DefaultProjector(h), h);
+        }
+
+        /// <summary>
+        /// We are using just some properties of the entity. Rewrite the properties as JObject field lookups and
+        /// record all the field names used to ensure we only select those.
+        /// </summary>
+        /// <param name="selectExpression">Select expression to rebind.</param>
+        private void RebindPropertiesAndElasticFields(Expression selectExpression)
+        {
+            var projection = ProjectionExpressionVisitor.Rebind(projectionParameter, mapping, selectExpression);
+            var compiled = Expression.Lambda(projection.Materialization, projectionParameter).Compile();
+            projector = h => compiled.DynamicInvoke(h);
+            fields.AddRange(projection.FieldNames);
         }
 
         private Expression VisitSkip(Expression source, Expression skipExpression)

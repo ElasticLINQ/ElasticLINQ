@@ -1,16 +1,60 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
+using System.Reflection;
 using ElasticLinq.Mapping;
 using ElasticLinq.Utility;
-using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
+using Newtonsoft.Json.Linq;
 
 namespace ElasticLinq.Request.Visitors
 {
+    /// <summary>
+    /// Rewrites select projections to bind to JObject and captures the field names
+    /// in order to only select those required.
+    /// </summary>
+    internal class ProjectionExpressionVisitor : ElasticFieldsProjectionExpressionVisitor
+    {
+        private static readonly MethodInfo GetFieldMethod = typeof(JObject).GetMethod("GetValue", new[] { typeof(string) });
+        private readonly HashSet<string> fieldNames = new HashSet<string>();
+
+        private ProjectionExpressionVisitor(ParameterExpression parameter, IElasticMapping mapping)
+            : base(parameter, mapping)
+        {
+        }
+
+        internal static new Projection Rebind(ParameterExpression parameter, IElasticMapping mapping, Expression selector)
+        {
+            var visitor = new ProjectionExpressionVisitor(parameter, mapping);
+            Argument.EnsureNotNull("selector", selector);
+            var materialization = visitor.Visit(selector);
+            return new Projection(visitor.fieldNames, materialization);
+        }
+
+        protected override Expression VisitMember(MemberExpression m)
+        {
+            if (m.Expression != null && m.Expression.NodeType == ExpressionType.Parameter)
+                return VisitFieldSelection(m);
+
+            return base.VisitMember(m);            
+        }
+
+        private Expression VisitFieldSelection(MemberExpression m)
+        {
+            var fieldName = Mapping.GetFieldName(m.Member);
+            fieldNames.Add(fieldName);
+            return Expression.Convert(Expression.Call(Expression.PropertyOrField(Parameter, "fields"), GetFieldMethod, Expression.Constant(fieldName)), m.Type);
+        }
+
+        protected override Expression VisitElasticField(MemberExpression m)
+        {
+            fieldNames.Add(Mapping.GetFieldName(m.Member));
+            return base.VisitElasticField(m);
+        }
+    }
+
     internal class Projection
     {
         private readonly HashSet<string> fieldNames;
@@ -22,65 +66,8 @@ namespace ElasticLinq.Request.Visitors
             this.materialization = materialization;
         }
 
-        public IEnumerable<string> FieldNames { get { return fieldNames.AsEnumerable(); }} 
-        
-        public Expression Materialization {get { return materialization; }}
-    }
+        public IEnumerable<string> FieldNames { get { return fieldNames.AsEnumerable(); } }
 
-    /// <summary>
-    /// Rewrites select projections to bind to JObject and captures the field names
-    /// in order to only select from ElasticSearch those required.
-    /// </summary>
-    internal class ProjectionExpressionVisitor : ExpressionVisitor
-    {
-        private static readonly MethodInfo getFieldMethod = typeof(JObject).GetMethod("GetValue", new[] { typeof(string) });
-
-        private readonly HashSet<string> fieldNames = new HashSet<string>();
-        private readonly ParameterExpression parameter;
-        private readonly IElasticMapping mapping;
-
-        private ProjectionExpressionVisitor(ParameterExpression parameter, IElasticMapping mapping)
-        {
-            this.parameter = parameter;
-            this.mapping = mapping;
-        }
-
-        internal static Projection ProjectColumns(ParameterExpression parameter, IElasticMapping mapping, Expression selector)
-        {
-            Argument.EnsureNotNull("parameter", parameter);
-            Argument.EnsureNotNull("mapping", mapping);
-            Argument.EnsureNotNull("selector", selector);
-
-            var visitor = new ProjectionExpressionVisitor(parameter, mapping);
-
-            var materialization = visitor.Visit(selector);
-            return new Projection(visitor.fieldNames, materialization);
-        }
-
-        protected override Expression VisitMember(MemberExpression m)
-        {
-            if (m.Member.DeclaringType == typeof(ElasticFields))
-                return VisitFieldSelection(m, false);
-
-            if (m.Expression == null || m.Expression.NodeType != ExpressionType.Parameter)
-                return base.VisitMember(m);
-
-            return VisitFieldSelection(m, true);
-        }
-
-        private Expression VisitFieldSelection(MemberExpression m, bool inFieldsProperty)
-        {
-            var fieldName = mapping.GetFieldName(m.Member);
-            fieldNames.Add(fieldName);
-
-            return Expression.Convert(GetFieldExpression(inFieldsProperty, fieldName), m.Type);
-        }
-
-        private Expression GetFieldExpression(bool inFieldsProperty, string fieldName)
-        {
-            return !inFieldsProperty
-                ? (Expression) Expression.PropertyOrField(parameter, fieldName)
-                : Expression.Call(Expression.PropertyOrField(parameter, "fields"), getFieldMethod, Expression.Constant(fieldName));
-        }
+        public Expression Materialization { get { return materialization; } }
     }
 }

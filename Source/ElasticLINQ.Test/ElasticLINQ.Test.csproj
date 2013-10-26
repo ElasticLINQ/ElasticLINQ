@@ -67,6 +67,7 @@
     <Compile Include="Request\Formatter\RequestFormatterTests.cs" />
     <Compile Include="Request\Visitors\BranchSelectExpressionVisitorTests.cs" />
     <Compile Include="Request\Visitors\ConstantMemberPairTests.cs" />
+    <Compile Include="Request\Visitors\ElasticFieldsProjectionExpressionVisitorTests.cs" />
     <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationTestsBase.cs" />
     <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationOrderByTests.cs" />
     <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationTests.cs" />
