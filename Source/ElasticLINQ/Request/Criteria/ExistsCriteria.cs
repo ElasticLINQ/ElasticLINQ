@@ -1,27 +1,27 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
-namespace ElasticLinq.Request.Filters
+namespace ElasticLinq.Request.Criteria
 {
     /// <summary>
-    /// Filter that selects documents if they do not have a value
+    /// Criteria that selects documents if they have any value
     /// in the specified field.
     /// </summary>
-    internal class MissingFilter : SingleFieldFilter, INegatableFilter
+    internal class ExistsCriteria : SingleFieldCriteria, INegatableCriteria
     {
-        public MissingFilter(string field)
+        public ExistsCriteria(string field)
             : base(field)
         {
         }
 
         public override string Name
         {
-            get { return "missing"; }
+            get { return "exists"; }
         }
 
-        public IFilter Negate()
+        public ICriteria Negate()
         {
-            return new ExistsFilter(Field);
+            return new MissingCriteria(Field);
         }
     }
 }

@@ -1,0 +1,37 @@
+﻿// Copyright (c) Tier 3 Inc. All rights reserved.
+// Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using ElasticLinq.Utility;
+
+namespace ElasticLinq.Request.Criteria
+{
+    /// <summary>
+    /// Base class for any criteria wanting to have criteria of it's
+    /// own such as AndCriteria and OrCriteria.
+    /// </summary>
+    internal abstract class CompoundCriteria : ICriteria
+    {
+        private readonly List<ICriteria> criteria;
+
+        protected CompoundCriteria(IEnumerable<ICriteria> criteria)
+        {
+            Argument.EnsureNotNull("criteria", criteria);
+            this.criteria = new List<ICriteria>(criteria);
+        }
+
+        public abstract string Name { get; }
+
+        public IReadOnlyList<ICriteria> Criteria
+        {
+            get { return criteria.AsReadOnly(); }
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{0} ({1})", Name, String.Join(", ", Criteria.Select(f => f.ToString()).ToArray()));
+        }
+    }
+}

@@ -3,7 +3,7 @@
 
 using ElasticLinq.Mapping;
 using ElasticLinq.Request.Expressions;
-using ElasticLinq.Request.Filters;
+using ElasticLinq.Request.Criteria;
 using ElasticLinq.Response.Model;
 using ElasticLinq.Utility;
 using System;
@@ -29,7 +29,7 @@ namespace ElasticLinq.Request.Visitors
         private Type type;
         private int skip;
         private int? take;
-        private IFilter topFilter;
+        private ICriteria topFilter;
 
         private ElasticQueryTranslator(IElasticMapping mapping)
         {
@@ -103,7 +103,7 @@ namespace ElasticLinq.Request.Visitors
                 var field = mapping.GetFieldName(((MemberExpression)matched).Member);
                 var containsSource = ((IEnumerable)((ConstantExpression)source).Value).Cast<object>();
                 var values = new List<object>(containsSource);
-                return new FilterExpression(TermFilter.FromIEnumerable(field, values.Distinct()));
+                return new CriteriaExpression(TermCriteria.FromIEnumerable(field, values.Distinct()));
             }
 
             throw new NotImplementedException("Unknown source for Contains");
@@ -177,9 +177,9 @@ namespace ElasticLinq.Request.Visitors
 
                 case ExpressionType.Not:
                     {
-                        var subExpression = Visit(node.Operand) as FilterExpression;
+                        var subExpression = Visit(node.Operand) as CriteriaExpression;
                         if (subExpression != null)
-                            return new FilterExpression(NotFilter.Create(subExpression.Filter));
+                            return new CriteriaExpression(NotCriteria.Create(subExpression.Criteria));
                         break;
                     }
             }
@@ -218,23 +218,23 @@ namespace ElasticLinq.Request.Visitors
             var lambda = (LambdaExpression)StripQuotes(predicate);
             var body = BooleanMemberAccessBecomesEquals(Visit(lambda.Body));
 
-            if (body is FilterExpression)
-                topFilter = AddFilter(((FilterExpression)body).Filter);
+            if (body is CriteriaExpression)
+                topFilter = AddFilter(((CriteriaExpression)body).Criteria);
             else
                 throw new NotSupportedException(String.Format("Unknown where predicate '{0}'", body));
 
             return Visit(source);
         }
 
-        private IFilter AddFilter(IFilter thisFilter)
+        private ICriteria AddFilter(ICriteria thisCriteria)
         {
             if (topFilter == null)
-                return thisFilter;
+                return thisCriteria;
 
-            if (topFilter is AndFilter)
-                return AndFilter.Combine(((AndFilter)topFilter).Filters.Concat(new[] { thisFilter }).ToArray());
+            if (topFilter is AndCriteria)
+                return AndCriteria.Combine(((AndCriteria)topFilter).Criteria.Concat(new[] { thisCriteria }).ToArray());
 
-            return AndFilter.Combine(topFilter, thisFilter);
+            return AndCriteria.Combine(topFilter, thisCriteria);
         }
 
         protected override Expression VisitBinary(BinaryExpression b)
@@ -262,21 +262,21 @@ namespace ElasticLinq.Request.Visitors
 
         private Expression VisitAndAlso(BinaryExpression b)
         {
-            var filters = AssertExpressionsOfType<FilterExpression>(b.Left, b.Right).Select(f => f.Filter).ToArray();
-            return new FilterExpression(AndFilter.Combine(filters));
+            var criteria = AssertExpressionsOfType<CriteriaExpression>(b.Left, b.Right).Select(f => f.Criteria).ToArray();
+            return new CriteriaExpression(AndCriteria.Combine(criteria));
         }
 
         private Expression VisitOrElse(BinaryExpression b)
         {
-            var filters = AssertExpressionsOfType<FilterExpression>(b.Left, b.Right).Select(f => f.Filter).ToArray();
-            return new FilterExpression(OrFilter.Combine(filters));
+            var criteria = AssertExpressionsOfType<CriteriaExpression>(b.Left, b.Right).Select(f => f.Criteria).ToArray();
+            return new CriteriaExpression(OrCriteria.Combine(criteria));
         }
 
         private IEnumerable<T> AssertExpressionsOfType<T>(params Expression[] expressions) where T : Expression
         {
             foreach (var expression in expressions.Select(BooleanMemberAccessBecomesEquals))
             {
-                var reducedExpression = expression is FilterExpression ? expression : Visit(expression);
+                var reducedExpression = expression is CriteriaExpression ? expression : Visit(expression);
                 if ((reducedExpression as T) == null)
                     throw new NotImplementedException(string.Format("Unknown binary expression {0}", reducedExpression));
 
@@ -294,8 +294,8 @@ namespace ElasticLinq.Request.Visitors
             if (e is MemberExpression && e.Type == typeof(bool))
                 return Visit(Expression.Equal(e, Expression.Constant(!wasNegative)));
 
-            if (wasNegative && e is FilterExpression)
-                return new FilterExpression(NotFilter.Create(((FilterExpression)e).Filter));
+            if (wasNegative && e is CriteriaExpression)
+                return new CriteriaExpression(NotCriteria.Create(((CriteriaExpression)e).Criteria));
 
             return e;
         }
@@ -331,10 +331,10 @@ namespace ElasticLinq.Request.Visitors
             var value = cm.ConstantExpression.Value ?? false;
 
             if (value.Equals(positiveTest))
-                return new FilterExpression(new ExistsFilter(fieldName));
+                return new CriteriaExpression(new ExistsCriteria(fieldName));
 
             if (value.Equals(!positiveTest))
-                return new FilterExpression(new MissingFilter(fieldName));
+                return new CriteriaExpression(new MissingCriteria(fieldName));
 
             throw new NotSupportedException("A null test Expression must consist a member and be compared to a bool or null");
         }
@@ -346,7 +346,7 @@ namespace ElasticLinq.Request.Visitors
             if (cm != null)
                 return cm.IsNullTest
                     ? CreateExists(cm, true)
-                    : new FilterExpression(new TermFilter(mapping.GetFieldName(cm.MemberExpression.Member), cm.ConstantExpression.Value));
+                    : new CriteriaExpression(new TermCriteria(mapping.GetFieldName(cm.MemberExpression.Member), cm.ConstantExpression.Value));
 
             throw new NotSupportedException("Equality must be between a Member and a Constant");
         }
@@ -366,7 +366,7 @@ namespace ElasticLinq.Request.Visitors
             if (cm != null)
                 return cm.IsNullTest
                     ? CreateExists(cm, false)
-                    : new FilterExpression(NotFilter.Create(new TermFilter(mapping.GetFieldName(cm.MemberExpression.Member), cm.ConstantExpression.Value)));
+                    : new CriteriaExpression(NotCriteria.Create(new TermCriteria(mapping.GetFieldName(cm.MemberExpression.Member), cm.ConstantExpression.Value)));
 
             throw new NotSupportedException("A NotEqual Expression must consist of a constant and a member");
         }
@@ -378,7 +378,7 @@ namespace ElasticLinq.Request.Visitors
             if (o != null)
             {
                 var field = mapping.GetFieldName(o.MemberExpression.Member);
-                return new FilterExpression(new RangeFilter(field, ExpressionTypeToRangeType(t), o.ConstantExpression.Value));
+                return new CriteriaExpression(new RangeCriteria(field, ExpressionTypeToRangeType(t), o.ConstantExpression.Value));
             }
 
             throw new NotSupportedException("A range must consist of a constant and a member");

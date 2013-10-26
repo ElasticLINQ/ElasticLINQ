@@ -7,29 +7,29 @@ using System.Diagnostics;
 using System.Linq;
 using ElasticLinq.Utility;
 
-namespace ElasticLinq.Request.Filters
+namespace ElasticLinq.Request.Criteria
 {
     /// <summary>
-    /// Filter that specifies a range of desired values for a given
+    /// Criteria that specifies a range of desired values for a given
     /// field that need to be satisfied to select a document.
     /// </summary>
     [DebuggerDisplay("{Field}")]
-    internal class RangeFilter : IFilter
+    internal class RangeCriteria : ICriteria
     {
         private readonly string field;
-        private readonly List<RangeSpecificationFilter> specifications;
+        private readonly List<RangeSpecificationCriteria> specifications;
 
-        public RangeFilter(string field, IEnumerable<RangeSpecificationFilter> specifications)
+        public RangeCriteria(string field, IEnumerable<RangeSpecificationCriteria> specifications)
         {
             Argument.EnsureNotBlank("field", field);
             Argument.EnsureNotNull("specifications", specifications);
 
             this.field = field;
-            this.specifications = new List<RangeSpecificationFilter>(specifications);
+            this.specifications = new List<RangeSpecificationCriteria>(specifications);
         }
 
-        public RangeFilter(string field, RangeComparison comparison, object value)
-            : this(field, new[] { new RangeSpecificationFilter(comparison, value) })
+        public RangeCriteria(string field, RangeComparison comparison, object value)
+            : this(field, new[] { new RangeSpecificationCriteria(comparison, value) })
         {
         }
 
@@ -43,7 +43,7 @@ namespace ElasticLinq.Request.Filters
             get { return field; }
         }
 
-        public IReadOnlyList<RangeSpecificationFilter> Specifications
+        public IReadOnlyList<RangeSpecificationCriteria> Specifications
         {
             get { return specifications; }
         }
@@ -63,7 +63,7 @@ namespace ElasticLinq.Request.Filters
     }
 
     [DebuggerDisplay("{Name,nq} {Value}")]
-    internal class RangeSpecificationFilter : IFilter
+    internal class RangeSpecificationCriteria : ICriteria
     {
         private readonly Dictionary<RangeComparison, string> rangeComparisonValues = new Dictionary<RangeComparison, string>
         {
@@ -76,7 +76,7 @@ namespace ElasticLinq.Request.Filters
         private readonly RangeComparison comparison;
         private readonly object value;
 
-        public RangeSpecificationFilter(RangeComparison comparison, object value)
+        public RangeSpecificationCriteria(RangeComparison comparison, object value)
         {
             Argument.EnsureIsDefinedEnum("comparison", comparison);
             Argument.EnsureNotNull("value", value);

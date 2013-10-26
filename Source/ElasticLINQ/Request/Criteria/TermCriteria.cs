@@ -6,28 +6,28 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ElasticLinq.Request.Filters
+namespace ElasticLinq.Request.Criteria
 {
     /// <summary>
-    /// Filter that specifies one or more possible values that a
+    /// Criteria that specifies one or more possible values that a
     /// field must match in order to select a document.
     /// </summary>
-    internal class TermFilter : IFilter
+    internal class TermCriteria : ICriteria
     {
         private readonly string field;
         private readonly HashSet<object> values;
 
-        public static TermFilter FromIEnumerable(string field, IEnumerable<object> values)
+        public static TermCriteria FromIEnumerable(string field, IEnumerable<object> values)
         {
-            return new TermFilter(field, values);
+            return new TermCriteria(field, values);
         }
 
-        public TermFilter(string field, params object[] values)
+        public TermCriteria(string field, params object[] values)
             : this(field, values.AsEnumerable())
         {
         }
 
-        private TermFilter(string field, IEnumerable<object> values)
+        private TermCriteria(string field, IEnumerable<object> values)
         {
             Argument.EnsureNotNull("value", values);
             this.field = field;

@@ -1,25 +1,25 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
-using ElasticLinq.Request.Filters;
+using ElasticLinq.Request.Criteria;
 using System;
 using System.Linq.Expressions;
 
 namespace ElasticLinq.Request.Expressions
 {
     /// <summary>
-    /// An expression node that represents a converted ElasticSearch filter.
+    /// An expression node that represents ElasticSearch criteria.
     /// </summary>
-    internal class FilterExpression : Expression
+    internal class CriteriaExpression : Expression
     {
-        private readonly IFilter filter;
+        private readonly ICriteria criteria;
 
-        public FilterExpression(IFilter filter)
+        public CriteriaExpression(ICriteria criteria)
         {
-            this.filter = filter;
+            this.criteria = criteria;
         }
 
-        public IFilter Filter { get { return filter; } }
+        public ICriteria Criteria { get { return criteria; } }
 
         public override ExpressionType NodeType
         {
@@ -38,7 +38,7 @@ namespace ElasticLinq.Request.Expressions
 
         public override string ToString()
         {
-            return filter.ToString();
+            return criteria.ToString();
         }
     }
 }

@@ -2,29 +2,29 @@
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
 using ElasticLinq.Request.Expressions;
-using ElasticLinq.Request.Filters;
+using ElasticLinq.Request.Criteria;
 using Xunit;
 
 namespace ElasticLinq.Test.Request.Expressions
 {
-    public class FilterExpressionTests
+    public class CriteriaExpressionTests
     {
         [Fact]
-        public void ConstructorSetsFilter()
+        public void ConstructorSetsCriteria()
         {
-            var filter = new TermFilter("field", "value");
+            var criteria = new TermCriteria("field", "value");
 
-            var expression = new FilterExpression(filter);
+            var expression = new CriteriaExpression(criteria);
 
-            Assert.Same(filter, expression.Filter);
+            Assert.Same(criteria, expression.Criteria);
         }
 
         [Fact]
         public void ExpressionsTypeIsBool()
         {
-            var filter = new TermFilter("field", "value");
+            var criteria = new TermCriteria("field", "value");
 
-            var expression = new FilterExpression(filter);
+            var expression = new CriteriaExpression(criteria);
 
             Assert.Equal(typeof(bool), expression.Type);
         }

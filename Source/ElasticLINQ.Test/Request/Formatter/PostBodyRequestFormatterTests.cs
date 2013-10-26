@@ -3,7 +3,7 @@
 
 using ElasticLinq;
 using ElasticLinq.Request;
-using ElasticLinq.Request.Filters;
+using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Formatter;
 using Newtonsoft.Json.Linq;
 using System;
@@ -36,14 +36,14 @@ namespace ElasticLinq.Test.Request.Formatter
         [Fact]
         public void BodyContainsFilterTerms()
         {
-            var filter = new TermFilter("term1", "criteria1", "criteria2");
+            var termCriteria = new TermCriteria("term1", "criteria1", "criteria2");
 
-            var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest("type1", filter: filter));
+            var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest("type1", filter: termCriteria));
             var body = JObject.Parse(formatter.Body);
 
             var result = TraverseWithAssert(body, "filter", "terms");
-            var actualTerms = TraverseWithAssert(result, filter.Field);
-            foreach (var criteria in filter.Values)
+            var actualTerms = TraverseWithAssert(result, termCriteria.Field);
+            foreach (var criteria in termCriteria.Values)
                 Assert.Contains(criteria, actualTerms.Select(t => t.ToString()).ToArray());
         }
 

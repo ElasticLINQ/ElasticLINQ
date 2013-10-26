@@ -4,16 +4,15 @@
 using ElasticLinq.Utility;
 using System;
 
-namespace ElasticLinq.Request.Filters
+namespace ElasticLinq.Request.Criteria
 {
-    internal abstract class SingleFieldFilter : IFilter
+    internal abstract class SingleFieldCriteria : ICriteria
     {
         private readonly string field;
 
-        protected SingleFieldFilter(string field)
+        protected SingleFieldCriteria(string field)
         {
             Argument.EnsureNotBlank("field", field);
-
             this.field = field;
         }
 

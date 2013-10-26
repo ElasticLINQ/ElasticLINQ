@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
 using ElasticLinq.Request;
-using ElasticLinq.Request.Filters;
+using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Formatter;
 using System;
 using System.Collections.Generic;
@@ -33,7 +33,7 @@ namespace ElasticLinq.Test.Request.Formatter
             return new ElasticSearchRequest("type1", 20, 10,
                 new List<string> { "field1" },
                 new List<SortOption> { new SortOption("sort1", false) },
-                new TermFilter("term1", "criteria"));
+                new TermCriteria("term1", "criteria"));
         }
     }
 }

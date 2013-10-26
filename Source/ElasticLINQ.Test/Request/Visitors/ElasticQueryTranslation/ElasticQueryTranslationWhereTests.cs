@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
 using System.Collections.Generic;
-using ElasticLinq.Request.Filters;
+using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Visitors;
 using System;
 using System.Linq;
@@ -13,669 +13,677 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
     public class ElasticQueryTranslationWhereTests : ElasticQueryTranslationTestsBase
     {
         [Fact]
-        public void ObjectEqualsMethodFromConstantGeneratesTermFilter()
+        public void ObjectEqualsMethodFromConstantGeneratesTermCriteria()
         {
             const string expectedConstant = "Robbie";
             var where = Robots.Where(e => expectedConstant.Equals(e.Name));
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<TermFilter>(filter);
-            var termFilter = (TermFilter)filter;
-            Assert.Equal("term", termFilter.Name);
-            Assert.Equal("name", termFilter.Field);
-            Assert.Equal(1, termFilter.Values.Count);
-            Assert.Equal(expectedConstant, termFilter.Values[0]);
+            Assert.IsType<TermCriteria>(criteria);
+            var termCriteria = (TermCriteria)criteria;
+            Assert.Equal("term", termCriteria.Name);
+            Assert.Equal("name", termCriteria.Field);
+            Assert.Equal(1, termCriteria.Values.Count);
+            Assert.Equal(expectedConstant, termCriteria.Values[0]);
         }
 
         [Fact]
-        public void ObjectEqualsMethodFromMemberGeneratesTermFilter()
+        public void ObjectEqualsMethodFromMemberGeneratesTermCriteria()
         {
             const string expectedConstant = "Robbie";
             var where = Robots.Where(e => expectedConstant.Equals(e.Name));
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<TermFilter>(filter);
-            var termFilter = (TermFilter)filter;
-            Assert.Equal("term", termFilter.Name);
-            Assert.Equal("name", termFilter.Field);
-            Assert.Equal(1, termFilter.Values.Count);
-            Assert.Equal(expectedConstant, termFilter.Values[0]);
+            Assert.IsType<TermCriteria>(criteria);
+            var termCriteria = (TermCriteria)criteria;
+            Assert.Equal("term", termCriteria.Name);
+            Assert.Equal("name", termCriteria.Field);
+            Assert.Equal(1, termCriteria.Values.Count);
+            Assert.Equal(expectedConstant, termCriteria.Values[0]);
         }
 
         [Fact]
-        public void ObjectStaticEqualsMethodGeneratesTermFilter()
+        public void ObjectStaticEqualsMethodGeneratesTermCriteria()
         {
             const string expectedConstant = "Marvin";
+            // ReSharper disable once RedundantNameQualifier
             var where = Robots.Where(e => Object.Equals(e.Name, expectedConstant));
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<TermFilter>(filter);
-            var termFilter = (TermFilter)filter;
-            Assert.Equal("term", termFilter.Name);
-            Assert.Equal("name", termFilter.Field);
-            Assert.Equal(1, termFilter.Values.Count);
-            Assert.Equal(expectedConstant, termFilter.Values[0]);
+            Assert.IsType<TermCriteria>(criteria);
+            var termCriteria = (TermCriteria)criteria;
+            Assert.Equal("term", termCriteria.Name);
+            Assert.Equal("name", termCriteria.Field);
+            Assert.Equal(1, termCriteria.Values.Count);
+            Assert.Equal(expectedConstant, termCriteria.Values[0]);
         }
 
         [Fact]
-        public void StringEqualsOperatorGeneratesTermFilter()
+        public void StringEqualsOperatorGeneratesTermCriteria()
         {
             const string expectedConstant = "Marvin";
             var where = Robots.Where(e => e.Name == expectedConstant);
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<TermFilter>(filter);
-            var termFilter = (TermFilter)filter;
-            Assert.Equal("term", termFilter.Name);
-            Assert.Equal("name", termFilter.Field);
-            Assert.Equal(1, termFilter.Values.Count);
-            Assert.Equal(expectedConstant, termFilter.Values[0]);
+            Assert.IsType<TermCriteria>(criteria);
+            var termCriteria = (TermCriteria)criteria;
+            Assert.Equal("term", termCriteria.Name);
+            Assert.Equal("name", termCriteria.Field);
+            Assert.Equal(1, termCriteria.Values.Count);
+            Assert.Equal(expectedConstant, termCriteria.Values[0]);
         }
 
         [Fact]
-        public void StringEqualsMethodFromMemberGeneratesTermFilter()
+        public void StringEqualsMethodFromMemberGeneratesTermCriteria()
         {
             const string expectedConstant = "Marvin";
             var where = Robots.Where(e => e.Name.Equals(expectedConstant));
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<TermFilter>(filter);
-            var termFilter = (TermFilter)filter;
-            Assert.Equal("term", termFilter.Name);
-            Assert.Equal("name", termFilter.Field);
-            Assert.Equal(1, termFilter.Values.Count);
-            Assert.Equal(expectedConstant, termFilter.Values[0]);
+            Assert.IsType<TermCriteria>(criteria);
+            var termCriteria = (TermCriteria)criteria;
+            Assert.Equal("term", termCriteria.Name);
+            Assert.Equal("name", termCriteria.Field);
+            Assert.Equal(1, termCriteria.Values.Count);
+            Assert.Equal(expectedConstant, termCriteria.Values[0]);
         }
 
         [Fact]
-        public void StringEqualsMethodFromConstantGeneratesTermFilter()
+        public void StringEqualsMethodFromConstantGeneratesTermCriteria()
         {
             const string expectedConstant = "Marvin";
             var where = Robots.Where(e => expectedConstant.Equals(e.Name));
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<TermFilter>(filter);
-            var termFilter = (TermFilter)filter;
-            Assert.Equal("term", termFilter.Name);
-            Assert.Equal("name", termFilter.Field);
-            Assert.Equal(1, termFilter.Values.Count);
-            Assert.Equal(expectedConstant, termFilter.Values[0]);
+            Assert.IsType<TermCriteria>(criteria);
+            var termCriteria = (TermCriteria)criteria;
+            Assert.Equal("term", termCriteria.Name);
+            Assert.Equal("name", termCriteria.Field);
+            Assert.Equal(1, termCriteria.Values.Count);
+            Assert.Equal(expectedConstant, termCriteria.Values[0]);
         }
 
         [Fact]
-        public void StringEqualsOperatorReversedArgumentsGeneratesTermFilter()
+        public void StringEqualsOperatorReversedArgumentsGeneratesTermCriteria()
         {
             const string expectedConstant = "Kryten";
             var where = Robots.Where(e => expectedConstant == e.Name);
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<TermFilter>(filter);
-            var termFilter = (TermFilter)filter;
-            Assert.Equal("term", termFilter.Name);
-            Assert.Equal("name", termFilter.Field);
-            Assert.Equal(1, termFilter.Values.Count);
-            Assert.Equal(expectedConstant, termFilter.Values[0]);
+            Assert.IsType<TermCriteria>(criteria);
+            var termCriteria = (TermCriteria)criteria;
+            Assert.Equal("term", termCriteria.Name);
+            Assert.Equal("name", termCriteria.Field);
+            Assert.Equal(1, termCriteria.Values.Count);
+            Assert.Equal(expectedConstant, termCriteria.Values[0]);
         }
 
         [Fact]
-        public void StringStaticEqualsMethodGeneratesTermFilter()
+        public void StringStaticEqualsMethodGeneratesTermCriteria()
         {
             const string expectedConstant = "Kryten";
             var where = Robots.Where(e => String.Equals(e.Name, expectedConstant));
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<TermFilter>(filter);
-            var termFilter = (TermFilter)filter;
-            Assert.Equal("term", termFilter.Name);
-            Assert.Equal("name", termFilter.Field);
-            Assert.Equal(1, termFilter.Values.Count);
-            Assert.Equal(expectedConstant, termFilter.Values[0]);
+            Assert.IsType<TermCriteria>(criteria);
+            var termCriteria = (TermCriteria)criteria;
+            Assert.Equal("term", termCriteria.Name);
+            Assert.Equal("name", termCriteria.Field);
+            Assert.Equal(1, termCriteria.Values.Count);
+            Assert.Equal(expectedConstant, termCriteria.Values[0]);
         }
 
         [Fact]
-        public void StringStaticEqualsMethodReversedArgumentsGeneratesTermFilter()
+        public void StringStaticEqualsMethodReversedArgumentsGeneratesTermCriteria()
         {
             const string expectedConstant = "IG-88";
             var where = Robots.Where(e => String.Equals(expectedConstant, e.Name));
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<TermFilter>(filter);
-            var termFilter = (TermFilter)filter;
-            Assert.Equal("term", termFilter.Name);
-            Assert.Equal("name", termFilter.Field);
-            Assert.Equal(1, termFilter.Values.Count);
-            Assert.Equal(expectedConstant, termFilter.Values[0]);
+            Assert.IsType<TermCriteria>(criteria);
+            var termCriteria = (TermCriteria)criteria;
+            Assert.Equal("term", termCriteria.Name);
+            Assert.Equal("name", termCriteria.Field);
+            Assert.Equal(1, termCriteria.Values.Count);
+            Assert.Equal(expectedConstant, termCriteria.Values[0]);
         }
 
         [Fact]
-        public void StringArrayExistingContainsGeneratesTermsFilter()
+        public void StringArrayExistingContainsGeneratesTermsCriteria()
         {
             var expectedNames = new[] { "Robbie", "Kryten", "IG-88", "Marvin" };
             var where = Robots.Where(e => expectedNames.Contains(e.Name));
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<TermFilter>(filter);
-            var termFilter = (TermFilter)filter;
-            Assert.Equal("terms", termFilter.Name);
-            Assert.Equal("name", termFilter.Field);
-            Assert.Equal(expectedNames.Length, termFilter.Values.Count);
+            Assert.IsType<TermCriteria>(criteria);
+            var termCriteria = (TermCriteria)criteria;
+            Assert.Equal("terms", termCriteria.Name);
+            Assert.Equal("name", termCriteria.Field);
+            Assert.Equal(expectedNames.Length, termCriteria.Values.Count);
             foreach (var term in expectedNames)
-                Assert.Contains(term, termFilter.Values);
+                Assert.Contains(term, termCriteria.Values);
         }
 
         [Fact]
-        public void StringArrayInlineContainsGeneratesTermsFilter()
+        public void StringArrayInlineContainsGeneratesTermsCriteria()
         {
             var expectedNames = new[] { "Robbie", "Kryten", "IG-88", "Marvin" };
             var where = Robots.Where(e => new[] { "Robbie", "Kryten", "IG-88", "Marvin" }.Contains(e.Name));
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<TermFilter>(filter);
-            var termFilter = (TermFilter)filter;
-            Assert.Equal("terms", termFilter.Name);
-            Assert.Equal("name", termFilter.Field);
-            Assert.Equal(expectedNames.Length, termFilter.Values.Count);
+            Assert.IsType<TermCriteria>(criteria);
+            var termCriteria = (TermCriteria)criteria;
+            Assert.Equal("terms", termCriteria.Name);
+            Assert.Equal("name", termCriteria.Field);
+            Assert.Equal(expectedNames.Length, termCriteria.Values.Count);
             foreach (var term in expectedNames)
-                Assert.Contains(term, termFilter.Values);
+                Assert.Contains(term, termCriteria.Values);
         }
 
         [Fact]
-        public void StringListExistingContainsGeneratesTermsFilter()
+        public void StringListExistingContainsGeneratesTermsCriteria()
         {
             var expectedNames = new List<string> { "Robbie", "Kryten", "IG-88", "Marvin" };
             var where = Robots.Where(e => expectedNames.Contains(e.Name));
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<TermFilter>(filter);
-            var termFilter = (TermFilter)filter;
-            Assert.Equal("terms", termFilter.Name);
-            Assert.Equal("name", termFilter.Field);
-            Assert.Equal(expectedNames.Count, termFilter.Values.Count);
+            Assert.IsType<TermCriteria>(criteria);
+            var termCriteria = (TermCriteria)criteria;
+            Assert.Equal("terms", termCriteria.Name);
+            Assert.Equal("name", termCriteria.Field);
+            Assert.Equal(expectedNames.Count, termCriteria.Values.Count);
             foreach (var term in expectedNames)
-                Assert.Contains(term, termFilter.Values);
+                Assert.Contains(term, termCriteria.Values);
         }
 
         [Fact]
-        public void StringListInlineContainsGeneratesTermsFilter()
+        public void StringListInlineContainsGeneratesTermsCriteria()
         {
             var expectedNames = new List<string> { "Robbie", "Kryten", "IG-88", "Marvin" };
             var where = Robots.Where(e => new List<string> { "Robbie", "Kryten", "IG-88", "Marvin" }.Contains(e.Name));
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<TermFilter>(filter);
-            var termFilter = (TermFilter)filter;
-            Assert.Equal("terms", termFilter.Name);
-            Assert.Equal("name", termFilter.Field);
-            Assert.Equal(expectedNames.Count, termFilter.Values.Count);
+            Assert.IsType<TermCriteria>(criteria);
+            var termCriteria = (TermCriteria)criteria;
+            Assert.Equal("terms", termCriteria.Name);
+            Assert.Equal("name", termCriteria.Field);
+            Assert.Equal(expectedNames.Count, termCriteria.Values.Count);
             foreach (var term in expectedNames)
-                Assert.Contains(term, termFilter.Values);
+                Assert.Contains(term, termCriteria.Values);
         }
 
         [Fact]
-        public void DecimalEqualsOperatorGeneratesTermFilter()
+        public void DecimalEqualsOperatorGeneratesTermCriteria()
         {
             const decimal expectedConstant = 710.956m;
             var where = Robots.Where(e => e.Cost == expectedConstant);
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<TermFilter>(filter);
-            var termFilter = (TermFilter)filter;
-            Assert.Equal("term", termFilter.Name);
-            Assert.Equal("cost", termFilter.Field);
-            Assert.Equal(1, termFilter.Values.Count);
-            Assert.Equal(expectedConstant, termFilter.Values[0]);
+            Assert.IsType<TermCriteria>(criteria);
+            var termCriteria = (TermCriteria)criteria;
+            Assert.Equal("term", termCriteria.Name);
+            Assert.Equal("cost", termCriteria.Field);
+            Assert.Equal(1, termCriteria.Values.Count);
+            Assert.Equal(expectedConstant, termCriteria.Values[0]);
         }
 
         [Fact]
-        public void DecimalStaticEqualsMethodGeneratesTermFilter()
+        public void DecimalStaticEqualsMethodGeneratesTermCriteria()
         {
             const decimal expectedConstant = 710.956m;
             var where = Robots.Where(e => decimal.Equals(e.Cost, expectedConstant));
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<TermFilter>(filter);
-            var termFilter = (TermFilter)filter;
-            Assert.Equal("term", termFilter.Name);
-            Assert.Equal("cost", termFilter.Field);
-            Assert.Equal(1, termFilter.Values.Count);
-            Assert.Equal(expectedConstant, termFilter.Values[0]);
+            Assert.IsType<TermCriteria>(criteria);
+            var termCriteria = (TermCriteria)criteria;
+            Assert.Equal("term", termCriteria.Name);
+            Assert.Equal("cost", termCriteria.Field);
+            Assert.Equal(1, termCriteria.Values.Count);
+            Assert.Equal(expectedConstant, termCriteria.Values[0]);
         }
 
         [Fact]
-        public void DecimalArrayContainsGeneratesTermsFilter()
+        public void DecimalArrayContainsGeneratesTermsCriteria()
         {
             var expectedHourlyWages = new[] { 1.1m, 3.2m, 4.9m, 7.6m, 8.9m, 12345.678m };
             var where = Robots.Where(e => expectedHourlyWages.Contains(e.Cost));
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<TermFilter>(filter);
-            var termFilter = (TermFilter)filter;
-            Assert.Equal("terms", termFilter.Name);
-            Assert.Equal("cost", termFilter.Field);
-            Assert.Equal(expectedHourlyWages.Length, termFilter.Values.Count);
+            Assert.IsType<TermCriteria>(criteria);
+            var termCriteria = (TermCriteria)criteria;
+            Assert.Equal("terms", termCriteria.Name);
+            Assert.Equal("cost", termCriteria.Field);
+            Assert.Equal(expectedHourlyWages.Length, termCriteria.Values.Count);
             foreach (var term in expectedHourlyWages)
-                Assert.Contains(term, termFilter.Values);
+                Assert.Contains(term, termCriteria.Values);
         }
 
         [Fact]
-        public void DecimalLessThanOperatorGeneratesLessThanRangeFilter()
+        public void DecimalLessThanOperatorGeneratesLessThanRangeCriteria()
         {
             const decimal expectedConstant = 710.956m;
             var where = Robots.Where(e => e.Cost < expectedConstant);
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<RangeFilter>(filter);
-            var rangeFilter = (RangeFilter)filter;
-            Assert.Equal("range", rangeFilter.Name);
-            Assert.Equal("cost", rangeFilter.Field);
-            Assert.Single(rangeFilter.Specifications, s => s.Comparison == RangeComparison.LessThan && Equals(s.Value, expectedConstant));
-            Assert.Equal(1, rangeFilter.Specifications.Count);
+            Assert.IsType<RangeCriteria>(criteria);
+            var rangeCriteria = (RangeCriteria)criteria;
+            Assert.Equal("range", rangeCriteria.Name);
+            Assert.Equal("cost", rangeCriteria.Field);
+            Assert.Single(rangeCriteria.Specifications, s => s.Comparison == RangeComparison.LessThan && Equals(s.Value, expectedConstant));
+            Assert.Equal(1, rangeCriteria.Specifications.Count);
         }
 
         [Fact]
-        public void DecimalLessThanOrEqualsOperatorGeneratesLessThanOrEqualRangeFilter()
+        public void DecimalLessThanOrEqualsOperatorGeneratesLessThanOrEqualRangeCriteria()
         {
             const decimal expectedConstant = 710.956m;
             var where = Robots.Where(e => e.Cost <= expectedConstant);
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<RangeFilter>(filter);
-            var rangeFilter = (RangeFilter)filter;
-            Assert.Equal("range", rangeFilter.Name);
-            Assert.Equal("cost", rangeFilter.Field);
-            Assert.Single(rangeFilter.Specifications, s => s.Comparison == RangeComparison.LessThanOrEqual && Equals(s.Value, expectedConstant));
-            Assert.Equal(1, rangeFilter.Specifications.Count);
+            Assert.IsType<RangeCriteria>(criteria);
+            var rangeCriteria = (RangeCriteria)criteria;
+            Assert.Equal("range", rangeCriteria.Name);
+            Assert.Equal("cost", rangeCriteria.Field);
+            Assert.Single(rangeCriteria.Specifications, s => s.Comparison == RangeComparison.LessThanOrEqual && Equals(s.Value, expectedConstant));
+            Assert.Equal(1, rangeCriteria.Specifications.Count);
         }
 
         [Fact]
-        public void DecimalGreaterThanOperatorGeneratesGreaterThanRangeFilter()
+        public void DecimalGreaterThanOperatorGeneratesGreaterThanRangeCriteria()
         {
             const decimal expectedConstant = 710.956m;
             var where = Robots.Where(e => e.Cost > expectedConstant);
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<RangeFilter>(filter);
-            var rangeFilter = (RangeFilter)filter;
-            Assert.Equal("range", rangeFilter.Name);
-            Assert.Equal("cost", rangeFilter.Field);
-            Assert.Single(rangeFilter.Specifications, s => s.Comparison == RangeComparison.GreaterThan && Equals(s.Value, expectedConstant));
-            Assert.Equal(1, rangeFilter.Specifications.Count);
+            Assert.IsType<RangeCriteria>(criteria);
+            var rangeCriteria = (RangeCriteria)criteria;
+            Assert.Equal("range", rangeCriteria.Name);
+            Assert.Equal("cost", rangeCriteria.Field);
+            Assert.Single(rangeCriteria.Specifications, s => s.Comparison == RangeComparison.GreaterThan && Equals(s.Value, expectedConstant));
+            Assert.Equal(1, rangeCriteria.Specifications.Count);
         }
 
         [Fact]
-        public void DecimalGreaterThanOrEqualsOperatorGeneratesGreaterThanOrEqualRangeFilter()
+        public void DecimalGreaterThanOrEqualsOperatorGeneratesGreaterThanOrEqualRangeCriteria()
         {
             const decimal expectedConstant = 710.956m;
             var where = Robots.Where(e => e.Cost >= expectedConstant);
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<RangeFilter>(filter);
-            var rangeFilter = (RangeFilter)filter;
-            Assert.Equal("range", rangeFilter.Name);
-            Assert.Equal("cost", rangeFilter.Field);
-            Assert.Single(rangeFilter.Specifications, s => s.Comparison == RangeComparison.GreaterThanOrEqual && Equals(s.Value, expectedConstant));
-            Assert.Equal(1, rangeFilter.Specifications.Count);
+            Assert.IsType<RangeCriteria>(criteria);
+            var rangeCriteria = (RangeCriteria)criteria;
+            Assert.Equal("range", rangeCriteria.Name);
+            Assert.Equal("cost", rangeCriteria.Field);
+            Assert.Single(rangeCriteria.Specifications, s => s.Comparison == RangeComparison.GreaterThanOrEqual && Equals(s.Value, expectedConstant));
+            Assert.Equal(1, rangeCriteria.Specifications.Count);
         }
 
         [Fact]
-        public void DecimalGreaterThanAndLessThanGeneratesGreaterThanOrLessThanRangeFilter()
+        public void DecimalGreaterThanAndLessThanGeneratesGreaterThanOrLessThanRangeCriteria()
         {
             const decimal expectedLower = 710.956m;
             const decimal expectedUpper = 3428.9m;
             var where = Robots.Where(e => e.Cost > expectedLower && e.Cost < expectedUpper);
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<RangeFilter>(filter);
-            var rangeFilter = (RangeFilter)filter;
-            Assert.Equal("range", rangeFilter.Name);
-            Assert.Equal("cost", rangeFilter.Field);
-            Assert.Single(rangeFilter.Specifications, s => s.Comparison == RangeComparison.GreaterThan && Equals(s.Value, expectedLower));
-            Assert.Single(rangeFilter.Specifications, s => s.Comparison == RangeComparison.LessThan && Equals(s.Value, expectedUpper));
-            Assert.Equal(2, rangeFilter.Specifications.Count);
+            Assert.IsType<RangeCriteria>(criteria);
+            var rangeCriteria = (RangeCriteria)criteria;
+            Assert.Equal("range", rangeCriteria.Name);
+            Assert.Equal("cost", rangeCriteria.Field);
+            Assert.Single(rangeCriteria.Specifications, s => s.Comparison == RangeComparison.GreaterThan && Equals(s.Value, expectedLower));
+            Assert.Single(rangeCriteria.Specifications, s => s.Comparison == RangeComparison.LessThan && Equals(s.Value, expectedUpper));
+            Assert.Equal(2, rangeCriteria.Specifications.Count);
         }
 
         [Fact]
-        public void DecimalGreaterThanOrEqualAndLessThanOrEqualGeneratesGreaterThanOrEqualLessThanOrEqualRangeFilter()
+        public void DecimalGreaterThanOrEqualAndLessThanOrEqualGeneratesGreaterThanOrEqualLessThanOrEqualRangeCriteria()
         {
             const decimal expectedLower = 710.956m;
             const decimal expectedUpper = 3428.9m;
             var where = Robots.Where(e => e.Cost >= expectedLower && e.Cost <= expectedUpper);
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<RangeFilter>(filter);
-            var rangeFilter = (RangeFilter)filter;
-            Assert.Equal("range", rangeFilter.Name);
-            Assert.Equal("cost", rangeFilter.Field);
-            Assert.Single(rangeFilter.Specifications, s => s.Comparison == RangeComparison.GreaterThanOrEqual && Equals(s.Value, expectedLower));
-            Assert.Single(rangeFilter.Specifications, s => s.Comparison == RangeComparison.LessThanOrEqual && Equals(s.Value, expectedUpper));
-            Assert.Equal(2, rangeFilter.Specifications.Count);
+            Assert.IsType<RangeCriteria>(criteria);
+            var rangeCriteria = (RangeCriteria)criteria;
+            Assert.Equal("range", rangeCriteria.Name);
+            Assert.Equal("cost", rangeCriteria.Field);
+            Assert.Single(rangeCriteria.Specifications, s => s.Comparison == RangeComparison.GreaterThanOrEqual && Equals(s.Value, expectedLower));
+            Assert.Single(rangeCriteria.Specifications, s => s.Comparison == RangeComparison.LessThanOrEqual && Equals(s.Value, expectedUpper));
+            Assert.Equal(2, rangeCriteria.Specifications.Count);
         }
 
         [Fact]
-        public void DoubleEqualsOperatorGeneratesTermFilter()
+        public void DoubleEqualsOperatorGeneratesTermCriteria()
         {
             const double expectedConstant = 710.956;
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
             var where = Robots.Where(e => e.EnergyUse == expectedConstant);
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<TermFilter>(filter);
-            var termFilter = (TermFilter)filter;
-            Assert.Equal("term", termFilter.Name);
-            Assert.Equal("energyUse", termFilter.Field);
-            Assert.Equal(1, termFilter.Values.Count);
-            Assert.Equal(expectedConstant, termFilter.Values[0]);
+            Assert.IsType<TermCriteria>(criteria);
+            var termCriteria = (TermCriteria)criteria;
+            Assert.Equal("term", termCriteria.Name);
+            Assert.Equal("energyUse", termCriteria.Field);
+            Assert.Equal(1, termCriteria.Values.Count);
+            Assert.Equal(expectedConstant, termCriteria.Values[0]);
         }
 
         [Fact]
-        public void DoubleStaticEqualsMethodGeneratesTermFilter()
+        public void DoubleStaticEqualsMethodGeneratesTermCriteria()
         {
             const double expectedConstant = 710.956;
             var where = Robots.Where(e => double.Equals(e.EnergyUse, expectedConstant));
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<TermFilter>(filter);
-            var termFilter = (TermFilter)filter;
-            Assert.Equal("term", termFilter.Name);
-            Assert.Equal("energyUse", termFilter.Field);
-            Assert.Equal(1, termFilter.Values.Count);
-            Assert.Equal(expectedConstant, termFilter.Values[0]);
+            Assert.IsType<TermCriteria>(criteria);
+            var termCriteria = (TermCriteria)criteria;
+            Assert.Equal("term", termCriteria.Name);
+            Assert.Equal("energyUse", termCriteria.Field);
+            Assert.Equal(1, termCriteria.Values.Count);
+            Assert.Equal(expectedConstant, termCriteria.Values[0]);
         }
 
         [Fact]
-        public void DoubleArrayContainsGeneratesTermsFilter()
+        public void DoubleArrayContainsGeneratesTermsCriteria()
         {
             var expectedValues = new[] { 1.1, 3.2, 4.9, 7.6, 8.9, 12345.678 };
             var where = Robots.Where(e => expectedValues.Contains(e.EnergyUse));
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<TermFilter>(filter);
-            var termFilter = (TermFilter)filter;
-            Assert.Equal("terms", termFilter.Name);
-            Assert.Equal("energyUse", termFilter.Field);
-            Assert.Equal(expectedValues.Length, termFilter.Values.Count);
+            Assert.IsType<TermCriteria>(criteria);
+            var termCriteria = (TermCriteria)criteria;
+            Assert.Equal("terms", termCriteria.Name);
+            Assert.Equal("energyUse", termCriteria.Field);
+            Assert.Equal(expectedValues.Length, termCriteria.Values.Count);
             foreach (var term in expectedValues)
-                Assert.Contains(term, termFilter.Values);
+                Assert.Contains(term, termCriteria.Values);
         }
 
         [Fact]
-        public void Int32EqualsOperatorGeneratesTermFilter()
+        public void Int32EqualsOperatorGeneratesTermCriteria()
         {
             const Int32 expectedConstant = 808;
             var where = Robots.Where(e => e.Id == expectedConstant);
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<TermFilter>(filter);
-            var termFilter = (TermFilter)filter;
-            Assert.Equal("term", termFilter.Name);
-            Assert.Equal("id", termFilter.Field);
-            Assert.Equal(1, termFilter.Values.Count);
-            Assert.Equal(expectedConstant, termFilter.Values[0]);
+            Assert.IsType<TermCriteria>(criteria);
+            var termCriteria = (TermCriteria)criteria;
+            Assert.Equal("term", termCriteria.Name);
+            Assert.Equal("id", termCriteria.Field);
+            Assert.Equal(1, termCriteria.Values.Count);
+            Assert.Equal(expectedConstant, termCriteria.Values[0]);
         }
 
         [Fact]
-        public void Int32StaticEqualsMethodGeneratesTermFilter()
+        public void Int32StaticEqualsMethodGeneratesTermCriteria()
         {
             const Int32 expectedConstant = 98004;
             var where = Robots.Where(e => int.Equals(e.Id, expectedConstant));
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<TermFilter>(filter);
-            var termFilter = (TermFilter)filter;
-            Assert.Equal("term", termFilter.Name);
-            Assert.Equal("id", termFilter.Field);
-            Assert.Equal(1, termFilter.Values.Count);
-            Assert.Equal(expectedConstant, termFilter.Values[0]);
+            Assert.IsType<TermCriteria>(criteria);
+            var termCriteria = (TermCriteria)criteria;
+            Assert.Equal("term", termCriteria.Name);
+            Assert.Equal("id", termCriteria.Field);
+            Assert.Equal(1, termCriteria.Values.Count);
+            Assert.Equal(expectedConstant, termCriteria.Values[0]);
         }
 
         [Fact]
-        public void Int32ArrayContainsGeneratesTermsFilter()
+        public void Int32ArrayContainsGeneratesTermsCriteria()
         {
             var expectedIds = new[] { 1, 3, 2, 9, 7, 6, 123, 45678 };
             var where = Robots.Where(e => expectedIds.Contains(e.Id));
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<TermFilter>(filter);
-            var termFilter = (TermFilter)filter;
-            Assert.Equal("terms", termFilter.Name);
-            Assert.Equal("id", termFilter.Field);
-            Assert.Equal(expectedIds.Length, termFilter.Values.Count);
+            Assert.IsType<TermCriteria>(criteria);
+            var termCriteria = (TermCriteria)criteria;
+            Assert.Equal("terms", termCriteria.Name);
+            Assert.Equal("id", termCriteria.Field);
+            Assert.Equal(expectedIds.Length, termCriteria.Values.Count);
             foreach (var term in expectedIds)
-                Assert.Contains(term, termFilter.Values);
+                Assert.Contains(term, termCriteria.Values);
         }
 
         [Fact]
-        public void DateTimeEqualsOperatorGeneratesTermFilter()
+        public void DateTimeEqualsOperatorGeneratesTermCriteria()
         {
             var expectedConstant = DateTime.Now;
             var where = Robots.Where(e => e.Started == expectedConstant);
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<TermFilter>(filter);
-            var termFilter = (TermFilter)filter;
-            Assert.Equal("term", termFilter.Name);
-            Assert.Equal("started", termFilter.Field);
-            Assert.Equal(1, termFilter.Values.Count);
-            Assert.Equal(expectedConstant, termFilter.Values[0]);
+            Assert.IsType<TermCriteria>(criteria);
+            var termCriteria = (TermCriteria)criteria;
+            Assert.Equal("term", termCriteria.Name);
+            Assert.Equal("started", termCriteria.Field);
+            Assert.Equal(1, termCriteria.Values.Count);
+            Assert.Equal(expectedConstant, termCriteria.Values[0]);
         }
 
         [Fact]
-        public void DateTimeStaticEqualsMethodGeneratesTermFilter()
+        public void DateTimeStaticEqualsMethodGeneratesTermCriteria()
         {
             var expectedConstant = DateTime.Now;
             var where = Robots.Where(e => DateTime.Equals(e.Started, expectedConstant));
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<TermFilter>(filter);
-            var termFilter = (TermFilter)filter;
-            Assert.Equal("term", termFilter.Name);
-            Assert.Equal("started", termFilter.Field);
-            Assert.Equal(1, termFilter.Values.Count);
-            Assert.Equal(expectedConstant, termFilter.Values[0]);
+            Assert.IsType<TermCriteria>(criteria);
+            var termCriteria = (TermCriteria)criteria;
+            Assert.Equal("term", termCriteria.Name);
+            Assert.Equal("started", termCriteria.Field);
+            Assert.Equal(1, termCriteria.Values.Count);
+            Assert.Equal(expectedConstant, termCriteria.Values[0]);
         }
 
         [Fact]
-        public void DateTimeArrayContainsGeneratesTermsFilter()
+        public void DateTimeArrayContainsGeneratesTermsCriteria()
         {
             var expectedIds = new[] { 1, 3, 2, 9, 7, 6, 123, 4568 }.Select(d => DateTime.Now.AddDays(d)).ToArray();
             var where = Robots.Where(e => expectedIds.Contains(e.Started));
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<TermFilter>(filter);
-            var termFilter = (TermFilter)filter;
-            Assert.Equal("terms", termFilter.Name);
-            Assert.Equal("started", termFilter.Field);
-            Assert.Equal(expectedIds.Length, termFilter.Values.Count);
+            Assert.IsType<TermCriteria>(criteria);
+            var termCriteria = (TermCriteria)criteria;
+            Assert.Equal("terms", termCriteria.Name);
+            Assert.Equal("started", termCriteria.Field);
+            Assert.Equal(expectedIds.Length, termCriteria.Values.Count);
             foreach (var term in expectedIds)
-                Assert.Contains(term, termFilter.Values);
+                Assert.Contains(term, termCriteria.Values);
         }
 
         [Fact]
-        public void StringEqualsNullGeneratesMissingFilter()
+        public void StringEqualsNullGeneratesMissingCriteria()
         {
             var where = Robots.Where(e => e.Name == null);
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<MissingFilter>(filter);
-            var missingFilter = (MissingFilter)filter;
-            Assert.Equal("missing", missingFilter.Name);
-            Assert.Equal("name", missingFilter.Field);
+            Assert.IsType<MissingCriteria>(criteria);
+            var missingCriteria = (MissingCriteria)criteria;
+            Assert.Equal("missing", missingCriteria.Name);
+            Assert.Equal("name", missingCriteria.Field);
         }
 
         [Fact]
-        public void StringEqualsNullNegatedGeneratesExistsFilter()
+        public void StringEqualsNullNegatedGeneratesExistsCriteria()
         {
+            // ReSharper disable once NegativeEqualityExpression
             var where = Robots.Where(e => !(e.Name == null));
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<ExistsFilter>(filter);
-            var missingFilter = (ExistsFilter)filter;
-            Assert.Equal("exists", missingFilter.Name);
-            Assert.Equal("name", missingFilter.Field);
+            Assert.IsType<ExistsCriteria>(criteria);
+            var missingCriteria = (ExistsCriteria)criteria;
+            Assert.Equal("exists", missingCriteria.Name);
+            Assert.Equal("name", missingCriteria.Field);
         }
 
         [Fact]
-        public void StringStaticEqualsNullMethodGeneratesMissingFilter()
+        public void StringStaticEqualsNullMethodGeneratesMissingCriteria()
         {
             var where = Robots.Where(e => String.Equals(e.Name, null));
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<MissingFilter>(filter);
-            var missingFilter = (MissingFilter)filter;
-            Assert.Equal("missing", missingFilter.Name);
-            Assert.Equal("name", missingFilter.Field);
+            Assert.IsType<MissingCriteria>(criteria);
+            var missingCriteria = (MissingCriteria)criteria;
+            Assert.Equal("missing", missingCriteria.Name);
+            Assert.Equal("name", missingCriteria.Field);
         }
 
         [Fact]
-        public void StringNotEqualsNullGeneratesExistsFilter()
+        public void StringNotEqualsNullGeneratesExistsCriteria()
         {
             var where = Robots.Where(e => e.Name != null);
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<ExistsFilter>(filter);
-            var existsFilter = (ExistsFilter)filter;
-            Assert.Equal("exists", existsFilter.Name);
-            Assert.Equal("name", existsFilter.Field);
+            Assert.IsType<ExistsCriteria>(criteria);
+            var existsCriteria = (ExistsCriteria)criteria;
+            Assert.Equal("exists", existsCriteria.Name);
+            Assert.Equal("name", existsCriteria.Field);
         }
 
         [Fact]
-        public void StringNotEqualsNullNegatedGeneratesMissingFilter()
+        public void StringNotEqualsNullNegatedGeneratesMissingCriteria()
         {
+            // ReSharper disable once NegativeEqualityExpression
             var where = Robots.Where(e => !(e.Name != null));
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<MissingFilter>(filter);
-            var missingFilter = (MissingFilter)filter;
-            Assert.Equal("missing", missingFilter.Name);
-            Assert.Equal("name", missingFilter.Field);
+            Assert.IsType<MissingCriteria>(criteria);
+            var missingCriteria = (MissingCriteria)criteria;
+            Assert.Equal("missing", missingCriteria.Name);
+            Assert.Equal("name", missingCriteria.Field);
         }
 
         [Fact]
-        public void StringStaticNotEqualsNullMethodGeneratesMissingFilter()
+        public void StringStaticNotEqualsNullMethodGeneratesMissingCriteria()
         {
             var where = Robots.Where(e => !String.Equals(e.Name, null));
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<ExistsFilter>(filter);
-            var existsFilter = (ExistsFilter)filter;
-            Assert.Equal("exists", existsFilter.Name);
-            Assert.Equal("name", existsFilter.Field);
+            Assert.IsType<ExistsCriteria>(criteria);
+            var existsCriteria = (ExistsCriteria)criteria;
+            Assert.Equal("exists", existsCriteria.Name);
+            Assert.Equal("name", existsCriteria.Field);
         }
 
         [Fact]
-        public void NullableIntEqualsNullGeneratesMissingFilter()
+        public void NullableIntEqualsNullGeneratesMissingCriteria()
         {
             var where = Robots.Where(e => e.Zone == null);
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<MissingFilter>(filter);
-            var missingFilter = (MissingFilter)filter;
-            Assert.Equal("missing", missingFilter.Name);
-            Assert.Equal("zone", missingFilter.Field);
+            Assert.IsType<MissingCriteria>(criteria);
+            var missingCriteria = (MissingCriteria)criteria;
+            Assert.Equal("missing", missingCriteria.Name);
+            Assert.Equal("zone", missingCriteria.Field);
         }
 
         [Fact]
-        public void NullableIntStaticEqualsNullMethodGeneratesMissingFilter()
+        public void NullableIntStaticEqualsNullMethodGeneratesMissingCriteria()
         {
+            // ReSharper disable once AccessToStaticMemberViaDerivedType
+            // ReSharper disable once RedundantNameQualifier
             var where = Robots.Where(e => Nullable<int>.Equals(e.Zone, null));
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<MissingFilter>(filter);
-            var missingFilter = (MissingFilter)filter;
-            Assert.Equal("missing", missingFilter.Name);
-            Assert.Equal("zone", missingFilter.Field);
+            Assert.IsType<MissingCriteria>(criteria);
+            var missingCriteria = (MissingCriteria)criteria;
+            Assert.Equal("missing", missingCriteria.Name);
+            Assert.Equal("zone", missingCriteria.Field);
         }
 
         [Fact]
-        public void NullableIntNotEqualsNullGeneratesExistsFilter()
+        public void NullableIntNotEqualsNullGeneratesExistsCriteria()
         {
             var where = Robots.Where(e => e.Zone != null);
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<ExistsFilter>(filter);
-            var existsFilter = (ExistsFilter)filter;
-            Assert.Equal("exists", existsFilter.Name);
-            Assert.Equal("zone", existsFilter.Field);
+            Assert.IsType<ExistsCriteria>(criteria);
+            var existsCriteria = (ExistsCriteria)criteria;
+            Assert.Equal("exists", existsCriteria.Name);
+            Assert.Equal("zone", existsCriteria.Field);
         }
 
         [Fact]
-        public void NullableIntStaticNotEqualsNullMethodGeneratesExistsFilter()
+        public void NullableIntStaticNotEqualsNullMethodGeneratesExistsCriteria()
         {
+            // ReSharper disable once AccessToStaticMemberViaDerivedType
+            // ReSharper disable once RedundantNameQualifier
             var where = Robots.Where(e => !Nullable<int>.Equals(e.Zone, null));
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<ExistsFilter>(filter);
-            var existsFilter = (ExistsFilter)filter;
-            Assert.Equal("exists", existsFilter.Name);
-            Assert.Equal("zone", existsFilter.Field);
+            Assert.IsType<ExistsCriteria>(criteria);
+            var existsCriteria = (ExistsCriteria)criteria;
+            Assert.Equal("exists", existsCriteria.Name);
+            Assert.Equal("zone", existsCriteria.Field);
         }
 
         [Fact]
-        public void NullableIntNotValuePropertyGeneratesExistsFilter()
+        public void NullableIntNotValuePropertyGeneratesExistsCriteria()
         {
             var where = Robots.Where(e => e.Zone.HasValue);
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<ExistsFilter>(filter);
-            var existsFilter = (ExistsFilter)filter;
-            Assert.Equal("exists", existsFilter.Name);
-            Assert.Equal("zone", existsFilter.Field);
+            Assert.IsType<ExistsCriteria>(criteria);
+            var existsCriteria = (ExistsCriteria)criteria;
+            Assert.Equal("exists", existsCriteria.Name);
+            Assert.Equal("zone", existsCriteria.Field);
         }
 
         [Fact]
-        public void NullableIntNotHasValuePropertyGeneratesMissingFilter()
+        public void NullableIntNotHasValuePropertyGeneratesMissingCriteria()
         {
             var where = Robots.Where(e => !e.Zone.HasValue);
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<MissingFilter>(filter);
-            var missingFilter = (MissingFilter)filter;
-            Assert.Equal("missing", missingFilter.Name);
-            Assert.Equal("zone", missingFilter.Field);
+            Assert.IsType<MissingCriteria>(criteria);
+            var missingCriteria = (MissingCriteria)criteria;
+            Assert.Equal("missing", missingCriteria.Name);
+            Assert.Equal("zone", missingCriteria.Field);
         }
 
         [Fact]
-        public void OrOperatorGeneratesOrFilter()
+        public void OrOperatorGeneratesOrCriteria()
         {
             var where = Robots.Where(e => e.Name == "IG-88" || e.Cost > 1);
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<OrFilter>(filter);
-            var orFilter = (OrFilter)filter;
-            Assert.Equal("or", orFilter.Name);
-            Assert.Single(orFilter.Filters, f => f.Name == "term");
-            Assert.Single(orFilter.Filters, f => f.Name == "range");
-            Assert.Equal(2, orFilter.Filters.Count);
+            Assert.IsType<OrCriteria>(criteria);
+            var orCriteria = (OrCriteria)criteria;
+            Assert.Equal("or", orCriteria.Name);
+            Assert.Single(orCriteria.Criteria, f => f.Name == "term");
+            Assert.Single(orCriteria.Criteria, f => f.Name == "range");
+            Assert.Equal(2, orCriteria.Criteria.Count);
         }
 
         [Fact]
-        public void OrOperatorGeneratesFlattenedOrFilter()
+        public void OrOperatorGeneratesFlattenedOrCriteria()
         {
             var possibleIds = new[] { 1, 2, 3, 4 };
             var where = Robots.Where(e => e.Name == "IG-88" || e.Cost > 1 || e.Zone.HasValue || possibleIds.Contains(e.Id));
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<OrFilter>(filter);
-            var orFilter = (OrFilter)filter;
-            Assert.Equal("or", orFilter.Name);
-            Assert.Single(orFilter.Filters, f => f.Name == "term");
-            Assert.Single(orFilter.Filters, f => f.Name == "range");
-            Assert.Single(orFilter.Filters, f => f.Name == "exists");
-            Assert.Single(orFilter.Filters, f => f.Name == "terms");
-            Assert.Equal(4, orFilter.Filters.Count);
+            Assert.IsType<OrCriteria>(criteria);
+            var orCriteria = (OrCriteria)criteria;
+            Assert.Equal("or", orCriteria.Name);
+            Assert.Single(orCriteria.Criteria, f => f.Name == "term");
+            Assert.Single(orCriteria.Criteria, f => f.Name == "range");
+            Assert.Single(orCriteria.Criteria, f => f.Name == "exists");
+            Assert.Single(orCriteria.Criteria, f => f.Name == "terms");
+            Assert.Equal(4, orCriteria.Criteria.Count);
         }
 
         [Fact]
-        public void AndOperatorGeneratesAndFilter()
+        public void AndOperatorGeneratesAndCriteria()
         {
             var where = Robots.Where(e => e.Name == "IG-88" && e.Cost > 1);
-            var filter = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
-            Assert.IsType<AndFilter>(filter);
-            var orFilter = (AndFilter)filter;
-            Assert.Equal("and", orFilter.Name);
-            Assert.Single(orFilter.Filters, f => f.Name == "term");
-            Assert.Single(orFilter.Filters, f => f.Name == "range");
-            Assert.Equal(2, orFilter.Filters.Count);
+            Assert.IsType<AndCriteria>(criteria);
+            var orCriteria = (AndCriteria)criteria;
+            Assert.Equal("and", orCriteria.Name);
+            Assert.Single(orCriteria.Criteria, f => f.Name == "term");
+            Assert.Single(orCriteria.Criteria, f => f.Name == "range");
+            Assert.Equal(2, orCriteria.Criteria.Count);
         }
     }
 }

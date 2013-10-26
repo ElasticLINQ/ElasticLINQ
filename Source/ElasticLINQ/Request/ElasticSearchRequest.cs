@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
-using ElasticLinq.Request.Filters;
+using ElasticLinq.Request.Criteria;
 using System.Collections.Generic;
 
 namespace ElasticLinq.Request
@@ -16,10 +16,10 @@ namespace ElasticLinq.Request
         private readonly int? size;
         private readonly List<string> fields;
         private readonly List<SortOption> sortOptions;
-        private readonly IFilter filter;
+        private readonly ICriteria filter;
 
         public ElasticSearchRequest(string type, int @from = 0, int? size = null, List<string> fields = null,
-            List<SortOption> sortOptions = null, IFilter filter = null)
+            List<SortOption> sortOptions = null, ICriteria filter = null)
         {
             this.type = type;
             this.@from = @from;
@@ -43,7 +43,7 @@ namespace ElasticLinq.Request
             get { return sortOptions.AsReadOnly(); }
         }
 
-        public IFilter Filter
+        public ICriteria Filter
         {
             get { return filter; }
         }
