@@ -30,7 +30,8 @@ namespace ElasticLinq.Request.Visitors
             if (node == null)
                 return null;
 
-            flattened.Add(node);
+            if (node.NodeType != ExpressionType.Quote)
+                flattened.Add(node);
             return base.Visit(node);
         }
     }

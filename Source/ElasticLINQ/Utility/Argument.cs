@@ -2,12 +2,14 @@
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
 using System;
+using System.Diagnostics;
 
 namespace ElasticLinq.Utility
 {
     /// <summary>
     /// Argument validation.
     /// </summary>
+    [DebuggerStepThrough]
     public static class Argument
     {
         public static void EnsureNotNull(string parameterName, object value)

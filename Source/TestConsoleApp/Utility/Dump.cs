@@ -19,6 +19,12 @@ namespace TestConsoleApp.Utility
         {
             Console.WriteLine();
 
+            if (value is string || value.GetType().IsValueType)
+            {
+                Console.WriteLine(value.ToString());
+                return;
+            }
+
             foreach (var property in value.GetType().GetProperties())
                 Console.WriteLine(property.Name + " : " + property.GetValue(value));
 
