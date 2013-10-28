@@ -29,7 +29,10 @@ namespace ElasticLinq.Request.Visitors
         private Type type;
         private int skip;
         private int? take;
-        private ICriteria topFilter;
+        private ICriteria filterRoot;
+        private ICriteria queryRoot;
+        private ICriteria unassignedCriteria;
+        private WhereTarget whereTarget = WhereTarget.Filter;
 
         private ElasticQueryTranslator(IElasticMapping mapping)
         {
@@ -45,7 +48,8 @@ namespace ElasticLinq.Request.Visitors
         {
             var evaluated = PartialEvaluator.Evaluate(e);
             Visit(evaluated);
-            var searchRequest = new ElasticSearchRequest(mapping.GetTypeName(type), skip, take, fields, sortOptions, topFilter);
+            ApplyUnassignedCriteria();
+            var searchRequest = new ElasticSearchRequest(mapping.GetTypeName(type), skip, take, fields, sortOptions, filterRoot, queryRoot);
             return new ElasticTranslateResult(searchRequest, projector ?? DefaultProjector);
         }
 
@@ -120,9 +124,35 @@ namespace ElasticLinq.Request.Visitors
                     if (m.Arguments.Count == 1)
                         return VisitOrderByScore(m.Arguments[0], !m.Method.Name.EndsWith("Descending"));
                     break;
+
+                case "WhereAppliesTo":
+                    if (m.Arguments.Count == 2)
+                        return VisitWhereAppliesTo(m.Arguments[0], m.Arguments[1]);
+                    break;
             }
 
-            throw new NotSupportedException(string.Format("The ElasticQuery method '{0}' is not supported", typeof(ElasticQuery<>).Name, m.Method.Name));
+            throw new NotSupportedException(string.Format("The ElasticQuery method '{0}' is not supported", m.Method.Name));
+        }
+
+        private Expression VisitWhereAppliesTo(Expression source, Expression targetExpression)
+        {
+            whereTarget = (WhereTarget)((ConstantExpression)targetExpression).Value;
+            ApplyUnassignedCriteria();
+
+            return Visit(source);
+        }
+
+        private void ApplyUnassignedCriteria()
+        {
+            if (unassignedCriteria == null)
+                return;
+
+            if (whereTarget == WhereTarget.Filter)
+                filterRoot = ApplyCriteria(filterRoot, unassignedCriteria);
+            else
+                queryRoot = ApplyCriteria(queryRoot, unassignedCriteria);
+
+            unassignedCriteria = null;
         }
 
         internal Expression VisitQueryableMethodCall(MethodCallExpression m)
@@ -218,23 +248,24 @@ namespace ElasticLinq.Request.Visitors
             var lambda = (LambdaExpression)StripQuotes(predicate);
             var body = BooleanMemberAccessBecomesEquals(Visit(lambda.Body));
 
-            if (body is CriteriaExpression)
-                topFilter = AddFilter(((CriteriaExpression)body).Criteria);
-            else
-                throw new NotSupportedException(String.Format("Unknown where predicate '{0}'", body));
+            var criteriaExpression = body as CriteriaExpression;
+            if (criteriaExpression == null)
+                throw new NotSupportedException(String.Format("Unknown Where predicate '{0}'", body));
+
+            unassignedCriteria = ApplyCriteria(unassignedCriteria, criteriaExpression.Criteria);
 
             return Visit(source);
         }
 
-        private ICriteria AddFilter(ICriteria thisCriteria)
+        private static ICriteria ApplyCriteria(ICriteria currentRoot, ICriteria newCriteria)
         {
-            if (topFilter == null)
-                return thisCriteria;
+            if (currentRoot == null)
+                return newCriteria;
 
-            if (topFilter is AndCriteria)
-                return AndCriteria.Combine(((AndCriteria)topFilter).Criteria.Concat(new[] { thisCriteria }).ToArray());
+            if (currentRoot is AndCriteria)
+                return AndCriteria.Combine(((AndCriteria)currentRoot).Criteria.Concat(new[] { newCriteria }).ToArray());
 
-            return AndCriteria.Combine(topFilter, thisCriteria);
+            return AndCriteria.Combine(currentRoot, newCriteria);
         }
 
         protected override Expression VisitBinary(BinaryExpression b)

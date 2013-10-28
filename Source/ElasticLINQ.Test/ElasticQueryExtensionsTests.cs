@@ -1,12 +1,11 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
-using ElasticLinq;
+using ElasticLinq.Test.TestSupport;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
-using ElasticLinq.Test.TestSupport;
 using Xunit;
 
 namespace ElasticLinq.Test
@@ -15,6 +14,36 @@ namespace ElasticLinq.Test
     {
         private class Sample
         {
+        }
+
+        [Fact]
+        public void WhereAppliesToQueryIsAddedToExpressionTree()
+        {
+            const WhereTarget expectedTarget = WhereTarget.Query;
+            var source = new FakeQueryProvider().CreateQuery<Sample>();
+            var applied = source.WhereAppliesTo(expectedTarget);
+
+            Assert.IsAssignableFrom<MethodCallExpression>(applied.Expression);
+            var callExpression = (MethodCallExpression)applied.Expression;
+
+            Assert.Equal(2, callExpression.Arguments.Count);
+            Assert.IsType<ConstantExpression>(callExpression.Arguments[1]);
+            Assert.Equal(((ConstantExpression)callExpression.Arguments[1]).Value, expectedTarget);
+        }
+
+        [Fact]
+        public void WhereAppliesToFilterIsAddedToExpressionTree()
+        {
+            const WhereTarget expectedTarget = WhereTarget.Filter;
+            var source = new FakeQueryProvider().CreateQuery<Sample>();
+            var applied = source.WhereAppliesTo(expectedTarget);
+
+            Assert.IsAssignableFrom<MethodCallExpression>(applied.Expression);
+            var callExpression = (MethodCallExpression)applied.Expression;
+
+            Assert.Equal(2, callExpression.Arguments.Count);
+            Assert.IsType<ConstantExpression>(callExpression.Arguments[1]);
+            Assert.Equal(((ConstantExpression)callExpression.Arguments[1]).Value, expectedTarget);
         }
 
         [Fact]
@@ -79,6 +108,8 @@ namespace ElasticLinq.Test
             var final = afterMethod.ToList();
 
             Assert.NotSame(source, afterMethod);
+            Assert.NotNull(final);
+
             Assert.IsType<FakeQueryProvider>(source.Provider);
             var finalExpression = ((FakeQueryProvider)source.Provider).FinalExpression;
             Assert.Equal(ExpressionType.Call, finalExpression.NodeType);

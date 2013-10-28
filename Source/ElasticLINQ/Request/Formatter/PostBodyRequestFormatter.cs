@@ -35,7 +35,11 @@ namespace ElasticLinq.Request.Formatter
             if (SearchRequest.Fields.Any())
                 root.Add("fields", new JArray(SearchRequest.Fields));
 
-            AddFilters(SearchRequest.Filter, root);
+            if (SearchRequest.Query != null)
+                root.Add("query", BuildCriteria(SearchRequest.Query));
+
+            if (SearchRequest.Filter != null)
+                root.Add("filter", BuildCriteria(SearchRequest.Filter));
 
             if (SearchRequest.SortOptions.Any())
                 root.Add("sort", new JArray(
@@ -54,13 +58,7 @@ namespace ElasticLinq.Request.Formatter
             return root;
         }
 
-        private static void AddFilters(ICriteria topFilter, JObject root)
-        {
-            if (topFilter != null)
-                root.Add("filter", BuildFilter(topFilter));
-        }
-
-        private static JObject BuildFilter(ICriteria criteria)
+        private static JObject BuildCriteria(ICriteria criteria)
         {
             if (criteria is RangeCriteria)
                 return Create((RangeCriteria)criteria);
@@ -101,14 +99,14 @@ namespace ElasticLinq.Request.Formatter
 
         private static JObject Create(NotCriteria criteria)
         {
-            return new JObject(new JProperty(criteria.Name, BuildFilter(criteria.Criteria)));
+            return new JObject(new JProperty(criteria.Name, BuildCriteria(criteria.Criteria)));
         }
 
         private static JObject Create(CompoundCriteria criteria)
         {
             return criteria.Criteria.Count == 1    // A compound filter with one item can be collapsed
-                ? BuildFilter(criteria.Criteria.First())
-                : new JObject(new JProperty(criteria.Name, new JArray(criteria.Criteria.Select(BuildFilter).ToList())));
+                ? BuildCriteria(criteria.Criteria.First())
+                : new JObject(new JProperty(criteria.Name, new JArray(criteria.Criteria.Select(BuildCriteria).ToList())));
         }
     }
 }

@@ -8,6 +8,12 @@ using System.Reflection;
 
 namespace ElasticLinq
 {
+    public enum WhereTarget
+    {
+        Filter,
+        Query
+    };
+
     /// <summary>
     /// Various extension methods that extend LINQ functionality for ElasticSearch queries.
     /// </summary>
@@ -17,6 +23,13 @@ namespace ElasticLinq
     /// </remarks>
     public static class ElasticQueryExtensions
     {
+        public static IOrderedQueryable<TSource> WhereAppliesTo<TSource>(this IQueryable<TSource> source, WhereTarget target)
+        {
+            var method = (MethodInfo)MethodBase.GetCurrentMethod();
+            return (IOrderedQueryable<TSource>)source.Provider.CreateQuery<TSource>(
+                Expression.Call(null, method.MakeGenericMethod(typeof(TSource)), source.Expression, Expression.Constant(target)));
+        }
+
         public static IOrderedQueryable<TSource> OrderByScore<TSource>(this IQueryable<TSource> source)
         {
             return OrderBy(source, (MethodInfo)MethodBase.GetCurrentMethod());
@@ -33,7 +46,7 @@ namespace ElasticLinq
             Argument.EnsureNotNull("method", method);
 
             return (IOrderedQueryable<TSource>)source.Provider.CreateQuery<TSource>(
-                Expression.Call(null, method.MakeGenericMethod(typeof(TSource)), new[] { source.Expression }));
+                Expression.Call(null, method.MakeGenericMethod(typeof(TSource)), source.Expression));
         }
 
         public static IOrderedQueryable<TSource> ThenByScore<TSource>(this IOrderedQueryable<TSource> source)
@@ -51,7 +64,7 @@ namespace ElasticLinq
             Argument.EnsureNotNull("source", source);
 
             return (IOrderedQueryable<TSource>)source.Provider.CreateQuery<TSource>(
-                Expression.Call(null, method.MakeGenericMethod(typeof(TSource)), new[] { source.Expression }));
+                Expression.Call(null, method.MakeGenericMethod(typeof(TSource)), source.Expression));
         }
     }
 }

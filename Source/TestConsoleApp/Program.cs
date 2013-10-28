@@ -24,7 +24,9 @@ namespace TestConsoleApp
             var provider = new ElasticQueryProvider(connection, new CouchbaseElasticMapping()) { Log = Console.Out };
 
             var query1 = new ElasticQuery<AccountSubscription>(provider)
-//                .Where(s => s.AccountAlias == "t3n")
+                .WhereAppliesTo(WhereTarget.Query)
+                .Where(s => s.AccountAlias == "t3n")
+                .WhereAppliesTo(WhereTarget.Filter)
                 .Where(s => s.EndDate.HasValue)
                 //.OrderByDescending(s => s.CreateDate)
                 //.OrderByDescending(s => ElasticFields.Score)

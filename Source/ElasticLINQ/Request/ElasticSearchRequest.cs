@@ -17,9 +17,10 @@ namespace ElasticLinq.Request
         private readonly List<string> fields;
         private readonly List<SortOption> sortOptions;
         private readonly ICriteria filter;
+        private readonly ICriteria query;
 
         public ElasticSearchRequest(string type, int @from = 0, int? size = null, List<string> fields = null,
-            List<SortOption> sortOptions = null, ICriteria filter = null)
+            List<SortOption> sortOptions = null, ICriteria filter = null, ICriteria query = null)
         {
             this.type = type;
             this.@from = @from;
@@ -27,10 +28,13 @@ namespace ElasticLinq.Request
             this.fields = fields ?? new List<string>();
             this.sortOptions = sortOptions ?? new List<SortOption>();
             this.filter = filter;
+            this.query = query;
         }
 
         public long @From { get { return @from; } }
+
         public long? Size { get { return size; } }
+        
         public string Type { get { return type; } }
 
         public IReadOnlyList<string> Fields
@@ -46,6 +50,11 @@ namespace ElasticLinq.Request
         public ICriteria Filter
         {
             get { return filter; }
+        }
+
+        public ICriteria Query
+        {
+            get { return query; }
         }
     }
 

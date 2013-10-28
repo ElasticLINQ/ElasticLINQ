@@ -685,5 +685,38 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             Assert.Single(orCriteria.Criteria, f => f.Name == "range");
             Assert.Equal(2, orCriteria.Criteria.Count);
         }
+
+        [Fact]
+        public void WhereAppliesToQuerySwitchesToQuery()
+        {
+            var where = Robots.WhereAppliesTo(WhereTarget.Query).Where(e => e.Name == "IG-88" && e.Cost > 1);
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest;
+
+            Assert.IsType<AndCriteria>(criteria.Query);
+            Assert.Null(criteria.Filter);
+            var orCriteria = (AndCriteria)criteria.Query;
+            Assert.Equal("and", orCriteria.Name);
+            Assert.Single(orCriteria.Criteria, f => f.Name == "term");
+            Assert.Single(orCriteria.Criteria, f => f.Name == "range");
+            Assert.Equal(2, orCriteria.Criteria.Count);
+        }
+
+        [Fact]
+        public void WhereAppliesToFilterSwitchesBackToFilter()
+        {
+            var where = Robots
+                .WhereAppliesTo(WhereTarget.Query)
+                .WhereAppliesTo(WhereTarget.Filter)
+                .Where(e => e.Name == "IG-88" && e.Cost > 1);
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest;
+
+            Assert.IsType<AndCriteria>(criteria.Filter);
+            Assert.Null(criteria.Query);
+            var orCriteria = (AndCriteria)criteria.Filter;
+            Assert.Equal("and", orCriteria.Name);
+            Assert.Single(orCriteria.Criteria, f => f.Name == "term");
+            Assert.Single(orCriteria.Criteria, f => f.Name == "range");
+            Assert.Equal(2, orCriteria.Criteria.Count);
+        }
     }
 }
