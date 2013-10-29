@@ -1,8 +1,10 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
-using System.Diagnostics;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace ElasticLinq.Response.Model
 {
@@ -18,6 +20,6 @@ namespace ElasticLinq.Response.Model
         public double? _score;
 
         public JObject _source;
-        public JObject fields;
+        public Dictionary<String, JToken> fields = new Dictionary<string, JToken>();
     }
 }

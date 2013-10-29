@@ -1,13 +1,15 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
+using System;
+using System.Runtime.InteropServices;
 using ElasticLinq.Mapping;
 using ElasticLinq.Utility;
-using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Newtonsoft.Json.Linq;
 
 namespace ElasticLinq.Request.Visitors
 {
@@ -17,7 +19,6 @@ namespace ElasticLinq.Request.Visitors
     /// </summary>
     internal class ProjectionExpressionVisitor : ElasticFieldsProjectionExpressionVisitor
     {
-        private static readonly MethodInfo getFieldMethod = typeof(JObject).GetMethod("GetValue", new[] { typeof(string) });
         private readonly HashSet<string> fieldNames = new HashSet<string>();
 
         private ProjectionExpressionVisitor(ParameterExpression parameter, IElasticMapping mapping)
@@ -38,14 +39,28 @@ namespace ElasticLinq.Request.Visitors
             if (m.Expression != null && m.Expression.NodeType == ExpressionType.Parameter)
                 return VisitFieldSelection(m);
 
-            return base.VisitMember(m);            
+            return base.VisitMember(m);
         }
+
+        private static readonly MethodInfo getFieldMethod = typeof(ProjectionExpressionVisitor).GetMethod("GetFieldValue", BindingFlags.Static | BindingFlags.NonPublic);
 
         private Expression VisitFieldSelection(MemberExpression m)
         {
             var fieldName = Mapping.GetFieldName(m.Member);
             fieldNames.Add(fieldName);
-            return Expression.Convert(Expression.Call(Expression.PropertyOrField(Parameter, "fields"), getFieldMethod, Expression.Constant(fieldName)), m.Type);
+            var getFieldExpression = Expression.Call(null, getFieldMethod, Expression.PropertyOrField(Parameter, "fields"), Expression.Constant(fieldName), Expression.Constant(m.Type));
+            return Expression.Convert(getFieldExpression, m.Type);
+        }
+
+        private static object GetFieldValue(IDictionary<string, JToken> dictionary, string key, Type expectedType)
+        {
+            JToken token;
+            if (dictionary.TryGetValue(key, out token))
+                return token.ToObject(expectedType);
+
+            return expectedType.IsValueType
+                ? Activator.CreateInstance(expectedType)
+                : null;
         }
 
         protected override Expression VisitElasticField(MemberExpression m)

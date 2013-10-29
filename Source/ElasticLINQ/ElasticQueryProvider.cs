@@ -91,9 +91,8 @@ namespace ElasticLinq
             var log = Log ?? new NullTextWriter();
             log.WriteLine("Type is " + elementType);
 
-            var response = new ElasticRequestProcessor(connection, log)
-                .Search(translation.SearchRequest)
-                .GetAwaiter().GetResult();
+            var searchTask = new ElasticRequestProcessor(connection, log).Search(translation.SearchRequest);
+            var response = searchTask.GetAwaiter().GetResult();
 
             return ElasticResponseMaterializer
                 .Materialize(response.hits.hits, elementType, translation.Projector);
