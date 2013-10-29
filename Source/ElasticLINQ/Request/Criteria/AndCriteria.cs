@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
+using System;
 using ElasticLinq.Utility;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +31,9 @@ namespace ElasticLinq.Request.Criteria
                 return null;
             if (criteria.Length == 1)
                 return criteria[0];
+
+            // Unwrap and combine ANDs
+            criteria = criteria.SelectMany(c => c is AndCriteria ? ((AndCriteria)c).Criteria : new[] { c }).ToArray();
 
             var combinedCriteria = new List<ICriteria>(criteria);
             CombineRanges(combinedCriteria);

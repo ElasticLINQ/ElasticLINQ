@@ -675,7 +675,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         [Fact]
         public void AndOperatorGeneratesAndCriteria()
         {
-            var where = Robots.Where(e => e.Name == "IG-88" && e.Cost > 1);
+            var where = Robots.Where(r => r.Name == "IG-88" && r.Cost > 1);
             var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
             Assert.IsType<AndCriteria>(criteria);
@@ -687,9 +687,24 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         }
 
         [Fact]
+        public void AndOperatorChainsAndsTogetherIntoSingleAndCriteria()
+        {
+            var where = Robots.Where(r => r.Name == "IG-88" && r.Cost > 1 && r.Zone.HasValue);
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+
+            Assert.IsType<AndCriteria>(criteria);
+            var andCriteria = (AndCriteria)criteria;
+            Assert.Equal("and", andCriteria.Name);
+            Assert.Single(andCriteria.Criteria, f => f.Name == "term");
+            Assert.Single(andCriteria.Criteria, f => f.Name == "range");
+            Assert.Single(andCriteria.Criteria, f => f.Name == "exists");
+            Assert.Equal(3, andCriteria.Criteria.Count);
+        }
+
+        [Fact]
         public void WhereAppliesToQuerySwitchesToQuery()
         {
-            var where = Robots.WhereAppliesTo(WhereTarget.Query).Where(e => e.Name == "IG-88" && e.Cost > 1);
+            var where = Robots.WhereAppliesTo(WhereTarget.Query).Where(r => r.Name == "IG-88" && r.Cost > 1);
             var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest;
 
             Assert.IsType<AndCriteria>(criteria.Query);
@@ -707,7 +722,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var where = Robots
                 .WhereAppliesTo(WhereTarget.Query)
                 .WhereAppliesTo(WhereTarget.Filter)
-                .Where(e => e.Name == "IG-88" && e.Cost > 1);
+                .Where(r => r.Name == "IG-88" && r.Cost > 1);
             var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest;
 
             Assert.IsType<AndCriteria>(criteria.Filter);
