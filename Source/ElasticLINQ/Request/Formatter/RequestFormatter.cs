@@ -8,15 +8,9 @@ namespace ElasticLinq.Request.Formatter
 {
     internal abstract class RequestFormatter
     {
-        internal static RequestFormatter Create(ElasticConnection connection,
-            ElasticSearchRequest searchRequest)
+        internal static RequestFormatter Create(ElasticConnection connection, ElasticSearchRequest searchRequest)
         {
-            var requiresPostBody = true; // TODO: Determine what requires a post body
-            var useGet = connection.PreferGetRequests && !requiresPostBody;
-
-            return useGet
-                ? (RequestFormatter)new GetQueryRequestFormatter(connection, searchRequest)
-                : new PostBodyRequestFormatter(connection, searchRequest);
+            return new PostBodyRequestFormatter(connection, searchRequest);
         }
 
         protected readonly ElasticConnection Connection;

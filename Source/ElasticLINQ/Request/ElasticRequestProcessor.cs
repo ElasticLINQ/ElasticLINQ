@@ -3,6 +3,7 @@
 
 using ElasticLinq.Request.Formatter;
 using ElasticLinq.Response.Model;
+using ElasticLinq.Utility;
 using Newtonsoft.Json;
 using System.Diagnostics;
 using System.IO;
@@ -21,6 +22,7 @@ namespace ElasticLinq.Request
 
         public ElasticRequestProcessor(ElasticConnection connection, TextWriter log)
         {
+            Argument.EnsureNotNull("connection", connection);
             this.connection = connection;
             this.log = log;
         }

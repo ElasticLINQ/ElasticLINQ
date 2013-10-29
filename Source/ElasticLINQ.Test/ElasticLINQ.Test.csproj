@@ -63,7 +63,6 @@
     <Compile Include="Request\Criteria\ExistsCriteriaTests.cs" />
     <Compile Include="Request\Criteria\TermCriteriaTests.cs" />
     <Compile Include="Request\Formatter\PostBodyRequestFormatterTests.cs" />
-    <Compile Include="Request\Formatter\GetQueryRequestFormatterTests.cs" />
     <Compile Include="Request\Formatter\RequestFormatterTests.cs" />
     <Compile Include="Request\Visitors\BranchSelectExpressionVisitorTests.cs" />
     <Compile Include="Request\Visitors\ConstantMemberPairTests.cs" />
