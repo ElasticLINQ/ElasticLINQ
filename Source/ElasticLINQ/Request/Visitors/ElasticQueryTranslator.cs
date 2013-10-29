@@ -64,6 +64,11 @@ namespace ElasticLinq.Request.Visitors
             if (m.Method.DeclaringType == typeof(ElasticQueryExtensions))
                 return VisitElasticMethodCall(m);
 
+            return VisitGenericMethodCall(m);
+        }
+
+        private Expression VisitGenericMethodCall(MethodCallExpression m)
+        {
             switch (m.Method.Name)
             {
                 case "Equals":
