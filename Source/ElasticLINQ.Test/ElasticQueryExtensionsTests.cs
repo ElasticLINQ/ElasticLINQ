@@ -12,9 +12,7 @@ namespace ElasticLinq.Test
 {
     public class ElasticQueryExtensionsTests
     {
-        private class Sample
-        {
-        }
+        private class Sample { }
 
         [Fact]
         public void WhereAppliesToQueryIsAddedToExpressionTree()

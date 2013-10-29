@@ -4,6 +4,7 @@
 using ElasticLinq.Mapping;
 using ElasticLinq.Utility;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using Xunit;
 
@@ -52,12 +53,14 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
+        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void ExecuteThrowsArgumentNullExceptionIfNull()
         {
             Assert.Throws<ArgumentNullException>(() => sharedProvider.Execute(null));
         }
 
         [Fact]
+        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void ExecuteTThrowsArgumentNullExceptionIfNull()
         {
             Assert.Throws<ArgumentNullException>(() => sharedProvider.Execute<Sample>(null));
