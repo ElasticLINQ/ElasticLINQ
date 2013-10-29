@@ -9,12 +9,14 @@ namespace ElasticLinq.Request
     {
         private readonly string name;
         private readonly bool ascending;
+        private readonly bool ignoreUnmapped;
 
-        public SortOption(string name, bool ascending)
+        public SortOption(string name, bool ascending, bool ignoreUnmapped = false)
         {
             Argument.EnsureNotBlank("name", name);
             this.name = name;
             this.ascending = ascending;
+            this.ignoreUnmapped = ignoreUnmapped;
         }
 
         public string Name
@@ -25,6 +27,11 @@ namespace ElasticLinq.Request
         public bool Ascending
         {
             get { return ascending; }
+        }
+
+        public bool IgnoreUnmapped
+        {
+            get { return ignoreUnmapped; }
         }
     }
 }

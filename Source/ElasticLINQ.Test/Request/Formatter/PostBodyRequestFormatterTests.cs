@@ -175,7 +175,7 @@ namespace ElasticLinq.Test.Request.Formatter
         [Fact]
         public void BodyContainsSortOptions()
         {
-            var desiredSortOptions = new List<SortOption> { new SortOption("first", true), new SortOption("second", false) };
+            var desiredSortOptions = new List<SortOption> { new SortOption("first", true), new SortOption("second", false), new SortOption("third", false, true) };
 
             var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest("type1", sortOptions: desiredSortOptions));
             var body = JObject.Parse(formatter.Body);
@@ -185,15 +185,26 @@ namespace ElasticLinq.Test.Request.Formatter
             {
                 var actualSort = result[i];
                 var desiredSort = desiredSortOptions[i];
-                if (desiredSort.Ascending)
+                if (desiredSort.IgnoreUnmapped)
                 {
-                    Assert.Equal(actualSort, desiredSort.Name);
+                    var first = (JProperty)actualSort.First;
+                    Assert.Equal(desiredSort.Name, first.Name);
+                    var childProperties = first.First.Children().Cast<JProperty>().ToArray();
+                    Assert.Single(childProperties, f => f.Name == "ignore_unmapped" && f.Value.ToObject<bool>());
+                    Assert.Single(childProperties, f => f.Name == "order" && f.Value.ToObject<string>() == "desc");
                 }
                 else
                 {
-                    var finalActualSort = actualSort[desiredSort.Name];
-                    Assert.NotNull(finalActualSort);
-                    Assert.Equal("desc", finalActualSort.ToString());
+                    if (desiredSort.Ascending)
+                    {
+                        Assert.Equal(desiredSort.Name, actualSort);
+                    }
+                    else
+                    {
+                        var finalActualSort = actualSort[desiredSort.Name];
+                        Assert.NotNull(finalActualSort);
+                        Assert.Equal("desc", finalActualSort.ToString());
+                    }
                 }
             }
         }

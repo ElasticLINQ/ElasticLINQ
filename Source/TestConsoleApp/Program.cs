@@ -19,7 +19,7 @@ namespace TestConsoleApp
                 var query = context.Query<AccountSubscription>()
                     .QueryString("buck or bucket")
                     .Where(s => s.EndDate.HasValue)
-                    .Select(a => new { a.Name, ElasticFields.Score });
+                    .Select(a => new { a.Name, ElasticFields.Score });                    
                 Dump.Query(query);
             }
 
@@ -27,7 +27,7 @@ namespace TestConsoleApp
                 // Filter AND between a TERM and an EXISTS
                 var query = context.Query<AccountSubscription>()
                     .Where(s => s.AccountAlias == "t3n" && s.EndDate.HasValue)
-                    .OrderBy(s => s.CreateDate)
+                    .OrderBy(s => s.EndDate)
                     .ThenByDescending(s => ElasticFields.Score);
                 Dump.Query(query);
             }

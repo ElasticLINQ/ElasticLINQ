@@ -58,9 +58,21 @@ namespace ElasticLinq.Request.Formatter
 
         private static JArray Build(IEnumerable<SortOption> sortOptions)
         {
-            return new JArray(sortOptions
-                    .Select(o => o.Ascending ? (object)o.Name : new JObject(new JProperty(o.Name, "desc")))
-                    .ToArray());
+            return new JArray(sortOptions.Select(Build).ToArray());
+        }
+
+        private static object Build(SortOption sortOption)
+        {
+            if (!sortOption.IgnoreUnmapped)
+                return sortOption.Ascending
+                    ? (object)sortOption.Name
+                    : new JObject(new JProperty(sortOption.Name, "desc"));
+
+            var properties = new List<JProperty> { new JProperty("ignore_unmapped", true) };
+            if (!sortOption.Ascending)
+                properties.Add(new JProperty("order", "desc"));
+
+            return new JObject(new JProperty(sortOption.Name, new JObject(properties)));
         }
 
         private static JObject BuildCriteria(ICriteria criteria)

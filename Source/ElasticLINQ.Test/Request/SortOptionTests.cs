@@ -34,6 +34,20 @@ namespace ElasticLinq.Test.Request
         }
 
         [Fact]
+        public void ConstructorSetsOptionalIgnoreUnmappedPropertyFromParameter()
+        {
+            const string expectedName = "SomeOtherField";
+            const bool expectedAscending = false;
+            const bool expectedIgnoreUnmapped = true;
+
+            var sortOption = new SortOption(expectedName, expectedAscending, expectedIgnoreUnmapped);
+
+            Assert.Equal(expectedName, sortOption.Name);
+            Assert.Equal(expectedAscending, sortOption.Ascending);
+            Assert.Equal(expectedIgnoreUnmapped, sortOption.IgnoreUnmapped);
+        }
+
+        [Fact]
         public void ConstructorThrowsArgumentNullExceptionWhenNameIsNull()
         {
             Assert.Throws<ArgumentNullException>(() => new SortOption(null, true));

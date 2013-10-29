@@ -462,7 +462,8 @@ namespace ElasticLinq.Request.Visitors
             if (final != null)
             {
                 var fieldName = mapping.GetFieldName(final.Member);
-                sortOptions.Insert(0, new SortOption(fieldName, ascending));
+                var ignoreUnmapped = TypeHelper.IsNullableType(final.Type); // Consider a config switch?
+                sortOptions.Insert(0, new SortOption(fieldName, ascending, ignoreUnmapped));
             }
 
             return Visit(source);
