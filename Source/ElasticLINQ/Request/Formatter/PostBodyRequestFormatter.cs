@@ -66,11 +66,13 @@ namespace ElasticLinq.Request.Formatter
             if (criteria is TermCriteria)
                 return Create((TermCriteria)criteria);
 
-            if (criteria is ExistsCriteria)
-                return Create((ExistsCriteria)criteria);
-
             if (criteria is NotCriteria)
                 return Create((NotCriteria)criteria);
+
+            // Base class formatters using name property
+
+            if (criteria is SingleFieldCriteria)
+                return Create((SingleFieldCriteria)criteria);
 
             if (criteria is CompoundCriteria)
                 return Create((CompoundCriteria)criteria);
@@ -92,7 +94,7 @@ namespace ElasticLinq.Request.Formatter
             return new JObject(new JProperty(criteria.Name, new JObject(new JProperty(criteria.Field, value))));
         }
 
-        private static JObject Create(ExistsCriteria criteria)
+        private static JObject Create(SingleFieldCriteria criteria)
         {
             return new JObject(new JProperty(criteria.Name, new JObject(new JProperty("field", criteria.Field))));
         }

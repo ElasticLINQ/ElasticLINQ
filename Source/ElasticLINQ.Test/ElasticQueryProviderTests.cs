@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
-using ElasticLinq;
 using ElasticLinq.Mapping;
 using ElasticLinq.Utility;
 using System;
@@ -50,6 +49,18 @@ namespace ElasticLinq.Test
 
             Assert.IsType<ElasticQuery<Sample>>(query);
             Assert.Same(provider, query.Provider);
-        }    
+        }
+
+        [Fact]
+        public void ExecuteThrowsArgumentNullExceptionIfNull()
+        {
+            Assert.Throws<ArgumentNullException>(() => sharedProvider.Execute(null));
+        }
+
+        [Fact]
+        public void ExecuteTThrowsArgumentNullExceptionIfNull()
+        {
+            Assert.Throws<ArgumentNullException>(() => sharedProvider.Execute<Sample>(null));
+        }
     }
 }

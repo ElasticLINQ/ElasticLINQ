@@ -69,5 +69,18 @@ namespace ElasticLinq.Test.Request.Criteria
             Assert.Contains(area408, orCriteria.Criteria);
             Assert.Equal(3, orCriteria.Criteria.Count);
         }
+
+        [Fact]
+        public void ToStringContainsSubfields()
+        {
+            var existsCriteria = new ExistsCriteria("thisIsAMissingField");
+            var termCriteria = new TermCriteria("termField", "some value");
+
+            var orCriteria = OrCriteria.Combine(existsCriteria, termCriteria);
+            var result = orCriteria.ToString();
+
+            Assert.Contains(existsCriteria.ToString(), result);
+            Assert.Contains(termCriteria.ToString(), result);
+        }
     }
 }

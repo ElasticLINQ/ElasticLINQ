@@ -31,11 +31,20 @@ namespace ElasticLinq.Request
             this.query = query;
         }
 
-        public long @From { get { return @from; } }
+        public long @From
+        {
+            get { return @from; }
+        }
 
-        public long? Size { get { return size; } }
-        
-        public string Type { get { return type; } }
+        public long? Size
+        {
+            get { return size; }
+        }
+
+        public string Type
+        {
+            get { return type; }
+        }
 
         public IReadOnlyList<string> Fields
         {
@@ -56,20 +65,5 @@ namespace ElasticLinq.Request
         {
             get { return query; }
         }
-    }
-
-    internal class SortOption
-    {
-        private readonly string name;
-        private readonly bool ascending;
-
-        public SortOption(string name, bool ascending)
-        {
-            this.name = name;
-            this.ascending = ascending;
-        }
-
-        public string Name { get { return name; } }
-        public bool Ascending { get { return ascending; } }
     }
 }

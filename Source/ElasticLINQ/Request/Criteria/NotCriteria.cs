@@ -42,5 +42,10 @@ namespace ElasticLinq.Request.Criteria
         {
             return criteria;
         }
+
+        public override string ToString()
+        {
+            return "not " + criteria;
+        }
     }
 }

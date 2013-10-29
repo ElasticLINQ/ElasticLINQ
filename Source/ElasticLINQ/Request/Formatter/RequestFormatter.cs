@@ -8,11 +8,6 @@ namespace ElasticLinq.Request.Formatter
 {
     internal abstract class RequestFormatter
     {
-        internal static RequestFormatter Create(ElasticConnection connection, ElasticSearchRequest searchRequest)
-        {
-            return new PostBodyRequestFormatter(connection, searchRequest);
-        }
-
         protected readonly ElasticConnection Connection;
         protected readonly ElasticSearchRequest SearchRequest;
 

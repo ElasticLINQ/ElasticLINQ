@@ -64,6 +64,7 @@
     <Compile Include="Request\Criteria\TermCriteriaTests.cs" />
     <Compile Include="Request\Formatter\PostBodyRequestFormatterTests.cs" />
     <Compile Include="Request\Formatter\RequestFormatterTests.cs" />
+    <Compile Include="Request\SortOptionTests.cs" />
     <Compile Include="Request\Visitors\BranchSelectExpressionVisitorTests.cs" />
     <Compile Include="Request\Visitors\ConstantMemberPairTests.cs" />
     <Compile Include="Request\Visitors\ElasticFieldsProjectionExpressionVisitorTests.cs" />

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
-using ElasticLinq;
 using ElasticLinq.Request;
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Formatter;
@@ -26,11 +25,34 @@ namespace ElasticLinq.Test.Request.Formatter
         }
 
         [Fact]
+        public void UrlPathContainsIndexSpecifier()
+        {
+            const string expectedIndex = "myIndex";
+            var indexConnection = new ElasticConnection(defaultConnection.Endpoint, defaultConnection.Timeout, expectedIndex);
+            var formatter = new PostBodyRequestFormatter(indexConnection, new ElasticSearchRequest("type1"));
+
+            Assert.Contains(expectedIndex, formatter.Uri.AbsolutePath);
+        }
+
+        [Fact]
         public void BodyIsJsonFormattedResponse()
         {
             var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest("type1"));
 
             Assert.DoesNotThrow(() => JObject.Parse(formatter.Body));
+        }
+
+        [Fact]
+        public void BodyContainsFilterTerm()
+        {
+            var termCriteria = new TermCriteria("term1", "singleCriteria");
+
+            var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest("type1", filter: termCriteria));
+            var body = JObject.Parse(formatter.Body);
+
+            var result = TraverseWithAssert(body, "filter", "term");
+            Assert.Equal(1, result.Count());
+            Assert.Equal(termCriteria.Values[0], result[termCriteria.Field].ToString());
         }
 
         [Fact]
@@ -45,6 +67,97 @@ namespace ElasticLinq.Test.Request.Formatter
             var actualTerms = TraverseWithAssert(result, termCriteria.Field);
             foreach (var criteria in termCriteria.Values)
                 Assert.Contains(criteria, actualTerms.Select(t => t.ToString()).ToArray());
+        }
+
+        [Fact]
+        public void BodyContainsFilterExists()
+        {
+            const string expectedFieldName = "fieldShouldExist";
+            var existsCriteria = new ExistsCriteria(expectedFieldName);
+
+            var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest("type1", filter: existsCriteria));
+            var body = JObject.Parse(formatter.Body);
+
+            var field = TraverseWithAssert(body, "filter", "exists", "field");
+            Assert.Equal(expectedFieldName, field);
+        }
+
+        [Fact]
+        public void BodyContainsFilterMissing()
+        {
+            const string expectedFieldName = "fieldShouldBeMissing";
+            var termCriteria = new MissingCriteria(expectedFieldName);
+
+            var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest("type1", filter: termCriteria));
+            var body = JObject.Parse(formatter.Body);
+
+            var field = TraverseWithAssert(body, "filter", "missing", "field");
+            Assert.Equal(expectedFieldName, field);
+        }
+
+        [Fact]
+        public void BodyContainsFilterNot()
+        {
+            var termCriteria = new TermCriteria("term1", "alpha", "bravo", "charlie", "delta", "echo");
+            var notCriteria = NotCriteria.Create(termCriteria);
+
+            var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest("type1", filter: notCriteria));
+            var body = JObject.Parse(formatter.Body);
+
+            var result = TraverseWithAssert(body, "filter", "not", "terms");
+            var actualTerms = TraverseWithAssert(result, termCriteria.Field);
+            foreach (var criteria in termCriteria.Values)
+                Assert.Contains(criteria, actualTerms.Select(t => t.ToString()).ToArray());
+        }
+
+        [Fact]
+        public void BodyContainsFilterOr()
+        {
+            var minCriteria = new RangeCriteria("minField", RangeComparison.GreaterThanOrEqual, 100);
+            var maxCriteria = new RangeCriteria("maxField", RangeComparison.LessThan, 32768);
+            var orCriteria = OrCriteria.Combine(minCriteria, maxCriteria);
+
+            var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest("type1", filter: orCriteria));
+            var body = JObject.Parse(formatter.Body);
+
+            var result = TraverseWithAssert(body, "filter", "or");
+            Assert.Equal(2, result.Children().Count());
+            foreach (var child in result)
+                Assert.True(((JProperty)(child.First)).Name == "range");
+        }
+
+        [Fact]
+        public void BodyContainsFilterSingleCollapsedOr()
+        {
+            const string expectedFieldName = "fieldShouldExist";
+            var existsCriteria = new ExistsCriteria(expectedFieldName);
+            var orCriteria = OrCriteria.Combine(existsCriteria);
+
+            var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest("type1", filter: orCriteria));
+            var body = JObject.Parse(formatter.Body);
+
+            var field = TraverseWithAssert(body, "filter", "exists", "field");
+            Assert.Equal(expectedFieldName, field);
+        }
+
+        [Fact]
+        public void BodyContainsQueryRange()
+        {
+            var rangeCriteria = new RangeCriteria("someField",
+                new[]
+                {
+                    new RangeSpecificationCriteria(RangeComparison.LessThan, 100),
+                    new RangeSpecificationCriteria(RangeComparison.GreaterThan, 200)
+                });
+
+            var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest("type1", query: rangeCriteria));
+            var body = JObject.Parse(formatter.Body);
+
+            var result = TraverseWithAssert(body, "query", "range");
+            var actualRange = TraverseWithAssert(result, rangeCriteria.Field);
+
+            Assert.Equal(100, actualRange["lt"]);
+            Assert.Equal(200, actualRange["gt"]);
         }
 
         [Fact]

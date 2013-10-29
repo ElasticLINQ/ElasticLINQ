@@ -44,5 +44,16 @@ namespace ElasticLinq.Test.Request.Criteria
         {
             Assert.Throws<ArgumentNullException>(() => NotCriteria.Create(null));
         }
+
+        [Fact]
+        public void ToStringContainsSubfields()
+        {
+            var termCriteria = new TermCriteria("termField", "some value");
+
+            var notCriteria = NotCriteria.Create(termCriteria);
+            var result = notCriteria.ToString();
+
+            Assert.Contains(termCriteria.ToString(), result);
+        }
    }
 }

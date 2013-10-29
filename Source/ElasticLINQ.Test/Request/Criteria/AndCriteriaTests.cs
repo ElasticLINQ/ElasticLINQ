@@ -103,5 +103,18 @@ namespace ElasticLinq.Test.Request.Criteria
             Assert.Single(combinedRange.Specifications, s => s.Comparison == lowerFirstRange.Specifications.First().Comparison);
             Assert.Single(combinedRange.Specifications, s => s.Comparison == upperFirstRange.Specifications.First().Comparison);
         }
+
+        [Fact]
+        public void ToStringContainsSubfields()
+        {
+            var existsCriteria = new ExistsCriteria("thisIsAMissingField");
+            var termCriteria = new TermCriteria("termField", "some value");
+
+            var andCriteria = AndCriteria.Combine(existsCriteria, termCriteria);
+            var result = andCriteria.ToString();
+
+            Assert.Contains(existsCriteria.ToString(), result);
+            Assert.Contains(termCriteria.ToString(), result);
+        }
     }
 }

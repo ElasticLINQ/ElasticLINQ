@@ -29,8 +29,7 @@ namespace ElasticLinq.Request
 
         public async Task<ElasticResponse> Search(ElasticSearchRequest searchRequest)
         {
-            var requestMessage = CreateRequestMessage(searchRequest);
-
+            using (var requestMessage = CreateRequestMessage(searchRequest))
             using (var response = await SendRequest(requestMessage))
             using (var responseStream = await response.Content.ReadAsStreamAsync())
                 return ParseResponse(responseStream);
@@ -38,19 +37,13 @@ namespace ElasticLinq.Request
 
         private HttpRequestMessage CreateRequestMessage(ElasticSearchRequest searchRequest)
         {
-            var formatter = RequestFormatter.Create(connection, searchRequest);
-            var postFormatter = formatter as PostBodyRequestFormatter;
-            var isPost = postFormatter != null;
-
-            var message = new HttpRequestMessage(isPost ? HttpMethod.Post : HttpMethod.Get, formatter.Uri);
+            var formatter = new PostBodyRequestFormatter(connection, searchRequest);
+            var message = new HttpRequestMessage(HttpMethod.Post, formatter.Uri);
             log.WriteLine("Request " + message.Method + " " + message.RequestUri);
 
-            if (isPost)
-            {
-                var body = postFormatter.Body;
-                message.Content = new StringContent(body);
-                log.WriteLine("Body\n" + body);
-            }
+            var body = formatter.Body;
+            message.Content = new StringContent(body);
+            log.WriteLine("Body\n" + body);
 
             return message;
         }

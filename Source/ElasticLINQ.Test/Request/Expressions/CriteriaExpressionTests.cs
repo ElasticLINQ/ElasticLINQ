@@ -28,5 +28,16 @@ namespace ElasticLinq.Test.Request.Expressions
 
             Assert.Equal(typeof(bool), expression.Type);
         }
+
+        [Fact]
+        public void CanReduceIsAlwaysFalse()
+        {
+            var criteria = new TermCriteria("field", "value");
+
+            var expression = new CriteriaExpression(criteria);
+
+            Assert.False(expression.CanReduce);
+        }
+
     }
 }

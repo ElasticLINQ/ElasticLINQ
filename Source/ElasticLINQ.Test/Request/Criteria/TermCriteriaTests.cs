@@ -43,5 +43,15 @@ namespace ElasticLinq.Test.Request.Criteria
 
             Assert.Equal(3, criteria.Values.Count);
         }
+
+        [Fact]
+        public void ToStringContainsFieldComparisonAndValue()
+        {
+            var termFilter = new TermCriteria("field", "single");
+            var result = termFilter.ToString();
+
+            Assert.Contains(termFilter.Field, result);
+            Assert.Contains((string)termFilter.Values[0], result);
+        }
     }
 }

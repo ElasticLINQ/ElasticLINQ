@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
-using ElasticLinq;
-using ElasticLinq.Request;
 using ElasticLinq.Request.Formatter;
 using System;
 using System.Globalization;
@@ -37,16 +35,6 @@ namespace ElasticLinq.Test.Request.Formatter
             var actual = RequestFormatter.Format(timespan);
 
             Assert.Equal(timespan.TotalMinutes.ToString(CultureInfo.InvariantCulture) + "m", actual);
-        }
-
-        [Fact]
-        public void CreateReturnsGetPostBodyRequestFormatterByDefault()
-        {
-            var connection = new ElasticConnection(new Uri("http://a.b.com/d"), TimeSpan.FromSeconds(1));
-
-            var formatter = RequestFormatter.Create(connection, new ElasticSearchRequest("R-Type"));
-
-            Assert.IsType<PostBodyRequestFormatter>(formatter);
         }
     }
 }

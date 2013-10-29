@@ -51,7 +51,7 @@ namespace ElasticLinq.Request.Criteria
 
         public override string ToString()
         {
-            return String.Format("{0} [{1}]", Name, String.Join(",", values.ToArray()));
+            return String.Format("{0} {1} [{2}]", Name, Field, String.Join(",", values.ToArray()));
         }
     }
 }

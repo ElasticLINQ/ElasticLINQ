@@ -94,5 +94,16 @@ namespace ElasticLinq.Test.Request.Criteria
             Assert.Equal(lt.Name, "lt");
             Assert.Equal(lte.Name, "lte");
         }
+
+        [Fact]
+        public void ToStringContainsFieldComparisonAndValue()
+        {
+            var rangeCriteria = new RangeCriteria("thisIsMyFieldName", RangeComparison.LessThan, "500");
+            var result = rangeCriteria.ToString();
+
+            Assert.Contains(rangeCriteria.Field, result);
+            Assert.Contains(rangeCriteria.Specifications[0].Comparison.ToString(), result);
+            Assert.Contains((string)rangeCriteria.Specifications[0].Value, result);
+        }
     }
 }
