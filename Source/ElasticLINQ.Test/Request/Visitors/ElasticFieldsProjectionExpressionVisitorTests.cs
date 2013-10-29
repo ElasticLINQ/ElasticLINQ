@@ -114,5 +114,18 @@ namespace ElasticLinq.Test.Request.Visitors
             Assert.NotNull(entityParameter);
             Assert.Single(flattened.OfType<MethodCallExpression>(), e => e.Arguments.Contains(entityParameter));
         }
+
+        [Fact]
+        public void RebindWithNonElasticMemberIsUnchanged()
+        {
+            var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(f => f.Name);
+            var rebound = ElasticFieldsProjectionExpressionVisitor.Rebind(hitParameter, validMapping, source.Expression);
+
+            var memberExpression = FlatteningExpressionVisitor.Flatten(rebound).OfType<MemberExpression>().FirstOrDefault();
+            Assert.NotNull(memberExpression);
+            Assert.Equal(memberExpression.Member.Name, "Name");
+            Assert.IsAssignableFrom<ParameterExpression>(memberExpression.Expression);
+            Assert.Equal("f", ((ParameterExpression)memberExpression.Expression).Name);
+        }
     }
 }
