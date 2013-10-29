@@ -50,6 +50,7 @@
     <Compile Include="Mapping\CouchbaseElasticMappingTests.cs" />
     <Compile Include="Mapping\ElasticFieldsMappingWrapperTests.cs" />
     <Compile Include="Mapping\MappingHelpersTests.cs" />
+    <Compile Include="Request\Criteria\QueryStringCriteriaTests.cs" />
     <Compile Include="Request\ElasticRequestProcessorTests.cs" />
     <Compile Include="ElasticConnectionTests.cs" />
     <Compile Include="Mapping\TrivialElasticMappingTests.cs" />

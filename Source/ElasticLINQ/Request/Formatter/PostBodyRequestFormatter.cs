@@ -4,6 +4,7 @@
 using ElasticLinq.Request.Criteria;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace ElasticLinq.Request.Formatter
@@ -42,10 +43,7 @@ namespace ElasticLinq.Request.Formatter
                 root.Add("filter", BuildCriteria(SearchRequest.Filter));
 
             if (SearchRequest.SortOptions.Any())
-                root.Add("sort", new JArray(
-                    SearchRequest.SortOptions
-                        .Select(o => o.Ascending ? (object)o.Name : new JObject(new JProperty(o.Name, "desc")))
-                        .ToArray()));
+                root.Add("sort", Build(SearchRequest.SortOptions));
 
             if (SearchRequest.From > 0)
                 root.Add("from", SearchRequest.From);
@@ -58,53 +56,68 @@ namespace ElasticLinq.Request.Formatter
             return root;
         }
 
+        private static JArray Build(IEnumerable<SortOption> sortOptions)
+        {
+            return new JArray(sortOptions
+                    .Select(o => o.Ascending ? (object)o.Name : new JObject(new JProperty(o.Name, "desc")))
+                    .ToArray());
+        }
+
         private static JObject BuildCriteria(ICriteria criteria)
         {
             if (criteria is RangeCriteria)
-                return Create((RangeCriteria)criteria);
+                return Build((RangeCriteria)criteria);
 
             if (criteria is TermCriteria)
-                return Create((TermCriteria)criteria);
+                return Build((TermCriteria)criteria);
 
             if (criteria is NotCriteria)
-                return Create((NotCriteria)criteria);
+                return Build((NotCriteria)criteria);
+
+            if (criteria is QueryStringCriteria)
+                return Build((QueryStringCriteria)criteria);
 
             // Base class formatters using name property
 
             if (criteria is SingleFieldCriteria)
-                return Create((SingleFieldCriteria)criteria);
+                return Build((SingleFieldCriteria)criteria);
 
             if (criteria is CompoundCriteria)
-                return Create((CompoundCriteria)criteria);
+                return Build((CompoundCriteria)criteria);
 
             throw new InvalidOperationException(String.Format("Unknown filter type {0}", criteria.GetType()));
         }
 
-        private static JObject Create(RangeCriteria criteria)
+        private static JObject Build(QueryStringCriteria criteria)
+        {
+            return new JObject(new JProperty(criteria.Name, new JObject(new JProperty("query", criteria.Value))));
+        }
+
+        private static JObject Build(RangeCriteria criteria)
         {
             // Range filters can be combined by field
             return new JObject(new JProperty(criteria.Name, new JObject(new JProperty(criteria.Field,
                    new JObject(criteria.Specifications.Select(s => new JProperty(s.Name, s.Value)).ToList())))));
         }
 
-        private static JObject Create(TermCriteria criteria)
+        private static JObject Build(TermCriteria criteria)
         {
             // Terms filter with one item is a single term filter
             var value = criteria.Values.Count == 1 ? criteria.Values[0] : new JArray(criteria.Values.ToArray());
             return new JObject(new JProperty(criteria.Name, new JObject(new JProperty(criteria.Field, value))));
         }
 
-        private static JObject Create(SingleFieldCriteria criteria)
+        private static JObject Build(SingleFieldCriteria criteria)
         {
             return new JObject(new JProperty(criteria.Name, new JObject(new JProperty("field", criteria.Field))));
         }
 
-        private static JObject Create(NotCriteria criteria)
+        private static JObject Build(NotCriteria criteria)
         {
             return new JObject(new JProperty(criteria.Name, BuildCriteria(criteria.Criteria)));
         }
 
-        private static JObject Create(CompoundCriteria criteria)
+        private static JObject Build(CompoundCriteria criteria)
         {
             return criteria.Criteria.Count == 1    // A compound filter with one item can be collapsed
                 ? BuildCriteria(criteria.Criteria.First())

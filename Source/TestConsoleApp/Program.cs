@@ -15,10 +15,20 @@ namespace TestConsoleApp
             var context = new ElasticContext(connection, new CouchbaseElasticMapping()) { Log = Console.Out };
 
             {
+                // QueryString simple case
+                var query = context.Query<AccountSubscription>()
+                    .QueryString("buck or bucket")
+                    .Where(s => s.EndDate.HasValue)
+                    .Select(a => new { a.Name, ElasticFields.Score });
+                Dump.Query(query);
+            }
+
+            {
                 // Filter AND between a TERM and an EXISTS
                 var query = context.Query<AccountSubscription>()
                     .Where(s => s.AccountAlias == "t3n" && s.EndDate.HasValue)
-                    .OrderBy(s => s.CreateDate);
+                    .OrderBy(s => s.CreateDate)
+                    .ThenByDescending(s => ElasticFields.Score);
                 Dump.Query(query);
             }
 
@@ -41,9 +51,10 @@ namespace TestConsoleApp
             }
 
             {
-                // Projecting into tuples with whole entity reference and score
+                // Projecting into tuples with whole entity reference and score with IN
+                var aliases = new[] { "t3n", "dpg", "pbt" };
                 var query = context.Query<AccountSubscription>()
-                    .Where(a => a.AccountAlias == "t3n")
+                    .Where(a => aliases.Contains(a.AccountAlias))
                     .Select(a => Tuple.Create(a, ElasticFields.Score));
                 Dump.Query(query);
             }

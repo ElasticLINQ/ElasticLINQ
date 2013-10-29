@@ -2,8 +2,8 @@
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
 using ElasticLinq.Mapping;
-using ElasticLinq.Request.Expressions;
 using ElasticLinq.Request.Criteria;
+using ElasticLinq.Request.Expressions;
 using ElasticLinq.Response.Model;
 using ElasticLinq.Utility;
 using System;
@@ -48,8 +48,12 @@ namespace ElasticLinq.Request.Visitors
         {
             var evaluated = PartialEvaluator.Evaluate(e);
             Visit(evaluated);
+
             ApplyUnassignedCriteria();
-            var searchRequest = new ElasticSearchRequest(mapping.GetTypeName(type), skip, take, fields, sortOptions, filterRoot, queryRoot);
+
+            var searchRequest = new ElasticSearchRequest(mapping.GetTypeName(type), skip, take, 
+                fields, sortOptions, filterRoot, queryRoot);
+            
             return new ElasticTranslateResult(searchRequest, projector ?? DefaultProjector);
         }
 
@@ -130,6 +134,11 @@ namespace ElasticLinq.Request.Visitors
                         return VisitOrderByScore(m.Arguments[0], !m.Method.Name.EndsWith("Descending"));
                     break;
 
+                case "QueryString":
+                    if (m.Arguments.Count == 2)
+                        return VisitQueryString(m.Arguments[0], m.Arguments[1]);
+                    break;
+
                 case "WhereAppliesTo":
                     if (m.Arguments.Count == 2)
                         return VisitWhereAppliesTo(m.Arguments[0], m.Arguments[1]);
@@ -137,6 +146,15 @@ namespace ElasticLinq.Request.Visitors
             }
 
             throw new NotSupportedException(string.Format("The ElasticQuery method '{0}' is not supported", m.Method.Name));
+        }
+
+        private Expression VisitQueryString(Expression source, Expression queryExpression)
+        {
+            var constantQueryExpression = (ConstantExpression)queryExpression;
+            var criteriaExpression = new CriteriaExpression(new QueryStringCriteria(constantQueryExpression.Value.ToString()));
+            queryRoot = ApplyCriteria(queryRoot, criteriaExpression.Criteria);
+
+            return Visit(source);
         }
 
         private Expression VisitWhereAppliesTo(Expression source, Expression targetExpression)

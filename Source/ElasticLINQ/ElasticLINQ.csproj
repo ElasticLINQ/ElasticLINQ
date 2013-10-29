@@ -59,6 +59,7 @@
     <Compile Include="Request\Criteria\OrCriteria.cs" />
     <Compile Include="Request\Criteria\RangeCriteria.cs" />
     <Compile Include="Request\Criteria\SingleFieldCriteria.cs" />
+    <Compile Include="Request\Criteria\QueryStringCriteria.cs" />
     <Compile Include="Request\Criteria\TermCriteria.cs" />
     <Compile Include="Request\Formatter\PostBodyRequestFormatter.cs" />
     <Compile Include="Request\Formatter\RequestFormatter.cs" />

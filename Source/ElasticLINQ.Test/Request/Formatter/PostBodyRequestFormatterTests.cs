@@ -35,7 +35,7 @@ namespace ElasticLinq.Test.Request.Formatter
         }
 
         [Fact]
-        public void BodyIsJsonFormattedResponse()
+        public void BodyIsValidJsonFormattedResponse()
         {
             var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest("type1"));
 
@@ -141,6 +141,19 @@ namespace ElasticLinq.Test.Request.Formatter
         }
 
         [Fact]
+        public void BodyContainsQueryString()
+        {
+            const string expectedQuery = "this is my query string";
+            var queryString = new QueryStringCriteria(expectedQuery);
+
+            var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest("type1", query: queryString));
+            var body = JObject.Parse(formatter.Body);
+
+            var result = TraverseWithAssert(body, "query", "query_string", "query");
+            Assert.Equal(expectedQuery, result.ToString());
+        }
+
+        [Fact]
         public void BodyContainsQueryRange()
         {
             var rangeCriteria = new RangeCriteria("someField",
@@ -155,7 +168,6 @@ namespace ElasticLinq.Test.Request.Formatter
 
             var result = TraverseWithAssert(body, "query", "range");
             var actualRange = TraverseWithAssert(result, rangeCriteria.Field);
-
             Assert.Equal(100, actualRange["lt"]);
             Assert.Equal(200, actualRange["gt"]);
         }

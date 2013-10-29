@@ -23,48 +23,43 @@ namespace ElasticLinq
     /// </remarks>
     public static class ElasticQueryExtensions
     {
-        public static IOrderedQueryable<TSource> WhereAppliesTo<TSource>(this IQueryable<TSource> source, WhereTarget target)
+        public static IQueryable<TSource> QueryString<TSource>(this IQueryable<TSource> source, string query)
         {
-            var method = (MethodInfo)MethodBase.GetCurrentMethod();
-            return (IOrderedQueryable<TSource>)source.Provider.CreateQuery<TSource>(
-                Expression.Call(null, method.MakeGenericMethod(typeof(TSource)), source.Expression, Expression.Constant(target)));
+            return CreateQueryMethodCall(source, (MethodInfo)MethodBase.GetCurrentMethod(), Expression.Constant(query));
+        }
+
+        public static IQueryable<TSource> WhereAppliesTo<TSource>(this IQueryable<TSource> source, WhereTarget target)
+        {
+            return CreateQueryMethodCall(source, (MethodInfo)MethodBase.GetCurrentMethod(), Expression.Constant(target));
         }
 
         public static IOrderedQueryable<TSource> OrderByScore<TSource>(this IQueryable<TSource> source)
         {
-            return OrderBy(source, (MethodInfo)MethodBase.GetCurrentMethod());
+            return (IOrderedQueryable<TSource>)CreateQueryMethodCall(source, (MethodInfo)MethodBase.GetCurrentMethod());
         }
 
         public static IOrderedQueryable<TSource> OrderByScoreDescending<TSource>(this IQueryable<TSource> source)
         {
-            return OrderBy(source, (MethodInfo)MethodBase.GetCurrentMethod());
-        }
-
-        private static IOrderedQueryable<TSource> OrderBy<TSource>(IQueryable<TSource> source, MethodInfo method )
-        {
-            Argument.EnsureNotNull("source", source);
-            Argument.EnsureNotNull("method", method);
-
-            return (IOrderedQueryable<TSource>)source.Provider.CreateQuery<TSource>(
-                Expression.Call(null, method.MakeGenericMethod(typeof(TSource)), source.Expression));
+            return (IOrderedQueryable<TSource>)CreateQueryMethodCall(source, (MethodInfo)MethodBase.GetCurrentMethod());
         }
 
         public static IOrderedQueryable<TSource> ThenByScore<TSource>(this IOrderedQueryable<TSource> source)
         {
-            return ThenBy(source, (MethodInfo)MethodBase.GetCurrentMethod());
+            return (IOrderedQueryable<TSource>)CreateQueryMethodCall(source, (MethodInfo)MethodBase.GetCurrentMethod());
         }
 
         public static IOrderedQueryable<TSource> ThenByScoreDescending<TSource>(this IOrderedQueryable<TSource> source)
         {
-            return ThenBy(source, (MethodInfo)MethodBase.GetCurrentMethod());
+            return (IOrderedQueryable<TSource>)CreateQueryMethodCall(source, (MethodInfo)MethodBase.GetCurrentMethod());
         }
 
-        private static IOrderedQueryable<TSource> ThenBy<TSource>(IOrderedQueryable<TSource> source, MethodInfo method)
+        private static IQueryable<TSource> CreateQueryMethodCall<TSource>(IQueryable<TSource> source, MethodInfo method, params Expression[] arguments)
         {
             Argument.EnsureNotNull("source", source);
+            Argument.EnsureNotNull("method", source);
 
-            return (IOrderedQueryable<TSource>)source.Provider.CreateQuery<TSource>(
-                Expression.Call(null, method.MakeGenericMethod(typeof(TSource)), source.Expression));
+            var callExpression = Expression.Call(null, method.MakeGenericMethod(typeof(TSource)), new [] { source.Expression }.Concat(arguments));
+            return source.Provider.CreateQuery<TSource>(callExpression);
         }
     }
 }
