@@ -12,7 +12,7 @@ namespace TestConsoleApp.Utility
             Console.WriteLine("\nResults:");
 
             foreach (var item in query)
-                Dump.Object(item);
+                Object(item);
         }
 
         public static void Object(object value)

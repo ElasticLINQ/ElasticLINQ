@@ -47,7 +47,7 @@ namespace ElasticLinq.Test.Response
 
         private static Hit CreateHit(string sampleField)
         {
-            return new Hit { fields = new JObject(new JProperty("someField", sampleField)) };
+            return new Hit { fields = new Dictionary<string, JToken> { { "someField", new JProperty("a","b").Value } } };
         }
 
         private class SampleClass

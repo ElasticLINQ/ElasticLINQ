@@ -204,7 +204,7 @@ namespace ElasticLinq.Test.Request.Formatter
         {
             const int expectedFrom = 1024;
 
-            var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest("type1", from: expectedFrom));
+            var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest("type1", expectedFrom));
             var body = JObject.Parse(formatter.Body);
 
             var result = TraverseWithAssert(body, "from");
