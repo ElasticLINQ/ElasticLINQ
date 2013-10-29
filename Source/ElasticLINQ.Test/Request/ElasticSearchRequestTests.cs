@@ -9,7 +9,7 @@ namespace ElasticLinq.Test.Request
     public class ElasticSearchRequestTests
     {
         [Fact]
-        public void ConstructorSetsPropertiesForRequiredParameters()
+        public void ConstructorSetsPropertiesFromRequiredParameters()
         {
             const string expectedType = "myType";
 
@@ -31,7 +31,7 @@ namespace ElasticLinq.Test.Request
         }
 
         [Fact]
-        public void ConstructorSetsPropertiesForOptionalParameters()
+        public void ConstructorSetsPropertiesFromOptionalParameters()
         {
             const int expectedFrom = 101;
             var request = new ElasticSearchRequest("myType", expectedFrom);

@@ -18,6 +18,12 @@ namespace ElasticLinq.Utility
                 throw new ArgumentNullException(parameterName);
         }
 
+        public static void EnsurePositive(string parameterName, TimeSpan value)
+        {
+            if (value < TimeSpan.Zero)
+                throw new ArgumentOutOfRangeException(parameterName, "Must be a positive TimeSpan.");
+        }
+
         public static void EnsureNotBlank(string parameterName, string value)
         {
             EnsureNotNull(parameterName, value);

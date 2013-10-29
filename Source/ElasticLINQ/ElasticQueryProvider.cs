@@ -33,6 +33,16 @@ namespace ElasticLinq
             this.mapping = mapping;
         }
 
+        internal ElasticConnection Connection
+        {
+            get { return connection; }
+        }
+
+        internal IElasticMapping Mapping
+        {
+            get { return mapping; }
+        }
+
         public IQueryable<T> CreateQuery<T>(Expression expression)
         {
             Argument.EnsureNotNull("expresssion", expression);

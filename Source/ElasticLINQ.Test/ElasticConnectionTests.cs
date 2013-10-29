@@ -8,18 +8,43 @@ namespace ElasticLinq.Test
 {
     public class ElasticConnectionTests
     {
+        private readonly Uri endpoint = new Uri("http://localhost:1234/abc");
+        private readonly TimeSpan timeout = TimeSpan.FromSeconds(19.2);
+        private const string Index = "myIndex";
+
         [Fact]
-        public void ConstructorSetsProperties()
+        public void ConstructorSetsPropertiesFromParameters()
         {
-            var expectedEndpoint = new Uri("http://localhost:1234/abc");
-            var expectedTimeout = TimeSpan.FromSeconds(19.2);
-            const string expectedIndex = "myIndex";
+            var connection = new ElasticConnection(endpoint, timeout, Index);
 
-            var connection = new ElasticConnection(expectedEndpoint, expectedTimeout, expectedIndex);
+            Assert.Equal(endpoint, connection.Endpoint);
+            Assert.Equal(timeout, connection.Timeout);
+            Assert.Equal(Index, connection.Index);
+        }
 
-            Assert.Equal(expectedEndpoint, connection.Endpoint);
-            Assert.Equal(expectedTimeout, connection.Timeout);
-            Assert.Equal(expectedIndex, connection.Index);
+        [Fact]
+        public void ConstructorThrowsArgumentNullExceptionWhenEndpointIsNull()
+        {
+            Assert.Throws<ArgumentNullException>(() => new ElasticConnection(null, timeout));
+        }
+
+        [Fact]
+        public void ConstructorThrowsArgumentOutOfRangeExceptionWhenTimespanLessThanZero()
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => new ElasticConnection(endpoint, TimeSpan.FromDays(-1), Index));
+        }
+
+
+        [Fact]
+        public void ConstructorThrowsArgumentNullExceptionWhenIndexSuppliedButNull()
+        {
+            Assert.Throws<ArgumentNullException>(() => new ElasticConnection(endpoint, timeout, null));
+        }
+
+        [Fact]
+        public void ConstructorThrowsArgumentExceptionWhenIndexSuppliedButBlank()
+        {
+            Assert.Throws<ArgumentException>(() => new ElasticConnection(endpoint, timeout, ""));
         }
     }
 }
