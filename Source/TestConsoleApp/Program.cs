@@ -43,9 +43,7 @@ namespace TestConsoleApp
             {
                 // Query TERM but then filter EXISTS - one possibility for the query/filter distinction
                 var query = context.Query<AccountSubscription>()
-                    .WhereAppliesTo(WhereTarget.Query)
-                    .Where(s => s.AccountAlias == "t3n")
-                    .WhereAppliesTo(WhereTarget.Filter)
+                    .Query(s => s.AccountAlias == "t3n")
                     .Where(s => s.EndDate.HasValue)
                     .Take(5);
                 Dump.Query(query);

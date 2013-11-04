@@ -29,10 +29,8 @@ namespace ElasticLinq.Request.Visitors
         private Type type;
         private int skip;
         private int? take;
-        private ICriteria filterRoot;
-        private ICriteria queryRoot;
-        private ICriteria unassignedCriteria;
-        private WhereTarget whereTarget = WhereTarget.Filter;
+        private ICriteria filter;
+        private ICriteria query;
 
         private ElasticQueryTranslator(IElasticMapping mapping)
         {
@@ -49,10 +47,8 @@ namespace ElasticLinq.Request.Visitors
             var evaluated = PartialEvaluator.Evaluate(e);
             Visit(evaluated);
 
-            ApplyUnassignedCriteria();
-
             var searchRequest = new ElasticSearchRequest(mapping.GetTypeName(type), skip, take, 
-                fields, sortOptions, filterRoot, queryRoot);
+                fields, sortOptions, filter, query);
             
             return new ElasticTranslateResult(searchRequest, projector ?? DefaultProjector);
         }
@@ -136,11 +132,6 @@ namespace ElasticLinq.Request.Visitors
                         return VisitQueryString(m.Arguments[0], m.Arguments[1]);
                     break;
 
-                case "WhereAppliesTo":
-                    if (m.Arguments.Count == 2)
-                        return VisitWhereAppliesTo(m.Arguments[0], m.Arguments[1]);
-                    break;
-
                 case "OrderByScore":
                 case "OrderByScoreDescending":
                 case "ThenByScore":
@@ -157,30 +148,9 @@ namespace ElasticLinq.Request.Visitors
         {
             var constantQueryExpression = (ConstantExpression)queryExpression;
             var criteriaExpression = new CriteriaExpression(new QueryStringCriteria(constantQueryExpression.Value.ToString()));
-            queryRoot = ApplyCriteria(queryRoot, criteriaExpression.Criteria);
+            query = ApplyCriteria(query, criteriaExpression.Criteria);
 
             return Visit(source);
-        }
-
-        private Expression VisitWhereAppliesTo(Expression source, Expression targetExpression)
-        {
-            whereTarget = (WhereTarget)((ConstantExpression)targetExpression).Value;
-            ApplyUnassignedCriteria();
-
-            return Visit(source);
-        }
-
-        private void ApplyUnassignedCriteria()
-        {
-            if (unassignedCriteria == null)
-                return;
-
-            if (whereTarget == WhereTarget.Filter)
-                filterRoot = ApplyCriteria(filterRoot, unassignedCriteria);
-            else
-                queryRoot = ApplyCriteria(queryRoot, unassignedCriteria);
-
-            unassignedCriteria = null;
         }
 
         internal Expression VisitQueryableMethodCall(MethodCallExpression m)
@@ -280,7 +250,7 @@ namespace ElasticLinq.Request.Visitors
             if (criteriaExpression == null)
                 throw new NotSupportedException(String.Format("Unknown Where predicate '{0}'", body));
 
-            queryRoot = ApplyCriteria(queryRoot, criteriaExpression.Criteria);
+            query = ApplyCriteria(query, criteriaExpression.Criteria);
 
             return Visit(source);
         }
@@ -294,7 +264,7 @@ namespace ElasticLinq.Request.Visitors
             if (criteriaExpression == null)
                 throw new NotSupportedException(String.Format("Unknown Where predicate '{0}'", body));
 
-            unassignedCriteria = ApplyCriteria(unassignedCriteria, criteriaExpression.Criteria);
+            filter = ApplyCriteria(filter, criteriaExpression.Criteria);
 
             return Visit(source);
         }

@@ -53,43 +53,6 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
-        public void WhereAppliesToQueryIsAddedToExpressionTree()
-        {
-            const WhereTarget expectedTarget = WhereTarget.Query;
-            var source = new FakeQueryProvider().CreateQuery<Sample>();
-            var applied = source.WhereAppliesTo(expectedTarget);
-
-            Assert.IsAssignableFrom<MethodCallExpression>(applied.Expression);
-            var callExpression = (MethodCallExpression)applied.Expression;
-
-            Assert.Equal(2, callExpression.Arguments.Count);
-            Assert.IsType<ConstantExpression>(callExpression.Arguments[1]);
-            Assert.Equal(((ConstantExpression)callExpression.Arguments[1]).Value, expectedTarget);
-        }
-
-        [Fact]
-        public void WhereAppliesToFilterIsAddedToExpressionTree()
-        {
-            const WhereTarget expectedTarget = WhereTarget.Filter;
-            var source = new FakeQueryProvider().CreateQuery<Sample>();
-            var applied = source.WhereAppliesTo(expectedTarget);
-
-            Assert.IsAssignableFrom<MethodCallExpression>(applied.Expression);
-            var callExpression = (MethodCallExpression)applied.Expression;
-
-            Assert.Equal(2, callExpression.Arguments.Count);
-            Assert.IsType<ConstantExpression>(callExpression.Arguments[1]);
-            Assert.Equal(((ConstantExpression)callExpression.Arguments[1]).Value, expectedTarget);
-        }
-
-        [Fact]
-        public void WhereAppliesToThrowsArgumentOutOfRangeExceptionWhenArgumentIsNull()
-        {
-            var source = new FakeQueryProvider().CreateQuery<Sample>();
-            Assert.Throws<ArgumentOutOfRangeException>(() => source.WhereAppliesTo((WhereTarget)901));
-        }
-
-        [Fact]
         public void OrderByScoreIsAddedToExpressionTree()
         {
             var source = new FakeQueryProvider().CreateQuery<Sample>();

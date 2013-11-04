@@ -48,7 +48,7 @@ Examples of supported name-field selects:
     Select(r => Tuple.Create(r.Id, ElasticFields.Score, r.Name)
 
 #### Where
-Where by default creates filter operations and supports the following patterns:
+Where creates filter operations and supports the following patterns:
 
 * `< > <= >=` maps to **range**
 * `==` maps to **term** 
@@ -60,9 +60,7 @@ Where by default creates filter operations and supports the following patterns:
 * ``Equals`` for static and instance maps to **term**
 * ``Contains`` on IEnumerable/arrays maps to **terms**
 
-You can however also switch the subsequent Where operations to become query terms instead of Where terms using the WhereAppliesTo(WhereTarget.Query) method.
-
-Note that exists and missing can not apply to Query and will throw. You can switch back with WhereAppliesto(WhereTarget.Filter). I recommend we don't actually use this pattern in the next release and introduce a Query method instead that acts like Where. 
+To create similar expression as queries use the .Query extension operator. It maps very similar operations but **exists** and **missing** are not available within queries on ElasticSearch.
 
 #### OrderBy/ThenBy
 Ordering is achieved by the usual LINQ methods however if you wish to sort by score you have two options:
@@ -79,9 +77,8 @@ Where ElasticSearch exceeds the basic LINQ patterns some additional extensions a
 A number of extensions on IQueryable are available via ``ElasticQueryExtensions`` to provide some of this functionality, this includes:
 
 * ``OrderByScore``, ``OrderByScoreDescending``, ``ThenByScore``, ``ThenByScoreDescending`` to order by the _score field.
+* ``Query`` to specify query criteria the same way ``Where`` maps to filter criteria.
 * ``QueryString(query)`` to pass through a query_string for search.
-* ``WhereAppliesTo(WhereTarget.Query)`` to switch subsequent Where operations from filter to query,
-*  ``WhereAppliesTo(WhereTarget.Filter)`` to switch subsequent Where operations back to filter.
 
 ####ElasticFields
 There is a static class called ElasticFields. This currently provides just Score and Id properties but you can use these to stand-in for the _score and _id values in ElasticSearch, e.g:
@@ -124,7 +121,6 @@ This includes currently:
 1. Formatting non-string values for querying - e.g. dates
 2. Error handling for unsupported LINQ syntax
 3. Error handling for bad or incorrect return data
-4. Consider dropping WhereTargets and replacing with Query operation that has Where-like semantics but always for query leaving Where always being a filter.
 
 ### Not yet supported
 1. Primary key look-up to other DB (e.g. Couchbase)

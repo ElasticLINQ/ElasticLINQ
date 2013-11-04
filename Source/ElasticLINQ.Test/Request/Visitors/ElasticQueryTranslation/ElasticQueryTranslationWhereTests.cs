@@ -702,9 +702,9 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         }
 
         [Fact]
-        public void WhereAppliesToQuerySwitchesToQuery()
+        public void QueryGeneratesToQueryCriteria()
         {
-            var where = Robots.WhereAppliesTo(WhereTarget.Query).Where(r => r.Name == "IG-88" && r.Cost > 1);
+            var where = Robots.Query(r => r.Name == "IG-88" && r.Cost > 1);
             var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest;
 
             Assert.IsType<AndCriteria>(criteria.Query);
@@ -717,21 +717,34 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         }
 
         [Fact]
-        public void WhereAppliesToFilterSwitchesBackToFilter()
+        public void QueryStringGeneratesQueryStringCriteria()
         {
-            var where = Robots
-                .WhereAppliesTo(WhereTarget.Query)
-                .WhereAppliesTo(WhereTarget.Filter)
-                .Where(r => r.Name == "IG-88" && r.Cost > 1);
+            const string expectedQueryStringValue = "Data";
+            var where = Robots.QueryString(expectedQueryStringValue);
             var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest;
 
-            Assert.IsType<AndCriteria>(criteria.Filter);
-            Assert.Null(criteria.Query);
-            var orCriteria = (AndCriteria)criteria.Filter;
-            Assert.Equal("and", orCriteria.Name);
-            Assert.Single(orCriteria.Criteria, f => f.Name == "term");
-            Assert.Single(orCriteria.Criteria, f => f.Name == "range");
-            Assert.Equal(2, orCriteria.Criteria.Count);
+            Assert.Null(criteria.Filter);
+            Assert.NotNull(criteria.Query);
+            Assert.IsType<QueryStringCriteria>(criteria.Query);
+            var queryStringCriteria = (QueryStringCriteria)criteria.Query;
+            Assert.Equal(expectedQueryStringValue, queryStringCriteria.Value);
         }
+
+        [Fact]
+        public void QueryStringWithQueryCombinesToAndQueryCriteria()
+        {
+            const string expectedQueryStringValue = "Data";
+            var where = Robots.QueryString(expectedQueryStringValue).Query(q => q.Cost > 0);
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest;
+
+            Assert.Null(criteria.Filter);
+            Assert.NotNull(criteria.Query);
+            Assert.IsType<AndCriteria>(criteria.Query);
+            var andCriteria = (AndCriteria)criteria.Query;
+            Assert.Single(andCriteria.Criteria, a => a.Name == "query_string");
+            Assert.Single(andCriteria.Criteria, a => a.Name == "range");
+            Assert.Equal(2, andCriteria.Criteria.Count);
+        }
+
     }
 }

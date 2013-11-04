@@ -9,12 +9,6 @@ using System.Reflection;
 
 namespace ElasticLinq
 {
-    public enum WhereTarget
-    {
-        Filter,
-        Query
-    };
-
     /// <summary>
     /// Various extension methods that extend LINQ functionality for ElasticSearch queries.
     /// </summary>
@@ -34,12 +28,6 @@ namespace ElasticLinq
         {
             Argument.EnsureNotNull("query", query);
             return CreateQueryMethodCall(source, (MethodInfo)MethodBase.GetCurrentMethod(), Expression.Constant(query));
-        }
-
-        public static IQueryable<TSource> WhereAppliesTo<TSource>(this IQueryable<TSource> source, WhereTarget target)
-        {
-            Argument.EnsureIsDefinedEnum("target", target);
-            return CreateQueryMethodCall(source, (MethodInfo)MethodBase.GetCurrentMethod(), Expression.Constant(target));
         }
 
         public static IOrderedQueryable<TSource> OrderByScore<TSource>(this IQueryable<TSource> source)
