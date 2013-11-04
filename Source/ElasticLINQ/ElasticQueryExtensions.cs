@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
 using ElasticLinq.Utility;
+using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -25,11 +26,13 @@ namespace ElasticLinq
     {
         public static IQueryable<TSource> QueryString<TSource>(this IQueryable<TSource> source, string query)
         {
+            Argument.EnsureNotNull("query", query);
             return CreateQueryMethodCall(source, (MethodInfo)MethodBase.GetCurrentMethod(), Expression.Constant(query));
         }
 
         public static IQueryable<TSource> WhereAppliesTo<TSource>(this IQueryable<TSource> source, WhereTarget target)
         {
+            Argument.EnsureIsDefinedEnum("target", target);
             return CreateQueryMethodCall(source, (MethodInfo)MethodBase.GetCurrentMethod(), Expression.Constant(target));
         }
 

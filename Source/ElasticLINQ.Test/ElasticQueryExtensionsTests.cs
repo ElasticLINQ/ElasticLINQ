@@ -15,6 +15,28 @@ namespace ElasticLinq.Test
         private class Sample { }
 
         [Fact]
+        public void QueryStringThrowsArgumentNullWhenArgumentIsNull()
+        {
+            var source = new FakeQueryProvider().CreateQuery<Sample>();
+            Assert.Throws<ArgumentNullException>(() => source.QueryString(null));
+        }
+
+        [Fact]
+        public void QueryStringIsAddedToExpressionTree()
+        {
+            const string expectedQueryString = "abcdef";
+            var source = new FakeQueryProvider().CreateQuery<Sample>();
+            var applied = source.QueryString(expectedQueryString);
+
+            Assert.IsAssignableFrom<MethodCallExpression>(applied.Expression);
+            var callExpression = (MethodCallExpression)applied.Expression;
+
+            Assert.Equal(2, callExpression.Arguments.Count);
+            Assert.IsType<ConstantExpression>(callExpression.Arguments[1]);
+            Assert.Equal(((ConstantExpression)callExpression.Arguments[1]).Value, expectedQueryString);
+        }
+
+        [Fact]
         public void WhereAppliesToQueryIsAddedToExpressionTree()
         {
             const WhereTarget expectedTarget = WhereTarget.Query;
@@ -42,6 +64,13 @@ namespace ElasticLinq.Test
             Assert.Equal(2, callExpression.Arguments.Count);
             Assert.IsType<ConstantExpression>(callExpression.Arguments[1]);
             Assert.Equal(((ConstantExpression)callExpression.Arguments[1]).Value, expectedTarget);
+        }
+
+        [Fact]
+        public void WhereAppliesToThrowsArgumentOutOfRangeExceptionWhenArgumentIsNull()
+        {
+            var source = new FakeQueryProvider().CreateQuery<Sample>();
+            Assert.Throws<ArgumentOutOfRangeException>(() => source.WhereAppliesTo((WhereTarget)901));
         }
 
         [Fact]
