@@ -19,7 +19,15 @@ namespace TestConsoleApp
                 var query = context.Query<AccountSubscription>()
                     .QueryString("buck or bucket")
                     .Where(s => s.EndDate.HasValue)
-                    .Select(a => new { a.Name, ElasticFields.Score });                    
+                    .Select(a => new { a.Name, ElasticFields.Score });
+                Dump.Query(query);
+            }
+
+            {
+                // Query based searching
+                var query = context.Query<AccountSubscription>()
+                    .Query(s => s.AccountAlias == "term")
+                    .Select(a => new { a.Name, ElasticFields.Score });
                 Dump.Query(query);
             }
 

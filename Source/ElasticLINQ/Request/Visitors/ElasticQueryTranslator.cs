@@ -126,12 +126,9 @@ namespace ElasticLinq.Request.Visitors
         {
             switch (m.Method.Name)
             {
-                case "OrderByScore":
-                case "OrderByScoreDescending":
-                case "ThenByScore":
-                case "ThenByScoreDescending":
-                    if (m.Arguments.Count == 1)
-                        return VisitOrderByScore(m.Arguments[0], !m.Method.Name.EndsWith("Descending"));
+                case "Query":
+                    if (m.Arguments.Count == 2)
+                        return VisitQuery(m.Arguments[0], m.Arguments[1]);
                     break;
 
                 case "QueryString":
@@ -142,6 +139,14 @@ namespace ElasticLinq.Request.Visitors
                 case "WhereAppliesTo":
                     if (m.Arguments.Count == 2)
                         return VisitWhereAppliesTo(m.Arguments[0], m.Arguments[1]);
+                    break;
+
+                case "OrderByScore":
+                case "OrderByScoreDescending":
+                case "ThenByScore":
+                case "ThenByScoreDescending":
+                    if (m.Arguments.Count == 1)
+                        return VisitOrderByScore(m.Arguments[0], !m.Method.Name.EndsWith("Descending"));
                     break;
             }
 
@@ -264,6 +269,20 @@ namespace ElasticLinq.Request.Visitors
             while (e.NodeType == ExpressionType.Quote)
                 e = ((UnaryExpression)e).Operand;
             return e;
+        }
+
+        private Expression VisitQuery(Expression source, Expression predicate)
+        {
+            var lambda = (LambdaExpression)StripQuotes(predicate);
+            var body = BooleanMemberAccessBecomesEquals(Visit(lambda.Body));
+
+            var criteriaExpression = body as CriteriaExpression;
+            if (criteriaExpression == null)
+                throw new NotSupportedException(String.Format("Unknown Where predicate '{0}'", body));
+
+            queryRoot = ApplyCriteria(queryRoot, criteriaExpression.Criteria);
+
+            return Visit(source);
         }
 
         private Expression VisitWhere(Expression source, Expression predicate)

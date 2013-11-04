@@ -24,6 +24,12 @@ namespace ElasticLinq
     /// </remarks>
     public static class ElasticQueryExtensions
     {
+        public static IQueryable<TSource> Query<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, bool>> predicate)
+        {
+            Argument.EnsureNotNull("predicate", predicate);
+            return CreateQueryMethodCall(source, (MethodInfo)MethodBase.GetCurrentMethod(), Expression.Quote(predicate));
+        }
+
         public static IQueryable<TSource> QueryString<TSource>(this IQueryable<TSource> source, string query)
         {
             Argument.EnsureNotNull("query", query);

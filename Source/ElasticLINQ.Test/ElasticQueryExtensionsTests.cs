@@ -12,7 +12,23 @@ namespace ElasticLinq.Test
 {
     public class ElasticQueryExtensionsTests
     {
-        private class Sample { }
+        private class Sample
+        {
+            public string Property { get; set; }
+        }
+
+        [Fact]
+        public void QueryIsAddedToExpressionTree()
+        {
+            var source = new FakeQueryProvider().CreateQuery<Sample>();
+            var queried = source.Query(s => s.Property == "a");
+
+            Assert.IsAssignableFrom<MethodCallExpression>(queried.Expression);
+            var callExpression = (MethodCallExpression)queried.Expression;
+
+            Assert.Equal(2, callExpression.Arguments.Count);
+            Assert.Equal(ExpressionType.Quote, callExpression.Arguments[1].NodeType);
+        }
 
         [Fact]
         public void QueryStringThrowsArgumentNullWhenArgumentIsNull()
