@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
+using System.Collections;
 using ElasticLinq.Mapping;
 using ElasticLinq.Request;
 using ElasticLinq.Request.Visitors;
@@ -94,8 +95,8 @@ namespace ElasticLinq
             var searchTask = new ElasticRequestProcessor(connection, log).Search(translation.SearchRequest);
             var response = searchTask.GetAwaiter().GetResult();
 
-            return ElasticResponseMaterializer
-                .Materialize(response.hits.hits, elementType, translation.Projector);
+            var list = ElasticResponseMaterializer.Materialize(response.hits.hits, elementType, translation.Projector);
+            return translation.FinalTransform(list);
         }
     }
 }

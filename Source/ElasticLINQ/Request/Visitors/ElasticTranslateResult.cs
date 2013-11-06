@@ -3,6 +3,7 @@
 
 using ElasticLinq.Response.Model;
 using System;
+using System.Collections;
 
 namespace ElasticLinq.Request.Visitors
 {
@@ -10,11 +11,13 @@ namespace ElasticLinq.Request.Visitors
     {
         private readonly ElasticSearchRequest searchRequest;
         private readonly Func<Hit, object> projector;
+        private readonly Func<IList, object> finalTransform; 
 
-        public ElasticTranslateResult(ElasticSearchRequest searchRequest, Func<Hit, object> projector)
+        public ElasticTranslateResult(ElasticSearchRequest searchRequest, Func<Hit, object> projector, Func<IList, object> finalTransform = null)
         {
             this.searchRequest = searchRequest;
             this.projector = projector;
+            this.finalTransform = finalTransform ?? (o => o);
         }
 
         public ElasticSearchRequest SearchRequest
@@ -25,6 +28,11 @@ namespace ElasticLinq.Request.Visitors
         public Func<Hit, object> Projector
         {
             get { return projector; }
+        }
+
+        public Func<IList, object> FinalTransform
+        {
+            get { return finalTransform; }
         }
     }
 }

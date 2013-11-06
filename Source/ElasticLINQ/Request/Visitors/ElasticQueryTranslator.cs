@@ -4,6 +4,7 @@
 using ElasticLinq.Mapping;
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Expressions;
+using ElasticLinq.Response;
 using ElasticLinq.Response.Model;
 using ElasticLinq.Utility;
 using System;
@@ -31,6 +32,7 @@ namespace ElasticLinq.Request.Visitors
         private int? take;
         private ICriteria filter;
         private ICriteria query;
+        private Func<IList, object> finalTransform;
 
         private ElasticQueryTranslator(IElasticMapping mapping)
         {
@@ -47,10 +49,10 @@ namespace ElasticLinq.Request.Visitors
             var evaluated = PartialEvaluator.Evaluate(e);
             Visit(evaluated);
 
-            var searchRequest = new ElasticSearchRequest(mapping.GetTypeName(type), skip, take, 
+            var searchRequest = new ElasticSearchRequest(mapping.GetTypeName(type), skip, take,
                 fields, sortOptions, filter, query);
-            
-            return new ElasticTranslateResult(searchRequest, projector ?? DefaultProjector);
+
+            return new ElasticTranslateResult(searchRequest, projector ?? DefaultProjector, finalTransform);
         }
 
         protected override Expression VisitMethodCall(MethodCallExpression m)
@@ -161,6 +163,17 @@ namespace ElasticLinq.Request.Visitors
                     if (m.Arguments.Count == 2)
                         return VisitSelect(m.Arguments[0], m.Arguments[1]);
                     break;
+
+                case "First":
+                case "FirstOrDefault":
+                case "Single":
+                case "SingleOrDefault":
+                    if (m.Arguments.Count == 1)
+                        return VisitFirstOrSingle(m.Arguments[0], null, m.Method.Name);
+                    if (m.Arguments.Count == 2)
+                        return VisitFirstOrSingle(m.Arguments[0], m.Arguments[1], m.Method.Name);
+                    break;
+
                 case "Where":
                     if (m.Arguments.Count == 2)
                         return VisitWhere(m.Arguments[0], m.Arguments[1]);
@@ -186,6 +199,17 @@ namespace ElasticLinq.Request.Visitors
             }
 
             throw new NotSupportedException(string.Format("The Queryable method '{0}' is not supported", m.Method.Name));
+        }
+
+        private Expression VisitFirstOrSingle(Expression source, Expression predicate, string methodName)
+        {
+            var isSingle = methodName.StartsWith("Single");
+            take = isSingle ? 2 : 1;
+            finalTransform = o => ElasticResponseMaterializer.SingleOrFirst(o, methodName.EndsWith("Default"), isSingle);
+
+            return predicate != null
+                ? VisitWhere(source, predicate)
+                : Visit(source);
         }
 
         protected override Expression VisitConstant(ConstantExpression c)
@@ -559,6 +583,11 @@ namespace ElasticLinq.Request.Visitors
         private void SetType(Type elementType)
         {
             type = elementType;
+        }
+
+        private void SetFinalTransform(Func<object, object> transform)
+        {
+            finalTransform = transform;
         }
     }
 }

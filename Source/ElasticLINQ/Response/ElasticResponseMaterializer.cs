@@ -3,9 +3,11 @@
 
 using ElasticLinq.Response.Model;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using ElasticLinq.Utility;
 
 namespace ElasticLinq.Response
 {
@@ -14,12 +16,11 @@ namespace ElasticLinq.Response
     /// </summary>
     public static class ElasticResponseMaterializer
     {
-        private static readonly MethodInfo materializer =
-            typeof(ElasticResponseMaterializer).GetMethod("Materialize", BindingFlags.NonPublic | BindingFlags.Static);
+        private static readonly MethodInfo materializer = typeof(ElasticResponseMaterializer).GetMethod("Materialize", BindingFlags.NonPublic | BindingFlags.Static);
 
-        public static object Materialize(IEnumerable<Hit> hits, Type elementType, Func<Hit, object> projector)
+        public static IList Materialize(IEnumerable<Hit> hits, Type elementType, Func<Hit, object> projector)
         {
-            return materializer
+            return (IList)materializer
                 .MakeGenericMethod(elementType)
                 .Invoke(null, new object[] { hits, projector });
         }
@@ -27,6 +28,20 @@ namespace ElasticLinq.Response
         internal static List<T> Materialize<T>(IEnumerable<Hit> hits, Func<Hit, object> projector)
         {
             return hits.Select(projector).Cast<T>().ToList();
+        }
+
+        internal static object SingleOrFirst(IList list, bool defaultIfNone, bool throwIfMany)
+        {
+            if (list.Count > 1 && throwIfMany)
+                throw new InvalidOperationException("Sequence contains more than one element");
+
+            if (list.Count != 0)
+                return list[0];
+
+            if (defaultIfNone)
+                return Activator.CreateInstance(TypeHelper.GetSequenceElementType(list.GetType()));
+
+            throw new InvalidOperationException("Sequence contains no elements");
         }
     }
 }

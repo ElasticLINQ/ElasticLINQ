@@ -26,6 +26,8 @@ A number of the basic operations are supported including:
 * ``Where(...)`` may map to filter or query (see below)
 * ``OrderBy``, ``OrderByDescending`` maps to sort (see below)
 * ``ThenBy``, ``ThenByDescending`` maps to sort desc (see below)
+* ``First``, ``FirstOrDefault`` maps to length 1, filter if predicate supplied
+* ``Single``, ``SingleOrDefault`` maps to length 2, filter if predicate supplied
 
 #### Select
 Select is supported and detects whole entity vs field selection with field, anonymous object and Tuple creation patterns:
