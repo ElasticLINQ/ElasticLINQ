@@ -745,6 +745,5 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             Assert.Single(andCriteria.Criteria, a => a.Name == "range");
             Assert.Equal(2, andCriteria.Criteria.Count);
         }
-
     }
 }
