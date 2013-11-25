@@ -53,6 +53,14 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
+        public void CreateQueryThrowsArgumentOutOfRangeIfExpressionTypeNotAssignableFromIQueryable()
+        {
+            var provider = new ElasticQueryProvider(connection, mapping);
+            
+            Assert.Throws<ArgumentOutOfRangeException>(() => provider.CreateQuery<Sample>(Expression.Constant(new Sample())));
+        }
+
+        [Fact]
         [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void ExecuteThrowsArgumentNullExceptionIfNull()
         {

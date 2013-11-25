@@ -11,7 +11,7 @@ namespace TestConsoleApp
     {
         private static void Main()
         {
-            var connection = new ElasticConnection(new Uri("http://192.168.2.12:9200"), TimeSpan.FromSeconds(10), "tier3");
+            var connection = new ElasticConnection(new Uri("http://192.168.2.14:9200"), TimeSpan.FromSeconds(10), "tier3");
             var context = new ElasticContext(connection, new CouchbaseElasticMapping()) { Log = Console.Out };
 
             {

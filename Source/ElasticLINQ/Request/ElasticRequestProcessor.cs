@@ -32,7 +32,7 @@ namespace ElasticLinq.Request
             using (var requestMessage = CreateRequestMessage(searchRequest))
             using (var response = await SendRequest(requestMessage))
             using (var responseStream = await response.Content.ReadAsStreamAsync())
-                return ParseResponse(responseStream);
+                return ParseResponse(responseStream, log);
         }
 
         private HttpRequestMessage CreateRequestMessage(ElasticSearchRequest searchRequest)
@@ -61,7 +61,7 @@ namespace ElasticLinq.Request
             }
         }
 
-        private ElasticResponse ParseResponse(Stream responseStream)
+        internal static ElasticResponse ParseResponse(Stream responseStream, TextWriter log)
         {
             using (var streamReader = new StreamReader(responseStream))
             {
