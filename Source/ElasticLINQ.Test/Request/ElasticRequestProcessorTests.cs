@@ -19,16 +19,14 @@ namespace ElasticLinq.Test.Request
         [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void ConstructorThrowsArgumentNullExceptionWhenConnectionIsNull()
         {
-            var textWriter = new NullTextWriter();
-            Assert.Throws<ArgumentNullException>(() => new ElasticRequestProcessor(null, textWriter));
+            Assert.Throws<ArgumentNullException>(() => new ElasticRequestProcessor(null, StreamWriter.Null));
         }
 
         [Fact]
         [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void ConstructorDoesntThrowWithValidParameters()
         {
-            var textWriter = new NullTextWriter();
-            Assert.DoesNotThrow(() => new ElasticRequestProcessor(connection, textWriter));
+            Assert.DoesNotThrow(() => new ElasticRequestProcessor(connection, StreamWriter.Null));
         }
 
         [Fact]

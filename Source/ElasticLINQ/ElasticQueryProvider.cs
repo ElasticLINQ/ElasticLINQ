@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
-using System.Collections;
 using ElasticLinq.Mapping;
 using ElasticLinq.Request;
 using ElasticLinq.Request.Visitors;
@@ -89,7 +88,7 @@ namespace ElasticLinq
             var translation = ElasticQueryTranslator.Translate(mapping, expression);
             var elementType = TypeHelper.GetSequenceElementType(expression.Type);
 
-            var log = Log ?? new NullTextWriter();
+            var log = Log ?? StreamWriter.Null;
             log.WriteLine("Type is " + elementType);
 
             var searchTask = new ElasticRequestProcessor(connection, log).Search(translation.SearchRequest);

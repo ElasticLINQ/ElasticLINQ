@@ -60,7 +60,7 @@ namespace ElasticLinq.Test
         [Fact]
         public void LogPropertyCanBeUnset()
         {
-            var context = new ElasticContext(connection, mapping) { Log = new NullTextWriter() };
+            var context = new ElasticContext(connection, mapping) { Log = Console.Out };
             context.Log = null;
 
             Assert.Null(context.Log);

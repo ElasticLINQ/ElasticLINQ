@@ -24,7 +24,7 @@ namespace ElasticLinq.Test
         {
             var provider = new ElasticQueryProvider(connection, mapping);
 
-            var log = new NullTextWriter();
+            var log = Console.Out;
             provider.Log = log;
 
             Assert.Equal(log, provider.Log);
