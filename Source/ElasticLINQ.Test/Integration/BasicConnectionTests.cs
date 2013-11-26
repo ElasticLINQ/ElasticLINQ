@@ -1,11 +1,10 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
-using System.Collections.Generic;
 using ElasticLinq.Mapping;
 using ElasticLinq.Test.TestSupport;
 using System;
-using System.IO;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using Xunit;
@@ -91,10 +90,8 @@ namespace ElasticLinq.Test.Integration
 
         private static void NoResultsPayload(HttpListenerContext context)
         {
-            context.Response.StatusCode = 200;
-            using (var writer = new StreamWriter(context.Response.OutputStream))
-                writer.Write("{\"took\":1,\"timed_out\":false,\"_shards\":{\"total\":5,\"successful\":5,\"failed\":0}," +
-                             "\"hits\":{\"total\":0,\"max_score\":null,\"hits\":[]}}");
+            context.Response.Write("{\"took\":1,\"timed_out\":false,\"_shards\":{\"total\":5,\"successful\":5,\"failed\":0}," +
+                       "\"hits\":{\"total\":0,\"max_score\":null,\"hits\":[]}}");
         }
     }
 }

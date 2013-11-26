@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading;
@@ -94,12 +95,21 @@ namespace ElasticLinq.Test.TestSupport
                 if (contextAsync.IsCompleted)
                 {
                     var context = contextAsync.Result;
+                    context.Response.StatusCode = 200;
                     responder(context);
                     requests.Add(context.Request);
-                    context.Response.StatusCode = 200;
                     context.Response.Close();
                 }
             }
+        }
+    }
+
+    public static class HttpStubExtensions
+    {
+        public static void Write(this HttpListenerResponse response, string output)
+        {
+            using (var writer = new StreamWriter(response.OutputStream))
+                writer.Write(output);
         }
     }
 }
