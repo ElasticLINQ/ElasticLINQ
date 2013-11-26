@@ -10,6 +10,10 @@ namespace ElasticLinq.Test.Utility
 {
     public class TypeHelperTests
     {
+        private class DirectObjectSubclass : object { }
+        private class IndirectObjectSubclass : DirectObjectSubclass { }
+        private class SubclassOfList : List<Decimal> { }
+
         [Fact]
         public void GetSequenceElementTypeIdentifiesListElementType()
         {
@@ -28,6 +32,16 @@ namespace ElasticLinq.Test.Utility
             var elementType = TypeHelper.GetSequenceElementType(type);
 
             Assert.Equal(typeof(decimal), elementType);
+        }
+
+        [Fact]
+        public void GetSequenceElementTypeReturnsOriginalTypeIfNoSequenceType()
+        {
+            var type = typeof(IndirectObjectSubclass);
+
+            var elementType = TypeHelper.GetSequenceElementType(type);
+
+            Assert.Equal(type, elementType);
         }
 
         [Fact]
@@ -55,6 +69,14 @@ namespace ElasticLinq.Test.Utility
         }
 
         [Fact]
+        public void FindIEnumerableWithDictionaryTKeyTValueReturnsIEnumerableKeyValuePair()
+        {
+            var type = TypeHelper.FindIEnumerable(typeof(Dictionary<string, DateTime>));
+
+            Assert.Equal(typeof(IEnumerable<KeyValuePair<string, DateTime>>), type);
+        }
+
+        [Fact]
         public void FindIEnumerableWithSubClassOfListTReturnsIEnumerableT()
         {
             var type = TypeHelper.FindIEnumerable(typeof(SubclassOfList));
@@ -62,7 +84,29 @@ namespace ElasticLinq.Test.Utility
             Assert.Equal(typeof(IEnumerable<Decimal>), type);
         }
 
-        private class SubclassOfList : List<Decimal> { }
+        [Fact]
+        public void FindIEnumerableWithDirectObjectSubclassReturnsNull()
+        {
+            var type = TypeHelper.FindIEnumerable(typeof(DirectObjectSubclass));
+
+            Assert.Null(type);
+        }
+
+        [Fact]
+        public void FindIEnumerableWithIndirectObjectSubclassReturnsNull()
+        {
+            var type = TypeHelper.FindIEnumerable(typeof(IndirectObjectSubclass));
+
+            Assert.Null(type);
+        }
+
+        [Fact]
+        public void FindIEnumerableWithObjectReturnsNull()
+        {
+            var type = TypeHelper.FindIEnumerable(typeof(object));
+
+            Assert.Null(type);
+        }
 
         [Fact]
         public void IsNullableTypeIdentifiesNullableValueTypeAsNullableT()
@@ -87,5 +131,6 @@ namespace ElasticLinq.Test.Utility
 
             Assert.False(isNullable);
         }
+
     }
 }

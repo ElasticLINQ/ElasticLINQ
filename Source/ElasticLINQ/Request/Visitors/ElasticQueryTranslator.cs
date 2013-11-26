@@ -287,7 +287,7 @@ namespace ElasticLinq.Request.Visitors
 
             var criteriaExpression = body as CriteriaExpression;
             if (criteriaExpression == null)
-                throw new NotSupportedException(String.Format("Unknown Where predicate '{0}'", body));
+                throw new NotSupportedException(String.Format("Unknown Query predicate '{0}'", body));
 
             query = ApplyCriteria(query, criteriaExpression.Criteria);
 
@@ -371,9 +371,6 @@ namespace ElasticLinq.Request.Visitors
 
             if (e is MemberExpression && e.Type == typeof(bool))
                 return Visit(Expression.Equal(e, Expression.Constant(!wasNegative)));
-
-            if (wasNegative && e is CriteriaExpression)
-                return new CriteriaExpression(NotCriteria.Create(((CriteriaExpression)e).Criteria));
 
             return e;
         }
