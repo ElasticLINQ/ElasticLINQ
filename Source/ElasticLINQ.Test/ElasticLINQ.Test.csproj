@@ -47,6 +47,7 @@
     <Compile Include="ElasticQueryExtensionsTests.cs" />
     <Compile Include="ElasticQueryProviderTests.cs" />
     <Compile Include="ElasticQueryTests.cs" />
+    <Compile Include="Integration\BasicConnectionTests.cs" />
     <Compile Include="Mapping\CouchbaseElasticMappingTests.cs" />
     <Compile Include="Mapping\ElasticFieldsMappingWrapperTests.cs" />
     <Compile Include="Mapping\MappingHelpersTests.cs" />
@@ -82,6 +83,7 @@
     <Compile Include="Request\Visitors\PartialEvaluatorTests.cs" />
     <Compile Include="Request\Visitors\ProjectionExpressionVisitorTests.cs" />
     <Compile Include="Response\ElasticResponseMaterializerTests.cs" />
+    <Compile Include="TestSupport\HttpStub.cs" />
     <Compile Include="TestSupport\FakeElasticMapping.cs" />
     <Compile Include="TestSupport\FakeQuery.cs" />
     <Compile Include="TestSupport\FakeQueryProvider.cs" />
@@ -98,7 +100,9 @@
       <Name>ElasticLINQ</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

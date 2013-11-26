@@ -5,7 +5,6 @@ using ElasticLinq.Request.Formatter;
 using ElasticLinq.Response.Model;
 using ElasticLinq.Utility;
 using Newtonsoft.Json;
-using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
