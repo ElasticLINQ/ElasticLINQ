@@ -9,7 +9,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 {
     public class ElasticQueryTranslationTestsBase
     {
-        protected static readonly ElasticConnection Connection = new ElasticConnection(new Uri("http://localhost"), TimeSpan.FromSeconds(10));
+        protected static readonly ElasticConnection Connection = new ElasticConnection(new Uri("http://localhost"));
         protected static readonly IElasticMapping Mapping = new TrivialElasticMapping();
         protected static readonly ElasticQueryProvider SharedProvider = new ElasticQueryProvider(Connection, Mapping);
 

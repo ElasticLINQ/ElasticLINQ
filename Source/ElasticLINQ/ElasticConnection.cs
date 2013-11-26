@@ -13,16 +13,23 @@ namespace ElasticLinq
     [DebuggerDisplay("{Endpoint.ToString(),nq}{Index,nq}")]
     public class ElasticConnection
     {
+        private static readonly TimeSpan defaultTimeout = TimeSpan.FromSeconds(10);
+
         private readonly Uri endpoint;
-        private readonly TimeSpan timeout;
+        private readonly TimeSpan timeout = defaultTimeout;
         private readonly string index;
 
-        public ElasticConnection(Uri endpoint, TimeSpan timeout)
+        public ElasticConnection(Uri endpoint)
         {
             Argument.EnsureNotNull("endpoint", endpoint);
-            Argument.EnsurePositive("timeout", timeout);
 
             this.endpoint = endpoint;
+        }
+
+        public ElasticConnection(Uri endpoint, TimeSpan timeout)
+            : this(endpoint)
+        {
+            Argument.EnsurePositive("timeout", timeout);
             this.timeout = timeout;
         }
 

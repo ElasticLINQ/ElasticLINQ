@@ -13,7 +13,24 @@ namespace ElasticLinq.Test
         private const string Index = "myIndex";
 
         [Fact]
-        public void ConstructorSetsPropertiesFromParameters()
+        public void ConstructorWithOneArgSetsPropertyFromParameter()
+        {
+            var connection = new ElasticConnection(endpoint);
+
+            Assert.Equal(endpoint, connection.Endpoint);
+        }
+
+        [Fact]
+        public void ConstructorWithTwoArgsSetsPropertiesFromParameters()
+        {
+            var connection = new ElasticConnection(endpoint, timeout);
+
+            Assert.Equal(endpoint, connection.Endpoint);
+            Assert.Equal(timeout, connection.Timeout);
+        }
+
+        [Fact]
+        public void ConstructorWithTreeArgsSetsPropertiesFromParameters()
         {
             var connection = new ElasticConnection(endpoint, timeout, Index);
 
@@ -25,7 +42,7 @@ namespace ElasticLinq.Test
         [Fact]
         public void ConstructorThrowsArgumentNullExceptionWhenEndpointIsNull()
         {
-            Assert.Throws<ArgumentNullException>(() => new ElasticConnection(null, timeout));
+            Assert.Throws<ArgumentNullException>(() => new ElasticConnection(null));
         }
 
         [Fact]
@@ -33,7 +50,6 @@ namespace ElasticLinq.Test
         {
             Assert.Throws<ArgumentOutOfRangeException>(() => new ElasticConnection(endpoint, TimeSpan.FromDays(-1), Index));
         }
-
 
         [Fact]
         public void ConstructorThrowsArgumentNullExceptionWhenIndexSuppliedButNull()

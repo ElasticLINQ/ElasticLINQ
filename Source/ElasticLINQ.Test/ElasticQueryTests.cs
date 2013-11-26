@@ -11,7 +11,7 @@ namespace ElasticLinq.Test
 {
     public class ElasticQueryTests
     {
-        private static readonly ElasticConnection connection = new ElasticConnection(new Uri("http://localhost"), TimeSpan.FromSeconds(10));
+        private static readonly ElasticConnection connection = new ElasticConnection(new Uri("http://localhost"));
         private static readonly ElasticQueryProvider provider = new ElasticQueryProvider(connection, new TrivialElasticMapping());
         private static readonly Expression validExpression = Expression.Constant(new ElasticQuery<Sample>(provider));
 

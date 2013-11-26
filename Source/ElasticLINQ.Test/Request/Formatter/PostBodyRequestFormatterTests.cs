@@ -14,7 +14,7 @@ namespace ElasticLinq.Test.Request.Formatter
 {
     public class PostBodyRequestFormatterTests
     {
-        private static readonly ElasticConnection defaultConnection = new ElasticConnection(new Uri("http://a.b.com:9000/"), TimeSpan.FromSeconds(10));
+        private static readonly ElasticConnection defaultConnection = new ElasticConnection(new Uri("http://a.b.com:9000/"));
 
         [Fact]
         public void UrlPathContainsTypeSpecifier()

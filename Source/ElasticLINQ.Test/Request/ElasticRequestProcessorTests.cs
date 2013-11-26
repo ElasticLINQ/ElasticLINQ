@@ -1,19 +1,18 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
-using System.IO;
-using System.Text;
 using ElasticLinq.Request;
-using ElasticLinq.Utility;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Text;
 using Xunit;
 
 namespace ElasticLinq.Test.Request
 {
     public class ElasticRequestProcessorTests
     {
-        private static readonly ElasticConnection connection = new ElasticConnection(new Uri("http://localhost"), TimeSpan.FromSeconds(10));
+        private static readonly ElasticConnection connection = new ElasticConnection(new Uri("http://localhost"));
 
         [Fact]
         [ExcludeFromCodeCoverage] // Expression isn't "executed"

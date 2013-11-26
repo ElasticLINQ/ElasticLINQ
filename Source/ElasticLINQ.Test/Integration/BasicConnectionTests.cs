@@ -24,7 +24,7 @@ namespace ElasticLinq.Test.Integration
         [Fact]
         public void QueryEvaluationCausesPostToConnectionEndpoint()
         {
-            using (var httpStub = new HttpStub(NoResultsPayload))
+            using (var httpStub = new HttpStub(ZeroHits))
             {
                 var context = MakeElasticContext(httpStub.Uri);
 
@@ -54,9 +54,9 @@ namespace ElasticLinq.Test.Integration
         [Fact]
         public void ProviderExecuteCausesPostToConnectionEndpoint()
         {
-            using (var httpStub = new HttpStub(NoResultsPayload))
+            using (var httpStub = new HttpStub(ZeroHits))
             {
-                var provider = new ElasticQueryProvider(new ElasticConnection(httpStub.Uri, TimeSpan.FromSeconds(5)), mapping);
+                var provider = new ElasticQueryProvider(new ElasticConnection(httpStub.Uri), mapping);
                 var query = new ElasticQuery<Robot>(provider);
 
                 provider.Execute(query.Expression);
@@ -70,9 +70,9 @@ namespace ElasticLinq.Test.Integration
         [Fact]
         public void ProviderExecuteTCausesPostToConnectionEndpoint()
         {
-            using (var httpStub = new HttpStub(NoResultsPayload))
+            using (var httpStub = new HttpStub(ZeroHits))
             {
-                var provider = new ElasticQueryProvider(new ElasticConnection(httpStub.Uri, TimeSpan.FromSeconds(5)), mapping);
+                var provider = new ElasticQueryProvider(new ElasticConnection(httpStub.Uri), mapping);
                 var query = new ElasticQuery<Robot>(provider);
 
                 provider.Execute<IEnumerable<Robot>>(query.Expression);
@@ -85,10 +85,10 @@ namespace ElasticLinq.Test.Integration
 
         private static ElasticContext MakeElasticContext(Uri uri)
         {
-            return new ElasticContext(new ElasticConnection(uri, TimeSpan.FromSeconds(5)), mapping);
+            return new ElasticContext(new ElasticConnection(uri), mapping);
         }
 
-        private static void NoResultsPayload(HttpListenerContext context)
+        private static void ZeroHits(HttpListenerContext context)
         {
             context.Response.Write("{\"took\":1,\"timed_out\":false,\"_shards\":{\"total\":5,\"successful\":5,\"failed\":0}," +
                        "\"hits\":{\"total\":0,\"max_score\":null,\"hits\":[]}}");

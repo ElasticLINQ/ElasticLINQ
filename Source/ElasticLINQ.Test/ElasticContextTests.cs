@@ -11,7 +11,7 @@ namespace ElasticLinq.Test
 {
     public class ElasticContextTests
     {
-        private static readonly ElasticConnection connection = new ElasticConnection(new Uri("http://localhost"), TimeSpan.FromSeconds(10));
+        private static readonly ElasticConnection connection = new ElasticConnection(new Uri("http://localhost"));
         private static readonly IElasticMapping mapping = new TrivialElasticMapping();
 
         private class Sample { };
