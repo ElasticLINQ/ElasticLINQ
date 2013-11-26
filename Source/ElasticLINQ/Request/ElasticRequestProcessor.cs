@@ -5,6 +5,7 @@ using ElasticLinq.Request.Formatter;
 using ElasticLinq.Response.Model;
 using ElasticLinq.Utility;
 using Newtonsoft.Json;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
@@ -52,8 +53,7 @@ namespace ElasticLinq.Request
         {
             using (var httpClient = new HttpClient { Timeout = connection.Timeout })
             {
-                var stopwatch = new Stopwatch();
-                stopwatch.Start();
+                var stopwatch = Stopwatch.StartNew();
                 var response = await httpClient.SendAsync(requestMessage);
                 stopwatch.Stop();
                 log.WriteLine("{0} response in {1}ms", response.StatusCode, stopwatch.ElapsedMilliseconds);
@@ -65,12 +65,12 @@ namespace ElasticLinq.Request
         {
             using (var streamReader = new StreamReader(responseStream))
             {
-                var stopwatch = new Stopwatch();
-                stopwatch.Start();
+                var stopwatch = Stopwatch.StartNew();
                 var results = new JsonSerializer().Deserialize<ElasticResponse>(new JsonTextReader(streamReader));
+                var resultCount = results == null ? 0 : results.hits.hits.Count;
                 stopwatch.Stop();
                 log.WriteLine("Deserialized {0} bytes into {1} objects in {2}ms",
-                    responseStream.Length, results.hits.hits.Count, stopwatch.ElapsedMilliseconds);
+                    responseStream.Length, resultCount, stopwatch.ElapsedMilliseconds);
                 return results;
             }
         }

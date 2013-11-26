@@ -92,10 +92,19 @@ namespace ElasticLinq
             log.WriteLine("Type is " + elementType);
 
             var searchTask = new ElasticRequestProcessor(connection, log).Search(translation.SearchRequest);
-            var response = searchTask.GetAwaiter().GetResult();
+            try
+            {
+                var response = searchTask.GetAwaiter().GetResult();
+                if (response == null)
+                    throw new InvalidOperationException("No HTTP response received.");
 
-            var list = ElasticResponseMaterializer.Materialize(response.hits.hits, elementType, translation.Projector);
-            return translation.FinalTransform(list);
+                var list = ElasticResponseMaterializer.Materialize(response.hits.hits, elementType, translation.Projector);
+                return translation.FinalTransform(list);
+            }
+            catch (AggregateException ex)
+            {
+                throw ex.InnerException;
+            }
         }
     }
 }
