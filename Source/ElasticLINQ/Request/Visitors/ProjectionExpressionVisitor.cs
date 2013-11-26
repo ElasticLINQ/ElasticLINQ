@@ -51,7 +51,7 @@ namespace ElasticLinq.Request.Visitors
             return Expression.Convert(getFieldExpression, m.Type);
         }
 
-        private static object GetFieldValue(IDictionary<string, JToken> dictionary, string key, Type expectedType)
+        internal static object GetFieldValue(IDictionary<string, JToken> dictionary, string key, Type expectedType)
         {
             JToken token;
             if (dictionary.TryGetValue(key, out token))

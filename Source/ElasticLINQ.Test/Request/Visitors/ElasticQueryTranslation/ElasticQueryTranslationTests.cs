@@ -1,9 +1,7 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
-using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Visitors;
-using System;
 using System.Linq;
 using Xunit;
 
@@ -42,10 +40,5 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
             Assert.Equal(actual, translation.SearchRequest.Size);
         }
-
-        [Fact]
-        public void FirstTranslatesToSize()
-        {
-        }
-    }
+   }
 }

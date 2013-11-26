@@ -30,11 +30,8 @@ namespace ElasticLinq.Response
             return hits.Select(projector).Cast<T>().ToList();
         }
 
-        internal static object SingleOrFirst(IList list, bool defaultIfNone, bool throwIfMany)
+        internal static object First(IList list, bool defaultIfNone)
         {
-            if (list.Count > 1 && throwIfMany)
-                throw new InvalidOperationException("Sequence contains more than one element");
-
             if (list.Count != 0)
                 return list[0];
 
@@ -42,6 +39,14 @@ namespace ElasticLinq.Response
                 return Activator.CreateInstance(TypeHelper.GetSequenceElementType(list.GetType()));
 
             throw new InvalidOperationException("Sequence contains no elements");
+        }
+
+        internal static object Single(IList list, bool defaultIfNone)
+        {
+            if (list.Count > 1)
+                throw new InvalidOperationException("Sequence contains more than one element");
+
+            return First(list, defaultIfNone);
         }
     }
 }

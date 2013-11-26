@@ -39,5 +39,14 @@ namespace ElasticLinq.Test.Request.Expressions
             Assert.False(expression.CanReduce);
         }
 
+        [Fact]
+        public void ToStringReturnsCriteriaToString()
+        {
+            var criteria = new TermCriteria("field", "value");
+
+            var expression = new CriteriaExpression(criteria);
+
+            Assert.Equal(criteria.ToString(), expression.ToString());
+        }
     }
 }

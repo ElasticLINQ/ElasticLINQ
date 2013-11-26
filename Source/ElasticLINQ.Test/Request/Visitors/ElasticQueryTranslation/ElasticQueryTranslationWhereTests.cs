@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Tier 3 Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 
+using System.Diagnostics.CodeAnalysis;
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Visitors;
 using System;
@@ -259,6 +260,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         }
 
         [Fact]
+        [ExcludeFromCodeCoverage] // Expression is not "executed"
         public void DecimalLessThanOperatorGeneratesLessThanRangeCriteria()
         {
             const decimal expectedConstant = 710.956m;
@@ -274,6 +276,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         }
 
         [Fact]
+        [ExcludeFromCodeCoverage] // Expression is not "executed"
         public void DecimalLessThanOrEqualsOperatorGeneratesLessThanOrEqualRangeCriteria()
         {
             const decimal expectedConstant = 710.956m;
@@ -289,6 +292,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         }
 
         [Fact]
+        [ExcludeFromCodeCoverage] // Expression is not "executed"
         public void DecimalGreaterThanOperatorGeneratesGreaterThanRangeCriteria()
         {
             const decimal expectedConstant = 710.956m;
@@ -304,6 +308,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         }
 
         [Fact]
+        [ExcludeFromCodeCoverage] // Expression is not "executed"
         public void DecimalGreaterThanOrEqualsOperatorGeneratesGreaterThanOrEqualRangeCriteria()
         {
             const decimal expectedConstant = 710.956m;
@@ -705,11 +710,11 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         public void QueryGeneratesToQueryCriteria()
         {
             var where = Robots.Query(r => r.Name == "IG-88" && r.Cost > 1);
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest;
+            var request = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest;
 
-            Assert.IsType<AndCriteria>(criteria.Query);
-            Assert.Null(criteria.Filter);
-            var orCriteria = (AndCriteria)criteria.Query;
+            Assert.IsType<AndCriteria>(request.Query);
+            Assert.Null(request.Filter);
+            var orCriteria = (AndCriteria)request.Query;
             Assert.Equal("and", orCriteria.Name);
             Assert.Single(orCriteria.Criteria, f => f.Name == "term");
             Assert.Single(orCriteria.Criteria, f => f.Name == "range");
@@ -735,12 +740,12 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             const string expectedQueryStringValue = "Data";
             var where = Robots.QueryString(expectedQueryStringValue).Query(q => q.Cost > 0);
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest;
+            var request = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest;
 
-            Assert.Null(criteria.Filter);
-            Assert.NotNull(criteria.Query);
-            Assert.IsType<AndCriteria>(criteria.Query);
-            var andCriteria = (AndCriteria)criteria.Query;
+            Assert.Null(request.Filter);
+            Assert.NotNull(request.Query);
+            Assert.IsType<AndCriteria>(request.Query);
+            var andCriteria = (AndCriteria)request.Query;
             Assert.Single(andCriteria.Criteria, a => a.Name == "query_string");
             Assert.Single(andCriteria.Criteria, a => a.Name == "range");
             Assert.Equal(2, andCriteria.Criteria.Count);

@@ -166,12 +166,18 @@ namespace ElasticLinq.Request.Visitors
 
                 case "First":
                 case "FirstOrDefault":
+                    if (m.Arguments.Count == 1)
+                        return VisitFirst(m.Arguments[0], null, m.Method.Name);
+                    if (m.Arguments.Count == 2)
+                        return VisitFirst(m.Arguments[0], m.Arguments[1], m.Method.Name);
+                    break;
+
                 case "Single":
                 case "SingleOrDefault":
                     if (m.Arguments.Count == 1)
-                        return VisitFirstOrSingle(m.Arguments[0], null, m.Method.Name);
+                        return VisitSingle(m.Arguments[0], null, m.Method.Name);
                     if (m.Arguments.Count == 2)
-                        return VisitFirstOrSingle(m.Arguments[0], m.Arguments[1], m.Method.Name);
+                        return VisitSingle(m.Arguments[0], m.Arguments[1], m.Method.Name);
                     break;
 
                 case "Where":
@@ -201,11 +207,20 @@ namespace ElasticLinq.Request.Visitors
             throw new NotSupportedException(string.Format("The Queryable method '{0}' is not supported", m.Method.Name));
         }
 
-        private Expression VisitFirstOrSingle(Expression source, Expression predicate, string methodName)
+        private Expression VisitFirst(Expression source, Expression predicate, string methodName)
         {
-            var isSingle = methodName.StartsWith("Single");
-            take = isSingle ? 2 : 1;
-            finalTransform = o => ElasticResponseMaterializer.SingleOrFirst(o, methodName.EndsWith("Default"), isSingle);
+            take = 1;
+            finalTransform = o => ElasticResponseMaterializer.First(o, methodName.EndsWith("Default"));
+
+            return predicate != null
+                ? VisitWhere(source, predicate)
+                : Visit(source);
+        }
+
+        private Expression VisitSingle(Expression source, Expression predicate, string methodName)
+        {
+            take = 2;
+            finalTransform = o => ElasticResponseMaterializer.Single(o, methodName.EndsWith("Default"));
 
             return predicate != null
                 ? VisitWhere(source, predicate)
@@ -295,13 +310,9 @@ namespace ElasticLinq.Request.Visitors
 
         private static ICriteria ApplyCriteria(ICriteria currentRoot, ICriteria newCriteria)
         {
-            if (currentRoot == null)
-                return newCriteria;
-
-            if (currentRoot is AndCriteria)
-                return AndCriteria.Combine(((AndCriteria)currentRoot).Criteria.Concat(new[] { newCriteria }).ToArray());
-
-            return AndCriteria.Combine(currentRoot, newCriteria);
+            return currentRoot == null
+                ? newCriteria
+                : AndCriteria.Combine(currentRoot, newCriteria);
         }
 
         protected override Expression VisitBinary(BinaryExpression b)
@@ -583,11 +594,6 @@ namespace ElasticLinq.Request.Visitors
         private void SetType(Type elementType)
         {
             type = elementType;
-        }
-
-        private void SetFinalTransform(Func<object, object> transform)
-        {
-            finalTransform = transform;
         }
     }
 }

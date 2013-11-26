@@ -70,6 +70,7 @@
     <Compile Include="Request\Visitors\BranchSelectExpressionVisitorTests.cs" />
     <Compile Include="Request\Visitors\ConstantMemberPairTests.cs" />
     <Compile Include="Request\Visitors\ElasticFieldsProjectionExpressionVisitorTests.cs" />
+    <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationSingularTests.cs" />
     <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationSelectTests.cs" />
     <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationTestsBase.cs" />
     <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationOrderByTests.cs" />

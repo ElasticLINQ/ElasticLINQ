@@ -35,6 +35,13 @@ namespace ElasticLinq.Test.Request.Formatter
         }
 
         [Fact]
+        public void ParseThrowsInvalidOperationForUnknownCriteriaTypes()
+        {
+            var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest("type1", query: new FakeCriteria()));
+            Assert.Throws<InvalidOperationException>(() => JObject.Parse(formatter.Body));
+        }
+
+        [Fact]
         public void BodyIsValidJsonFormattedResponse()
         {
             var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest("type1"));
@@ -255,6 +262,11 @@ namespace ElasticLinq.Test.Request.Formatter
             }
 
             return token;
+        }
+
+        class FakeCriteria : ICriteria
+        {
+            public string Name { get; private set; }
         }
     }
 }
