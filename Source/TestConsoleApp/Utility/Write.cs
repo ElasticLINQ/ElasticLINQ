@@ -3,19 +3,19 @@ using System.Linq;
 
 namespace TestConsoleApp.Utility
 {
-    public static class Dump
+    public static class Write
     {
-        public static void Query<T>(IQueryable<T> query)
+        public static void WriteToConsole<T>(this IQueryable<T> query)
         {
             Console.WriteLine(query);
 
             Console.WriteLine("\nResults:");
 
             foreach (var item in query)
-                Object(item);
+                ToConsole(item);
         }
 
-        public static void Object(object value)
+        public static void ToConsole(object value)
         {
             Console.WriteLine();
 
