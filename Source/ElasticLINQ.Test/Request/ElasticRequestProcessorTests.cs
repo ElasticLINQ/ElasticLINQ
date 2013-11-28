@@ -1,11 +1,13 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using ElasticLinq.Request;
+using NSubstitute;
+using Xunit;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
-using Xunit;
+using System.Threading.Tasks;
 
 namespace ElasticLinq.Test.Request
 {
@@ -25,6 +27,36 @@ namespace ElasticLinq.Test.Request
         public void ConstructorDoesntThrowWithValidParameters()
         {
             Assert.DoesNotThrow(() => new ElasticRequestProcessor(connection, StreamWriter.Null));
+        }
+
+        [Fact]
+        public static async Task NoAuthorizationWithEmptyUserName()
+        {
+            var log = Substitute.For<TextWriter>();
+            var messageHandler = new SpyMessageHandler();
+            var processor = new ElasticRequestProcessor(connection, log, messageHandler);
+            var request = new ElasticSearchRequest("docType");
+
+            await processor.SearchAsync(request);
+
+            Assert.Null(messageHandler.Request.Headers.Authorization);
+        }
+
+        [Fact]
+        public static async Task ForcesBasicAuthorizationWhenProvidedWithUsernameAndPassword()
+        {
+            var log = Substitute.For<TextWriter>();
+            var connection = new ElasticConnection(new Uri("http://localhost"), "myUser", "myPass");
+            var messageHandler = new SpyMessageHandler();
+            var processor = new ElasticRequestProcessor(connection, log, messageHandler);
+            var request = new ElasticSearchRequest("docType");
+
+            await processor.SearchAsync(request);
+
+            var auth = messageHandler.Request.Headers.Authorization;
+            Assert.NotNull(auth);
+            Assert.Equal("Basic", auth.Scheme);
+            Assert.Equal("myUser:myPass", Encoding.ASCII.GetString(Convert.FromBase64String(auth.Parameter)));
         }
 
         [Fact]

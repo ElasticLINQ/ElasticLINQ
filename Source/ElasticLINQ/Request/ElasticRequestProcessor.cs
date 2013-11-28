@@ -17,19 +17,25 @@ namespace ElasticLinq.Request
     internal class ElasticRequestProcessor
     {
         private readonly ElasticConnection connection;
+        private readonly HttpMessageHandler innerMessageHandler;
         private readonly TextWriter log;
 
         public ElasticRequestProcessor(ElasticConnection connection, TextWriter log)
+            : this(connection, log, new WebRequestHandler()) { }
+
+        internal ElasticRequestProcessor(ElasticConnection connection, TextWriter log, HttpMessageHandler innerMessageHandler)
         {
             Argument.EnsureNotNull("connection", connection);
+
             this.connection = connection;
             this.log = log;
+            this.innerMessageHandler = innerMessageHandler;
         }
 
-        public async Task<ElasticResponse> Search(ElasticSearchRequest searchRequest)
+        public async Task<ElasticResponse> SearchAsync(ElasticSearchRequest searchRequest)
         {
             using (var requestMessage = CreateRequestMessage(searchRequest))
-            using (var response = await SendRequest(requestMessage))
+            using (var response = await SendRequestAsync(requestMessage))
             using (var responseStream = await response.Content.ReadAsStreamAsync())
                 return ParseResponse(responseStream, log);
         }
@@ -38,18 +44,18 @@ namespace ElasticLinq.Request
         {
             var formatter = new PostBodyRequestFormatter(connection, searchRequest);
             var message = new HttpRequestMessage(HttpMethod.Post, formatter.Uri);
-            log.WriteLine("Request " + message.Method + " " + message.RequestUri);
+            log.WriteLine("Request {0} {1}", message.Method, message.RequestUri);
 
             var body = formatter.Body;
             message.Content = new StringContent(body);
-            log.WriteLine("Body\n" + body);
+            log.WriteLine("Body\n{0}", body);
 
             return message;
         }
 
-        private async Task<HttpResponseMessage> SendRequest(HttpRequestMessage requestMessage)
+        private async Task<HttpResponseMessage> SendRequestAsync(HttpRequestMessage requestMessage)
         {
-            using (var httpClient = new HttpClient { Timeout = connection.Timeout })
+            using (var httpClient = new HttpClient(new ForcedAuthHandler(connection.UserName, connection.Password, innerMessageHandler)) { Timeout = connection.Timeout })
             {
                 var stopwatch = Stopwatch.StartNew();
                 var response = await httpClient.SendAsync(requestMessage);

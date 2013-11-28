@@ -8,8 +8,37 @@ namespace ElasticLinq.Test
     public class ElasticConnectionTests
     {
         private readonly Uri endpoint = new Uri("http://localhost:1234/abc");
-        private readonly TimeSpan timeout = TimeSpan.FromSeconds(19.2);
-        private const string Index = "myIndex";
+        private readonly string password = "thePassword";
+        private readonly string userName = "theUser";
+
+        [Fact]
+        public void GuardClauses_Constructor()
+        {
+            Assert.Throws<ArgumentNullException>(() => new ElasticConnection(null));
+            Assert.Throws<ArgumentNullException>(() => new ElasticConnection(null, userName, password));
+            Assert.Throws<ArgumentNullException>(() => new ElasticConnection(endpoint, null, password));
+            Assert.Throws<ArgumentNullException>(() => new ElasticConnection(endpoint, userName, null));
+
+            Assert.Throws<ArgumentException>(() => new ElasticConnection(endpoint, "", password));
+            Assert.Throws<ArgumentException>(() => new ElasticConnection(endpoint, userName, ""));
+        }
+
+        [Fact]
+        public void GuardClauses_Index()
+        {
+            var connection = new ElasticConnection(endpoint);
+
+            Assert.Throws<ArgumentNullException>(() => connection.Index = null);
+            Assert.Throws<ArgumentException>(() => connection.Index = "");
+        }
+
+        [Fact]
+        public void GuardClauses_Timeout()
+        {
+            var connection = new ElasticConnection(endpoint);
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => connection.Timeout = TimeSpan.FromDays(-1));
+        }
 
         [Fact]
         public void ConstructorWithOneArgSetsPropertyFromParameter()
@@ -20,46 +49,13 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
-        public void ConstructorWithTwoArgsSetsPropertiesFromParameters()
+        public void ConstructorWithThreeArgsSetsPropertiesFromParameters()
         {
-            var connection = new ElasticConnection(endpoint, timeout);
+            var connection = new ElasticConnection(endpoint, userName, password);
 
             Assert.Equal(endpoint, connection.Endpoint);
-            Assert.Equal(timeout, connection.Timeout);
-        }
-
-        [Fact]
-        public void ConstructorWithTreeArgsSetsPropertiesFromParameters()
-        {
-            var connection = new ElasticConnection(endpoint, timeout, Index);
-
-            Assert.Equal(endpoint, connection.Endpoint);
-            Assert.Equal(timeout, connection.Timeout);
-            Assert.Equal(Index, connection.Index);
-        }
-
-        [Fact]
-        public void ConstructorThrowsArgumentNullExceptionWhenEndpointIsNull()
-        {
-            Assert.Throws<ArgumentNullException>(() => new ElasticConnection(null));
-        }
-
-        [Fact]
-        public void ConstructorThrowsArgumentOutOfRangeExceptionWhenTimespanLessThanZero()
-        {
-            Assert.Throws<ArgumentOutOfRangeException>(() => new ElasticConnection(endpoint, TimeSpan.FromDays(-1), Index));
-        }
-
-        [Fact]
-        public void ConstructorThrowsArgumentNullExceptionWhenIndexSuppliedButNull()
-        {
-            Assert.Throws<ArgumentNullException>(() => new ElasticConnection(endpoint, timeout, null));
-        }
-
-        [Fact]
-        public void ConstructorThrowsArgumentExceptionWhenIndexSuppliedButBlank()
-        {
-            Assert.Throws<ArgumentException>(() => new ElasticConnection(endpoint, timeout, ""));
+            Assert.Equal(userName, connection.UserName);
+            Assert.Equal(password, connection.Password);
         }
     }
 }

@@ -27,7 +27,7 @@ namespace ElasticLinq.Test.Request.Formatter
         public void UrlPathContainsIndexSpecifier()
         {
             const string expectedIndex = "myIndex";
-            var indexConnection = new ElasticConnection(defaultConnection.Endpoint, defaultConnection.Timeout, expectedIndex);
+            var indexConnection = new ElasticConnection(defaultConnection.Endpoint) { Index = expectedIndex };
             var formatter = new PostBodyRequestFormatter(indexConnection, new ElasticSearchRequest("type1"));
 
             Assert.Contains(expectedIndex, formatter.Uri.AbsolutePath);

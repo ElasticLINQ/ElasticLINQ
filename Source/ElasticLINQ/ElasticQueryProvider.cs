@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 
 namespace ElasticLinq
 {
@@ -64,7 +65,8 @@ namespace ElasticLinq
             }
             catch (TargetInvocationException ex)
             {
-                throw ex.InnerException;
+                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+                return null;  // Never called, as the above code re-throws
             }
         }
 
@@ -90,7 +92,7 @@ namespace ElasticLinq
             var log = Log ?? StreamWriter.Null;
             log.WriteLine("Type is " + elementType);
 
-            var searchTask = new ElasticRequestProcessor(connection, log).Search(translation.SearchRequest);
+            var searchTask = new ElasticRequestProcessor(connection, log).SearchAsync(translation.SearchRequest);
             try
             {
                 var response = searchTask.GetAwaiter().GetResult();
@@ -102,7 +104,8 @@ namespace ElasticLinq
             }
             catch (AggregateException ex)
             {
-                throw ex.InnerException;
+                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+                return null;  // Never called, as the above code re-throws
             }
         }
     }

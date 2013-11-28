@@ -15,8 +15,10 @@ namespace ElasticLinq
         private static readonly TimeSpan defaultTimeout = TimeSpan.FromSeconds(10);
 
         private readonly Uri endpoint;
-        private readonly TimeSpan timeout = defaultTimeout;
-        private readonly string index;
+        private string index;
+        private readonly string password;
+        private TimeSpan timeout = defaultTimeout;
+        private readonly string userName;
 
         public ElasticConnection(Uri endpoint)
         {
@@ -25,18 +27,15 @@ namespace ElasticLinq
             this.endpoint = endpoint;
         }
 
-        public ElasticConnection(Uri endpoint, TimeSpan timeout)
+        public ElasticConnection(Uri endpoint, string userName, string password)
             : this(endpoint)
         {
-            Argument.EnsurePositive("timeout", timeout);
-            this.timeout = timeout;
-        }
+            Argument.EnsureNotBlank("userName", userName);
+            Argument.EnsureNotBlank("password", password);
 
-        public ElasticConnection(Uri endpoint, TimeSpan timeout, string index)
-            : this(endpoint, timeout)
-        {
-            Argument.EnsureNotBlank("index", index);
-            this.index = index;
+            this.endpoint = endpoint;
+            this.userName = userName;
+            this.password = password;
         }
 
         public Uri Endpoint
@@ -44,14 +43,34 @@ namespace ElasticLinq
             get { return endpoint; }
         }
 
-        public TimeSpan Timeout
-        {
-            get { return timeout; }
-        }
-
         public string Index
         {
             get { return index; }
+            set
+            {
+                Argument.EnsureNotBlank("value", value);
+                index = value;
+            }
+        }
+
+        public string Password
+        {
+            get { return password; }
+        }
+
+        public TimeSpan Timeout
+        {
+            get { return timeout; }
+            set
+            {
+                Argument.EnsurePositive("value", value);
+                timeout = value;
+            }
+        }
+
+        public string UserName
+        {
+            get { return userName; }
         }
     }
 }
