@@ -17,33 +17,85 @@ namespace ElasticLinq
     /// </remarks>
     public static class ElasticQueryExtensions
     {
+        /// <summary>
+        /// Queries an ElasticSearch index based on a predicate.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="T:System.Linq.IQueryable`1"/> that contains elements from the input sequence that satisfy the condition specified by <paramref name="predicate"/>.
+        /// </returns>
+        /// <param name="source">An <see cref="T:System.Linq.IQueryable`1"/> to query.</param>
+        /// <param name="predicate">A function to test each element for a condition.</param>
+        /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
+        /// <exception cref="T:System.ArgumentNullException"><paramref name="source"/> or <paramref name="predicate"/> is null.</exception>
         public static IQueryable<TSource> Query<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, bool>> predicate)
         {
             Argument.EnsureNotNull("predicate", predicate);
             return CreateQueryMethodCall(source, (MethodInfo)MethodBase.GetCurrentMethod(), Expression.Quote(predicate));
         }
 
+        /// <summary>
+        /// Queries an ElasticSearch index based on a query string.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="T:System.Linq.IQueryable`1"/> that contains elements from the input sequence that satisfy the condition specified by <paramref name="query"/>.
+        /// </returns>
+        /// <param name="source">An <see cref="T:System.Linq.IQueryable`1"/> to query.</param>
+        /// <param name="query">A query string to test each element for.</param>
+        /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
+        /// <exception cref="T:System.ArgumentNullException"><paramref name="source"/> or <paramref name="query"/> is null.</exception>
         public static IQueryable<TSource> QueryString<TSource>(this IQueryable<TSource> source, string query)
         {
             Argument.EnsureNotNull("query", query);
             return CreateQueryMethodCall(source, (MethodInfo)MethodBase.GetCurrentMethod(), Expression.Constant(query));
         }
 
+        /// <summary>
+        /// Sorts the elements of a sequence in ascending order by their ElasticSearch score.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="T:System.Linq.IOrderedQueryable`1"/> whose elements are sorted according to score.
+        /// </returns>
+        /// <param name="source">A sequence of values to order.</param>
+        /// <exception cref="T:System.ArgumentNullException"><paramref name="source"/> is null.</exception>
         public static IOrderedQueryable<TSource> OrderByScore<TSource>(this IQueryable<TSource> source)
         {
             return (IOrderedQueryable<TSource>)CreateQueryMethodCall(source, (MethodInfo)MethodBase.GetCurrentMethod());
         }
 
+        /// <summary>
+        /// Sorts the elements of a sequence in descending order by their ElasticSearch score.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="T:System.Linq.IOrderedQueryable`1"/> whose elements are sorted according to score.
+        /// </returns>
+        /// <param name="source">A sequence of values to order.</param>
+        /// <exception cref="T:System.ArgumentNullException"><paramref name="source"/> is null.</exception>
         public static IOrderedQueryable<TSource> OrderByScoreDescending<TSource>(this IQueryable<TSource> source)
         {
             return (IOrderedQueryable<TSource>)CreateQueryMethodCall(source, (MethodInfo)MethodBase.GetCurrentMethod());
         }
 
+        /// <summary>
+        /// Performs a subsequent ordering of the elements in a sequence in ascending order by their ElasticSearch score.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="T:System.Linq.IOrderedQueryable`1"/> whose elements are sorted according to score.
+        /// </returns>
+        /// <param name="source">A sequence of values to order.</param>
+        /// <exception cref="T:System.ArgumentNullException"><paramref name="source"/> is null.</exception>
         public static IOrderedQueryable<TSource> ThenByScore<TSource>(this IOrderedQueryable<TSource> source)
         {
             return (IOrderedQueryable<TSource>)CreateQueryMethodCall(source, (MethodInfo)MethodBase.GetCurrentMethod());
         }
 
+        /// <summary>
+        /// Performs a subsequent ordering of the elements in a sequence in descending order by their ElasticSearch score.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="T:System.Linq.IOrderedQueryable`1"/> whose elements are sorted according to score.
+        /// </returns>
+        /// <param name="source">A sequence of values to order.</param>
+        /// <exception cref="T:System.ArgumentNullException"><paramref name="source"/> is null.</exception>
         public static IOrderedQueryable<TSource> ThenByScoreDescending<TSource>(this IOrderedQueryable<TSource> source)
         {
             return (IOrderedQueryable<TSource>)CreateQueryMethodCall(source, (MethodInfo)MethodBase.GetCurrentMethod());
@@ -54,7 +106,7 @@ namespace ElasticLinq
             Argument.EnsureNotNull("source", source);
             Argument.EnsureNotNull("method", source);
 
-            var callExpression = Expression.Call(null, method.MakeGenericMethod(typeof(TSource)), new [] { source.Expression }.Concat(arguments));
+            var callExpression = Expression.Call(null, method.MakeGenericMethod(typeof(TSource)), new[] { source.Expression }.Concat(arguments));
             return source.Provider.CreateQuery<TSource>(callExpression);
         }
     }
