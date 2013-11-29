@@ -6,6 +6,10 @@ using System.Linq.Expressions;
 
 namespace ElasticLinq.Request.Visitors
 {
+    /// <summary>
+    /// Expression visitor that substitutes references to <see cref="ElasticFields"/>
+    /// with the desired underlying special reserved name.
+    /// </summary>
     internal class ElasticFieldsProjectionExpressionVisitor : ExpressionVisitor
     {
         protected readonly ParameterExpression Parameter;

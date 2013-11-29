@@ -1,19 +1,19 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
-using System;
 using ElasticLinq.Mapping;
 using ElasticLinq.Utility;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using Newtonsoft.Json.Linq;
 
 namespace ElasticLinq.Request.Visitors
 {
     /// <summary>
     /// Rewrites select projections to bind to JObject and captures the field names
-    /// in order to only select those required.
+    /// in order to only select those fields required.
     /// </summary>
     internal class ProjectionExpressionVisitor : ElasticFieldsProjectionExpressionVisitor
     {

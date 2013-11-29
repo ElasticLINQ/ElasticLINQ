@@ -6,6 +6,11 @@ using System.Collections;
 
 namespace ElasticLinq.Request.Visitors
 {
+    /// <summary>
+    /// Represents the result of a query transation including both
+    /// the remote <see cref="ElasticSearchRequest"/> and the local
+    /// projection and transform functions.
+    /// </summary>
     internal class ElasticTranslateResult
     {
         private readonly ElasticSearchRequest searchRequest;

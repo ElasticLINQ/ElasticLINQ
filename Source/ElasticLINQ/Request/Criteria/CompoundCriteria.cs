@@ -8,7 +8,7 @@ using System.Linq;
 namespace ElasticLinq.Request.Criteria
 {
     /// <summary>
-    /// Base class for any criteria wanting to have criteria of it's
+    /// Base class for any criteria wanting to have criteria of its
     /// own such as AndCriteria and OrCriteria.
     /// </summary>
     internal abstract class CompoundCriteria : ICriteria

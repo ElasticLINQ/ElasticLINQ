@@ -6,8 +6,8 @@ using System.Linq.Expressions;
 namespace ElasticLinq.Request.Visitors
 {
     /// <summary>
-    /// Flattens an expression tree into a list of expressions for debugging
-    /// and testing senarios.
+    /// Flattens an expression tree into a list of expressions for
+    /// debugging and testing.
     /// </summary>
     internal class FlatteningExpressionVisitor : ExpressionVisitor
     {

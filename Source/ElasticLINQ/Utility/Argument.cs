@@ -6,7 +6,7 @@ using System.Diagnostics;
 namespace ElasticLinq.Utility
 {
     /// <summary>
-    /// Argument validation.
+    /// Argument validation static helpers to reduce noise in other methods.
     /// </summary>
     [DebuggerStepThrough]
     public static class Argument

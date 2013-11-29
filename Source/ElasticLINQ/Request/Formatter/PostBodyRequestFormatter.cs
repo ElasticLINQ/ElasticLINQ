@@ -130,7 +130,8 @@ namespace ElasticLinq.Request.Formatter
 
         private static JObject Build(CompoundCriteria criteria)
         {
-            return criteria.Criteria.Count == 1    // A compound filter with one item can be collapsed
+            // A compound filter with one item can be collapsed
+            return criteria.Criteria.Count == 1    
                 ? BuildCriteria(criteria.Criteria.First())
                 : new JObject(new JProperty(criteria.Name, new JArray(criteria.Criteria.Select(BuildCriteria).ToList())));
         }

@@ -94,7 +94,6 @@
     <Compile Include="TestSupport\FakeQueryProvider.cs" />
     <Compile Include="Utility\ArgumentTests.cs" />
     <Compile Include="Utility\SpyMessageHandler.cs" />
-    <Compile Include="Utility\StaticConstructorsTests.cs" />
     <Compile Include="Utility\TypeHelperTests.cs" />
   </ItemGroup>
   <ItemGroup>

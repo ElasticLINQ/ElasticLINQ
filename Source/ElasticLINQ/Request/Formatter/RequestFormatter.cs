@@ -5,6 +5,9 @@ using System.Globalization;
 
 namespace ElasticLinq.Request.Formatter
 {
+    /// <summary>
+    /// Formats various parts of a <see cref="ElasticSearchRequest"/>.
+    /// </summary>
     internal abstract class RequestFormatter
     {
         protected readonly ElasticConnection Connection;

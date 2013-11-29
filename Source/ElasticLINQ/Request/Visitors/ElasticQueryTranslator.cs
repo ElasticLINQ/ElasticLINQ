@@ -16,7 +16,8 @@ using System.Reflection;
 namespace ElasticLinq.Request.Visitors
 {
     /// <summary>
-    /// Expression visitor to translate a LINQ query into ElasticSearch request.
+    /// Expression visitor to translate a LINQ query into a <see cref="ElasticTranslateResult"/>
+    /// that captures remote and local semantics.
     /// </summary>
     internal class ElasticQueryTranslator : ExpressionVisitor
     {

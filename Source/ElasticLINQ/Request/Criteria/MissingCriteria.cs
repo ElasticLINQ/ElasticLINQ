@@ -3,7 +3,7 @@
 namespace ElasticLinq.Request.Criteria
 {
     /// <summary>
-    /// Criteria that selects documents if they do not have a value
+    /// Criteria to select documents if they do not have a value
     /// in the specified field.
     /// </summary>
     internal class MissingCriteria : SingleFieldCriteria, INegatableCriteria

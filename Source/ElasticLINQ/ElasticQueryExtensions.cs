@@ -9,11 +9,10 @@ using System.Reflection;
 namespace ElasticLinq
 {
     /// <summary>
-    /// Various extension methods that extend LINQ functionality for ElasticSearch queries.
+    /// Extension methods that extend LINQ functionality for ElasticSearch queries.
     /// </summary>
     /// <remarks>
-    /// These can not extend ElasticQuery as Queryable extends and returns IQueryable.
-    /// Using these against any other provider will fail.
+    /// Using these methods against any provider except <see cref="ElasticQueryProvider"/> will fail.
     /// </remarks>
     public static class ElasticQueryExtensions
     {

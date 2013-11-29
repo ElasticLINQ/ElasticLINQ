@@ -7,9 +7,9 @@ using System.Linq.Expressions;
 namespace ElasticLinq.Request.Visitors
 {
     /// <summary>
-    /// PartialEvaluator determines which part of the tree can be locally
-    /// evaluated before execution and substitutes those parts with constant
-    /// values obtained from that local execution.
+    /// Determines which part of the tree can be locally
+    /// evaluated before execution and substitutes those parts
+    /// with constant values obtained from local execution of that part.
     /// </summary>
     internal static class PartialEvaluator
     {

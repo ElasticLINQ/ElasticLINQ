@@ -87,7 +87,6 @@
     <Compile Include="Response\Model\Hit.cs" />
     <Compile Include="Response\Model\Hits.cs" />
     <Compile Include="Response\Model\ShardStatistics.cs" />
-    <Compile Include="Utility\StaticConstructors.cs" />
     <Compile Include="Request\Visitors\ProjectionExpressionVisitor.cs" />
   </ItemGroup>
   <ItemGroup>

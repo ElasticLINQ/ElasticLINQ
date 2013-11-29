@@ -5,7 +5,7 @@ using ElasticLinq.Utility;
 namespace ElasticLinq.Request.Criteria
 {
     /// <summary>
-    /// Criteria that inverts the logic of criteria it wraps.
+    /// Criteria that inverts the logic of criteria it contains.
     /// </summary>
     internal class NotCriteria : ICriteria, INegatableCriteria
     {
@@ -16,10 +16,9 @@ namespace ElasticLinq.Request.Criteria
             Argument.EnsureNotNull("criteria", criteria);
 
             // Allow some criteria to provide their own negation instead
-            if (criteria is INegatableCriteria)
-                return ((INegatableCriteria) criteria).Negate();
-
-            return new NotCriteria(criteria);
+            return criteria is INegatableCriteria
+                ? ((INegatableCriteria) criteria).Negate()
+                : new NotCriteria(criteria);
         }
 
         private NotCriteria(ICriteria criteria)

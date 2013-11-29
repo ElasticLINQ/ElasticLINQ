@@ -6,6 +6,9 @@ using System.IO;
 
 namespace ElasticLinq
 {
+    /// <summary>
+    /// Provides an entry point to easily create LINQ queries for ElasticSearch.
+    /// </summary>
     public class ElasticContext
     {
         private readonly ElasticConnection connection;

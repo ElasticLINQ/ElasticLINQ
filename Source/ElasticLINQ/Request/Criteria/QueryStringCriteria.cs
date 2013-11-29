@@ -4,6 +4,9 @@ using ElasticLinq.Utility;
 
 namespace ElasticLinq.Request.Criteria
 {
+    /// <summary>
+    /// Criteria that specifies a query string to be passed to ElasticSearch.
+    /// </summary>
     public class QueryStringCriteria : ICriteria
     {
         private readonly string value;

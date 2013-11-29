@@ -1,5 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using System.CodeDom;
 using ElasticLinq.Utility;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,9 +32,7 @@ namespace ElasticLinq.Request.Criteria
                 return criteria[0];
 
             // Unwrap and combine ANDs
-            criteria = criteria.SelectMany(c => c is AndCriteria ? ((AndCriteria)c).Criteria : new[] { c }).ToArray();
-
-            var combinedCriteria = new List<ICriteria>(criteria);
+            var combinedCriteria = criteria.SelectMany(c => c is AndCriteria ? ((AndCriteria) c).Criteria : new[] {c}).ToList();
             CombineRanges(combinedCriteria);
 
             return combinedCriteria.Count == 1

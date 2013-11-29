@@ -7,8 +7,8 @@ namespace ElasticLinq.Request.Visitors
 {
     /// <summary>
     /// Visits the expression tree and for any node in its list
-    /// it replaces that expression with a constant expression
-    /// that resulted from it's compilation and invocation.
+    /// replaces that expression with a constant expression
+    /// that resulted from its compilation and invocation.
     /// </summary>
     internal class EvaluatingExpressionVisitor : ExpressionVisitor
     {

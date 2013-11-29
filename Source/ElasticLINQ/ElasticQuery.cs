@@ -10,7 +10,7 @@ using System.Linq.Expressions;
 namespace ElasticLinq
 {
     /// <summary>
-    /// ElasticSearch query object used to start LINQ queries.
+    /// ElasticSearch query object used to facilitate LINQ query syntax.
     /// </summary>
     /// <typeparam name="T">Element type being queried.</typeparam>
     public class ElasticQuery<T> : IOrderedQueryable<T>
