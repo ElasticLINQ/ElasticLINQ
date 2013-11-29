@@ -54,7 +54,6 @@ namespace TestConsoleApp
                 .Take(5)
                 .WriteToConsole();
 
-
             // Filter terms from an array with Tuple to return original entity + score
             var aliases = new[] { "t3n", "dpg", "pbt" };
             context

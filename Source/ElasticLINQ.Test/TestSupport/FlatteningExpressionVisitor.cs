@@ -3,7 +3,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace ElasticLinq.Request.Visitors
+namespace ElasticLinq.Test.TestSupport
 {
     /// <summary>
     /// Flattens an expression tree into a list of expressions for
@@ -31,6 +31,7 @@ namespace ElasticLinq.Request.Visitors
 
             if (node.NodeType != ExpressionType.Quote)
                 flattened.Add(node);
+
             return base.Visit(node);
         }
     }

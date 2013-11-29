@@ -72,7 +72,6 @@
     <Compile Include="Request\Expressions\CriteriaExpression.cs" />
     <Compile Include="Request\Visitors\ElasticTranslateResult.cs" />
     <Compile Include="Request\Visitors\EvaluatingExpressionVisitor.cs" />
-    <Compile Include="Request\Visitors\FlatteningExpressionVisitor.cs" />
     <Compile Include="Request\Visitors\PartialEvaluator.cs" />
     <Compile Include="Utility\Argument.cs" />
     <Compile Include="Utility\ForcedAuthHandler.cs" />
