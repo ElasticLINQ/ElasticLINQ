@@ -14,10 +14,28 @@ namespace TestConsoleApp
             var connection = new ElasticConnection(new Uri("http://192.168.2.14:9200")) { Index = "tier3" };
             var context = new ElasticContext(connection, new CouchbaseElasticMapping()) { Log = Console.Out };
 
+            DocumentQueries(context);
             BasicSampleQueries(context);
 
             Console.Write("\n\nComplete.");
             Console.ReadKey();
+        }
+
+        private static void DocumentQueries(ElasticContext context)
+        {
+            context
+                .Query<Activity>()
+                .Where(a => a.AccountAlias == "t3n")
+                .Where(a => a.CreatedDate >= new DateTime(2013, 09, 01) && a.CreatedDate <= new DateTime(2013, 09, 08))
+                .Take(1000000)
+                .OrderByDescending(o => o.CreatedDate)
+                .WriteToConsole();
+
+            context
+                .Query<AccountSubscription>()
+                .Where(s => s.SubscriptionId == "abc" && s.AccountAlias == "t3n" && !s.EndDate.HasValue)
+                .OrderByDescending(s => s.CreateDate)
+                .WriteToConsole();
         }
 
         private static void BasicSampleQueries(ElasticContext context)
