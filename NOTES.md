@@ -5,7 +5,7 @@ Welcome to the first drop of ElasticLINQ. As this is a work in progress there ar
 ## Getting started
 To get started you need to create an ElasticConnection with the URL and timeout values (and optionally index name), e.g.
 
-	var connection = new ElasticConnection(new Uri("http://192.168.2.12:9200"), TimeSpan.FromSeconds(10), "myIndex");
+	var connection = new ElasticConnection(new Uri("http://192.168.2.12:9200") { Index = "myIndex" });
 
 Then create an ElasticContext with the connection passed in the constructor and the mapping provider to use:
 
@@ -50,7 +50,7 @@ Examples of supported name-field selects:
     Select(r => Tuple.Create(r.Id, ElasticFields.Score, r.Name)
 
 #### Where
-Where creates filter operations and supports the following patterns:
+Where creates **filter** operations and supports the following patterns:
 
 * `< > <= >=` maps to **range**
 * `==` maps to **term** 
@@ -62,12 +62,12 @@ Where creates filter operations and supports the following patterns:
 * ``Equals`` for static and instance maps to **term**
 * ``Contains`` on IEnumerable/arrays maps to **terms**
 
-To create similar expression as queries use the .Query extension operator. It maps very similar operations but **exists** and **missing** are not available within queries on ElasticSearch.
+To create similar expression as **queries** use the .Query extension operator. It maps very similar operations but **exists** and **missing** are not available within queries on ElasticSearch.
 
 #### OrderBy/ThenBy
 Ordering is achieved by the usual LINQ methods however if you wish to sort by score you have two options:
 
-1. Normal method with ElasticFields.Score ``OrderBy(o => ElasticFields.Score)``
+1. Normal method with ElasticFields.Score static property ``OrderBy(o => ElasticFields.Score)``
 2. IQueryable methods with score in the name ``OrderByScore()``
 
 The latter is more easily discovered but the former should be kept around as it is the same pattern used in Select projections. Recommend the former for the less common orderings and latter for common.
@@ -93,18 +93,15 @@ There is a mapping interface called IElasticMapping. A default CouchbaseElasticM
 
 ## Implementation notes
 
-### Licensing
-The code is able to be licensed under Apache 2 as it is not based on IQToolkit.
-
 ### Dependencies
 JSON.Net is required for serializing the ElasticSearch queries to JSON and parsing the results coming back.
 
 XUnit.Net is required for the unit tests.
 
-### Unit tests
-Currently around 85% test coverage.
+NSubstitute is required for some unit tests.
 
-Unit tests are very isolated and it would be a good idea to implement some integration tests to exercise the remaining parts of the pipeline. Doing so would require either an ElasticSearch instance or some kind of fake/mock to sit in at the HTTP layer.  
+### Unit tests
+Currently around 95% test coverage and some tests use an included HTTP listener to correct sending and receiving of requests.
 
 ### Query optimizations
 The query translator supports a few query optimization's to ensure that the generated ElasticLINQ query looks good and not like it was translated from another language. 
@@ -137,7 +134,3 @@ This includes currently:
 **Nested queries running multiple ElasticSearch requests**
 
 Very complex to do and breaks the explicit boundaries recommended in LINQ providers.
-
-**HTTP GET queries**
-
-Very limited in scope as to what it can achieve.
