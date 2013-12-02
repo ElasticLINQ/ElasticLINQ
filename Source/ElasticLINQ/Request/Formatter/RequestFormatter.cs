@@ -53,5 +53,13 @@ namespace ElasticLinq.Request.Formatter
 
             return timeSpan.TotalMinutes.ToString(CultureInfo.InvariantCulture) + "m";
         }
+
+        internal static object FormatTerm(object value)
+        {
+            if (value is string)
+                return value.ToString().ToLower(CultureInfo.CurrentCulture);
+
+            return value;            
+        }
     }
 }

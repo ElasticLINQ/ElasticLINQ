@@ -96,26 +96,33 @@ namespace ElasticLinq.Request.Formatter
             if (criteria is CompoundCriteria)
                 return Build((CompoundCriteria)criteria);
 
-            throw new InvalidOperationException(String.Format("Unknown filter type {0}", criteria.GetType()));
+            throw new InvalidOperationException(String.Format("Unknown criteria type {0}", criteria.GetType()));
         }
 
         private static JObject Build(QueryStringCriteria criteria)
         {
-            return new JObject(new JProperty(criteria.Name, new JObject(new JProperty("query", criteria.Value))));
+            var unformattedValue = criteria.Value; // We do not reformat query_string
+            return new JObject(new JProperty(criteria.Name, new JObject(new JProperty("query", unformattedValue))));
         }
 
         private static JObject Build(RangeCriteria criteria)
         {
             // Range filters can be combined by field
-            return new JObject(new JProperty(criteria.Name, new JObject(new JProperty(criteria.Field,
-                   new JObject(criteria.Specifications.Select(s => new JProperty(s.Name, s.Value)).ToList())))));
+            return new JObject(
+                new JProperty(criteria.Name,
+                    new JObject(new JProperty(criteria.Field,
+                        new JObject(criteria.Specifications.Select(s =>
+                            new JProperty(s.Name, FormatTerm(s.Value))).ToList())))));
         }
 
         private static JObject Build(TermCriteria criteria)
         {
             // Terms filter with one item is a single term filter
-            var value = criteria.Values.Count == 1 ? criteria.Values[0] : new JArray(criteria.Values.ToArray());
-            return new JObject(new JProperty(criteria.Name, new JObject(new JProperty(criteria.Field, value))));
+            var formattedValue = criteria.Values.Count == 1
+                ? FormatTerm(criteria.Values[0])
+                : new JArray(criteria.Values.Select(FormatTerm).ToArray());
+
+            return new JObject(new JProperty(criteria.Name, new JObject(new JProperty(criteria.Field, formattedValue))));
         }
 
         private static JObject Build(SingleFieldCriteria criteria)
@@ -131,7 +138,7 @@ namespace ElasticLinq.Request.Formatter
         private static JObject Build(CompoundCriteria criteria)
         {
             // A compound filter with one item can be collapsed
-            return criteria.Criteria.Count == 1    
+            return criteria.Criteria.Count == 1
                 ? BuildCriteria(criteria.Criteria.First())
                 : new JObject(new JProperty(criteria.Name, new JArray(criteria.Criteria.Select(BuildCriteria).ToList())));
         }
