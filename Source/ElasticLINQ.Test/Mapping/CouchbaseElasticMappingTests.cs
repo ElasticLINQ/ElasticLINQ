@@ -5,14 +5,13 @@ using ElasticLinq.Response.Model;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 using Xunit;
 
 namespace ElasticLinq.Test.Mapping
 {
     public class CouchbaseElasticMappingTests
     {
-        private const string DefaultPrefix = "doc.couchbaseElasticMappingTests.";
+        public string SampleProperty { get; set; }
 
         [Fact]
         public void GetTypeNameIsCouchbaseDocumentByDefault()
@@ -25,24 +24,69 @@ namespace ElasticLinq.Test.Mapping
         }
 
         [Fact]
+        public void ConstructorThrowsArgumentNullExceptionIfTypeNameIsNull()
+        {
+            Assert.Throws<ArgumentNullException>(() => new CouchbaseElasticMapping(null, false));
+        }
+
+        [Fact]
+        public void ConstructorThrowsArgumentExceptionIfTypeNameIsEmpty()
+        {
+            Assert.Throws<ArgumentException>(() => new CouchbaseElasticMapping("", false));
+        }
+
+        [Fact]
         public void ConstructorTypeNameOverridesGetTypeName()
         {
             const string expected = "myTypeName";
 
-            var mapping = new CouchbaseElasticMapping(expected);
+            var mapping = new CouchbaseElasticMapping(expected, false);
 
             Assert.Equal(expected, mapping.GetTypeName(typeof(CouchbaseElasticMappingTests)));
         }
 
         [Fact]
-        public void GetFieldNamePrefixesAndCamelCasesMemberName()
+        public void GetFieldNameDoesNotIncludeTypeNameByDefault()
         {
-            var memberInfo = MethodBase.GetCurrentMethod();
+            var propertyInfo = GetType().GetProperty("SampleProperty");
 
             var mapping = new CouchbaseElasticMapping();
-            var actual = mapping.GetFieldName(memberInfo);
+            var actual = mapping.GetFieldName(propertyInfo);
 
-            Assert.Equal(DefaultPrefix + "getFieldNamePrefixesAndCamelCasesMemberName", actual);
+            Assert.Equal("doc.couchbaseElasticMappingTests.sampleProperty", actual);
+        }
+
+        [Fact]
+        public void GetFieldNameDoesNotIncludeTypeNameWhenRequestedNotTo()
+        {
+            var propertyInfo = GetType().GetProperty("SampleProperty");
+
+            var mapping = new CouchbaseElasticMapping("shouldNotInclude", false);
+            var actual = mapping.GetFieldName(propertyInfo);
+
+            Assert.Equal("doc.couchbaseElasticMappingTests.sampleProperty", actual);
+        }
+
+        [Fact]
+        public void GetFieldNameDoesIncludeTypeNameWhenRequestedTo()
+        {
+            var propertyInfo = GetType().GetProperty("SampleProperty");
+
+            var mapping = new CouchbaseElasticMapping("myTypeName", true);
+            var actual = mapping.GetFieldName(propertyInfo);
+
+            Assert.Equal("myTypeName.doc.couchbaseElasticMappingTests.sampleProperty", actual);
+        }
+
+        [Fact]
+        public void GetFieldNamePrefixesAndCamelCasesMemberName()
+        {
+            var propertyInfo = GetType().GetProperty("SampleProperty");
+
+            var mapping = new CouchbaseElasticMapping();
+            var actual = mapping.GetFieldName(propertyInfo);
+
+            Assert.Equal("doc.couchbaseElasticMappingTests.sampleProperty", actual);
         }
 
         [Fact]

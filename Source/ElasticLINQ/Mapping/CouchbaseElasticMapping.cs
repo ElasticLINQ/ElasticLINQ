@@ -14,15 +14,19 @@ namespace ElasticLinq.Mapping
     public class CouchbaseElasticMapping : IElasticMapping
     {
         private readonly string typeName;
+        private readonly string fieldPrefix;
 
         public CouchbaseElasticMapping()
+            : this("couchbaseDocument", false)
         {
-            typeName = "couchbaseDocument";
         }
 
-        public CouchbaseElasticMapping(string typeName)
+        public CouchbaseElasticMapping(string typeName, bool qualifyFieldNames)
         {
+            Argument.EnsureNotBlank("typeName", typeName);
+
             this.typeName = typeName;
+            fieldPrefix = qualifyFieldNames ? typeName + ".doc" : "doc";
         }        
 
         public string GetFieldName(MemberInfo memberInfo)
@@ -30,7 +34,7 @@ namespace ElasticLinq.Mapping
             Argument.EnsureNotNull("memberInfo", memberInfo);
 
             return string.Join(".",
-                "doc",
+                fieldPrefix,
                 GetDocTypeName(memberInfo.ReflectedType),
                 memberInfo.Name.ToCamelCase());
         }
