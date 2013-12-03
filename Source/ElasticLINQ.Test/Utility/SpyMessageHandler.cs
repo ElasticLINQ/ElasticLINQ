@@ -1,9 +1,11 @@
-﻿using System.Net;
+﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
+
+using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ElasticLinq.Test
+namespace ElasticLinq.Test.Utility
 {
     public class SpyMessageHandler : HttpMessageHandler
     {

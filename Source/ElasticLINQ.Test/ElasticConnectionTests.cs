@@ -41,6 +41,16 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
+        public void TimeoutPropertyCanBeSet()
+        {
+            var expected = TimeSpan.FromSeconds(123);
+
+            var connection = new ElasticConnection(endpoint) { Timeout = expected };
+
+            Assert.Equal(expected, connection.Timeout);
+        }
+
+        [Fact]
         public void ConstructorWithOneArgSetsPropertyFromParameter()
         {
             var connection = new ElasticConnection(endpoint);

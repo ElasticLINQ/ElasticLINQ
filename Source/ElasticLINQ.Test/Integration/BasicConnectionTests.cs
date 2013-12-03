@@ -1,5 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using System.Collections;
 using ElasticLinq.Mapping;
 using ElasticLinq.Test.TestSupport;
 using System;
@@ -79,6 +80,40 @@ namespace ElasticLinq.Test.Integration
                 var request = httpStub.Requests.Single();
                 Assert.Equal("POST", request.HttpMethod);
                 Assert.Equal("/robots/_search", request.RawUrl);
+            }
+        }
+
+        [Fact]
+        public void QueryImplicitGetEnumeratorCausesConnection()
+        {
+            using (var httpStub = new HttpStub(ZeroHits))
+            {
+                var provider = new ElasticQueryProvider(new ElasticConnection(httpStub.Uri), mapping);
+                var query = new ElasticQuery<Robot>(provider);
+
+                var enumerator = query.GetEnumerator();
+
+                var request = httpStub.Requests.Single();
+                Assert.Equal("POST", request.HttpMethod);
+                Assert.Equal("/robots/_search", request.RawUrl);
+                Assert.NotNull(enumerator);
+            }
+        }
+
+        [Fact]
+        public void QueryExplicitIEnumerableGetEnumeratorCausesConnection()
+        {
+            using (var httpStub = new HttpStub(ZeroHits))
+            {
+                var provider = new ElasticQueryProvider(new ElasticConnection(httpStub.Uri), mapping);
+                var query = new ElasticQuery<Robot>(provider);
+
+                var enumerator = ((IEnumerable)query).GetEnumerator();
+
+                var request = httpStub.Requests.Single();
+                Assert.Equal("POST", request.HttpMethod);
+                Assert.Equal("/robots/_search", request.RawUrl);
+                Assert.NotNull(enumerator);
             }
         }
 
