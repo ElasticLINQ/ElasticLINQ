@@ -133,6 +133,34 @@ namespace ElasticLinq.Test.Request.Formatter
         }
 
         [Fact]
+        public void BodyContainsRangeFilter()
+        {
+            const string expectedField = "capacity";
+            const decimal expectedRange = 2.0m;
+            var criteria = new RangeCriteria(expectedField, RangeComparison.GreaterThanOrEqual, expectedRange);
+
+            var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest("type1", filter: criteria));
+            var body = JObject.Parse(formatter.Body);
+
+            var result = TraverseWithAssert(body, "filter", "range", expectedField, "gte");
+            Assert.Equal(expectedRange, result);
+        }
+
+        [Fact]
+        public void BodyContainsRegexFilter()
+        {
+            const string expectedField = "motor";
+            const string expectedRegexp = "SR20DET";
+            var criteria = new RegexpCriteria(expectedField, expectedRegexp);
+
+            var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest("type1", filter: criteria));
+            var body = JObject.Parse(formatter.Body);
+
+            var actualRegexp = TraverseWithAssert(body, "filter", "regexp", expectedField);
+            Assert.Equal(expectedRegexp, actualRegexp);
+        }
+
+        [Fact]
         public void BodyContainsFilterSingleCollapsedOr()
         {
             const string expectedFieldName = "fieldShouldExist";
@@ -260,6 +288,7 @@ namespace ElasticLinq.Test.Request.Formatter
                 token = token[path];
             }
 
+            Assert.NotNull(token);
             return token;
         }
 

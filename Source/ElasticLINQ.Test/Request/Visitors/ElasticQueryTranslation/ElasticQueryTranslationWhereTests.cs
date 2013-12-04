@@ -706,7 +706,33 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         }
 
         [Fact]
-        public void QueryGeneratesToQueryCriteria()
+        public void RegexElasticMethodCreatesRegexWhereCriteria()
+        {
+            var where = Robots.Where(r => ElasticMethods.Regexp(r.Name, "r.*bot"));
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+
+            Assert.IsType<RegexpCriteria>(criteria);
+            var regexpCriteria = (RegexpCriteria)criteria;
+            Assert.Equal("regexp", regexpCriteria.Name);
+            Assert.Equal("name", regexpCriteria.Field);
+            Assert.Equal("r.*bot", regexpCriteria.Regexp);
+        }
+
+        [Fact]
+        public void QueryAndWhereGeneratesQueryAndFilterCriteria()
+        {
+            var query = Robots
+                .Query(r => ElasticMethods.Regexp(r.Name, "r.*bot"))
+                .Where(r => r.Zone.HasValue);
+
+            var searchRequest = ElasticQueryTranslator.Translate(Mapping, query.Expression).SearchRequest;
+
+            Assert.IsType<RegexpCriteria>(searchRequest.Query);
+            Assert.IsType<ExistsCriteria>(searchRequest.Filter);
+        }
+
+        [Fact]
+        public void QueryGeneratesQueryCriteria()
         {
             var where = Robots.Query(r => r.Name == "IG-88" && r.Cost > 1);
             var request = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest;

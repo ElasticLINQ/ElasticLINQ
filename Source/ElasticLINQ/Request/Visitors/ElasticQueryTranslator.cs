@@ -67,9 +67,35 @@ namespace ElasticLinq.Request.Visitors
                 return VisitEnumerableMethodCall(m);
 
             if (m.Method.DeclaringType == typeof(ElasticQueryExtensions))
-                return VisitElasticMethodCall(m);
+                return VisitElasticQueryExtensionsMethodCall(m);
+
+            if (m.Method.DeclaringType == typeof(ElasticMethods))
+                return VisitElasticMethodsMethodCall(m);
 
             return VisitGenericMethodCall(m);
+        }
+
+        private Expression VisitElasticMethodsMethodCall(MethodCallExpression m)
+        {
+            switch (m.Method.Name)
+            {
+                case "Regexp":
+                    if (m.Arguments.Count == 2)
+                        return VisitRegexp(m.Arguments[0], m.Arguments[1]);
+                    break;
+            }
+
+            throw new NotSupportedException(string.Format("The ElasticMethods method '{0}' is not supported", m.Method.Name));
+        }
+
+        private Expression VisitRegexp(Expression left, Expression right)
+        {
+            var cm = ConstantMemberPair.Create(left, right);
+
+            if (cm != null)
+                return new CriteriaExpression(new RegexpCriteria(mapping.GetFieldName(cm.MemberExpression.Member), cm.ConstantExpression.Value.ToString()));
+
+            throw new NotSupportedException("Regexp must be between a Member and a Constant");            
         }
 
         private Expression VisitGenericMethodCall(MethodCallExpression m)
@@ -123,7 +149,7 @@ namespace ElasticLinq.Request.Visitors
             throw new NotImplementedException("Unknown source for Contains");
         }
 
-        internal Expression VisitElasticMethodCall(MethodCallExpression m)
+        internal Expression VisitElasticQueryExtensionsMethodCall(MethodCallExpression m)
         {
             switch (m.Method.Name)
             {

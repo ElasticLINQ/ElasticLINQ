@@ -79,6 +79,9 @@ namespace ElasticLinq.Request.Formatter
             if (criteria is RangeCriteria)
                 return Build((RangeCriteria)criteria);
 
+            if (criteria is RegexpCriteria)
+                return Build((RegexpCriteria)criteria);
+
             if (criteria is TermCriteria)
                 return Build((TermCriteria)criteria);
 
@@ -113,6 +116,11 @@ namespace ElasticLinq.Request.Formatter
                     new JObject(new JProperty(criteria.Field,
                         new JObject(criteria.Specifications.Select(s =>
                             new JProperty(s.Name, FormatTerm(s.Value))).ToList())))));
+        }
+
+        private static JObject Build(RegexpCriteria criteria)
+        {
+            return new JObject(new JProperty(criteria.Name, new JObject(new JProperty(criteria.Field, criteria.Regexp))));
         }
 
         private static JObject Build(TermCriteria criteria)

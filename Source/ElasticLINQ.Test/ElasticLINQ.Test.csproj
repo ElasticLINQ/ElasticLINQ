@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="ElasticContextTests.cs" />
     <Compile Include="ElasticFieldsTests.cs" />
+    <Compile Include="ElasticMethodsTests.cs" />
     <Compile Include="ElasticQueryExtensionsTests.cs" />
     <Compile Include="ElasticQueryProviderTests.cs" />
     <Compile Include="ElasticQueryTests.cs" />
@@ -57,6 +58,7 @@
     <Compile Include="Mapping\ElasticFieldsMappingWrapperTests.cs" />
     <Compile Include="Mapping\MappingHelpersTests.cs" />
     <Compile Include="Request\Criteria\QueryStringCriteriaTests.cs" />
+    <Compile Include="Request\Criteria\RegExpCriteriaTests.cs" />
     <Compile Include="Request\ElasticRequestProcessorTests.cs" />
     <Compile Include="ElasticConnectionTests.cs" />
     <Compile Include="Mapping\TrivialElasticMappingTests.cs" />

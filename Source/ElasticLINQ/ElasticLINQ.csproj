@@ -44,6 +44,7 @@
     <Compile Include="ElasticConnection.cs" />
     <Compile Include="ElasticContext.cs" />
     <Compile Include="ElasticFields.cs" />
+    <Compile Include="ElasticMethods.cs" />
     <Compile Include="ElasticQuery.cs" />
     <Compile Include="ElasticQueryExtensions.cs" />
     <Compile Include="ElasticQueryProvider.cs" />
@@ -59,6 +60,7 @@
     <Compile Include="Request\Criteria\NotCriteria.cs" />
     <Compile Include="Request\Criteria\OrCriteria.cs" />
     <Compile Include="Request\Criteria\RangeCriteria.cs" />
+    <Compile Include="Request\Criteria\RegExpCriteria.cs" />
     <Compile Include="Request\Criteria\SingleFieldCriteria.cs" />
     <Compile Include="Request\Criteria\QueryStringCriteria.cs" />
     <Compile Include="Request\Criteria\TermCriteria.cs" />

@@ -14,7 +14,7 @@ namespace ElasticLinq.Request.Visitors
     internal static class PartialEvaluator
     {
         private static readonly Type[] doNotEvaluateMembersDeclaredOn = { typeof(ElasticFields) };
-        private static readonly Type[] doNotEvaluateMethodsDeclaredOn = { typeof(Enumerable), typeof(ElasticQueryExtensions), typeof(Queryable) };
+        private static readonly Type[] doNotEvaluateMethodsDeclaredOn = { typeof(Enumerable), typeof(Queryable), typeof(ElasticQueryExtensions), typeof(ElasticMethods) };
 
         public static Expression Evaluate(Expression e)
         {
