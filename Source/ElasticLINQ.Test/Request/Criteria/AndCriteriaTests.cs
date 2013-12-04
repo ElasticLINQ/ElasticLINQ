@@ -50,9 +50,9 @@ namespace ElasticLinq.Test.Request.Criteria
         public void CombineWithSingleCriteriaReturnsThatCriteria()
         {
             var rangeCriteria = new RangeCriteria("field", RangeComparison.LessThan, 1);
-            var criteria = AndCriteria.Combine(rangeCriteria);
+            var andCriteria = AndCriteria.Combine(rangeCriteria);
 
-            Assert.Same(rangeCriteria, criteria);
+            Assert.Same(rangeCriteria, andCriteria);
         }
 
         [Fact]
@@ -70,16 +70,16 @@ namespace ElasticLinq.Test.Request.Criteria
         [Fact]
         public void CombineWithTwoSameFieldRangeCriteriaCombinesIntoSingleRangeCriteria()
         {
-            var lowerFirstRange = new RangeCriteria("first", RangeComparison.GreaterThan, "lower");
-            var upperFirstRange = new RangeCriteria("first", RangeComparison.LessThanOrEqual, "upper");
+            var lowerRangeCriteria = new RangeCriteria("first", RangeComparison.GreaterThan, "lower");
+            var upperRangeCriteria = new RangeCriteria("first", RangeComparison.LessThanOrEqual, "upper");
 
-            var criteria = AndCriteria.Combine(lowerFirstRange, upperFirstRange);
+            var andCriteria = AndCriteria.Combine(lowerRangeCriteria, upperRangeCriteria);
 
-            Assert.IsType<RangeCriteria>(criteria);
-            var rangeCriteria = (RangeCriteria)criteria;
-            Assert.Equal(rangeCriteria.Field, lowerFirstRange.Field);
-            Assert.Single(rangeCriteria.Specifications, s => s.Comparison == lowerFirstRange.Specifications.First().Comparison);
-            Assert.Single(rangeCriteria.Specifications, s => s.Comparison == upperFirstRange.Specifications.First().Comparison);
+            Assert.IsType<RangeCriteria>(andCriteria);
+            var rangeCriteria = (RangeCriteria)andCriteria;
+            Assert.Equal(rangeCriteria.Field, lowerRangeCriteria.Field);
+            Assert.Single(rangeCriteria.Specifications, s => s.Comparison == lowerRangeCriteria.Specifications.First().Comparison);
+            Assert.Single(rangeCriteria.Specifications, s => s.Comparison == upperRangeCriteria.Specifications.First().Comparison);
         }
 
         [Fact]

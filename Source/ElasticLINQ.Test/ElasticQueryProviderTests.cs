@@ -1,7 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using ElasticLinq.Mapping;
-using ElasticLinq.Utility;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;

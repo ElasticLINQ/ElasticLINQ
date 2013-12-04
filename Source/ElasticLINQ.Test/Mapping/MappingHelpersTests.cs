@@ -115,7 +115,7 @@ namespace ElasticLinq.Test.Mapping
             public int WriteOnly { set { backing = value; } }
             public int ReadOnly { get { return backing; } }
             public string NotValueType { get; set; }
-            public int Field;
+            public int Field = 1;
 
             public int Valid { get; set; }
         }

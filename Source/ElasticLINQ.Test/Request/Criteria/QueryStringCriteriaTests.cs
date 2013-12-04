@@ -13,9 +13,9 @@ namespace ElasticLinq.Test.Request.Criteria
         {
             const string expectedValue = "r2d2"; 
 
-            var queryStringCriteria = new QueryStringCriteria(expectedValue);
+            var criteria = new QueryStringCriteria(expectedValue);
 
-            Assert.Equal(expectedValue, queryStringCriteria.Value);
+            Assert.Equal(expectedValue, criteria.Value);
         }
 
         [Fact]

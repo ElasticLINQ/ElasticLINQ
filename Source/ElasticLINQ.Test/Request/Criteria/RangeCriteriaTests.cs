@@ -97,12 +97,12 @@ namespace ElasticLinq.Test.Request.Criteria
         [Fact]
         public void ToStringContainsFieldComparisonAndValue()
         {
-            var rangeCriteria = new RangeCriteria("thisIsMyFieldName", RangeComparison.LessThan, "500");
-            var result = rangeCriteria.ToString();
+            var criteria = new RangeCriteria("thisIsMyFieldName", RangeComparison.LessThan, "500");
+            var result = criteria.ToString();
 
-            Assert.Contains(rangeCriteria.Field, result);
-            Assert.Contains(rangeCriteria.Specifications[0].Comparison.ToString(), result);
-            Assert.Contains((string)rangeCriteria.Specifications[0].Value, result);
+            Assert.Contains(criteria.Field, result);
+            Assert.Contains(criteria.Specifications[0].Comparison.ToString(), result);
+            Assert.Contains((string)criteria.Specifications[0].Value, result);
         }
     }
 }

@@ -44,10 +44,10 @@ namespace ElasticLinq.Test.Request.Criteria
         [Fact]
         public void ToStringContainsFieldComparisonAndValue()
         {
-            var missingCriteria = new MissingCriteria("thisIsAMissingField");
-            var result = missingCriteria.ToString();
+            var criteria = new MissingCriteria("thisIsAMissingField");
+            var result = criteria.ToString();
 
-            Assert.Contains(missingCriteria.Field, result);
+            Assert.Contains(criteria.Field, result);
         }
    }
 }
