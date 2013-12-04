@@ -8,7 +8,7 @@ namespace ElasticLinq.Request.Criteria
     /// <summary>
     /// Base class for any criteria that maps to a single field.
     /// </summary>
-    internal abstract class SingleFieldCriteria : ICriteria
+    public abstract class SingleFieldCriteria : ICriteria
     {
         private readonly string field;
 

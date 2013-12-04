@@ -1,6 +1,7 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using ElasticLinq.Mapping;
+using ElasticLinq.Request.Criteria;
 using ElasticLinq.Response.Model;
 using Newtonsoft.Json.Linq;
 using System;
@@ -33,6 +34,11 @@ namespace ElasticLinq.Test.TestSupport
             return new JObject(
                 new JProperty("type", docType.Name),
                 new JProperty("hit", hit._id));
+        }
+
+        public ICriteria GetTypeSelectionCriteria(Type docType)
+        {
+            return null;
         }
 
         public IReadOnlyList<MemberInfo> GetFieldNames

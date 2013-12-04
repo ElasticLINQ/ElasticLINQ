@@ -1,5 +1,7 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using ElasticLinq.Mapping;
+using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Visitors;
 using System.Linq;
 using Xunit;
@@ -16,6 +18,16 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var translation = ElasticQueryTranslator.Translate(Mapping, Robots.Expression);
 
             Assert.Equal(actual, translation.SearchRequest.Type);
+        }
+
+        [Fact]
+        public void TypeSelectionCriteriaIsAddedWhenNoOtherCriteria()
+        {
+            var mapping = new CouchbaseElasticMapping();
+
+            var translation = ElasticQueryTranslator.Translate(mapping, Robots.Expression);
+
+            Assert.IsType<ExistsCriteria>(translation.SearchRequest.Filter);
         }
 
         [Fact]

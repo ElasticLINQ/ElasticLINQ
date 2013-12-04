@@ -7,7 +7,7 @@ namespace ElasticLinq.Request.Criteria
     /// knows of a way to negate it's effects without being
     /// wrapped in a NotCriteria.
     /// </summary>
-    internal interface INegatableCriteria
+    public interface INegatableCriteria
     {
         ICriteria Negate();
     }

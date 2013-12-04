@@ -49,6 +49,9 @@ namespace ElasticLinq.Request.Visitors
             var evaluated = PartialEvaluator.Evaluate(e);
             Visit(evaluated);
 
+            if (filter == null && query == null)
+                filter = mapping.GetTypeSelectionCriteria(type);
+
             var searchRequest = new ElasticSearchRequest(mapping.GetTypeName(type), skip, take,
                 fields, sortOptions, filter, query);
 

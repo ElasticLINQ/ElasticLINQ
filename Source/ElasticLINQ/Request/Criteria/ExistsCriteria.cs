@@ -6,7 +6,7 @@ namespace ElasticLinq.Request.Criteria
     /// Criteria that selects documents if they have any value
     /// in the specified field.
     /// </summary>
-    internal class ExistsCriteria : SingleFieldCriteria, INegatableCriteria
+    public class ExistsCriteria : SingleFieldCriteria, INegatableCriteria
     {
         public ExistsCriteria(string field)
             : base(field)

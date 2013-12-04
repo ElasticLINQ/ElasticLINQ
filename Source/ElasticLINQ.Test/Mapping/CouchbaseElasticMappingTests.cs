@@ -1,6 +1,7 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using ElasticLinq.Mapping;
+using ElasticLinq.Request.Criteria;
 using ElasticLinq.Response.Model;
 using Newtonsoft.Json.Linq;
 using System;
@@ -11,6 +12,11 @@ namespace ElasticLinq.Test.Mapping
 {
     public class CouchbaseElasticMappingTests
     {
+        private class Sample
+        {
+            public int PropertyOfSample { get; set; }
+        };
+
         public string SampleProperty { get; set; }
 
         [Fact]
@@ -114,10 +120,7 @@ namespace ElasticLinq.Test.Mapping
             Assert.Same(expected, actual);
         }
 
-        private class Sample { };
-
         [Fact]
-        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void GetObjectSourceThrowsArgumentNullExceptionWhenTypeIsNull()
         {
             var mapping = new CouchbaseElasticMapping();
@@ -126,12 +129,38 @@ namespace ElasticLinq.Test.Mapping
         }
 
         [Fact]
-        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void GetObjectSourceThrowsArgumentNullExceptionWhenHitIsNull()
         {
             var mapping = new CouchbaseElasticMapping();
 
             Assert.Throws<ArgumentNullException>(() => mapping.GetObjectSource(typeof(Hit), null));
         }
+
+        [Fact]
+        public void GetTypeSelectionCriteriaReturnsExistsWithFullyQualifiedField()
+        {
+            var mapping = new CouchbaseElasticMapping("myType", true);
+
+            var criteria = mapping.GetTypeSelectionCriteria(typeof(Sample));
+
+            Assert.IsType<ExistsCriteria>(criteria);
+            var existsCriteria = (ExistsCriteria)criteria;
+
+            Assert.Equal("myType.doc.sample.propertyOfSample", existsCriteria.Field);
+        }
+
+        [Fact]
+        public void GetTypeSelectionCriteriaReturnsExistsWithPartiallyQualifiedField()
+        {
+            var mapping = new CouchbaseElasticMapping();
+
+            var criteria = mapping.GetTypeSelectionCriteria(typeof(Sample));
+
+            Assert.IsType<ExistsCriteria>(criteria);
+            var existsCriteria = (ExistsCriteria)criteria;
+
+            Assert.Equal("doc.sample.propertyOfSample", existsCriteria.Field);
+        }
+
     }
 }

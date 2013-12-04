@@ -1,6 +1,9 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using ElasticLinq.Utility;
+using System;
+using System.Linq;
+using System.Reflection;
 
 namespace ElasticLinq.Mapping
 {
@@ -25,6 +28,13 @@ namespace ElasticLinq.Mapping
             return value.Length < 1
                 ? value
                 : value + (value.EndsWith("s") ? "" : "s");
+        }
+
+        public static PropertyInfo GetSelectionProperty(Type type)
+        {
+            return type
+                .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                .FirstOrDefault(p => p.CanRead && p.CanWrite && p.PropertyType.IsValueType && !p.PropertyType.IsGenericType);
         }
     }
 }

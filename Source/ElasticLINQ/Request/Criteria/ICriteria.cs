@@ -6,7 +6,7 @@ namespace ElasticLinq.Request.Criteria
     /// Interface that all Criteria must implement to be part of
     /// the query filter tree for ElasticSearch.
     /// </summary>
-    internal interface ICriteria
+    public interface ICriteria
     {
         string Name { get; }
     }

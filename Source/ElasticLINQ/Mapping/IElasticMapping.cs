@@ -1,5 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using ElasticLinq.Request.Criteria;
 using ElasticLinq.Response.Model;
 using Newtonsoft.Json.Linq;
 using System;
@@ -15,5 +16,6 @@ namespace ElasticLinq.Mapping
         string GetFieldName(MemberInfo memberInfo);
         string GetTypeName(Type type);
         JToken GetObjectSource(Type docType, Hit hit);
+        ICriteria GetTypeSelectionCriteria(Type docType);
     }
 }

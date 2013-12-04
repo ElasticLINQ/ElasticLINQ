@@ -1,5 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using System.Reflection;
 using ElasticLinq.Mapping;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -93,6 +94,30 @@ namespace ElasticLinq.Test.Mapping
         public void ToPluralWithNullThrowsArgumentNullException()
         {
             Assert.Throws<ArgumentNullException>(() => ((string)null).ToPlural());
+        }
+
+        [Fact]
+        public void GetSelectionPropertyReturnsReadWriteNonGenericValueProperty()
+        {
+            var selectionProperty = MappingHelpers.GetSelectionProperty(typeof(ClassWithOneValidSelectionProperty));
+
+            Assert.IsAssignableFrom<PropertyInfo>(selectionProperty);
+            Assert.Equal("Valid", selectionProperty.Name);
+            Assert.Equal(typeof(ClassWithOneValidSelectionProperty), selectionProperty.DeclaringType);
+            Assert.Equal(typeof(int), selectionProperty.PropertyType);
+        }
+
+        class ClassWithOneValidSelectionProperty
+        {
+            private int backing;
+
+            public int? Nullable { get; set; }
+            public int WriteOnly { set { backing = value; } }
+            public int ReadOnly { get { return backing; } }
+            public string NotValueType { get; set; }
+            public int Field;
+
+            public int Valid { get; set; }
         }
     }
 }

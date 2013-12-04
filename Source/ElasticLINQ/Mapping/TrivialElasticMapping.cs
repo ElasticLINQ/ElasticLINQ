@@ -1,5 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using ElasticLinq.Request.Criteria;
 using ElasticLinq.Response.Model;
 using ElasticLinq.Utility;
 using Newtonsoft.Json.Linq;
@@ -32,6 +33,11 @@ namespace ElasticLinq.Mapping
             Argument.EnsureNotNull("hit", hit);
 
             return hit._source;
+        }
+
+        public ICriteria GetTypeSelectionCriteria(Type docType)
+        {
+            return null;
         }
     }
 }
