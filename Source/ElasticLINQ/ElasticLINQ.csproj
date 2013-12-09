@@ -91,6 +91,7 @@
     <Compile Include="Request\Visitors\ProjectionExpressionVisitor.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ElasticLINQ.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
