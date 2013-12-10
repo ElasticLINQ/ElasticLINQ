@@ -15,5 +15,10 @@ namespace ElasticLinq
         {
             throw exception;
         }
+
+        public static bool Prefix(string property, string value)
+        {
+            throw exception;
+        }
     }
 }

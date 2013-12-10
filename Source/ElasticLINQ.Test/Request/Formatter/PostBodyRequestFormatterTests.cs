@@ -161,6 +161,20 @@ namespace ElasticLinq.Test.Request.Formatter
         }
 
         [Fact]
+        public void BodyContainsPrefixFilter()
+        {
+            const string expectedField = "motor";
+            const string expectedPrefix = "SR20";
+            var criteria = new PrefixCriteria(expectedField, expectedPrefix);
+
+            var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest("type1", filter: criteria));
+            var body = JObject.Parse(formatter.Body);
+
+            var actualRegexp = TraverseWithAssert(body, "filter", "prefix", expectedField);
+            Assert.Equal(expectedPrefix, actualRegexp);
+        }
+
+        [Fact]
         public void BodyContainsFilterSingleCollapsedOr()
         {
             const string expectedFieldName = "fieldShouldExist";

@@ -72,7 +72,7 @@ namespace ElasticLinq.Request.Visitors
             if (m.Method.DeclaringType == typeof(ElasticMethods))
                 return VisitElasticMethodsMethodCall(m);
 
-            return VisitGenericMethodCall(m);
+            return VisitCommonMethodCall(m);
         }
 
         private Expression VisitElasticMethodsMethodCall(MethodCallExpression m)
@@ -83,9 +83,24 @@ namespace ElasticLinq.Request.Visitors
                     if (m.Arguments.Count == 2)
                         return VisitRegexp(m.Arguments[0], m.Arguments[1]);
                     break;
+
+                case "Prefix":
+                    if (m.Arguments.Count == 2)
+                        return VisitPrefix(m.Arguments[0], m.Arguments[1]);
+                    break;
             }
 
             throw new NotSupportedException(string.Format("The ElasticMethods method '{0}' is not supported", m.Method.Name));
+        }
+
+        private Expression VisitPrefix(Expression left, Expression right)
+        {
+            var cm = ConstantMemberPair.Create(left, right);
+
+            if (cm != null)
+                return new CriteriaExpression(new PrefixCriteria(mapping.GetFieldName(cm.MemberExpression.Member), cm.ConstantExpression.Value));
+
+            throw new NotSupportedException("Prefix must be between a Member and a Constant");            
         }
 
         private Expression VisitRegexp(Expression left, Expression right)
@@ -98,7 +113,7 @@ namespace ElasticLinq.Request.Visitors
             throw new NotSupportedException("Regexp must be between a Member and a Constant");            
         }
 
-        private Expression VisitGenericMethodCall(MethodCallExpression m)
+        private Expression VisitCommonMethodCall(MethodCallExpression m)
         {
             switch (m.Method.Name)
             {
@@ -440,7 +455,7 @@ namespace ElasticLinq.Request.Visitors
             if (value.Equals(!positiveTest))
                 return new CriteriaExpression(new MissingCriteria(fieldName));
 
-            throw new NotSupportedException("A null test Expression must consist a member and be compared to a bool or null");
+            throw new NotSupportedException("A null test Expression must have a member being compared to a bool or null");
         }
 
         private Expression VisitEquals(Expression left, Expression right)

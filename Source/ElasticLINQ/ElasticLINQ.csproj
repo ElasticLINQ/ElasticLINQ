@@ -59,6 +59,7 @@
     <Compile Include="Request\Criteria\MissingCriteria.cs" />
     <Compile Include="Request\Criteria\NotCriteria.cs" />
     <Compile Include="Request\Criteria\OrCriteria.cs" />
+    <Compile Include="Request\Criteria\PrefixCriteria.cs" />
     <Compile Include="Request\Criteria\RangeCriteria.cs" />
     <Compile Include="Request\Criteria\RegExpCriteria.cs" />
     <Compile Include="Request\Criteria\SingleFieldCriteria.cs" />

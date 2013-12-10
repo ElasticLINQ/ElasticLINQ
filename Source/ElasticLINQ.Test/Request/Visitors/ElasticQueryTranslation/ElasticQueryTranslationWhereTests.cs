@@ -719,6 +719,19 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         }
 
         [Fact]
+        public void PrefixElasticMethodCreatesPrefixWhereCriteria()
+        {
+            var where = Robots.Where(r => ElasticMethods.Prefix(r.Name, "robot"));
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+
+            Assert.IsType<PrefixCriteria>(criteria);
+            var regexpCriteria = (PrefixCriteria)criteria;
+            Assert.Equal("prefix", regexpCriteria.Name);
+            Assert.Equal("name", regexpCriteria.Field);
+            Assert.Equal("robot", regexpCriteria.Prefix);
+        }
+
+        [Fact]
         public void QueryAndWhereGeneratesQueryAndFilterCriteria()
         {
             var query = Robots

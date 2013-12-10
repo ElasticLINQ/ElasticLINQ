@@ -57,6 +57,7 @@
     <Compile Include="Mapping\CouchbaseElasticMappingTests.cs" />
     <Compile Include="Mapping\ElasticFieldsMappingWrapperTests.cs" />
     <Compile Include="Mapping\MappingHelpersTests.cs" />
+    <Compile Include="Request\Criteria\PrefixCriteriaTests.cs" />
     <Compile Include="Request\Criteria\QueryStringCriteriaTests.cs" />
     <Compile Include="Request\Criteria\RegExpCriteriaTests.cs" />
     <Compile Include="Request\ElasticRequestProcessorTests.cs" />
