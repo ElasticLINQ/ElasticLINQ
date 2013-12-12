@@ -1,16 +1,15 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
-using System.Security.Cryptography;
 using ElasticLinq.Request;
 using ElasticLinq.Request.Criteria;
-using ElasticLinq.Request.Formatter;
+using ElasticLinq.Request.Formatters;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
-namespace ElasticLinq.Test.Request.Formatter
+namespace ElasticLinq.Test.Request.Formatters
 {
     public class PostBodyRequestFormatterTests
     {

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
-namespace ElasticLinq.Request.Formatter
+namespace ElasticLinq.Request.Formatters
 {
     /// <summary>
     /// Formats various parts of a <see cref="ElasticSearchRequest"/>.

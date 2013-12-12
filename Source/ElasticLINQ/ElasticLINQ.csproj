@@ -68,8 +68,8 @@
     <Compile Include="Request\Expressions\FacetExpression.cs" />
     <Compile Include="Request\Facets\IFacet.cs" />
     <Compile Include="Request\Facets\StatisticalFacet.cs" />
-    <Compile Include="Request\Formatter\PostBodyRequestFormatter.cs" />
-    <Compile Include="Request\Formatter\RequestFormatter.cs" />
+    <Compile Include="Request\Formatters\PostBodyRequestFormatter.cs" />
+    <Compile Include="Request\Formatters\RequestFormatter.cs" />
     <Compile Include="Request\SortOption.cs" />
     <Compile Include="Request\Visitors\BranchSelectExpressionVisitor.cs" />
     <Compile Include="Request\Visitors\ConstantMemberPair.cs" />

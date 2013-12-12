@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ElasticLinq.Request.Formatter
+namespace ElasticLinq.Request.Formatters
 {
     /// <summary>
     /// Formats an ElasticSearchRequest into a JSON POST body to be sent
