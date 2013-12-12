@@ -10,59 +10,18 @@ namespace ElasticLinq.Request
     /// </summary>
     internal class ElasticSearchRequest
     {
-        private readonly string type;
-        private readonly int @from;
-        private readonly int? size;
-        private readonly List<string> fields;
-        private readonly List<SortOption> sortOptions;
-        private readonly ICriteria filter;
-        private readonly ICriteria query;
-
-        public ElasticSearchRequest(string type, int @from = 0, int? size = null, List<string> fields = null,
-            List<SortOption> sortOptions = null, ICriteria filter = null, ICriteria query = null)
+        public ElasticSearchRequest()
         {
-            this.type = type;
-            this.@from = @from;
-            this.size = size;
-            this.fields = fields ?? new List<string>();
-            this.sortOptions = sortOptions ?? new List<SortOption>();
-            this.filter = filter;
-            this.query = query;
+            Fields = new List<string>();
+            SortOptions = new List<SortOption>();
         }
 
-        public long @From
-        {
-            get { return @from; }
-        }
-
-        public long? Size
-        {
-            get { return size; }
-        }
-
-        public string Type
-        {
-            get { return type; }
-        }
-
-        public IReadOnlyList<string> Fields
-        {
-            get { return fields.AsReadOnly(); }
-        }
-
-        public IReadOnlyList<SortOption> SortOptions
-        {
-            get { return sortOptions.AsReadOnly(); }
-        }
-
-        public ICriteria Filter
-        {
-            get { return filter; }
-        }
-
-        public ICriteria Query
-        {
-            get { return query; }
-        }
+        public long @From { get; set; }
+        public long? Size { get; set; }
+        public string Type { get; set; }
+        public List<string> Fields { get; set; }
+        public List<SortOption> SortOptions { get; set; }
+        public ICriteria Filter { get; set; }
+        public ICriteria Query { get; set; }
     }
 }

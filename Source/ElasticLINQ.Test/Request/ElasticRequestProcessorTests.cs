@@ -36,7 +36,7 @@ namespace ElasticLinq.Test.Request
             var log = Substitute.For<TextWriter>();
             var messageHandler = new SpyMessageHandler();
             var processor = new ElasticRequestProcessor(connection, log, messageHandler);
-            var request = new ElasticSearchRequest("docType");
+            var request = new ElasticSearchRequest { Type = "docType" };
 
             await processor.SearchAsync(request);
 
@@ -50,7 +50,7 @@ namespace ElasticLinq.Test.Request
             var connection = new ElasticConnection(new Uri("http://localhost"), "myUser", "myPass");
             var messageHandler = new SpyMessageHandler();
             var processor = new ElasticRequestProcessor(connection, log, messageHandler);
-            var request = new ElasticSearchRequest("docType");
+            var request = new ElasticSearchRequest { Type = "docType" };
 
             await processor.SearchAsync(request);
 

@@ -15,7 +15,7 @@ namespace ElasticLinq.Test.Request.Visitors
         [Fact]
         public void ConstructorSetsProperties()
         {
-            var expectedSearch = new ElasticSearchRequest("someType");
+            var expectedSearch = new ElasticSearchRequest { Type = "someType" };
             Func<Hit, object> expectedProjector = h => null;
             Func<IList, object> expectedFinalTransform = a => a;
 
@@ -32,14 +32,14 @@ namespace ElasticLinq.Test.Request.Visitors
         [Fact]
         public void ConstructorDefaultsFinalTransformToNonTransforming()
         {
-            var expectedSearch = new ElasticSearchRequest("someType");
+            var expectedSearch = new ElasticSearchRequest { Type = "someType" };
             Func<Hit, object> expectedProjector = h => null;
 
             var result = new ElasticTranslateResult(expectedSearch, expectedProjector);
 
             Assert.Same(expectedSearch, result.SearchRequest);
             Assert.Same(expectedProjector, result.Projector);
-            
+
             Assert.NotNull(result.FinalTransform);
             var transforming = new List<string>();
             var afterTransforming = result.FinalTransform.Invoke(transforming);

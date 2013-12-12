@@ -21,17 +21,12 @@ namespace ElasticLinq.Request.Visitors
     /// </summary>
     internal class ElasticQueryTranslator : ExpressionVisitor
     {
+        private readonly ElasticSearchRequest searchRequest = new ElasticSearchRequest();
         private readonly IElasticMapping mapping;
         private readonly ParameterExpression projectionParameter = Expression.Parameter(typeof(Hit), "h");
-        private readonly List<string> fields = new List<string>();
-        private readonly List<SortOption> sortOptions = new List<SortOption>();
 
-        private Func<Hit, Object> projector;
         private Type type;
-        private int skip;
-        private int? take;
-        private ICriteria filter;
-        private ICriteria query;
+        private Func<Hit, Object> projector;
         private Func<IList, object> finalTransform;
 
         private ElasticQueryTranslator(IElasticMapping mapping)
@@ -49,11 +44,9 @@ namespace ElasticLinq.Request.Visitors
             var evaluated = PartialEvaluator.Evaluate(e);
             Visit(evaluated);
 
-            if (filter == null && query == null)
-                filter = mapping.GetTypeSelectionCriteria(type);
-
-            var searchRequest = new ElasticSearchRequest(mapping.GetTypeName(type), skip, take,
-                fields, sortOptions, filter, query);
+            searchRequest.Type = mapping.GetTypeName(type);
+            if (searchRequest.Filter == null && searchRequest.Query == null)
+                searchRequest.Filter = mapping.GetTypeSelectionCriteria(type);
 
             return new ElasticTranslateResult(searchRequest, projector ?? DefaultProjector, finalTransform);
         }
@@ -194,7 +187,7 @@ namespace ElasticLinq.Request.Visitors
         {
             var constantQueryExpression = (ConstantExpression)queryExpression;
             var criteriaExpression = new CriteriaExpression(new QueryStringCriteria(constantQueryExpression.Value.ToString()));
-            query = ApplyCriteria(query, criteriaExpression.Criteria);
+            searchRequest.Query = ApplyCriteria(searchRequest.Query, criteriaExpression.Criteria);
 
             return Visit(source);
         }
@@ -253,7 +246,7 @@ namespace ElasticLinq.Request.Visitors
 
         private Expression VisitFirst(Expression source, Expression predicate, string methodName)
         {
-            take = 1;
+            searchRequest.Size = 1;
             finalTransform = o => ElasticResponseMaterializer.First(o, methodName.EndsWith("Default"));
 
             return predicate != null
@@ -263,7 +256,7 @@ namespace ElasticLinq.Request.Visitors
 
         private Expression VisitSingle(Expression source, Expression predicate, string methodName)
         {
-            take = 2;
+            searchRequest.Size = 2;
             finalTransform = o => ElasticResponseMaterializer.Single(o, methodName.EndsWith("Default"));
 
             return predicate != null
@@ -274,7 +267,7 @@ namespace ElasticLinq.Request.Visitors
         protected override Expression VisitConstant(ConstantExpression c)
         {
             if (c.Value is IQueryable)
-                SetType(((IQueryable)c.Value).ElementType);
+                type = ((IQueryable)c.Value).ElementType;
 
             return c;
         }
@@ -333,7 +326,7 @@ namespace ElasticLinq.Request.Visitors
             if (criteriaExpression == null)
                 throw new NotSupportedException(string.Format("Unknown Query predicate '{0}'", body));
 
-            query = ApplyCriteria(query, criteriaExpression.Criteria);
+            searchRequest.Query = ApplyCriteria(searchRequest.Query, criteriaExpression.Criteria);
 
             return Visit(source);
         }
@@ -347,7 +340,7 @@ namespace ElasticLinq.Request.Visitors
             if (criteriaExpression == null)
                 throw new NotSupportedException(String.Format("Unknown Where predicate '{0}'", body));
 
-            filter = ApplyCriteria(filter, criteriaExpression.Criteria);
+            searchRequest.Filter = ApplyCriteria(searchRequest.Filter, criteriaExpression.Criteria);
 
             return Visit(source);
         }
@@ -528,7 +521,7 @@ namespace ElasticLinq.Request.Visitors
             {
                 var fieldName = mapping.GetFieldName(final.Member);
                 var ignoreUnmapped = TypeHelper.IsNullableType(final.Type); // Consider a config switch?
-                sortOptions.Insert(0, new SortOption(fieldName, ascending, ignoreUnmapped));
+                searchRequest.SortOptions.Insert(0, new SortOption(fieldName, ascending, ignoreUnmapped));
             }
 
             return Visit(source);
@@ -536,7 +529,7 @@ namespace ElasticLinq.Request.Visitors
 
         private Expression VisitOrderByScore(Expression source, bool ascending)
         {
-            sortOptions.Insert(0, new SortOption("_score", ascending));
+            searchRequest.SortOptions.Insert(0, new SortOption("_score", ascending));
             return Visit(source);
         }
 
@@ -608,14 +601,14 @@ namespace ElasticLinq.Request.Visitors
             var projection = ProjectionExpressionVisitor.Rebind(projectionParameter, mapping, selectExpression);
             var compiled = Expression.Lambda(projection.Materialization, projectionParameter).Compile();
             projector = h => compiled.DynamicInvoke(h);
-            fields.AddRange(projection.FieldNames);
+            searchRequest.Fields.AddRange(projection.FieldNames);
         }
 
         private Expression VisitSkip(Expression source, Expression skipExpression)
         {
             var skipConstant = Visit(skipExpression) as ConstantExpression;
             if (skipConstant != null)
-                skip = (int)skipConstant.Value;
+                searchRequest.From = (int)skipConstant.Value;
             return Visit(source);
         }
 
@@ -623,18 +616,13 @@ namespace ElasticLinq.Request.Visitors
         {
             var takeConstant = Visit(takeExpression) as ConstantExpression;
             if (takeConstant != null)
-                take = (int)takeConstant.Value;
+                searchRequest.Size = (int)takeConstant.Value;
             return Visit(source);
         }
 
         private Func<Hit, Object> DefaultProjector
         {
             get { return hit => mapping.GetObjectSource(type, hit).ToObject(type); }
-        }
-
-        private void SetType(Type elementType)
-        {
-            type = elementType;
         }
     }
 }
