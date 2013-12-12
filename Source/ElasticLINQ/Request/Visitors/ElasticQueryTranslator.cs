@@ -161,7 +161,7 @@ namespace ElasticLinq.Request.Visitors
                 return new CriteriaExpression(TermCriteria.FromIEnumerable(field, values.Distinct()));
             }
 
-            throw new NotImplementedException("Unknown source for Contains");
+            throw new NotSupportedException(string.Format("Unknown source '{0}' for Contains operation", source));
         }
 
         internal Expression VisitElasticQueryExtensionsMethodCall(MethodCallExpression m)
@@ -314,7 +314,7 @@ namespace ElasticLinq.Request.Visitors
                     break;
             }
 
-            throw new NotSupportedException(String.Format("The MemberInfo '{0}' is not supported", m.Member.Name));
+            throw new NotSupportedException(string.Format("The MemberInfo '{0}' is not supported", m.Member.Name));
         }
 
         private static Expression StripQuotes(Expression e)
@@ -331,7 +331,7 @@ namespace ElasticLinq.Request.Visitors
 
             var criteriaExpression = body as CriteriaExpression;
             if (criteriaExpression == null)
-                throw new NotSupportedException(String.Format("Unknown Query predicate '{0}'", body));
+                throw new NotSupportedException(string.Format("Unknown Query predicate '{0}'", body));
 
             query = ApplyCriteria(query, criteriaExpression.Criteria);
 
@@ -378,7 +378,7 @@ namespace ElasticLinq.Request.Visitors
                     return VisitComparisonBinary(b);
 
                 default:
-                    throw new NotImplementedException(String.Format("Don't yet know {0}", b.NodeType));
+                    throw new NotSupportedException(string.Format("The binary expression '{0}' is not supported", b.NodeType));
             }
         }
 
@@ -400,7 +400,7 @@ namespace ElasticLinq.Request.Visitors
             {
                 var reducedExpression = expression is CriteriaExpression ? expression : Visit(expression);
                 if ((reducedExpression as T) == null)
-                    throw new NotImplementedException(string.Format("Unknown binary expression {0}", reducedExpression));
+                    throw new NotSupportedException(string.Format("Unexpected binary expression '{0}'", reducedExpression));
 
                 yield return (T)reducedExpression;
             }
@@ -439,7 +439,7 @@ namespace ElasticLinq.Request.Visitors
                     return VisitRange(b.NodeType, left, right);
 
                 default:
-                    throw new NotImplementedException(String.Format("Don't yet know {0}", b.NodeType));
+                    throw new NotSupportedException(string.Format("The binary expression '{0}' is not supported", b.NodeType));
             }
         }
 
@@ -487,25 +487,25 @@ namespace ElasticLinq.Request.Visitors
                     ? CreateExists(cm, false)
                     : new CriteriaExpression(NotCriteria.Create(new TermCriteria(mapping.GetFieldName(cm.MemberExpression.Member), cm.ConstantExpression.Value)));
 
-            throw new NotSupportedException("A NotEqual Expression must consist of a constant and a member");
+            throw new NotSupportedException("A not-equal expression must consist of a constant and a member");
         }
 
         private Expression VisitRange(ExpressionType t, Expression left, Expression right)
         {
-            var o = ConstantMemberPair.Create(left, right);
+            var cm = ConstantMemberPair.Create(left, right);
 
-            if (o != null)
+            if (cm != null)
             {
-                var field = mapping.GetFieldName(o.MemberExpression.Member);
-                return new CriteriaExpression(new RangeCriteria(field, ExpressionTypeToRangeType(t), o.ConstantExpression.Value));
+                var field = mapping.GetFieldName(cm.MemberExpression.Member);
+                return new CriteriaExpression(new RangeCriteria(field, ExpressionTypeToRangeType(t), cm.ConstantExpression.Value));
             }
 
             throw new NotSupportedException("A range must consist of a constant and a member");
         }
 
-        private static RangeComparison ExpressionTypeToRangeType(ExpressionType t)
+        private static RangeComparison ExpressionTypeToRangeType(ExpressionType expressionType)
         {
-            switch (t)
+            switch (expressionType)
             {
                 case ExpressionType.GreaterThan:
                     return RangeComparison.GreaterThan;
@@ -517,7 +517,7 @@ namespace ElasticLinq.Request.Visitors
                     return RangeComparison.LessThanOrEqual;
             }
 
-            throw new ArgumentOutOfRangeException("t");
+            throw new ArgumentOutOfRangeException("expressionType");
         }
 
         private Expression VisitOrderBy(Expression source, Expression orderByExpression, bool ascending)
