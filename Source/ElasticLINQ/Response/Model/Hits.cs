@@ -9,7 +9,7 @@ namespace ElasticLinq.Response.Model
     /// Container of hit responses from ElasticSearch.
     /// </summary>
     [DebuggerDisplay("{hits.Count} hits of {total}")]
-    public class Hits
+    internal class Hits
     {
         public long total;
         public double? max_score;

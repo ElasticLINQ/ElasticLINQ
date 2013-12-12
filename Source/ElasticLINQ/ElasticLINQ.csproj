@@ -65,6 +65,9 @@
     <Compile Include="Request\Criteria\SingleFieldCriteria.cs" />
     <Compile Include="Request\Criteria\QueryStringCriteria.cs" />
     <Compile Include="Request\Criteria\TermCriteria.cs" />
+    <Compile Include="Request\Expressions\FacetExpression.cs" />
+    <Compile Include="Request\Facets\IFacet.cs" />
+    <Compile Include="Request\Facets\StatisticalFacet.cs" />
     <Compile Include="Request\Formatter\PostBodyRequestFormatter.cs" />
     <Compile Include="Request\Formatter\RequestFormatter.cs" />
     <Compile Include="Request\SortOption.cs" />
@@ -76,6 +79,7 @@
     <Compile Include="Request\Visitors\ElasticTranslateResult.cs" />
     <Compile Include="Request\Visitors\EvaluatingExpressionVisitor.cs" />
     <Compile Include="Request\Visitors\PartialEvaluator.cs" />
+    <Compile Include="Response\Model\Facet.cs" />
     <Compile Include="Utility\Argument.cs" />
     <Compile Include="Utility\ForcedAuthHandler.cs" />
     <Compile Include="Utility\TypeHelper.cs" />

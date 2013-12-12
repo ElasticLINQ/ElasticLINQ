@@ -8,7 +8,7 @@ namespace ElasticLinq.Response.Model
     /// Shard statistics response from ElasticSearch.
     /// </summary>
     [DebuggerDisplay("{failed} failed, {successful} success")]
-    public class ShardStatistics
+    internal class ShardStatistics
     {
         public int total;
         public int successful;

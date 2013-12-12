@@ -1,6 +1,7 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using ElasticLinq.Request.Criteria;
+using ElasticLinq.Request.Facets;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -30,16 +31,16 @@ namespace ElasticLinq.Request.Formatter
 
         private JObject CreateJsonPayload()
         {
-            var root = new JObject();
+            var root = new JObject { { "timeout", Format(Connection.Timeout) } };
 
             if (SearchRequest.Fields.Any())
                 root.Add("fields", new JArray(SearchRequest.Fields));
 
             if (SearchRequest.Query != null)
-                root.Add("query", BuildCriteria(SearchRequest.Query));
+                root.Add("query", Build(SearchRequest.Query));
 
             if (SearchRequest.Filter != null)
-                root.Add("filter", BuildCriteria(SearchRequest.Filter));
+                root.Add("filter", Build(SearchRequest.Filter));
 
             if (SearchRequest.SortOptions.Any())
                 root.Add("sort", Build(SearchRequest.SortOptions));
@@ -50,14 +51,40 @@ namespace ElasticLinq.Request.Formatter
             if (SearchRequest.Size.HasValue)
                 root.Add("size", SearchRequest.Size.Value);
 
-            root.Add("timeout", Format(Connection.Timeout));
+            if (SearchRequest.Facets.Any())
+                root.Add("facets", Build(SearchRequest.Facets));
 
             return root;
         }
 
+        private static JToken Build(IEnumerable<IFacet> facets)
+        {
+            return new JObject(facets.Select(Build));
+        }
+
+        private static JProperty Build(IFacet facet)
+        {
+            JToken facetBody = null;
+
+            if (facet is StatisticalFacet)
+                facetBody = Build((StatisticalFacet)facet);
+
+            if (facetBody != null)
+                return new JProperty(facet.Name, new JObject(new JProperty(facet.Type, facetBody)));
+                
+            throw new InvalidOperationException("Unknown class of IFacet");
+        }
+
+        private static JToken Build(StatisticalFacet statisticalFacet)
+        {
+            return statisticalFacet.Fields.Count() == 1
+                ? new JObject(new JProperty("field", statisticalFacet.Fields.First()))
+                : new JObject(new JProperty("fields", new JArray(statisticalFacet.Fields)));
+        }
+
         private static JArray Build(IEnumerable<SortOption> sortOptions)
         {
-            return new JArray(sortOptions.Select(Build).ToArray());
+            return new JArray(sortOptions.Select(Build));
         }
 
         private static object Build(SortOption sortOption)
@@ -74,7 +101,7 @@ namespace ElasticLinq.Request.Formatter
             return new JObject(new JProperty(sortOption.Name, new JObject(properties)));
         }
 
-        private static JObject BuildCriteria(ICriteria criteria)
+        private static JObject Build(ICriteria criteria)
         {
             if (criteria is RangeCriteria)
                 return Build((RangeCriteria)criteria);
@@ -148,15 +175,15 @@ namespace ElasticLinq.Request.Formatter
 
         private static JObject Build(NotCriteria criteria)
         {
-            return new JObject(new JProperty(criteria.Name, BuildCriteria(criteria.Criteria)));
+            return new JObject(new JProperty(criteria.Name, Build(criteria.Criteria)));
         }
 
         private static JObject Build(CompoundCriteria criteria)
         {
             // A compound filter with one item can be collapsed
             return criteria.Criteria.Count == 1
-                ? BuildCriteria(criteria.Criteria.First())
-                : new JObject(new JProperty(criteria.Name, new JArray(criteria.Criteria.Select(BuildCriteria).ToList())));
+                ? Build(criteria.Criteria.First())
+                : new JObject(new JProperty(criteria.Name, new JArray(criteria.Criteria.Select(Build).ToList())));
         }
     }
 }

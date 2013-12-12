@@ -1,5 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
 using System.Net;
@@ -10,7 +11,7 @@ namespace ElasticLinq.Response.Model
     /// Top-level response from ElasticSearch.
     /// </summary>
     [DebuggerDisplay("{hits.hits.Count} hits in {took} ms")]
-    public class ElasticResponse
+    internal class ElasticResponse
     {
         public int took;
         public bool timed_out;
@@ -19,5 +20,7 @@ namespace ElasticLinq.Response.Model
 
         public JValue error;
         public HttpStatusCode status;
+
+        public Dictionary<string, Facet> facets;
     }
 }

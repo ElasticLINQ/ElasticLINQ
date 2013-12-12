@@ -3,6 +3,7 @@
 using ElasticLinq.Mapping;
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Expressions;
+using ElasticLinq.Request.Facets;
 using ElasticLinq.Response;
 using ElasticLinq.Response.Model;
 using ElasticLinq.Utility;
@@ -137,18 +138,46 @@ namespace ElasticLinq.Request.Visitors
                     if (m.Arguments.Count == 2)
                         return VisitEnumerableContainsMethodCall(m.Arguments[0], m.Arguments[1]);
                     break;
+
+                case "Min":
+                case "Max":
+                case "Sum":
+                case "Average":
+                case "Count":
+                case "LongCount":
+                    if (m.Arguments.Count == 2)
+                        return VisitAggregateMethodCall(m.Arguments[0], m.Arguments[1], m.Method.Name);
+                    break;
             }
 
             throw new NotSupportedException(string.Format("The Enumerable method '{0}' is not supported", m.Method.Name));
         }
 
+        private Expression VisitAggregateMethodCall(Expression source, Expression match, string operation)
+        {
+            var lambda = (LambdaExpression)StripQuotes(match);
+            var property = Visit(lambda.Body);
+
+            if (property is MemberExpression)
+            {                
+                var field = mapping.GetFieldName(((MemberExpression)property).Member);
+
+                // TODO: If source is a group, we need to term_stats not statistical
+                var facet = new StatisticalFacet("stats", field);
+                searchRequest.Facets.Add(facet);
+                return Visit(source);
+            }
+
+            throw new NotImplementedException("Unknown aggregate property");
+        }
+
         private Expression VisitEnumerableContainsMethodCall(Expression source, Expression match)
         {
-            var matched = Visit(match);
+            var property = Visit(match);
 
-            if (source is ConstantExpression && matched is MemberExpression)
+            if (source is ConstantExpression && property is MemberExpression)
             {
-                var field = mapping.GetFieldName(((MemberExpression)matched).Member);
+                var field = mapping.GetFieldName(((MemberExpression)property).Member);
                 var containsSource = ((IEnumerable)((ConstantExpression)source).Value).Cast<object>();
                 var values = new List<object>(containsSource);
                 return new CriteriaExpression(TermCriteria.FromIEnumerable(field, values.Distinct()));
@@ -238,6 +267,11 @@ namespace ElasticLinq.Request.Visitors
                 case "ThenByDescending":
                     if (m.Arguments.Count == 2)
                         return VisitOrderBy(m.Arguments[0], m.Arguments[1], m.Method.Name == "ThenBy");
+                    break;
+
+                case "Sum":
+                    if (m.Arguments.Count == 2)
+                        return VisitAggregateMethodCall(m.Arguments[0], m.Arguments[1], m.Method.Name);
                     break;
             }
 
