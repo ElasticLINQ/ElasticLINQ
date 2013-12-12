@@ -26,5 +26,6 @@ namespace ElasticLinq.Request
         public ICriteria Filter { get; set; }
         public ICriteria Query { get; set; }
         public List<IFacet> Facets { get; set; }
+        public string SearchType { get; set; }
     }
 }

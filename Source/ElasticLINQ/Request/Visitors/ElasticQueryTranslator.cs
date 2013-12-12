@@ -165,6 +165,7 @@ namespace ElasticLinq.Request.Visitors
                 // TODO: If source is a group, we need to term_stats not statistical
                 var facet = new StatisticalFacet("stats", field);
                 searchRequest.Facets.Add(facet);
+                searchRequest.SearchType = "count"; // We don't need documents
                 return Visit(source);
             }
 
