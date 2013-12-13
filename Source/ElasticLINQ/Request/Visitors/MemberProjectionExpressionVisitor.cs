@@ -12,21 +12,22 @@ using System.Reflection;
 namespace ElasticLinq.Request.Visitors
 {
     /// <summary>
-    /// Rewrites select projections to bind to JObject and captures the field names
-    /// in order to only select those fields required.
+    /// Rebinds select projection entity proprties to JObject and captures the
+    /// specific field names for selection.
     /// </summary>
-    internal class ProjectionExpressionVisitor : ElasticFieldsProjectionExpressionVisitor
+    internal class MemberProjectionExpressionVisitor : ElasticFieldExpressionVisitor
     {
+        private static readonly MethodInfo getFieldMethod = typeof(MemberProjectionExpressionVisitor).GetMethod("GetFieldValue", BindingFlags.Static | BindingFlags.NonPublic);
         private readonly HashSet<string> fieldNames = new HashSet<string>();
 
-        private ProjectionExpressionVisitor(ParameterExpression parameter, IElasticMapping mapping)
+        private MemberProjectionExpressionVisitor(ParameterExpression parameter, IElasticMapping mapping)
             : base(parameter, mapping)
         {
         }
 
         internal static new Projection Rebind(ParameterExpression parameter, IElasticMapping mapping, Expression selector)
         {
-            var visitor = new ProjectionExpressionVisitor(parameter, mapping);
+            var visitor = new MemberProjectionExpressionVisitor(parameter, mapping);
             Argument.EnsureNotNull("selector", selector);
             var materialization = visitor.Visit(selector);
             return new Projection(visitor.fieldNames, materialization);
@@ -39,8 +40,6 @@ namespace ElasticLinq.Request.Visitors
 
             return base.VisitMember(m);
         }
-
-        private static readonly MethodInfo getFieldMethod = typeof(ProjectionExpressionVisitor).GetMethod("GetFieldValue", BindingFlags.Static | BindingFlags.NonPublic);
 
         private Expression VisitFieldSelection(MemberExpression m)
         {

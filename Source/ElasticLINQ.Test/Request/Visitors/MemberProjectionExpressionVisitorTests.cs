@@ -13,7 +13,7 @@ using Xunit;
 
 namespace ElasticLinq.Test.Request.Visitors
 {
-    public class ProjectionExpressionVisitorTests
+    public class MemberProjectionExpressionVisitorTests
     {
         private class Sample
         {
@@ -26,19 +26,19 @@ namespace ElasticLinq.Test.Request.Visitors
         [Fact]
         public void RebindThrowsArgumentNullExceptionIfParameterIsNull()
         {
-            Assert.Throws<ArgumentNullException>(() => ProjectionExpressionVisitor.Rebind(null, validMapping, Expression.Constant(1)));
+            Assert.Throws<ArgumentNullException>(() => MemberProjectionExpressionVisitor.Rebind(null, validMapping, Expression.Constant(1)));
         }
 
         [Fact]
         public void RebindThrowsArgumentNullExceptionIfMappingIsNull()
         {
-            Assert.Throws<ArgumentNullException>(() => ProjectionExpressionVisitor.Rebind(validParameter, null, Expression.Constant(1)));
+            Assert.Throws<ArgumentNullException>(() => MemberProjectionExpressionVisitor.Rebind(validParameter, null, Expression.Constant(1)));
         }
 
         [Fact]
         public void RebindThrowsArgumentNullExceptionIfSelectorIsNull()
         {
-            Assert.Throws<ArgumentNullException>(() => ProjectionExpressionVisitor.Rebind(validParameter, validMapping, null));
+            Assert.Throws<ArgumentNullException>(() => MemberProjectionExpressionVisitor.Rebind(validParameter, validMapping, null));
         }
 
         [Fact]
@@ -46,7 +46,7 @@ namespace ElasticLinq.Test.Request.Visitors
         {
             var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(s => s.Name);
             var hitParameter = Expression.Parameter(typeof(Hit));
-            var rebound = ProjectionExpressionVisitor.Rebind(hitParameter, validMapping, source.Expression);
+            var rebound = MemberProjectionExpressionVisitor.Rebind(hitParameter, validMapping, source.Expression);
 
             Assert.Contains("name", rebound.FieldNames);
             Assert.Equal(1, rebound.FieldNames.Count());
@@ -57,7 +57,7 @@ namespace ElasticLinq.Test.Request.Visitors
         {
             var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(s => new { s.Name, s.Id });
             var hitParameter = Expression.Parameter(typeof(Hit));
-            var rebound = ProjectionExpressionVisitor.Rebind(hitParameter, validMapping, source.Expression);
+            var rebound = MemberProjectionExpressionVisitor.Rebind(hitParameter, validMapping, source.Expression);
 
             Assert.Contains("name", rebound.FieldNames);
             Assert.Contains("id", rebound.FieldNames);
@@ -69,7 +69,7 @@ namespace ElasticLinq.Test.Request.Visitors
         {
             var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(s => Tuple.Create(s.Name, s.Id));
             var hitParameter = Expression.Parameter(typeof(Hit));
-            var rebound = ProjectionExpressionVisitor.Rebind(hitParameter, validMapping, source.Expression);
+            var rebound = MemberProjectionExpressionVisitor.Rebind(hitParameter, validMapping, source.Expression);
 
             Assert.Contains("name", rebound.FieldNames);
             Assert.Contains("id", rebound.FieldNames);
@@ -83,7 +83,7 @@ namespace ElasticLinq.Test.Request.Visitors
             const string key = "Summer";
             var dictionary = new Dictionary<string, JToken> { { key, JToken.FromObject(expected) } };
 
-            var actual = (Sample) ProjectionExpressionVisitor.GetFieldValue(dictionary, key, typeof(Sample));
+            var actual = (Sample) MemberProjectionExpressionVisitor.GetFieldValue(dictionary, key, typeof(Sample));
 
             Assert.Equal(expected.Id, actual.Id);
             Assert.Equal(expected.Name, actual.Name);
@@ -94,7 +94,7 @@ namespace ElasticLinq.Test.Request.Visitors
         {
             var dictionary = new Dictionary<string, JToken>();
 
-            var actual = (int)ProjectionExpressionVisitor.GetFieldValue(dictionary, "Any", typeof(int));
+            var actual = (int)MemberProjectionExpressionVisitor.GetFieldValue(dictionary, "Any", typeof(int));
 
             Assert.Equal(0, actual);
         }
@@ -104,7 +104,7 @@ namespace ElasticLinq.Test.Request.Visitors
         {
             var dictionary = new Dictionary<string, JToken>();
 
-            var actual = (Sample)ProjectionExpressionVisitor.GetFieldValue(dictionary, "Any", typeof(Sample));
+            var actual = (Sample)MemberProjectionExpressionVisitor.GetFieldValue(dictionary, "Any", typeof(Sample));
 
             Assert.Null(actual);
         }

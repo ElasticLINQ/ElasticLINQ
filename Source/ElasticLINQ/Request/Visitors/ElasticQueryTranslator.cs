@@ -614,14 +614,14 @@ namespace ElasticLinq.Request.Visitors
         }
 
         /// <summary>
-        /// We are using the whole entity in a new select projection. REbind any ElasticField references to JObject
+        /// We are using the whole entity in a new select projection. Rebind any ElasticField references to JObject
         /// and ensure the entity parameter is a freshly materialized entity object from our default materializer.
         /// </summary>
         /// <param name="selectExpression">Select expression to rebind.</param>
         /// <param name="entityParameter">Parameter that references the whole entity.</param>
         private void RebindElasticFieldsAndChainProjector(Expression selectExpression, ParameterExpression entityParameter)
         {
-            var projection = ElasticFieldsProjectionExpressionVisitor.Rebind(projectionParameter, mapping, selectExpression);
+            var projection = ElasticFieldExpressionVisitor.Rebind(projectionParameter, mapping, selectExpression);
             var compiled = Expression.Lambda(projection, entityParameter, projectionParameter).Compile();
             projector = h => compiled.DynamicInvoke(DefaultProjector(h), h);
         }
@@ -633,7 +633,7 @@ namespace ElasticLinq.Request.Visitors
         /// <param name="selectExpression">Select expression to rebind.</param>
         private void RebindPropertiesAndElasticFields(Expression selectExpression)
         {
-            var projection = ProjectionExpressionVisitor.Rebind(projectionParameter, mapping, selectExpression);
+            var projection = MemberProjectionExpressionVisitor.Rebind(projectionParameter, mapping, selectExpression);
             var compiled = Expression.Lambda(projection.Materialization, projectionParameter).Compile();
             projector = h => compiled.DynamicInvoke(h);
             searchRequest.Fields.AddRange(projection.FieldNames);

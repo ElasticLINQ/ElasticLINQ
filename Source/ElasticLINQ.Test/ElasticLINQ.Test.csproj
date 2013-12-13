@@ -78,7 +78,7 @@
     <Compile Include="Request\SortOptionTests.cs" />
     <Compile Include="Request\Visitors\BranchSelectExpressionVisitorTests.cs" />
     <Compile Include="Request\Visitors\ConstantMemberPairTests.cs" />
-    <Compile Include="Request\Visitors\ElasticFieldsProjectionExpressionVisitorTests.cs" />
+    <Compile Include="Request\Visitors\ElasticFieldExpressionVisitorTests.cs" />
     <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationSingularTests.cs" />
     <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationSelectTests.cs" />
     <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationTestsBase.cs" />
@@ -88,7 +88,7 @@
     <Compile Include="Request\Visitors\ElasticTranslateResultTests.cs" />
     <Compile Include="Request\Visitors\EvaluatingExpressionVisitorTests.cs" />
     <Compile Include="Request\Visitors\PartialEvaluatorTests.cs" />
-    <Compile Include="Request\Visitors\ProjectionExpressionVisitorTests.cs" />
+    <Compile Include="Request\Visitors\MemberProjectionExpressionVisitorTests.cs" />
     <Compile Include="Response\ElasticResponseMaterializerTests.cs" />
     <Compile Include="TestSupport\FlatteningExpressionVisitor.cs" />
     <Compile Include="TestSupport\HttpStub.cs" />

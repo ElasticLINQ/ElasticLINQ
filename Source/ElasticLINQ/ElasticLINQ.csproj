@@ -73,7 +73,7 @@
     <Compile Include="Request\SortOption.cs" />
     <Compile Include="Request\Visitors\BranchSelectExpressionVisitor.cs" />
     <Compile Include="Request\Visitors\ConstantMemberPair.cs" />
-    <Compile Include="Request\Visitors\ElasticFieldsProjectionExpressionVisitor.cs" />
+    <Compile Include="Request\Visitors\ElasticFieldExpressionVisitor.cs" />
     <Compile Include="Request\Visitors\ElasticQueryTranslator.cs" />
     <Compile Include="Request\Expressions\CriteriaExpression.cs" />
     <Compile Include="Request\Visitors\ElasticTranslateResult.cs" />
@@ -93,7 +93,7 @@
     <Compile Include="Response\Model\Hit.cs" />
     <Compile Include="Response\Model\Hits.cs" />
     <Compile Include="Response\Model\ShardStatistics.cs" />
-    <Compile Include="Request\Visitors\ProjectionExpressionVisitor.cs" />
+    <Compile Include="Request\Visitors\MemberProjectionExpressionVisitor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ElasticLINQ.nuspec" />
