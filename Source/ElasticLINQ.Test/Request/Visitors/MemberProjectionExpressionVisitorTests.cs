@@ -83,7 +83,7 @@ namespace ElasticLinq.Test.Request.Visitors
             const string key = "Summer";
             var dictionary = new Dictionary<string, JToken> { { key, JToken.FromObject(expected) } };
 
-            var actual = (Sample) MemberProjectionExpressionVisitor.GetFieldValue(dictionary, key, typeof(Sample));
+            var actual = (Sample)MemberProjectionExpressionVisitor.GetDictionaryValueOrDefault(dictionary, key, typeof(Sample));
 
             Assert.Equal(expected.Id, actual.Id);
             Assert.Equal(expected.Name, actual.Name);
@@ -94,7 +94,7 @@ namespace ElasticLinq.Test.Request.Visitors
         {
             var dictionary = new Dictionary<string, JToken>();
 
-            var actual = (int)MemberProjectionExpressionVisitor.GetFieldValue(dictionary, "Any", typeof(int));
+            var actual = (int)MemberProjectionExpressionVisitor.GetDictionaryValueOrDefault(dictionary, "Any", typeof(int));
 
             Assert.Equal(0, actual);
         }
@@ -104,7 +104,7 @@ namespace ElasticLinq.Test.Request.Visitors
         {
             var dictionary = new Dictionary<string, JToken>();
 
-            var actual = (Sample)MemberProjectionExpressionVisitor.GetFieldValue(dictionary, "Any", typeof(Sample));
+            var actual = (Sample)MemberProjectionExpressionVisitor.GetDictionaryValueOrDefault(dictionary, "Any", typeof(Sample));
 
             Assert.Null(actual);
         }

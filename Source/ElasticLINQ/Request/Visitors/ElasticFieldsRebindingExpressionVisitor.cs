@@ -10,23 +10,16 @@ namespace ElasticLinq.Request.Visitors
     /// Expression visitor that substitutes references to <see cref="ElasticFields"/>
     /// with the desired underlying special reserved name.
     /// </summary>
-    internal class ElasticFieldExpressionVisitor : ExpressionVisitor
+    internal class ElasticFieldsRebindingExpressionVisitor : RebindingExpressionVisitor
     {
-        protected readonly ParameterExpression Parameter;
-        protected readonly IElasticMapping Mapping;
-
-        protected ElasticFieldExpressionVisitor(ParameterExpression parameter, IElasticMapping mapping)
+        public ElasticFieldsRebindingExpressionVisitor(ParameterExpression parameter, IElasticMapping mapping)
+            : base(parameter, mapping)
         {
-            Argument.EnsureNotNull("parameter", parameter);
-            Argument.EnsureNotNull("mapping", mapping);
-
-            Parameter = parameter;
-            Mapping = mapping;
         }
 
         internal static Expression Rebind(ParameterExpression parameter, IElasticMapping mapping, Expression selector)
         {
-            var visitor = new ElasticFieldExpressionVisitor(parameter, mapping);
+            var visitor = new ElasticFieldsRebindingExpressionVisitor(parameter, mapping);
             Argument.EnsureNotNull("selector", selector);
             return visitor.Visit(selector);
         }

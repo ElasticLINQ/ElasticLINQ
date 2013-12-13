@@ -73,12 +73,14 @@
     <Compile Include="Request\SortOption.cs" />
     <Compile Include="Request\Visitors\BranchSelectExpressionVisitor.cs" />
     <Compile Include="Request\Visitors\ConstantMemberPair.cs" />
-    <Compile Include="Request\Visitors\ElasticFieldExpressionVisitor.cs" />
+    <Compile Include="Request\Visitors\AggregateExpressionVisitor.cs" />
+    <Compile Include="Request\Visitors\ElasticFieldsRebindingExpressionVisitor.cs" />
     <Compile Include="Request\Visitors\ElasticQueryTranslator.cs" />
     <Compile Include="Request\Expressions\CriteriaExpression.cs" />
     <Compile Include="Request\Visitors\ElasticTranslateResult.cs" />
     <Compile Include="Request\Visitors\EvaluatingExpressionVisitor.cs" />
     <Compile Include="Request\Visitors\PartialEvaluator.cs" />
+    <Compile Include="Request\Visitors\RebindingExpressionVisitor.cs" />
     <Compile Include="Response\Model\Facet.cs" />
     <Compile Include="Utility\Argument.cs" />
     <Compile Include="Utility\ForcedAuthHandler.cs" />

@@ -3,7 +3,6 @@
 using ElasticLinq.Mapping;
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Expressions;
-using ElasticLinq.Request.Facets;
 using ElasticLinq.Response;
 using ElasticLinq.Response.Model;
 using ElasticLinq.Utility;
@@ -23,8 +22,8 @@ namespace ElasticLinq.Request.Visitors
     internal class ElasticQueryTranslator : ExpressionVisitor
     {
         private readonly ElasticSearchRequest searchRequest = new ElasticSearchRequest();
+        private readonly ParameterExpression hitParameter = Expression.Parameter(typeof(Hit), "h");
         private readonly IElasticMapping mapping;
-        private readonly ParameterExpression projectionParameter = Expression.Parameter(typeof(Hit), "h");
 
         private Type type;
         private Func<Hit, Object> projector;
@@ -42,8 +41,10 @@ namespace ElasticLinq.Request.Visitors
 
         private ElasticTranslateResult Translate(Expression e)
         {
-            var evaluated = PartialEvaluator.Evaluate(e);
-            Visit(evaluated);
+            var evaluation = PartialEvaluator.Evaluate(e);
+            var aggregate = AggregateExpressionVisitor.Rebind(hitParameter, mapping, evaluation);
+
+            Visit(aggregate);
 
             searchRequest.Type = mapping.GetTypeName(type);
             if (searchRequest.Filter == null && searchRequest.Query == null)
@@ -138,38 +139,9 @@ namespace ElasticLinq.Request.Visitors
                     if (m.Arguments.Count == 2)
                         return VisitEnumerableContainsMethodCall(m.Arguments[0], m.Arguments[1]);
                     break;
-
-                case "Min":
-                case "Max":
-                case "Sum":
-                case "Average":
-                case "Count":
-                case "LongCount":
-                    if (m.Arguments.Count == 2)
-                        return VisitAggregateMethodCall(m.Arguments[0], m.Arguments[1], m.Method.Name);
-                    break;
             }
 
             throw new NotSupportedException(string.Format("The Enumerable method '{0}' is not supported", m.Method.Name));
-        }
-
-        private Expression VisitAggregateMethodCall(Expression source, Expression match, string operation)
-        {
-            var lambda = (LambdaExpression)StripQuotes(match);
-            var property = Visit(lambda.Body);
-
-            if (property is MemberExpression)
-            {                
-                var field = mapping.GetFieldName(((MemberExpression)property).Member);
-
-                // TODO: If source is a group, we need to term_stats not statistical
-                var facet = new StatisticalFacet("stats", field);
-                searchRequest.Facets.Add(facet);
-                searchRequest.SearchType = "count"; // We don't need documents
-                return Visit(source);
-            }
-
-            throw new NotImplementedException("Unknown aggregate property");
         }
 
         private Expression VisitEnumerableContainsMethodCall(Expression source, Expression match)
@@ -268,11 +240,6 @@ namespace ElasticLinq.Request.Visitors
                 case "ThenByDescending":
                     if (m.Arguments.Count == 2)
                         return VisitOrderBy(m.Arguments[0], m.Arguments[1], m.Method.Name == "ThenBy");
-                    break;
-
-                case "Sum":
-                    if (m.Arguments.Count == 2)
-                        return VisitAggregateMethodCall(m.Arguments[0], m.Arguments[1], m.Method.Name);
                     break;
             }
 
@@ -621,8 +588,8 @@ namespace ElasticLinq.Request.Visitors
         /// <param name="entityParameter">Parameter that references the whole entity.</param>
         private void RebindElasticFieldsAndChainProjector(Expression selectExpression, ParameterExpression entityParameter)
         {
-            var projection = ElasticFieldExpressionVisitor.Rebind(projectionParameter, mapping, selectExpression);
-            var compiled = Expression.Lambda(projection, entityParameter, projectionParameter).Compile();
+            var projection = ElasticFieldsRebindingExpressionVisitor.Rebind(hitParameter, mapping, selectExpression);
+            var compiled = Expression.Lambda(projection, entityParameter, hitParameter).Compile();
             projector = h => compiled.DynamicInvoke(DefaultProjector(h), h);
         }
 
@@ -633,8 +600,8 @@ namespace ElasticLinq.Request.Visitors
         /// <param name="selectExpression">Select expression to rebind.</param>
         private void RebindPropertiesAndElasticFields(Expression selectExpression)
         {
-            var projection = MemberProjectionExpressionVisitor.Rebind(projectionParameter, mapping, selectExpression);
-            var compiled = Expression.Lambda(projection.Materialization, projectionParameter).Compile();
+            var projection = MemberProjectionExpressionVisitor.Rebind(hitParameter, mapping, selectExpression);
+            var compiled = Expression.Lambda(projection.Materializer, hitParameter).Compile();
             projector = h => compiled.DynamicInvoke(h);
             searchRequest.Fields.AddRange(projection.FieldNames);
         }
