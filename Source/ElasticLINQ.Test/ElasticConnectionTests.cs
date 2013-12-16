@@ -8,19 +8,19 @@ namespace ElasticLinq.Test
     public class ElasticConnectionTests
     {
         private readonly Uri endpoint = new Uri("http://localhost:1234/abc");
-        private readonly string password = "thePassword";
-        private readonly string userName = "theUser";
+        private const string Password = "thePassword";
+        private const string UserName = "theUser";
 
         [Fact]
         public void GuardClauses_Constructor()
         {
             Assert.Throws<ArgumentNullException>(() => new ElasticConnection(null));
-            Assert.Throws<ArgumentNullException>(() => new ElasticConnection(null, userName, password));
-            Assert.Throws<ArgumentNullException>(() => new ElasticConnection(endpoint, null, password));
-            Assert.Throws<ArgumentNullException>(() => new ElasticConnection(endpoint, userName, null));
+            Assert.Throws<ArgumentNullException>(() => new ElasticConnection(null, UserName, Password));
+            Assert.Throws<ArgumentNullException>(() => new ElasticConnection(endpoint, null, Password));
+            Assert.Throws<ArgumentNullException>(() => new ElasticConnection(endpoint, UserName, null));
 
-            Assert.Throws<ArgumentException>(() => new ElasticConnection(endpoint, "", password));
-            Assert.Throws<ArgumentException>(() => new ElasticConnection(endpoint, userName, ""));
+            Assert.Throws<ArgumentException>(() => new ElasticConnection(endpoint, "", Password));
+            Assert.Throws<ArgumentException>(() => new ElasticConnection(endpoint, UserName, ""));
         }
 
         [Fact]
@@ -61,11 +61,11 @@ namespace ElasticLinq.Test
         [Fact]
         public void ConstructorWithThreeArgsSetsPropertiesFromParameters()
         {
-            var connection = new ElasticConnection(endpoint, userName, password);
+            var connection = new ElasticConnection(endpoint, UserName, Password);
 
             Assert.Equal(endpoint, connection.Endpoint);
-            Assert.Equal(userName, connection.UserName);
-            Assert.Equal(password, connection.Password);
+            Assert.Equal(UserName, connection.UserName);
+            Assert.Equal(Password, connection.Password);
         }
     }
 }

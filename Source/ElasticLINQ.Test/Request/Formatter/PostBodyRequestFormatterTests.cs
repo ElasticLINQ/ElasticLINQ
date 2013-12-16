@@ -1,6 +1,5 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
-using System.Security.Cryptography;
 using ElasticLinq.Request;
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Formatter;

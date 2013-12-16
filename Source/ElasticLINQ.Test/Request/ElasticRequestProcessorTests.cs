@@ -47,9 +47,9 @@ namespace ElasticLinq.Test.Request
         public static async Task ForcesBasicAuthorizationWhenProvidedWithUsernameAndPassword()
         {
             var log = Substitute.For<TextWriter>();
-            var connection = new ElasticConnection(new Uri("http://localhost"), "myUser", "myPass");
+            var localConnection = new ElasticConnection(new Uri("http://localhost"), "myUser", "myPass");
             var messageHandler = new SpyMessageHandler();
-            var processor = new ElasticRequestProcessor(connection, log, messageHandler);
+            var processor = new ElasticRequestProcessor(localConnection, log, messageHandler);
             var request = new ElasticSearchRequest { Type = "docType" };
 
             await processor.SearchAsync(request);
