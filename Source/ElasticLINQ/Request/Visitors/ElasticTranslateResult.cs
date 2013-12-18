@@ -2,7 +2,6 @@
 
 using ElasticLinq.Response.Model;
 using System;
-using System.Collections;
 
 namespace ElasticLinq.Request.Visitors
 {
@@ -14,14 +13,12 @@ namespace ElasticLinq.Request.Visitors
     internal class ElasticTranslateResult
     {
         private readonly ElasticSearchRequest searchRequest;
-        private readonly Func<Hit, object> projector;
-        private readonly Func<IList, object> finalTransform; 
+        private readonly Func<ElasticResponse, object> materializer;
 
-        public ElasticTranslateResult(ElasticSearchRequest searchRequest, Func<Hit, object> projector, Func<IList, object> finalTransform = null)
+        public ElasticTranslateResult(ElasticSearchRequest searchRequest, Func<ElasticResponse, object> materializer)
         {
             this.searchRequest = searchRequest;
-            this.projector = projector;
-            this.finalTransform = finalTransform ?? (o => o);
+            this.materializer = materializer;
         }
 
         public ElasticSearchRequest SearchRequest
@@ -29,14 +26,9 @@ namespace ElasticLinq.Request.Visitors
             get { return searchRequest; }
         }
 
-        public Func<Hit, object> Projector
+        public Func<ElasticResponse, object> Materializer
         {
-            get { return projector; }
-        }
-
-        public Func<IList, object> FinalTransform
-        {
-            get { return finalTransform; }
+            get { return materializer; }
         }
     }
 }

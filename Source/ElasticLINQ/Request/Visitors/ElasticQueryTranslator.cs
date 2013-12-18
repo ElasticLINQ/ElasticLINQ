@@ -26,12 +26,12 @@ namespace ElasticLinq.Request.Visitors
         private readonly IElasticMapping mapping;
 
         private Type type;
-        private Func<Hit, Object> projector;
-        private Func<IList, object> finalTransform;
+        private Func<ElasticResponse, object> materializer;
 
         private ElasticQueryTranslator(IElasticMapping mapping)
         {
             this.mapping = new ElasticFieldsMappingWrapper(mapping);
+            materializer = EntityMaterializer;
         }
 
         internal static ElasticTranslateResult Translate(IElasticMapping mapping, Expression e)
@@ -50,7 +50,7 @@ namespace ElasticLinq.Request.Visitors
             if (searchRequest.Filter == null && searchRequest.Query == null)
                 searchRequest.Filter = mapping.GetTypeSelectionCriteria(type);
 
-            return new ElasticTranslateResult(searchRequest, projector ?? DefaultProjector, finalTransform);
+            return new ElasticTranslateResult(searchRequest, materializer ?? EntityMaterializer);
         }
 
         protected override Expression VisitMethodCall(MethodCallExpression m)
@@ -249,7 +249,7 @@ namespace ElasticLinq.Request.Visitors
         private Expression VisitFirst(Expression source, Expression predicate, string methodName)
         {
             searchRequest.Size = 1;
-            finalTransform = o => ElasticResponseMaterializer.First(o, methodName.EndsWith("Default"));
+            materializer = m => ElasticResponseMaterializer.First((IList)materializer(m), methodName.EndsWith("Default"));
 
             return predicate != null
                 ? VisitWhere(source, predicate)
@@ -259,7 +259,7 @@ namespace ElasticLinq.Request.Visitors
         private Expression VisitSingle(Expression source, Expression predicate, string methodName)
         {
             searchRequest.Size = 2;
-            finalTransform = o => ElasticResponseMaterializer.Single(o, methodName.EndsWith("Default"));
+            materializer = m => ElasticResponseMaterializer.Single((IList)materializer(m), methodName.EndsWith("Default"));
 
             return predicate != null
                 ? VisitWhere(source, predicate)
@@ -590,7 +590,7 @@ namespace ElasticLinq.Request.Visitors
         {
             var projection = ElasticFieldsRebindingExpressionVisitor.Rebind(hitParameter, mapping, selectExpression);
             var compiled = Expression.Lambda(projection, entityParameter, hitParameter).Compile();
-            projector = h => compiled.DynamicInvoke(DefaultProjector(h), h);
+            materializer = h => compiled.DynamicInvoke(EntityMaterializer(h), h);
         }
 
         /// <summary>
@@ -602,7 +602,7 @@ namespace ElasticLinq.Request.Visitors
         {
             var projection = MemberProjectionExpressionVisitor.Rebind(hitParameter, mapping, selectExpression);
             var compiled = Expression.Lambda(projection.Materializer, hitParameter).Compile();
-            projector = h => compiled.DynamicInvoke(h);
+            materializer = h => compiled.DynamicInvoke(h);
             searchRequest.Fields.AddRange(projection.FieldNames);
         }
 
@@ -622,9 +622,9 @@ namespace ElasticLinq.Request.Visitors
             return Visit(source);
         }
 
-        private Func<Hit, Object> DefaultProjector
+        private Func<ElasticResponse, Object> EntityMaterializer
         {
-            get { return hit => mapping.GetObjectSource(type, hit).ToObject(type); }
+            get { return response => response.hits.hits.Select(h => mapping.GetObjectSource(type, h).ToObject(type)); }
         }
     }
 }
