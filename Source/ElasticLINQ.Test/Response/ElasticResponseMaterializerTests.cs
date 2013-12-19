@@ -18,7 +18,7 @@ namespace ElasticLinq.Test.Response
             Func<Hit, SampleClass> materializer = h => new SampleClass { SampleField = (string)h.fields["someField"] };
             var hits = new[] { "first", "second", "third" }.Select(CreateHit).ToList();
 
-            var materialized = ElasticResponseMaterializer.Materialize<SampleClass>(hits, materializer);
+            var materialized = ElasticResponseMaterializer.Many<SampleClass>(hits, materializer);
 
             Assert.Equal(hits.Count, materialized.Count);
             var index = 0;
@@ -32,7 +32,7 @@ namespace ElasticLinq.Test.Response
             Func<Hit, SampleClass> materializer = h => new SampleClass { SampleField = (string)h.fields["someField"] };
             var hits = new[] { "first", "second", "third" }.Select(CreateHit).ToList();
 
-            var materialized = ElasticResponseMaterializer.Materialize(hits, typeof(SampleClass), materializer);
+            var materialized = ElasticResponseMaterializer.Many(hits, typeof(SampleClass), materializer);
 
             Assert.IsType<List<SampleClass>>(materialized);
 
@@ -49,7 +49,7 @@ namespace ElasticLinq.Test.Response
         {
             var list = new List<SampleClass> { new SampleClass(), new SampleClass() };
 
-            Assert.Throws<InvalidOperationException>(() => ElasticResponseMaterializer.Single(list, true));
+            Assert.Throws<InvalidOperationException>(() => ElasticResponseMaterializer.Single(list, o => o, true, typeof(SampleClass)));
         }
 
         [Fact]
@@ -57,7 +57,7 @@ namespace ElasticLinq.Test.Response
         {
             var list = new List<SampleClass>();
 
-            var actual = ElasticResponseMaterializer.Single(list, true);
+            var actual = ElasticResponseMaterializer.Single(list, o => o, true, typeof(SampleClass));
 
             Assert.IsType<SampleClass>(actual);
         }
@@ -67,16 +67,16 @@ namespace ElasticLinq.Test.Response
         {
             var list = new List<SampleClass>();
 
-            Assert.Throws<InvalidOperationException>(() => ElasticResponseMaterializer.Single(list, false));
+            Assert.Throws<InvalidOperationException>(() => ElasticResponseMaterializer.Single(list, o => o, false, typeof(SampleClass)));
         }
 
         [Fact]
         public void SingleReturnsOnlyResultGivenOneResult()
         {
             var expected = new SampleClass();
-            var list = new List<SampleClass> { expected };
+            var list = new List<Hit> { new Hit() };
 
-            var actual = ElasticResponseMaterializer.Single(list, false);
+            var actual = ElasticResponseMaterializer.Single(list, o => expected, false, typeof(SampleClass));
 
             Assert.Same(expected, actual);
         }
@@ -86,7 +86,7 @@ namespace ElasticLinq.Test.Response
         {
             var list = new List<SampleClass>();
 
-            var actual = ElasticResponseMaterializer.First(list, true);
+            var actual = ElasticResponseMaterializer.First(list, o => o, true, typeof(SampleClass));
 
             Assert.IsType<SampleClass>(actual);
         }
@@ -96,16 +96,16 @@ namespace ElasticLinq.Test.Response
         {
             var list = new List<SampleClass>();
 
-            Assert.Throws<InvalidOperationException>(() => ElasticResponseMaterializer.First(list, false));
+            Assert.Throws<InvalidOperationException>(() => ElasticResponseMaterializer.First(list, o => o, false, typeof(SampleClass)));
         }
 
         [Fact]
         public void FirstReturnsOnlyResultGivenOneResult()
         {
             var expected = new SampleClass();
-            var list = new List<SampleClass> { expected };
+            var list = new List<Hit> { new Hit(), new Hit() };
 
-            var actual = ElasticResponseMaterializer.First(list, false);
+            var actual = ElasticResponseMaterializer.First(list, o => expected, false, typeof(SampleClass));
 
             Assert.Same(expected, actual);
         }
@@ -114,9 +114,9 @@ namespace ElasticLinq.Test.Response
         public void FirstReturnsFirstResultGivenMoreThanOneResult()
         {
             var expected = new SampleClass();
-            var list = new List<SampleClass> { expected, new SampleClass() };
+            var list = new List<Hit> { new Hit(), new Hit() };
 
-            var actual = ElasticResponseMaterializer.First(list, false);
+            var actual = ElasticResponseMaterializer.First(list, o => expected, false, typeof(SampleClass));
 
             Assert.Same(expected, actual);
         }

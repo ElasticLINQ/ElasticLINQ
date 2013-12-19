@@ -22,12 +22,13 @@ namespace ElasticLinq.Request.Visitors
     internal class ElasticQueryTranslator : ExpressionVisitor
     {
         private readonly ElasticSearchRequest searchRequest = new ElasticSearchRequest();
-        private readonly IElasticMapping mapping;
         private readonly ParameterExpression projectionParameter = Expression.Parameter(typeof(Hit), "h");
+        private readonly IElasticMapping mapping;
 
         private Type type;
-        private Func<Hit, Object> projector;
-        private Func<IList, object> finalTransform;
+        private Type finalItemType;
+        private Func<Hit, Object> itemProjector;
+        private Func<IEnumerable, object> resultProjector;
 
         private ElasticQueryTranslator(IElasticMapping mapping)
         {
@@ -48,7 +49,11 @@ namespace ElasticLinq.Request.Visitors
             if (searchRequest.Filter == null && searchRequest.Query == null)
                 searchRequest.Filter = mapping.GetTypeSelectionCriteria(type);
 
-            return new ElasticTranslateResult(searchRequest, projector ?? DefaultProjector, finalTransform);
+            finalItemType = finalItemType ?? type;
+            itemProjector = itemProjector ?? DefaultItemProjector;
+            resultProjector = resultProjector ?? (o => ElasticResponseMaterializer.Many((IEnumerable<Hit>)o, finalItemType, itemProjector));
+
+            return new ElasticTranslateResult(searchRequest, itemProjector, resultProjector);
         }
 
         protected override Expression VisitMethodCall(MethodCallExpression m)
@@ -247,7 +252,7 @@ namespace ElasticLinq.Request.Visitors
         private Expression VisitFirst(Expression source, Expression predicate, string methodName)
         {
             searchRequest.Size = 1;
-            finalTransform = o => ElasticResponseMaterializer.First(o, methodName.EndsWith("Default"));
+            resultProjector = o => ElasticResponseMaterializer.First(o, itemProjector, methodName.EndsWith("Default"), finalItemType);
 
             return predicate != null
                 ? VisitWhere(source, predicate)
@@ -257,7 +262,7 @@ namespace ElasticLinq.Request.Visitors
         private Expression VisitSingle(Expression source, Expression predicate, string methodName)
         {
             searchRequest.Size = 2;
-            finalTransform = o => ElasticResponseMaterializer.Single(o, methodName.EndsWith("Default"));
+            resultProjector = o => ElasticResponseMaterializer.Single(o, itemProjector, methodName.EndsWith("Default"), finalItemType);
 
             return predicate != null
                 ? VisitWhere(source, predicate)
@@ -579,7 +584,7 @@ namespace ElasticLinq.Request.Visitors
         }
 
         /// <summary>
-        /// We are using the whole entity in a new select projection. REbind any ElasticField references to JObject
+        /// We are using the whole entity in a new select projection. Rebind any ElasticField references to JObject
         /// and ensure the entity parameter is a freshly materialized entity object from our default materializer.
         /// </summary>
         /// <param name="selectExpression">Select expression to rebind.</param>
@@ -588,7 +593,8 @@ namespace ElasticLinq.Request.Visitors
         {
             var projection = ElasticFieldsProjectionExpressionVisitor.Rebind(projectionParameter, mapping, selectExpression);
             var compiled = Expression.Lambda(projection, entityParameter, projectionParameter).Compile();
-            projector = h => compiled.DynamicInvoke(DefaultProjector(h), h);
+            itemProjector = h => compiled.DynamicInvoke(DefaultItemProjector(h), h);
+            finalItemType = selectExpression.Type;
         }
 
         /// <summary>
@@ -600,7 +606,7 @@ namespace ElasticLinq.Request.Visitors
         {
             var projection = ProjectionExpressionVisitor.Rebind(projectionParameter, mapping, selectExpression);
             var compiled = Expression.Lambda(projection.Materialization, projectionParameter).Compile();
-            projector = h => compiled.DynamicInvoke(h);
+            itemProjector = h => compiled.DynamicInvoke(h);
             searchRequest.Fields.AddRange(projection.FieldNames);
         }
 
@@ -620,7 +626,7 @@ namespace ElasticLinq.Request.Visitors
             return Visit(source);
         }
 
-        private Func<Hit, Object> DefaultProjector
+        private Func<Hit, Object> DefaultItemProjector
         {
             get { return hit => mapping.GetObjectSource(type, hit).ToObject(type); }
         }

@@ -99,8 +99,7 @@ namespace ElasticLinq
                 if (response == null)
                     throw new InvalidOperationException("No HTTP response received.");
 
-                var list = ElasticResponseMaterializer.Materialize(response.hits.hits, elementType, translation.Projector);
-                return translation.FinalTransform(list);
+                return translation.ResultCreator(response.hits.hits);
             }
             catch (AggregateException ex)
             {

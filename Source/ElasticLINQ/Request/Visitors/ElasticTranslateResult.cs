@@ -14,14 +14,14 @@ namespace ElasticLinq.Request.Visitors
     internal class ElasticTranslateResult
     {
         private readonly ElasticSearchRequest searchRequest;
-        private readonly Func<Hit, object> projector;
-        private readonly Func<IList, object> finalTransform; 
+        private readonly Func<Hit, object> itemCreator;
+        private readonly Func<IEnumerable, object> resultCreator; 
 
-        public ElasticTranslateResult(ElasticSearchRequest searchRequest, Func<Hit, object> projector, Func<IList, object> finalTransform = null)
+        public ElasticTranslateResult(ElasticSearchRequest searchRequest, Func<Hit, object> itemCreator, Func<IEnumerable, object> resultCreator)
         {
             this.searchRequest = searchRequest;
-            this.projector = projector;
-            this.finalTransform = finalTransform ?? (o => o);
+            this.itemCreator = itemCreator;
+            this.resultCreator = resultCreator;
         }
 
         public ElasticSearchRequest SearchRequest
@@ -29,14 +29,14 @@ namespace ElasticLinq.Request.Visitors
             get { return searchRequest; }
         }
 
-        public Func<Hit, object> Projector
+        public Func<Hit, object> ItemCreator
         {
-            get { return projector; }
+            get { return itemCreator; }
         }
 
-        public Func<IList, object> FinalTransform
+        public Func<IEnumerable, object> ResultCreator
         {
-            get { return finalTransform; }
+            get { return resultCreator; }
         }
     }
 }
