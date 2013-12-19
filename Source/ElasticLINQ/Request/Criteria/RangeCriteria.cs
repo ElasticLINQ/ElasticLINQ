@@ -49,7 +49,7 @@ namespace ElasticLinq.Request.Criteria
 
         public override string ToString()
         {
-            return "range: " + field + "(" + String.Join(", ", specifications.Select(s => s.ToString())) + ")";
+            return "range: " + field + "(" + String.Join(",", specifications.Select(s => s.ToString())) + ")";
         }
     }
 
@@ -101,7 +101,7 @@ namespace ElasticLinq.Request.Criteria
 
         public override string ToString()
         {
-            return rangeComparisonValues[comparison] + " " + value;
+            return comparison + " " + value;
         }
     }
 }
