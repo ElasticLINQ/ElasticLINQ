@@ -90,7 +90,7 @@
     <Compile Include="Request\Visitors\PartialEvaluatorTests.cs" />
     <Compile Include="Request\Visitors\ProjectionExpressionVisitorTests.cs" />
     <Compile Include="Response\Materializers\MaterializerTestHelper.cs" />
-    <Compile Include="Response\Materializers\ElasticSingleHitMaterializerTests.cs" />
+    <Compile Include="Response\Materializers\ElasticOneHitMaterializerTests.cs" />
     <Compile Include="Response\Materializers\ElasticManyHitsMaterializerTests.cs" />
     <Compile Include="TestSupport\FlatteningExpressionVisitor.cs" />
     <Compile Include="TestSupport\HttpStub.cs" />

@@ -10,7 +10,14 @@ namespace ElasticLinq.Test
     {
         [Fact]
         [ExcludeFromCodeCoverage] // Expression isn't "executed"
-        public void ScoreThrowsIfAccessed()
+        public void PrefixThrowsIfAccessed()
+        {
+            Assert.Throws<InvalidOperationException>(() => ElasticMethods.Prefix("a", "b"));
+        }
+
+        [Fact]
+        [ExcludeFromCodeCoverage] // Expression isn't "executed"
+        public void RegexpThrowsIfAccessed()
         {
             Assert.Throws<InvalidOperationException>(() => ElasticMethods.Regexp("a", "b"));
         }

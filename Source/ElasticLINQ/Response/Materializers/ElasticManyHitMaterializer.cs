@@ -22,7 +22,7 @@ namespace ElasticLinq.Response.Materializers
         public ElasticManyHitsMaterializer(Func<Hit, object> itemCreator, Type elementType)
         {
             this.itemCreator = itemCreator;
-            this.elementType = elementType ?? itemCreator.Method.ReturnType;
+            this.elementType = elementType;
         }
 
         public object Materialize(ElasticResponse elasticResponse)

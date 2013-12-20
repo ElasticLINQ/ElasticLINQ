@@ -19,7 +19,7 @@ namespace ElasticLinq.Test.Response.Materializers
         }
 
         [Fact]
-        public void SingleOrDefaultReturnsDefaultGivenNoResults()
+        public void SingleOrDefaultReturnsNullGivenNoResultsForAReferenceType()
         {
             var response = MaterializerTestHelper.CreateSampleResponse(0);
             var materializer = new ElasticOneHitMaterializer(o => o, typeof(SampleClass), throwIfMoreThanOne: true, defaultIfNone: true);
@@ -27,6 +27,17 @@ namespace ElasticLinq.Test.Response.Materializers
             var actual = materializer.Materialize(response);
 
             Assert.Null(actual);
+        }
+
+        [Fact]
+        public void SingleOrDefaultReturnsDefaultGivenNoResultsForAValueType()
+        {
+            var response = MaterializerTestHelper.CreateSampleResponse(0);
+            var materializer = new ElasticOneHitMaterializer(o => o, typeof(int), throwIfMoreThanOne: true, defaultIfNone: true);
+
+            var actual = materializer.Materialize(response);
+
+            Assert.Equal(default(int), actual);
         }
 
         [Fact]
