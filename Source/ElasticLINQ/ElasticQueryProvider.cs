@@ -3,7 +3,6 @@
 using ElasticLinq.Mapping;
 using ElasticLinq.Request;
 using ElasticLinq.Request.Visitors;
-using ElasticLinq.Response;
 using ElasticLinq.Utility;
 using System;
 using System.IO;
@@ -99,7 +98,7 @@ namespace ElasticLinq
                 if (response == null)
                     throw new InvalidOperationException("No HTTP response received.");
 
-                return translation.ResultCreator(response.hits.hits);
+                return translation.Materializer.Materialize(response);
             }
             catch (AggregateException ex)
             {

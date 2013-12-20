@@ -3,7 +3,7 @@
 using ElasticLinq.Mapping;
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Expressions;
-using ElasticLinq.Response;
+using ElasticLinq.Response.Materializers;
 using ElasticLinq.Response.Model;
 using ElasticLinq.Utility;
 using System;
@@ -28,7 +28,7 @@ namespace ElasticLinq.Request.Visitors
         private Type type;
         private Type finalItemType;
         private Func<Hit, Object> itemProjector;
-        private Func<IEnumerable, object> resultProjector;
+        private IElasticMaterializer materializer;
 
         private ElasticQueryTranslator(IElasticMapping mapping)
         {
@@ -49,11 +49,10 @@ namespace ElasticLinq.Request.Visitors
             if (searchRequest.Filter == null && searchRequest.Query == null)
                 searchRequest.Filter = mapping.GetTypeSelectionCriteria(type);
 
-            finalItemType = finalItemType ?? type;
-            itemProjector = itemProjector ?? DefaultItemProjector;
-            resultProjector = resultProjector ?? (o => ElasticResponseMaterializer.Many((IEnumerable<Hit>)o, finalItemType, itemProjector));
+            if (materializer == null)
+                materializer = new ElasticManyHitsMaterializer(itemProjector ?? DefaultItemProjector, finalItemType ?? type);
 
-            return new ElasticTranslateResult(searchRequest, itemProjector, resultProjector);
+            return new ElasticTranslateResult(searchRequest, materializer);
         }
 
         protected override Expression VisitMethodCall(MethodCallExpression m)
@@ -208,18 +207,12 @@ namespace ElasticLinq.Request.Visitors
 
                 case "First":
                 case "FirstOrDefault":
-                    if (m.Arguments.Count == 1)
-                        return VisitFirst(m.Arguments[0], null, m.Method.Name);
-                    if (m.Arguments.Count == 2)
-                        return VisitFirst(m.Arguments[0], m.Arguments[1], m.Method.Name);
-                    break;
-
                 case "Single":
                 case "SingleOrDefault":
                     if (m.Arguments.Count == 1)
-                        return VisitSingle(m.Arguments[0], null, m.Method.Name);
+                        return VisitFirstOrSingle(m.Arguments[0], null, m.Method.Name);
                     if (m.Arguments.Count == 2)
-                        return VisitSingle(m.Arguments[0], m.Arguments[1], m.Method.Name);
+                        return VisitFirstOrSingle(m.Arguments[0], m.Arguments[1], m.Method.Name);
                     break;
 
                 case "Where":
@@ -249,20 +242,14 @@ namespace ElasticLinq.Request.Visitors
             throw new NotSupportedException(string.Format("The Queryable method '{0}' is not supported", m.Method.Name));
         }
 
-        private Expression VisitFirst(Expression source, Expression predicate, string methodName)
+        private Expression VisitFirstOrSingle(Expression source, Expression predicate, string methodName)
         {
-            searchRequest.Size = 1;
-            resultProjector = o => ElasticResponseMaterializer.First(o, itemProjector, methodName.EndsWith("Default"), finalItemType);
+            var single = methodName.StartsWith("Single");
+            var orDefault = methodName.EndsWith("OrDefault");
 
-            return predicate != null
-                ? VisitWhere(source, predicate)
-                : Visit(source);
-        }
-
-        private Expression VisitSingle(Expression source, Expression predicate, string methodName)
-        {
-            searchRequest.Size = 2;
-            resultProjector = o => ElasticResponseMaterializer.Single(o, itemProjector, methodName.EndsWith("Default"), finalItemType);
+            searchRequest.Size = single ? 2 : 1;
+            finalItemType = source.Type;
+            materializer = new ElasticOneHitMaterializer(itemProjector ?? DefaultItemProjector, finalItemType, single, orDefault);
 
             return predicate != null
                 ? VisitWhere(source, predicate)
@@ -608,6 +595,7 @@ namespace ElasticLinq.Request.Visitors
             var compiled = Expression.Lambda(projection.Materialization, projectionParameter).Compile();
             itemProjector = h => compiled.DynamicInvoke(h);
             searchRequest.Fields.AddRange(projection.FieldNames);
+            finalItemType = selectExpression.Type;
         }
 
         private Expression VisitSkip(Expression source, Expression skipExpression)

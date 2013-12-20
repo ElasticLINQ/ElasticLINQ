@@ -2,9 +2,7 @@
 
 using ElasticLinq.Request;
 using ElasticLinq.Request.Visitors;
-using ElasticLinq.Response.Model;
-using System;
-using System.Collections;
+using ElasticLinq.Response.Materializers;
 using Xunit;
 
 namespace ElasticLinq.Test.Request.Visitors
@@ -15,17 +13,12 @@ namespace ElasticLinq.Test.Request.Visitors
         public void ConstructorSetsProperties()
         {
             var expectedSearch = new ElasticSearchRequest { Type = "someType" };
-            Func<Hit, object> expectedProjector = h => null;
-            Func<IEnumerable, object> expectedFinalTransform = a => a;
+            var expectedMaterializer = new ElasticManyHitsMaterializer(o => o, typeof(ElasticConnectionTests));
 
-            var result = new ElasticTranslateResult(expectedSearch, expectedProjector, expectedFinalTransform);
+            var result = new ElasticTranslateResult(expectedSearch, expectedMaterializer);
 
             Assert.Same(expectedSearch, result.SearchRequest);
-            Assert.Same(expectedProjector, result.ItemCreator);
-            Assert.Same(expectedFinalTransform, result.ResultCreator);
-
-            Assert.Null(expectedProjector.Invoke(new Hit())); // For code coverage only
-            Assert.Null(expectedFinalTransform.Invoke(null)); // For code coverage only
+            Assert.Same(expectedMaterializer, result.Materializer);
         }
     }
 }

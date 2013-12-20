@@ -11,7 +11,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
     public class ElasticQueryTranslationTests : ElasticQueryTranslationTestsBase
     {
         [Fact]
-        public void TypeIsSetFromType()
+        public void SearchRequestTypeIsSetFromType()
         {
             var actual = Mapping.GetTypeName(typeof(Robot));
 
