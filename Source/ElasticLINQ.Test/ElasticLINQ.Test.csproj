@@ -89,7 +89,9 @@
     <Compile Include="Request\Visitors\EvaluatingExpressionVisitorTests.cs" />
     <Compile Include="Request\Visitors\PartialEvaluatorTests.cs" />
     <Compile Include="Request\Visitors\MemberProjectionExpressionVisitorTests.cs" />
-    <Compile Include="Response\ElasticResponseMaterializerTests.cs" />
+    <Compile Include="Response\Materializers\MaterializerTestHelper.cs" />
+    <Compile Include="Response\Materializers\ElasticOneHitMaterializerTests.cs" />
+    <Compile Include="Response\Materializers\ElasticManyHitsMaterializerTests.cs" />
     <Compile Include="TestSupport\FlatteningExpressionVisitor.cs" />
     <Compile Include="TestSupport\HttpStub.cs" />
     <Compile Include="TestSupport\FakeElasticMapping.cs" />

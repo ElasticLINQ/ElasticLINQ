@@ -70,6 +70,8 @@
     <Compile Include="Request\Facets\StatisticalFacet.cs" />
     <Compile Include="Request\Formatters\PostBodyRequestFormatter.cs" />
     <Compile Include="Request\Formatters\RequestFormatter.cs" />
+    <Compile Include="Response\Materializers\ElasticOneHitMaterializer.cs" />
+    <Compile Include="Response\Materializers\ElasticManyHitMaterializer.cs" />
     <Compile Include="Request\SortOption.cs" />
     <Compile Include="Request\Visitors\BranchSelectExpressionVisitor.cs" />
     <Compile Include="Request\Visitors\ConstantMemberPair.cs" />
@@ -82,6 +84,7 @@
     <Compile Include="Request\Visitors\PartialEvaluator.cs" />
     <Compile Include="Request\Visitors\RebindingExpressionVisitor.cs" />
     <Compile Include="Response\Model\Facet.cs" />
+    <Compile Include="Response\Materializers\IElasticMaterializer.cs" />
     <Compile Include="Utility\Argument.cs" />
     <Compile Include="Utility\ForcedAuthHandler.cs" />
     <Compile Include="Utility\TypeHelper.cs" />
@@ -91,7 +94,6 @@
     <Compile Include="Request\ElasticRequestProcessor.cs" />
     <Compile Include="Request\ElasticSearchRequest.cs" />
     <Compile Include="Response\Model\ElasticResponse.cs" />
-    <Compile Include="Response\ElasticResponseMaterializer.cs" />
     <Compile Include="Response\Model\Hit.cs" />
     <Compile Include="Response\Model\Hits.cs" />
     <Compile Include="Response\Model\ShardStatistics.cs" />
