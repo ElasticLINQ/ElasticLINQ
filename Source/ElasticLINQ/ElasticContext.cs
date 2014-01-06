@@ -9,7 +9,7 @@ namespace ElasticLinq
     /// <summary>
     /// Provides an entry point to easily create LINQ queries for ElasticSearch.
     /// </summary>
-    public class ElasticContext
+    public class ElasticContext : IElasticContext
     {
         private readonly ElasticConnection connection;
         private readonly ElasticQueryProvider provider;
