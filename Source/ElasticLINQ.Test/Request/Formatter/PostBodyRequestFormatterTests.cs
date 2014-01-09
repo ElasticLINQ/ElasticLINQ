@@ -294,6 +294,31 @@ namespace ElasticLinq.Test.Request.Formatter
             Assert.Equal(expectedSize, result);
         }
 
+        [Fact]
+        public static void BodyContainsTimeoutWhenSpecified()
+        {
+            const string expectedTimeout = "15s";
+            var connection = new ElasticConnection(new Uri("http://localhost/")) { Timeout = TimeSpan.FromSeconds(15) };
+
+            var formatter = new PostBodyRequestFormatter(connection, new ElasticSearchRequest());
+            var body = JObject.Parse(formatter.Body);
+
+            var result = TraverseWithAssert(body, "timeout");
+            Assert.Equal(expectedTimeout, result);
+        }
+
+        [Fact]
+        public static void BodyDoesNotContainTimeoutWhenZero()
+        {
+            var connection = new ElasticConnection(new Uri("http://localhost/")) { Timeout = TimeSpan.Zero };
+
+            var formatter = new PostBodyRequestFormatter(connection, new ElasticSearchRequest());
+            var body = JObject.Parse(formatter.Body);
+
+            var result = body["timeout"];
+            Assert.Null(result);
+        }
+
         private static JToken TraverseWithAssert(JToken token, params string[] paths)
         {
             foreach (var path in paths)

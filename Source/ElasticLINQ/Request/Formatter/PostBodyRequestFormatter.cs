@@ -1,6 +1,7 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using ElasticLinq.Request.Criteria;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -25,7 +26,7 @@ namespace ElasticLinq.Request.Formatter
 
         public string Body
         {
-            get { return CreateJsonPayload().ToString(); }
+            get { return CreateJsonPayload().ToString(Formatting.None); }
         }
 
         private JObject CreateJsonPayload()
@@ -50,7 +51,8 @@ namespace ElasticLinq.Request.Formatter
             if (SearchRequest.Size.HasValue)
                 root.Add("size", SearchRequest.Size.Value);
 
-            root.Add("timeout", Format(Connection.Timeout));
+            if (Connection.Timeout != TimeSpan.Zero)
+                root.Add("timeout", Format(Connection.Timeout));
 
             return root;
         }
