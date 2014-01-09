@@ -1,0 +1,13 @@
+<Project ToolsVersion="4.0" DefaultTargets="Test" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <XunitMsBuildRunner Include="$(SolutionDir)packages\**\xunit.runner.msbuild.dll"/>
+  </ItemGroup>
+  <UsingTask TaskName="Xunit.Runner.MSBuild.xunit" AssemblyFile="@(XunitMsBuildRunner)"/>
+
+  <Target Name="Test">
+    <ItemGroup>
+      <TestAssemblies Include="$(SolutionDir)**\bin\$(Configuration)\*.Test.dll"/>
+    </ItemGroup>
+    <xunit Assemblies="@(TestAssemblies)" />
+  </Target>
+</Project>

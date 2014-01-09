@@ -98,6 +98,9 @@
     <Compile Include="Utility\ArgumentTests.cs" />
     <Compile Include="Utility\SpyMessageHandler.cs" />
     <Compile Include="Utility\TypeHelperTests.cs" />
+    <Compile Include="..\GlobalAssemblyInfo.cs">
+      <Link>Properties\GlobalAssemblyInfo.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
