@@ -13,7 +13,7 @@ namespace ElasticLinq
     /// ElasticSearch query object used to facilitate LINQ query syntax.
     /// </summary>
     /// <typeparam name="T">Element type being queried.</typeparam>
-    public class ElasticQuery<T> : IOrderedQueryable<T>
+    public class ElasticQuery<T> : IElasticQuery<T>
     {
         private readonly ElasticQueryProvider provider;
         private readonly Expression expression;

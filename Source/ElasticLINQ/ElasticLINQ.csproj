@@ -49,6 +49,7 @@
     <Compile Include="ElasticQueryExtensions.cs" />
     <Compile Include="ElasticQueryProvider.cs" />
     <Compile Include="IElasticContext.cs" />
+    <Compile Include="IElasticQuery.cs" />
     <Compile Include="Mapping\CouchbaseElasticMapping.cs" />
     <Compile Include="Mapping\ElasticFieldsMappingWrapper.cs" />
     <Compile Include="Mapping\MappingHelpers.cs" />
