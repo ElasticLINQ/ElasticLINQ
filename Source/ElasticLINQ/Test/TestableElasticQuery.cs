@@ -29,7 +29,7 @@ namespace ElasticLinq.Test
 
         public IEnumerator<T> GetEnumerator()
         {
-            Context.Requests.Add(ToString());
+            Context.Requests.Add(ToElasticSearchQuery());
 
             return ((IEnumerable<T>)Provider.Execute(Expression)).GetEnumerator();
         }
