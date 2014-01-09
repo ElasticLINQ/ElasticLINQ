@@ -106,6 +106,26 @@ namespace ElasticLinq.Test
             Assert.Throws<ArgumentNullException>(() => ElasticQueryExtensions.ThenByScoreDescending<Sample>(null));
         }
 
+        [Fact]
+        public static void WithElasticQuery_ToElasticSearchQuery_ReturnsJSON()
+        {
+            var query = new TestableElasticContext().Query<Sample>();
+
+            var result = query.Where(x => x.Property == "2112").ToElasticSearchQuery();
+
+            Assert.Equal(@"{""filter"":{""term"":{""property"":""2112""}}}", result);
+        }
+
+        [Fact]
+        public static void WithNonElasticQuery_ToElasticSearchQuery_Throws()
+        {
+            var query = new[] { 42, 2112 }.AsQueryable();
+
+            var ex = Assert.Throws<ArgumentException>(() => query.ToElasticSearchQuery());
+            Assert.True(ex.Message.StartsWith("Query must be of type IElasticQuery<> to call ToElasticSearchQuery()"));
+            Assert.Equal("source", ex.ParamName);
+        }
+
         private static void AssertIsAddedToExpressionTree<TSequence, TElement>(TSequence source, Func<TSequence, TSequence> method, string methodName)
             where TSequence : IQueryable<TElement>
         {

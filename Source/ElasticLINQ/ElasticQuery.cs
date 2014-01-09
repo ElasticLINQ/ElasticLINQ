@@ -6,6 +6,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using ElasticLinq.Request.Visitors;
+using ElasticLinq.Request.Formatter;
 
 namespace ElasticLinq
 {
@@ -61,6 +63,16 @@ namespace ElasticLinq
         public IQueryProvider Provider
         {
             get { return provider; }
+        }
+
+        /// <summary>
+        /// Shows the query that would be issued to ElasticSearch
+        /// </summary>
+        public string ToElasticSearchQuery()
+        {
+            var request = ElasticQueryTranslator.Translate(provider.Mapping, Expression);
+            var formatter = new PostBodyRequestFormatter(provider.Connection, request.SearchRequest);
+            return formatter.Body;
         }
     }
 }

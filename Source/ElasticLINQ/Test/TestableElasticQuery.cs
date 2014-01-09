@@ -39,7 +39,7 @@ namespace ElasticLinq.Test
             return GetEnumerator();
         }
 
-        public override string ToString()
+        public string ToElasticSearchQuery()
         {
             var request = ElasticQueryTranslator.Translate(Context.Mapping, Expression);
             var formatter = new PostBodyRequestFormatter(Context.Connection, request.SearchRequest);

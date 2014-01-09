@@ -8,5 +8,6 @@ namespace ElasticLinq
 {
     public interface IElasticQuery<T> : IOrderedQueryable<T>
     {
+        string ToElasticSearchQuery();
     }
 }
