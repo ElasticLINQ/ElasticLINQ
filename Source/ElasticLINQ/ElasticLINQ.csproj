@@ -82,6 +82,7 @@
     <Compile Include="Test\TestableElasticQuery.cs" />
     <Compile Include="Test\TestableElasticQueryProvider.cs" />
     <Compile Include="Utility\Argument.cs" />
+    <Compile Include="Utility\AsyncHelper.cs" />
     <Compile Include="Utility\ForcedAuthHandler.cs" />
     <Compile Include="Utility\TypeHelper.cs" />
     <Compile Include="Mapping\IElasticMapping.cs" />
