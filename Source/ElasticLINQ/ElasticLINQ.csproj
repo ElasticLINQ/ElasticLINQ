@@ -48,6 +48,8 @@
     <Compile Include="ElasticQuery.cs" />
     <Compile Include="ElasticQueryExtensions.cs" />
     <Compile Include="ElasticQueryProvider.cs" />
+    <Compile Include="IElasticContext.cs" />
+    <Compile Include="IElasticQuery.cs" />
     <Compile Include="Mapping\CouchbaseElasticMapping.cs" />
     <Compile Include="Mapping\ElasticFieldsMappingWrapper.cs" />
     <Compile Include="Mapping\MappingHelpers.cs" />
@@ -85,7 +87,11 @@
     <Compile Include="Request\Visitors\RebindingExpressionVisitor.cs" />
     <Compile Include="Response\Model\Facet.cs" />
     <Compile Include="Response\Materializers\IElasticMaterializer.cs" />
+    <Compile Include="Test\TestableElasticContext.cs" />
+    <Compile Include="Test\TestableElasticQuery.cs" />
+    <Compile Include="Test\TestableElasticQueryProvider.cs" />
     <Compile Include="Utility\Argument.cs" />
+    <Compile Include="Utility\AsyncHelper.cs" />
     <Compile Include="Utility\ForcedAuthHandler.cs" />
     <Compile Include="Utility\TypeHelper.cs" />
     <Compile Include="Mapping\IElasticMapping.cs" />
@@ -98,6 +104,9 @@
     <Compile Include="Response\Model\Hits.cs" />
     <Compile Include="Response\Model\ShardStatistics.cs" />
     <Compile Include="Request\Visitors\MemberProjectionExpressionVisitor.cs" />
+    <Compile Include="..\GlobalAssemblyInfo.cs">
+      <Link>Properties\GlobalAssemblyInfo.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="ElasticLINQ.nuspec" />

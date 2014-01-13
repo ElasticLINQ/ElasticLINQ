@@ -2,6 +2,7 @@
 
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Facets;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -26,12 +27,12 @@ namespace ElasticLinq.Request.Formatters
 
         public string Body
         {
-            get { return CreateJsonPayload().ToString(); }
+            get { return CreateJsonPayload().ToString(Formatting.None); }
         }
 
         private JObject CreateJsonPayload()
         {
-            var root = new JObject { { "timeout", Format(Connection.Timeout) } };
+            var root = new JObject();
 
             if (SearchRequest.Fields.Any())
                 root.Add("fields", new JArray(SearchRequest.Fields));
@@ -53,6 +54,9 @@ namespace ElasticLinq.Request.Formatters
 
             if (SearchRequest.Facets.Any())
                 root.Add("facets", Build(SearchRequest.Facets));
+
+            if (Connection.Timeout != TimeSpan.Zero)
+                root.Add("timeout", Format(Connection.Timeout));
 
             return root;
         }

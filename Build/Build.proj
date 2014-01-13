@@ -1,0 +1,87 @@
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Default">
+  <PropertyGroup>
+    <RootDir>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..'))\</RootDir>
+    <BuildDir>$(RootDir)Build\</BuildDir>
+    <SolutionDir>$(RootDir)Source\</SolutionDir>
+    <NugetDir>$(SolutionDir).nuget\</NugetDir>
+    <PackagesDir>$(SolutionDir)packages\</PackagesDir>
+  </PropertyGroup>
+
+  <Import Project="$(BuildDir)Tasks.proj"/>
+
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">Any CPU</Platform>
+    <TrackFileAccess>false</TrackFileAccess>
+    <NugetExe>$(NugetDir)nuget.exe</NugetExe>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <SolutionFile Include="$(SolutionDir)ElasticLINQ.sln"/>
+    <NuspecFiles Include="$(SolutionDir)**\*.nuspec"/>
+    <NuGetCsprojTargets Include="$(SolutionDir)ElasticLINQ\ElasticLINQ.csproj"/>
+  </ItemGroup>
+
+  <Target Name="Default" DependsOnTargets="Test"/>
+  <Target Name="TeamCity" DependsOnTargets="Clean;PackageRestore;SetVersionNumber;Test;Packages"/>
+
+  <Target Name="Build" DependsOnTargets="PackageRestore">
+    <MSBuild
+        Projects="@(SolutionFile)"
+        Targets="Build"
+        Properties="Configuration=$(Configuration);TrackFileAccess=$(TrackFileAccess)"/>
+  </Target>
+
+  <Target Name="Clean">
+    <ItemGroup>
+      <CleanFileList Include="$(RootDir)*.nupkg;$(NugetExe)"/>
+    </ItemGroup>
+    <MSBuild
+        Projects="@(SolutionFile)"
+        Targets="Clean"
+        Properties="Configuration=$(Configuration);TrackFileAccess=$(TrackFileAccess)"/>
+    <Delete Files="@(CleanFileList)" ContinueOnError="true"/>
+  </Target>
+
+  <Target Name="PackageRestore" DependsOnTargets="_DownloadNuGet">
+    <Exec Command="$(NugetExe) restore @(SolutionFile) -NonInteractive -Verbosity quiet"/>
+  </Target>
+
+  <Target Name="Packages">
+    <Exec Command="$(NugetExe) pack %(NuGetCsProjTargets.Identity) -NoPackageAnalysis -NonInteractive -Verbosity quiet -Symbols -Properties Configuration=$(Configuration)" WorkingDirectory="$(RootDir)"/>
+  </Target>
+
+  <Target Name="Test" DependsOnTargets="Build">
+    <Message Text=" " Importance="High"/>
+    <MSBuild Projects="$(BuildDir)Tests.proj" Properties="SolutionDir=$(SolutionDir);Configuration=$(Configuration)"/>
+  </Target>
+
+  <PropertyGroup Condition="'$(BuildNumber)' == ''">
+    <BuildNumber>$(BUILD_NUMBER)</BuildNumber>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(BuildNumber)' == ''">
+    <BuildNumber>0</BuildNumber>
+  </PropertyGroup>
+
+  <Target Name="SetVersionNumber">
+    <RegexReplace
+        Pattern='AssemblyVersion\("(\d+\.\d+\.\d+)\.\d+"\)'
+        Replacement='AssemblyVersion("$1.$(BuildNumber)")'
+        Files="$(SolutionDir)GlobalAssemblyInfo.cs"/>
+    <RegexReplace
+        Pattern='&lt;version&gt;(\d+\.\d+\.\d+(-[A-Za-z0-9-]+)?)&lt;'
+        Replacement='&lt;version&gt;$1-build$(BuildNumber)&lt;'
+        Files="@(NuspecFiles)"
+        Condition=" '$(BuildNumber)' != '0' "/>
+    <RegexReplace
+        Pattern='&lt;version&gt;(\d+\.\d+\.\d+(-[A-Za-z0-9-]+)?)-build\d+&lt;'
+        Replacement='&lt;version&gt;$1&lt;'
+        Files="@(NuspecFiles)"
+        Condition=" '$(BuildNumber)' == '0' "/>
+  </Target>
+
+  <Target Name="_DownloadNuGet">
+    <MakeDir Directories="$(NugetDir)" Condition="!Exists('$(NugetDir)')"/>
+    <DownloadNuGet OutputFilename="$(NugetExe)" Condition="!Exists('$(NugetExe)')"/>
+  </Target>
+</Project>

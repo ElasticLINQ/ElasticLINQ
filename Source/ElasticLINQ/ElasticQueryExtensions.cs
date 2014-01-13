@@ -100,6 +100,23 @@ namespace ElasticLinq
             return (IOrderedQueryable<TSource>)CreateQueryMethodCall(source, (MethodInfo)MethodBase.GetCurrentMethod());
         }
 
+        /// <summary>
+        /// Converts an <see cref="IElasticQuery`1"/> into the JSON that would be submitted
+        /// to ElasticSearch.
+        /// </summary>
+        /// <param name="source">An <see cref="T:System.Linq.IQueryable`1"/> to query.</param>
+        /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
+        /// <returns>The ElasticSearch JSON representing this query.</returns>
+        /// <exception cref="ArgumentException"><paramref name="source"/> is not of type <see cref="IElasticQuery`1"/>.</exception>
+        public static string ToElasticSearchQuery<TSource>(this IQueryable<TSource> source)
+        {
+            var elasticQuery = source as IElasticQuery<TSource>;
+            if (elasticQuery == null)
+                throw new ArgumentException("Query must be of type IElasticQuery<> to call ToElasticSearchQuery()", "source");
+
+            return elasticQuery.ToElasticSearchQuery();
+        }
+
         private static IQueryable<TSource> CreateQueryMethodCall<TSource>(IQueryable<TSource> source, MethodInfo method, params Expression[] arguments)
         {
             Argument.EnsureNotNull("source", source);

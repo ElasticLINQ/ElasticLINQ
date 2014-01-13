@@ -44,7 +44,7 @@ namespace ElasticLinq
 
         public IQueryable<T> CreateQuery<T>(Expression expression)
         {
-            Argument.EnsureNotNull("expresssion", expression);
+            Argument.EnsureNotNull("expression", expression);
 
             if (!typeof(IQueryable<T>).IsAssignableFrom(expression.Type))
                 throw new ArgumentOutOfRangeException("expression");
@@ -54,7 +54,7 @@ namespace ElasticLinq
 
         public IQueryable CreateQuery(Expression expression)
         {
-            Argument.EnsureNotNull("expresssion", expression);
+            Argument.EnsureNotNull("expression", expression);
 
             var elementType = TypeHelper.GetSequenceElementType(expression.Type);
             var queryType = typeof(ElasticQuery<>).MakeGenericType(elementType);
@@ -71,14 +71,14 @@ namespace ElasticLinq
 
         public TResult Execute<TResult>(Expression expression)
         {
-            Argument.EnsureNotNull("expresssion", expression);
+            Argument.EnsureNotNull("expression", expression);
 
             return (TResult)ExecuteInternal(expression);
         }
 
         public object Execute(Expression expression)
         {
-            Argument.EnsureNotNull("expresssion", expression);
+            Argument.EnsureNotNull("expression", expression);
 
             return ExecuteInternal(expression);
         }
@@ -91,10 +91,9 @@ namespace ElasticLinq
             var log = Log ?? StreamWriter.Null;
             log.WriteLine("Type is " + elementType);
 
-            var searchTask = new ElasticRequestProcessor(connection, log).SearchAsync(translation.SearchRequest);
             try
             {
-                var response = searchTask.GetAwaiter().GetResult();
+                var response = AsyncHelper.RunSync(() => new ElasticRequestProcessor(connection, log).SearchAsync(translation.SearchRequest));
                 if (response == null)
                     throw new InvalidOperationException("No HTTP response received.");
 
