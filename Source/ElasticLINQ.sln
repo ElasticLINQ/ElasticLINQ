@@ -19,6 +19,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{DF49DB26-2CDA-437B-94C5-62200CB0ACFC}"
 	ProjectSection(SolutionItems) = preProject
 		..\Build\Build.proj = ..\Build\Build.proj
+		ElasticLINQ\ElasticLINQ.nuspec = ElasticLINQ\ElasticLINQ.nuspec
+		GlobalAssemblyInfo.cs = GlobalAssemblyInfo.cs
 		..\Build\Tasks.proj = ..\Build\Tasks.proj
 		..\Build\Tests.proj = ..\Build\Tests.proj
 	EndProjectSection

@@ -88,12 +88,12 @@ namespace ElasticLinq
             var translation = ElasticQueryTranslator.Translate(mapping, expression);
             var elementType = TypeHelper.GetSequenceElementType(expression.Type);
 
-            var log = Log ?? StreamWriter.Null;
-            log.WriteLine("Type is " + elementType);
+            if (Log != null)
+                Log.WriteLine("Type is " + elementType);
 
             try
             {
-                var response = AsyncHelper.RunSync(() => new ElasticRequestProcessor(connection, log).SearchAsync(translation.SearchRequest));
+                var response = AsyncHelper.RunSync(() => new ElasticRequestProcessor(connection, Log).SearchAsync(translation.SearchRequest));
                 if (response == null)
                     throw new InvalidOperationException("No HTTP response received.");
 

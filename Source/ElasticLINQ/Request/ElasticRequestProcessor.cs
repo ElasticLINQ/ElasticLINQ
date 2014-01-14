@@ -44,11 +44,15 @@ namespace ElasticLinq.Request
         {
             var formatter = new PostBodyRequestFormatter(connection, searchRequest);
             var message = new HttpRequestMessage(HttpMethod.Post, formatter.Uri);
-            log.WriteLine("Request {0} {1}", message.Method, message.RequestUri);
+
+            if (log != null)
+                log.WriteLine("Request {0} {1}", message.Method, message.RequestUri);
 
             var body = formatter.Body;
             message.Content = new StringContent(body);
-            log.WriteLine("Body\n{0}", body);
+
+            if (log != null)
+                log.WriteLine("Body\n{0}", body);
 
             return message;
         }
@@ -60,7 +64,10 @@ namespace ElasticLinq.Request
                 var stopwatch = Stopwatch.StartNew();
                 var response = await httpClient.SendAsync(requestMessage);
                 stopwatch.Stop();
-                log.WriteLine("{0} response in {1}ms", response.StatusCode, stopwatch.ElapsedMilliseconds);
+
+                if (log != null)
+                    log.WriteLine("{0} response in {1}ms", response.StatusCode, stopwatch.ElapsedMilliseconds);
+
                 return response;
             }
         }
@@ -73,8 +80,11 @@ namespace ElasticLinq.Request
                 var results = new JsonSerializer().Deserialize<ElasticResponse>(new JsonTextReader(streamReader));
                 var resultCount = results == null ? 0 : results.hits.hits.Count;
                 stopwatch.Stop();
-                log.WriteLine("Deserialized {0} bytes into {1} objects in {2}ms",
-                    responseStream.Length, resultCount, stopwatch.ElapsedMilliseconds);
+
+                if (log != null)
+                    log.WriteLine("Deserialized {0} bytes into {1} objects in {2}ms",
+                        responseStream.Length, resultCount, stopwatch.ElapsedMilliseconds);
+
                 return results;
             }
         }
