@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestConsoleApp", "TestConsoleApp\TestConsoleApp.csproj", "{876CF360-7395-44E6-9F3E-C4705856E49C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElasticLINQ", "ElasticLINQ\ElasticLINQ.csproj", "{875E1599-5B7F-4084-BBE0-0D70C3C80428}"
@@ -12,6 +14,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\LICENCE.txt = ..\LICENCE.txt
 		..\NOTES.md = ..\NOTES.md
 		..\README.md = ..\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{DF49DB26-2CDA-437B-94C5-62200CB0ACFC}"
+	ProjectSection(SolutionItems) = preProject
+		..\Build\Build.proj = ..\Build\Build.proj
+		ElasticLINQ\ElasticLINQ.nuspec = ElasticLINQ\ElasticLINQ.nuspec
+		GlobalAssemblyInfo.cs = GlobalAssemblyInfo.cs
+		..\Build\Tasks.proj = ..\Build\Tasks.proj
+		..\Build\Tests.proj = ..\Build\Tests.proj
 	EndProjectSection
 EndProject
 Global
@@ -35,5 +46,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{DF49DB26-2CDA-437B-94C5-62200CB0ACFC} = {99B0D181-5D19-4E30-96EA-F8E42C81F8E6}
 	EndGlobalSection
 EndGlobal

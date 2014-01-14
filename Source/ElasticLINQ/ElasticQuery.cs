@@ -6,6 +6,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using ElasticLinq.Request.Visitors;
+using ElasticLinq.Request.Formatter;
 
 namespace ElasticLinq
 {
@@ -13,7 +15,7 @@ namespace ElasticLinq
     /// ElasticSearch query object used to facilitate LINQ query syntax.
     /// </summary>
     /// <typeparam name="T">Element type being queried.</typeparam>
-    public class ElasticQuery<T> : IOrderedQueryable<T>
+    public class ElasticQuery<T> : IElasticQuery<T>
     {
         private readonly ElasticQueryProvider provider;
         private readonly Expression expression;
@@ -61,6 +63,16 @@ namespace ElasticLinq
         public IQueryProvider Provider
         {
             get { return provider; }
+        }
+
+        /// <summary>
+        /// Shows the query that would be issued to ElasticSearch
+        /// </summary>
+        public string ToElasticSearchQuery()
+        {
+            var request = ElasticQueryTranslator.Translate(provider.Mapping, Expression);
+            var formatter = new PostBodyRequestFormatter(provider.Connection, request.SearchRequest);
+            return formatter.Body;
         }
     }
 }
