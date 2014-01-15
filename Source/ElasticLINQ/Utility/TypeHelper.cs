@@ -48,7 +48,12 @@ namespace ElasticLinq.Utility
             }
         }
 
-        public static bool IsNullableType(Type type)
+        public static bool IsNullable(Type type)
+        {
+            return !type.IsValueType || IsOfNullableT(type);
+        }
+
+        public static bool IsOfNullableT(Type type)
         {
             return type != null && type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
         }

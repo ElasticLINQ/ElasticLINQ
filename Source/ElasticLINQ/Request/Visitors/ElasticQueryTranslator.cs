@@ -302,7 +302,7 @@ namespace ElasticLinq.Request.Visitors
                     return m;
 
                 case ExpressionType.MemberAccess:
-                    if (m.Member.Name == "HasValue" && TypeHelper.IsNullableType(m.Member.DeclaringType))
+                    if (m.Member.Name == "HasValue" && TypeHelper.IsOfNullableT(m.Member.DeclaringType))
                         return m;
                     break;
             }
@@ -520,7 +520,7 @@ namespace ElasticLinq.Request.Visitors
             if (final != null)
             {
                 var fieldName = mapping.GetFieldName(final.Member);
-                var ignoreUnmapped = TypeHelper.IsNullableType(final.Type); // Consider a config switch?
+                var ignoreUnmapped = TypeHelper.IsNullable(final.Type); // Consider a config switch?
                 searchRequest.SortOptions.Insert(0, new SortOption(fieldName, ascending, ignoreUnmapped));
             }
 

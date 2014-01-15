@@ -108,28 +108,51 @@ namespace ElasticLinq.Test.Utility
         }
 
         [Fact]
-        public void IsNullableTypeIdentifiesNullableValueTypeAsNullableT()
+        public void IsOfNullableTIdentifiesNullableValueTypeAsNullableT()
         {
-            var isNullable = TypeHelper.IsNullableType(typeof(int?));
+            var isNullable = TypeHelper.IsOfNullableT(typeof(int?));
 
             Assert.True(isNullable);
         }
 
         [Fact]
-        public void IsNullableTypeIdentifiesValueTypeAsNotNullableT()
+        public void IsOfNullableTIdentifiesValueTypeAsNotNullableT()
         {
-            var isNullable = TypeHelper.IsNullableType(typeof(int));
+            var isNullable = TypeHelper.IsOfNullableT(typeof(int));
 
             Assert.False(isNullable);
         }
 
         [Fact]
-        public void IsNullableTypeIdentifiesReferenceTypeAsNotNullableT()
+        public void IsOfNullableTIdentifiesReferenceTypeAsNotNullableT()
         {
-            var isNullable = TypeHelper.IsNullableType(typeof(string));
+            var isNullable = TypeHelper.IsOfNullableT(typeof(string));
 
             Assert.False(isNullable);
         }
 
+        [Fact]
+        public void IsNullableIdentifiesReferenceTypeAsNullable()
+        {
+            var isNullable = TypeHelper.IsNullable(typeof(string));
+
+            Assert.True(isNullable);
+        }
+
+        [Fact]
+        public void IsNullableIdentifiesNullableIntAsNullable()
+        {
+            var isNullable = TypeHelper.IsNullable(typeof(int?));
+
+            Assert.True(isNullable);
+        }
+
+        [Fact]
+        public void IsNullableIdentifiesIntAsNotNullable()
+        {
+            var isNullable = TypeHelper.IsNullable(typeof(int));
+
+            Assert.False(isNullable);
+        }
     }
 }
