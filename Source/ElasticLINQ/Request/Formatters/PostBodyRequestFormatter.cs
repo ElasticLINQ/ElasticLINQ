@@ -2,6 +2,7 @@
 
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Facets;
+using ElasticLinq.Utility;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -23,6 +24,12 @@ namespace ElasticLinq.Request.Formatters
 
         protected override void CompleteSearchUri(UriBuilder builder)
         {
+            var parameters = builder.GetQueryParameters();
+
+            if (!String.IsNullOrEmpty(SearchRequest.SearchType))
+                parameters["search_type"] = SearchRequest.SearchType;
+
+            builder.SetQueryParameters(parameters);
         }
 
         public string Body
