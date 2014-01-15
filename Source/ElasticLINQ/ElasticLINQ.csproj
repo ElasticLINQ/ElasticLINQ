@@ -85,7 +85,6 @@
     <Compile Include="Request\Visitors\EvaluatingExpressionVisitor.cs" />
     <Compile Include="Request\Visitors\PartialEvaluator.cs" />
     <Compile Include="Request\Visitors\RebindingExpressionVisitor.cs" />
-    <Compile Include="Response\Model\Facet.cs" />
     <Compile Include="Response\Materializers\IElasticMaterializer.cs" />
     <Compile Include="Test\TestableElasticContext.cs" />
     <Compile Include="Test\TestableElasticQuery.cs" />

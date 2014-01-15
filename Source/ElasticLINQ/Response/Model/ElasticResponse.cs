@@ -21,6 +21,6 @@ namespace ElasticLinq.Response.Model
         public JValue error;
         public HttpStatusCode status;
 
-        public Dictionary<string, Facet> facets;
+        public Dictionary<string, JToken> facets;
     }
 }
