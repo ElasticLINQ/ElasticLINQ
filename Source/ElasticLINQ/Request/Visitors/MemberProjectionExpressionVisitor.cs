@@ -1,10 +1,9 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
-using System.Linq;
 using ElasticLinq.Mapping;
 using ElasticLinq.Utility;
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace ElasticLinq.Request.Visitors
@@ -17,8 +16,8 @@ namespace ElasticLinq.Request.Visitors
     {
         private readonly HashSet<string> fieldNames = new HashSet<string>();
 
-        private MemberProjectionExpressionVisitor(ParameterExpression parameter, IElasticMapping mapping)
-            : base(parameter, mapping)
+        private MemberProjectionExpressionVisitor(ParameterExpression bindingParameter, IElasticMapping mapping)
+            : base(bindingParameter, mapping)
         {
         }
 
@@ -48,7 +47,7 @@ namespace ElasticLinq.Request.Visitors
         {
             var fieldName = Mapping.GetFieldName(m.Member);
             fieldNames.Add(fieldName);
-            var getFieldExpression = Expression.Call(null, GetDictionaryValueMethod, Expression.PropertyOrField(Parameter, "fields"), Expression.Constant(fieldName), Expression.Constant(m.Type));
+            var getFieldExpression = Expression.Call(null, GetDictionaryValueMethod, Expression.PropertyOrField(BindingParameter, "fields"), Expression.Constant(fieldName), Expression.Constant(m.Type));
             return Expression.Convert(getFieldExpression, m.Type);
         }
     }

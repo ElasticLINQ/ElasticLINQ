@@ -2,8 +2,8 @@
 
 using ElasticLinq.Mapping;
 using ElasticLinq.Request.Facets;
+using ElasticLinq.Response.Model;
 using ElasticLinq.Utility;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,10 +17,24 @@ namespace ElasticLinq.Request.Visitors
     /// </summary>
     internal class AggregateExpressionVisitor : RebindingExpressionVisitor
     {
-        private readonly List<IFacet> facets = new List<IFacet>();
+        private static readonly MethodInfo getFacetFromResponseMethod = typeof(AggregateExpressionVisitor)
+            .GetMethod("GetFacetFromResponse", BindingFlags.Static | BindingFlags.NonPublic);
 
-        public AggregateExpressionVisitor(ParameterExpression parameter, IElasticMapping mapping)
-            : base(parameter, mapping)
+        private static readonly Dictionary<string, string> methodToFacetSlice = new Dictionary<string, string>
+        {
+            { "Min", "min" },
+            { "Max", "max" },
+            { "Sum", "total" },
+            { "Average", "mean" },
+            { "Count", "count" },
+            { "LongCount", "count" }
+        };
+
+        private readonly Dictionary<string, IFacet> facets = new Dictionary<string, IFacet>();
+        private readonly Dictionary<string, MemberInfo> groupByMembers = new Dictionary<string, MemberInfo>();
+
+        public AggregateExpressionVisitor(ParameterExpression bindingParameter, IElasticMapping mapping)
+            : base(bindingParameter, mapping)
         {
         }
 
@@ -31,57 +45,54 @@ namespace ElasticLinq.Request.Visitors
             return visitor.Visit(expression);
         }
 
+        private void StoreGroupByMemberInfo(MethodCallExpression m)
+        {
+            var lambda = (LambdaExpression)StripQuotes(m.Arguments[1]);
+            var parameter = lambda.Parameters[0];
+
+            if (!groupByMembers.ContainsKey(parameter.Name))
+                groupByMembers[parameter.Name] = ((MemberExpression)lambda.Body).Member;
+        }
+
         protected override Expression VisitMethodCall(MethodCallExpression m)
         {
+            // Create the GroupBy before we process the args so we have something to reference
+            var sourceMethodCall = m.Arguments[0] as MethodCallExpression;
+            if (sourceMethodCall != null && sourceMethodCall.Method.Name == "GroupBy")
+                StoreGroupByMemberInfo(sourceMethodCall);
+
             if (m.Method.DeclaringType == typeof(Enumerable))
             {
-                switch (m.Method.Name)
+                string slice;
+                if (methodToFacetSlice.TryGetValue(m.Method.Name, out slice))
                 {
-                    case "Min":
-                    case "Max":
-                    case "Sum":
-                    case "Average":
-                    case "Count":
-                    case "LongCount":
-                        if (m.Arguments.Count == 2)
-                            return VisitAggregateMethodCall(m.Arguments[0], m.Arguments[1], m.Method.Name);
-                        break;
-                }
-            }
-
-            if (m.Method.DeclaringType == typeof(Queryable))
-            {
-                switch (m.Method.Name)
-                {
-                    case "Sum":
-                        if (m.Arguments.Count == 2)
-                            return VisitAggregateMethodCall(m.Arguments[0], m.Arguments[1], m.Method.Name);
-                        break;
+                    if (m.Arguments.Count == 1)
+                        return VisitAggregateTerm((ParameterExpression)m.Arguments[0], slice, m.Method.ReturnType);
                 }
             }
 
             return base.VisitMethodCall(m);
         }
 
-        private Expression VisitAggregateMethodCall(Expression source, Expression match, string operation)
+        private Expression VisitAggregateTerm(ParameterExpression parameter, string slice, Type returnType)
         {
-            var lambda = (LambdaExpression)StripQuotes(match);
-            var property = Visit(lambda.Body);
+            // Create the term facet
+            var groupByMemberInfo = groupByMembers[parameter.Name];
+            var keyField = Mapping.GetFieldName(groupByMemberInfo);
+            facets[keyField] = new TermsFacet(keyField, keyField);
 
-            if (property is MemberExpression)
-            {
-                var field = Mapping.GetFieldName(((MemberExpression)property).Member);
+            // Rebind the property to the correct ElasticResponse node
+            var getFacetExpression = Expression.Call(null, getFacetFromResponseMethod, BindingParameter,
+                Expression.Constant(keyField), Expression.Constant(slice), Expression.Constant(returnType));
 
-                // TODO: If source is a group, we need to term_stats not statistical
-                facets.Add(new StatisticalFacet("stats", field));
+            return Expression.Convert(getFacetExpression, returnType);
+        }
 
-                var getFieldExpression = Expression.Call(null, GetDictionaryValueMethod, Expression.PropertyOrField(Parameter, "facets"), Expression.Constant("stats"), Expression.Constant(match.Type));
-
-                return Expression.Convert(getFieldExpression, match.Type);
-                //searchRequest.SearchType = "count"; // We don't need documents
-            }
-
-            throw new NotImplementedException("Unknown aggregate property");
+        internal static object GetFacetFromResponse(ElasticResponse r, string key, string slice, Type expectedType)
+        {
+            return 1;
+            // TODO: Handle missing values
+            return r.facets[key][slice].ToObject(expectedType);
         }
     }
 }

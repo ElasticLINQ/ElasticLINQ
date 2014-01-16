@@ -12,18 +12,18 @@ namespace ElasticLinq.Request.Visitors
 {
     internal abstract class RebindingExpressionVisitor : ExpressionVisitor
     {
-        protected readonly ParameterExpression Parameter;
+        protected readonly ParameterExpression BindingParameter;
         protected readonly IElasticMapping Mapping;
 
         protected static readonly MethodInfo GetDictionaryValueMethod = typeof(RebindingExpressionVisitor)
             .GetMethod("GetDictionaryValueOrDefault", BindingFlags.Static | BindingFlags.NonPublic);
 
-        protected RebindingExpressionVisitor(ParameterExpression parameter, IElasticMapping mapping)
+        protected RebindingExpressionVisitor(ParameterExpression bindingParameter, IElasticMapping mapping)
         {
-            Argument.EnsureNotNull("parameter", parameter);
+            Argument.EnsureNotNull("bindingParameter", bindingParameter);
             Argument.EnsureNotNull("mapping", mapping);
 
-            Parameter = parameter;
+            BindingParameter = bindingParameter;
             Mapping = mapping;
         }
 

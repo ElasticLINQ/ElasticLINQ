@@ -12,8 +12,8 @@ namespace ElasticLinq.Request.Visitors
     /// </summary>
     internal class ElasticFieldsRebindingExpressionVisitor : RebindingExpressionVisitor
     {
-        public ElasticFieldsRebindingExpressionVisitor(ParameterExpression parameter, IElasticMapping mapping)
-            : base(parameter, mapping)
+        public ElasticFieldsRebindingExpressionVisitor(ParameterExpression bindingParameter, IElasticMapping mapping)
+            : base(bindingParameter, mapping)
         {
         }
 
@@ -33,7 +33,7 @@ namespace ElasticLinq.Request.Visitors
 
         protected virtual Expression VisitElasticField(MemberExpression m)
         {
-            return Expression.Convert(Expression.PropertyOrField(Parameter, Mapping.GetFieldName(m.Member)), m.Type);
+            return Expression.Convert(Expression.PropertyOrField(BindingParameter, Mapping.GetFieldName(m.Member)), m.Type);
         }
     }
 }
