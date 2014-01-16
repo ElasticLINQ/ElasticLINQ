@@ -26,7 +26,7 @@ namespace ElasticLinq
             provider = new ElasticQueryProvider(connection, mapping);
         }
 
-        public IQueryable<T> Query<T>()
+        public virtual IQueryable<T> Query<T>()
         {
             return new ElasticQuery<T>(provider);
         }
