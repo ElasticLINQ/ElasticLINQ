@@ -107,7 +107,21 @@ namespace ElasticLinq.Test.Mapping
             Assert.Equal(typeof(int), selectionProperty.PropertyType);
         }
 
+        [Fact]
+        public void GetSelectionPropertyWithNoSuitablePropertyThrows()
+        {
+            var ex = Record.Exception(() => MappingHelpers.GetSelectionProperty(typeof(ClassWithNoValidSelectionProperties)));
+
+            Assert.IsType<InvalidOperationException>(ex);
+            Assert.Equal("Could not find public read/write non-generic value type property to use for a default query against ElasticLinq.Test.Mapping.MappingHelpersTests+ClassWithNoValidSelectionProperties.", ex.Message);
+        }
+
         class ClassWithOneValidSelectionProperty
+        {
+            public int Valid { get; set; }
+        }
+
+        class ClassWithNoValidSelectionProperties
         {
             private int backing;
 
@@ -115,9 +129,9 @@ namespace ElasticLinq.Test.Mapping
             public int WriteOnly { set { backing = value; } }
             public int ReadOnly { get { return backing; } }
             public string NotValueType { get; set; }
-            public int Field = 1;
+            private int NonPublic { get; set; }
 
-            public int Valid { get; set; }
+            public int Field = 1;
         }
     }
 }

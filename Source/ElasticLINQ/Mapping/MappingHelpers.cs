@@ -32,9 +32,13 @@ namespace ElasticLinq.Mapping
 
         public static PropertyInfo GetSelectionProperty(Type type)
         {
-            return type
-                .GetProperties(BindingFlags.Instance | BindingFlags.Public)
-                .FirstOrDefault(p => p.CanRead && p.CanWrite && p.PropertyType.IsValueType && !p.PropertyType.IsGenericType);
+            var property = type.GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                               .FirstOrDefault(p => p.CanRead && p.CanWrite && p.PropertyType.IsValueType && !p.PropertyType.IsGenericType);
+
+            if (property == null)
+                throw new InvalidOperationException(String.Format("Could not find public read/write non-generic value type property to use for a default query against {0}.", type.FullName));
+
+            return property;
         }
     }
 }
