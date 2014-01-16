@@ -6,6 +6,6 @@ namespace ElasticLinq
 {
     public interface IElasticContext
     {
-        IElasticQuery<T> Query<T>();
+        IQueryable<T> Query<T>();
     }
 }
