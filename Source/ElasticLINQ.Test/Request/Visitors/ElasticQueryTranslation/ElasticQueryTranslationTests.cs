@@ -3,8 +3,10 @@
 using ElasticLinq.Mapping;
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Visitors;
+using System;
 using System.Linq;
 using Xunit;
+using Xunit.Extensions;
 
 namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 {
@@ -50,6 +52,19 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var translation = ElasticQueryTranslator.Translate(Mapping, taken.Expression);
 
             Assert.Equal(actual, translation.SearchRequest.Size);
+        }
+
+        [Theory]
+        [InlineData(42, 2112)]
+        [InlineData(2112, 42)]
+        public void TakeTranslatesToSmallestSize(int size1, int size2)
+        {
+            var expectedSize = Math.Min(size1, size2);
+
+            var taken = Robots.Take(size1).Take(size2);
+            var translation = ElasticQueryTranslator.Translate(Mapping, taken.Expression);
+
+            Assert.Equal(expectedSize, translation.SearchRequest.Size);
         }
    }
 }

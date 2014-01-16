@@ -93,7 +93,7 @@ namespace ElasticLinq.Request.Visitors
             if (cm != null)
                 return new CriteriaExpression(new PrefixCriteria(mapping.GetFieldName(cm.MemberExpression.Member), cm.ConstantExpression.Value));
 
-            throw new NotSupportedException("Prefix must be between a Member and a Constant");            
+            throw new NotSupportedException("Prefix must be between a Member and a Constant");
         }
 
         private Expression VisitRegexp(Expression left, Expression right)
@@ -103,7 +103,7 @@ namespace ElasticLinq.Request.Visitors
             if (cm != null)
                 return new CriteriaExpression(new RegexpCriteria(mapping.GetFieldName(cm.MemberExpression.Member), cm.ConstantExpression.Value.ToString()));
 
-            throw new NotSupportedException("Regexp must be between a Member and a Constant");            
+            throw new NotSupportedException("Regexp must be between a Member and a Constant");
         }
 
         private Expression VisitCommonMethodCall(MethodCallExpression m)
@@ -616,7 +616,14 @@ namespace ElasticLinq.Request.Visitors
         {
             var takeConstant = Visit(takeExpression) as ConstantExpression;
             if (takeConstant != null)
-                searchRequest.Size = (int)takeConstant.Value;
+            {
+                var takeValue = (int)takeConstant.Value;
+
+                if (searchRequest.Size.HasValue)
+                    searchRequest.Size = Math.Min(searchRequest.Size.GetValueOrDefault(), takeValue);
+                else
+                    searchRequest.Size = takeValue;
+            }
             return Visit(source);
         }
 
