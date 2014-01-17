@@ -23,7 +23,7 @@ namespace ElasticLinq.Request.Visitors
             this.facets = facets;
         }
 
-        public Expression Express { get { return expression; } }
+        public Expression Expression { get { return expression; } }
 
         public IReadOnlyList<IFacet> Facets { get { return facets.AsReadOnly(); } }
     }

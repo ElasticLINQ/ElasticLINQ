@@ -75,6 +75,7 @@
     <Compile Include="Request\Formatters\PostBodyRequestFormatter.cs" />
     <Compile Include="Request\Formatters\RequestFormatter.cs" />
     <Compile Include="Request\Visitors\AggregateExpressionVisitor.cs" />
+    <Compile Include="Response\Materializers\Aggregates.cs" />
     <Compile Include="Response\Materializers\ElasticFacetsMaterializer.cs" />
     <Compile Include="Response\Materializers\ElasticOneHitMaterializer.cs" />
     <Compile Include="Response\Materializers\ElasticManyHitMaterializer.cs" />

@@ -42,13 +42,19 @@ namespace ElasticLinq.Request.Visitors
         private ElasticTranslateResult Translate(Expression e)
         {
             var evaluated = PartialEvaluator.Evaluate(e);
-            //var aggregated = AggregateExpressionVisitor.Rebind()
-            Visit(evaluated);
+
+            var aggregateRowParameter = Expression.Parameter(typeof(AggregateRow), "r");
+            var aggregated = AggregateExpressionVisitor.Rebind(aggregateRowParameter, mapping, evaluated);
+            
+            Visit(aggregated.Expression);
 
             searchRequest.Type = mapping.GetTypeName(type);
 
             if (searchRequest.Filter == null && searchRequest.Query == null)
                 searchRequest.Filter = mapping.GetTypeSelectionCriteria(type);
+
+            if (aggregated.Facets.Any())
+                searchRequest.SearchType = "count"; // Suppress hits for aggregate queries
 
             if (materializer == null)
                 materializer = new ElasticManyHitsMaterializer(itemProjector ?? DefaultItemProjector, finalItemType ?? type);
