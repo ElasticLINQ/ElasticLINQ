@@ -13,7 +13,7 @@ namespace ElasticLinq.Test
 
         public TestableElasticQueryProvider(TestableElasticContext context)
         {
-            this.context = context;
+            this.context = context;            
         }
 
         public IQueryable<TElement> CreateQuery<TElement>(Expression expression)

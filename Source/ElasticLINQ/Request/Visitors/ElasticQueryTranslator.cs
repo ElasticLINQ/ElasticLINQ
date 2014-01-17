@@ -42,6 +42,7 @@ namespace ElasticLinq.Request.Visitors
         private ElasticTranslateResult Translate(Expression e)
         {
             var evaluated = PartialEvaluator.Evaluate(e);
+            //var aggregated = AggregateExpressionVisitor.Rebind()
             Visit(evaluated);
 
             searchRequest.Type = mapping.GetTypeName(type);

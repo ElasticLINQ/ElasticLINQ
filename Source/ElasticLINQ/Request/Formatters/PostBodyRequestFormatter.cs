@@ -80,17 +80,43 @@ namespace ElasticLinq.Request.Formatters
             if (facet is StatisticalFacet)
                 facetBody = Build((StatisticalFacet)facet);
 
+            if (facet is TermsStatsFacet)
+                facetBody = Build((TermsStatsFacet)facet);
+
+            if (facet is TermsFacet)
+                facetBody = Build((TermsFacet)facet);
+
             if (facetBody != null)
                 return new JProperty(facet.Name, new JObject(new JProperty(facet.Type, facetBody)));
-                
+
             throw new InvalidOperationException("Unknown class of IFacet");
         }
 
         private static JToken Build(StatisticalFacet statisticalFacet)
         {
-            return statisticalFacet.Fields.Count() == 1
-                ? new JObject(new JProperty("field", statisticalFacet.Fields.First()))
-                : new JObject(new JProperty("fields", new JArray(statisticalFacet.Fields)));
+            return new JObject(
+                BuildFieldProperty(statisticalFacet.Fields.ToArray())
+            );
+        }
+
+        private static JToken Build(TermsStatsFacet termStatsFacet)
+        {
+            return new JObject(
+                new JProperty("key_field", termStatsFacet.Key),
+                new JProperty("value_field", termStatsFacet.Value)
+            );
+        }
+
+        private static JToken Build(TermsFacet termsFacet)
+        {
+            return new JObject(BuildFieldProperty(termsFacet.Fields.ToArray()));
+        }
+
+        private static JToken BuildFieldProperty(IReadOnlyCollection<string> fields)
+        {
+            return fields.Count == 1
+                ? new JProperty("field", fields.First())
+                : new JProperty("fields", new JArray(fields));
         }
 
         private static JArray Build(IEnumerable<SortOption> sortOptions)

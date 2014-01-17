@@ -14,7 +14,18 @@ namespace TestConsoleApp
             var connection = new ElasticConnection(new Uri("http://192.168.2.14:9200")) { Index = "tier3" };
             var context = new ElasticContext(connection, new CouchbaseElasticMapping()) { Log = Console.Out };
 
-            DocumentQueries(context);
+            //context
+            //    .Query<Activity>()
+            //    .Select(a => new { a.EntityId })
+            //    .WriteToConsole();
+
+            context
+                .Query<Activity>()
+                .GroupBy(a => a.EntityType)
+                .Select(a => new { a.Key, Count = a.Count(), Avg = a.Max(b => b.CreatedDate) })
+                .WriteToConsole();
+
+            //DocumentQueries(context);
             BasicSampleQueries(context);
 
             Console.Write("\n\nComplete.");
