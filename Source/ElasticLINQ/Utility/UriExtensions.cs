@@ -12,7 +12,7 @@ namespace ElasticLinq.Utility
         {
             var query = uri.Query.StartsWith("?") ? uri.Query.Substring(1) : uri.Query;
             return query
-                .Split('&').Select(p => p.Split('='))
+                .Split(new [] { '&' }, StringSplitOptions.RemoveEmptyEntries).Select(p => p.Split('='))
                 .ToDictionary(k => k[0], v => v.Length > 1 ? v[1] : "");   
         }
 
