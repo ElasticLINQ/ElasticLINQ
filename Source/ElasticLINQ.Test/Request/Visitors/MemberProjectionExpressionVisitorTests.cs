@@ -1,14 +1,13 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
-using System.Collections.Generic;
 using ElasticLinq.Mapping;
 using ElasticLinq.Request.Visitors;
-using ElasticLinq.Response.Model;
 using ElasticLinq.Test.TestSupport;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace ElasticLinq.Test.Request.Visitors
@@ -20,7 +19,6 @@ namespace ElasticLinq.Test.Request.Visitors
             public string Name { get; set; }
             public string Id { get; set; }
         }
-        private readonly ParameterExpression validParameter = Expression.Parameter(typeof(Sample), "s");
         private readonly IElasticMapping validMapping = new TrivialElasticMapping();
 
         [Fact]

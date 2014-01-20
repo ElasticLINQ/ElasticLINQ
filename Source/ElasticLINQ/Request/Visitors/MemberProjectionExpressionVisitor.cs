@@ -15,7 +15,7 @@ namespace ElasticLinq.Request.Visitors
     /// Rebinds select projection entity member accesses to JObject fields
     /// recording the specific field names required for selection.
     /// </summary>
-    internal class MemberProjectionExpressionVisitor : ElasticFieldsRebindingExpressionVisitor
+    internal class MemberProjectionExpressionVisitor : ElasticFieldsExpressionVisitor
     {
         protected static readonly MethodInfo GetDictionaryValueMethod = typeof(MemberProjectionExpressionVisitor)
             .GetMethod("GetDictionaryValueOrDefault", BindingFlags.Static | BindingFlags.NonPublic);
@@ -27,13 +27,13 @@ namespace ElasticLinq.Request.Visitors
         {
         }
 
-        internal static new RebindingResult<string> Rebind(IElasticMapping mapping, Expression selector)
+        internal static new RebindCollectionResult<string> Rebind(IElasticMapping mapping, Expression selector)
         {
             var parameter = Expression.Parameter(typeof(Hit), "h");
             var visitor = new MemberProjectionExpressionVisitor(parameter, mapping);
             Argument.EnsureNotNull("selector", selector);
             var materializer = visitor.Visit(selector);
-            return new RebindingResult<string>(materializer, visitor.fieldNames, parameter);
+            return new RebindCollectionResult<string>(materializer, visitor.fieldNames, parameter);
         }
 
         protected override Expression VisitMember(MemberExpression m)

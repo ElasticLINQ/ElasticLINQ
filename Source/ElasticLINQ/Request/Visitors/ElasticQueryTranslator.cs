@@ -583,7 +583,7 @@ namespace ElasticLinq.Request.Visitors
         /// <param name="entityParameter">Parameter that references the whole entity.</param>
         private void RebindElasticFieldsAndChainProjector(Expression selectExpression, ParameterExpression entityParameter)
         {
-            var projection = ElasticFieldsRebindingExpressionVisitor.Rebind(mapping, selectExpression);
+            var projection = ElasticFieldsExpressionVisitor.Rebind(mapping, selectExpression);
             var compiled = Expression.Lambda(projection.Item1, entityParameter, projection.Item2).Compile();
             itemProjector = h => compiled.DynamicInvoke(DefaultItemProjector(h), h);
             finalItemType = selectExpression.Type;

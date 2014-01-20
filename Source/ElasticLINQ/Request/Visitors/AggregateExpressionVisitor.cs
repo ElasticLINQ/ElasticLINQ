@@ -15,7 +15,7 @@ namespace ElasticLinq.Request.Visitors
     /// <summary>
     /// Rebinds aggregate method accesses to JObject facet fields.
     /// </summary>
-    internal class AggregateExpressionVisitor : RebindingExpressionVisitor
+    internal class AggregateExpressionVisitor : ExpressionVisitor
     {
         private static readonly MethodInfo getValueFromRow = typeof(AggregateRow).GetMethod("GetValue", BindingFlags.Static | BindingFlags.NonPublic);
         private static readonly MethodInfo getKeyFromRow = typeof(AggregateRow).GetMethod("GetKey", BindingFlags.Static | BindingFlags.NonPublic);
@@ -32,18 +32,21 @@ namespace ElasticLinq.Request.Visitors
 
         private readonly Dictionary<string, IFacet> facets = new Dictionary<string, IFacet>();
         private readonly Dictionary<string, MemberInfo> groupByMembers = new Dictionary<string, MemberInfo>();
+        private readonly ParameterExpression bindingParameter;
+        private readonly IElasticMapping mapping;
 
         public AggregateExpressionVisitor(ParameterExpression bindingParameter, IElasticMapping mapping)
-            : base(bindingParameter, mapping)
         {
+            this.bindingParameter = bindingParameter;
+            this.mapping = mapping;
         }
 
-        internal static RebindingResult<IFacet> Rebind(IElasticMapping mapping, Expression expression)
+        internal static RebindCollectionResult<IFacet> Rebind(IElasticMapping mapping, Expression expression)
         {
             var parameter = Expression.Parameter(typeof(AggregateRow), "r");
             var visitor = new AggregateExpressionVisitor(parameter, mapping);
             Argument.EnsureNotNull("expression", expression);
-            return new RebindingResult<IFacet>(visitor.Visit(expression), new HashSet<IFacet>(visitor.facets.Values), parameter);
+            return new RebindCollectionResult<IFacet>(visitor.Visit(expression), new HashSet<IFacet>(visitor.facets.Values), parameter);
         }
 
         private void StoreGroupByMemberInfo(MethodCallExpression m)
@@ -80,7 +83,7 @@ namespace ElasticLinq.Request.Visitors
 
         private Expression VisitAggregateKey(Type returnType)
         {
-            var getFacetExpression = Expression.Call(null, getKeyFromRow, BindingParameter);
+            var getFacetExpression = Expression.Call(null, getKeyFromRow, bindingParameter);
             return Expression.Convert(getFacetExpression, returnType);
         }
 
@@ -90,16 +93,23 @@ namespace ElasticLinq.Request.Visitors
             facets[termsStatsFacet.Name] = termsStatsFacet;
 
             // Rebind the property to the correct ElasticResponse node
-            var getFacetExpression = Expression.Call(null, getValueFromRow, BindingParameter, Expression.Constant(termsStatsFacet.Name), Expression.Constant(operation));
+            var getFacetExpression = Expression.Call(null, getValueFromRow, bindingParameter, Expression.Constant(termsStatsFacet.Name), Expression.Constant(operation));
 
             return Expression.Convert(getFacetExpression, returnType);
         }
 
-        private TermsStatsFacet CreateTermsStatsFacet(ParameterExpression parameter, LambdaExpression property)
+        protected static Expression StripQuotes(Expression e)
         {
-            var keyField = Mapping.GetFieldName(groupByMembers[parameter.Name]);
+            while (e.NodeType == ExpressionType.Quote)
+                e = ((UnaryExpression)e).Operand;
+            return e;
+        }
+
+        internal TermsStatsFacet CreateTermsStatsFacet(ParameterExpression parameter, LambdaExpression property)
+        {
+            var keyField = mapping.GetFieldName(groupByMembers[parameter.Name]);
             var valueExpression = (MemberExpression)Visit(property.Body);
-            var valueField = Mapping.GetFieldName(valueExpression.Member);
+            var valueField = mapping.GetFieldName(valueExpression.Member);
             return new TermsStatsFacet(valueField, keyField, valueField);
         }
     }

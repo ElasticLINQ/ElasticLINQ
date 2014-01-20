@@ -82,13 +82,13 @@
     <Compile Include="Request\SortOption.cs" />
     <Compile Include="Request\Visitors\BranchSelectExpressionVisitor.cs" />
     <Compile Include="Request\Visitors\ConstantMemberPair.cs" />
-    <Compile Include="Request\Visitors\ElasticFieldsRebindingExpressionVisitor.cs" />
+    <Compile Include="Request\Visitors\ElasticFieldsExpressionVisitor.cs" />
     <Compile Include="Request\Visitors\ElasticQueryTranslator.cs" />
     <Compile Include="Request\Expressions\CriteriaExpression.cs" />
     <Compile Include="Request\Visitors\ElasticTranslateResult.cs" />
     <Compile Include="Request\Visitors\EvaluatingExpressionVisitor.cs" />
     <Compile Include="Request\Visitors\PartialEvaluator.cs" />
-    <Compile Include="Request\Visitors\RebindingExpressionVisitor.cs" />
+    <Compile Include="Request\Visitors\RebindCollectionResult.cs" />
     <Compile Include="Response\Materializers\IElasticMaterializer.cs" />
     <Compile Include="Test\TestableElasticContext.cs" />
     <Compile Include="Test\TestableElasticQuery.cs" />

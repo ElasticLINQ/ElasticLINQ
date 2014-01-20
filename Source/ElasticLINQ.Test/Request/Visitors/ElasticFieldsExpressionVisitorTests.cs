@@ -10,7 +10,7 @@ using Xunit;
 
 namespace ElasticLinq.Test.Request.Visitors
 {
-    public class ElasticFieldExpressionVisitorTests
+    public class ElasticFieldsExpressionVisitorTests
     {
         private class Sample
         {
@@ -23,20 +23,20 @@ namespace ElasticLinq.Test.Request.Visitors
         [Fact]
         public void RebindThrowsArgumentNullExceptionIfMappingIsNull()
         {
-            Assert.Throws<ArgumentNullException>(() => ElasticFieldsRebindingExpressionVisitor.Rebind(null, Expression.Constant(1)));
+            Assert.Throws<ArgumentNullException>(() => ElasticFieldsExpressionVisitor.Rebind(null, Expression.Constant(1)));
         }
 
         [Fact]
         public void RebindThrowsArgumentNullExceptionIfSelectorIsNull()
         {
-            Assert.Throws<ArgumentNullException>(() => ElasticFieldsRebindingExpressionVisitor.Rebind(validMapping, null));
+            Assert.Throws<ArgumentNullException>(() => ElasticFieldsExpressionVisitor.Rebind(validMapping, null));
         }
 
         [Fact]
         public void RebindEntityToEntityIsUnchanged()
         {
             var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(f => f);
-            var rebound = ElasticFieldsRebindingExpressionVisitor.Rebind(validMapping, source.Expression);
+            var rebound = ElasticFieldsExpressionVisitor.Rebind(validMapping, source.Expression);
             Assert.Same(source.Expression, rebound.Item1);
         }
 
@@ -44,7 +44,7 @@ namespace ElasticLinq.Test.Request.Visitors
         public void RebindElasticFieldsToHitProperties()
         {
             var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(f => ElasticFields.Score);
-            var rebound = ElasticFieldsRebindingExpressionVisitor.Rebind(validMapping, source.Expression);
+            var rebound = ElasticFieldsExpressionVisitor.Rebind(validMapping, source.Expression);
 
             var flattened = FlatteningExpressionVisitor.Flatten(rebound.Item1);
             Assert.Single(flattened.OfType<MemberExpression>(), e => e.Expression == rebound.Item2 && e.Member.Name == "_score");
@@ -54,7 +54,7 @@ namespace ElasticLinq.Test.Request.Visitors
         public void RebindAnonymousProjectionElasticFieldsToHitProperties()
         {
             var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(f => new { ElasticFields.Score });
-            var rebound = ElasticFieldsRebindingExpressionVisitor.Rebind(validMapping, source.Expression);
+            var rebound = ElasticFieldsExpressionVisitor.Rebind(validMapping, source.Expression);
 
             var flattened = FlatteningExpressionVisitor.Flatten(rebound.Item1);
             Assert.Single(flattened.OfType<MemberExpression>(), e => e.Expression == rebound.Item2 && e.Member.Name == "_score");
@@ -65,7 +65,7 @@ namespace ElasticLinq.Test.Request.Visitors
         public void RebindTupleCreateMethodElasticFieldsToHitProperties()
         {
             var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(f => Tuple.Create(ElasticFields.Score));
-            var rebound = ElasticFieldsRebindingExpressionVisitor.Rebind(validMapping, source.Expression);
+            var rebound = ElasticFieldsExpressionVisitor.Rebind(validMapping, source.Expression);
 
             var flattened = FlatteningExpressionVisitor.Flatten(rebound.Item1);
             Assert.Single(flattened.OfType<MemberExpression>(), e => e.Expression == rebound.Item2 && e.Member.Name == "_score");
@@ -76,7 +76,7 @@ namespace ElasticLinq.Test.Request.Visitors
         public void RebindAnonymousProjectionEntityAndElasticFieldsToMaterializationAndHitProperty()
         {
             var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(f => new { f, ElasticFields.Score });
-            var rebound = ElasticFieldsRebindingExpressionVisitor.Rebind(validMapping, source.Expression);
+            var rebound = ElasticFieldsExpressionVisitor.Rebind(validMapping, source.Expression);
 
             var flattened = FlatteningExpressionVisitor.Flatten(rebound.Item1);
             Assert.Single(flattened.OfType<MemberExpression>(), m => m.Expression == rebound.Item2 && m.Member.Name == "_score");
@@ -91,7 +91,7 @@ namespace ElasticLinq.Test.Request.Visitors
         public void RebindTupleCreateMethodEntityAndElasticFieldsToMaterializationAndHitProperty()
         {
             var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(f => Tuple.Create(ElasticFields.Id, f));
-            var rebound = ElasticFieldsRebindingExpressionVisitor.Rebind(validMapping, source.Expression);
+            var rebound = ElasticFieldsExpressionVisitor.Rebind(validMapping, source.Expression);
 
             var flattened = FlatteningExpressionVisitor.Flatten(rebound.Item1);
             Assert.Single(flattened.OfType<MemberExpression>(), e => e.Expression == rebound.Item2 && e.Member.Name == "_id");
@@ -106,7 +106,7 @@ namespace ElasticLinq.Test.Request.Visitors
         public void RebindWithNonElasticMemberIsUnchanged()
         {
             var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(f => f.Name);
-            var rebound = ElasticFieldsRebindingExpressionVisitor.Rebind(validMapping, source.Expression);
+            var rebound = ElasticFieldsExpressionVisitor.Rebind(validMapping, source.Expression);
 
             var memberExpression = FlatteningExpressionVisitor.Flatten(rebound.Item1).OfType<MemberExpression>().FirstOrDefault();
             Assert.NotNull(memberExpression);
