@@ -1,12 +1,13 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
-using System.Reflection;
 using ElasticLinq.Mapping;
 using ElasticLinq.Response.Model;
 using ElasticLinq.Utility;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace ElasticLinq.Request.Visitors
 {
@@ -16,7 +17,7 @@ namespace ElasticLinq.Request.Visitors
     /// </summary>
     internal class MemberProjectionExpressionVisitor : ElasticFieldsRebindingExpressionVisitor
     {
-        protected static readonly MethodInfo GetDictionaryValueMethod = typeof(RebindingExpressionVisitor)
+        protected static readonly MethodInfo GetDictionaryValueMethod = typeof(MemberProjectionExpressionVisitor)
             .GetMethod("GetDictionaryValueOrDefault", BindingFlags.Static | BindingFlags.NonPublic);
 
         private readonly HashSet<string> fieldNames = new HashSet<string>();
@@ -26,13 +27,13 @@ namespace ElasticLinq.Request.Visitors
         {
         }
 
-        internal static new MemberProjectionResult Rebind(IElasticMapping mapping, Expression selector)
+        internal static new RebindingResult<string> Rebind(IElasticMapping mapping, Expression selector)
         {
             var parameter = Expression.Parameter(typeof(Hit), "h");
             var visitor = new MemberProjectionExpressionVisitor(parameter, mapping);
             Argument.EnsureNotNull("selector", selector);
             var materializer = visitor.Visit(selector);
-            return new MemberProjectionResult(visitor.fieldNames, materializer, parameter);
+            return new RebindingResult<string>(materializer, visitor.fieldNames, parameter);
         }
 
         protected override Expression VisitMember(MemberExpression m)
@@ -56,23 +57,16 @@ namespace ElasticLinq.Request.Visitors
             var getFieldExpression = Expression.Call(null, GetDictionaryValueMethod, Expression.PropertyOrField(BindingParameter, "fields"), Expression.Constant(fieldName), Expression.Constant(m.Type));
             return Expression.Convert(getFieldExpression, m.Type);
         }
-    }
 
-    internal class MemberProjectionResult
-    {
-        private readonly HashSet<string> fieldNames;
-        private readonly Expression materializer;
-        private readonly ParameterExpression parameter;
-
-        public MemberProjectionResult(HashSet<string> fieldNames, Expression materializer, ParameterExpression parameter)
+        internal static object GetDictionaryValueOrDefault(IDictionary<string, JToken> dictionary, string key, Type expectedType)
         {
-            this.fieldNames = fieldNames;
-            this.materializer = materializer;
-            this.parameter = parameter;
-        }
+            JToken token;
+            if (dictionary.TryGetValue(key, out token))
+                return token.ToObject(expectedType);
 
-        public IEnumerable<string> FieldNames { get { return fieldNames.AsEnumerable(); } }
-        public ParameterExpression Parameter { get { return parameter; } }
-        public Expression Materializer { get { return materializer; } }
+            return expectedType.IsValueType
+                ? Activator.CreateInstance(expectedType)
+                : null;
+        }
     }
 }

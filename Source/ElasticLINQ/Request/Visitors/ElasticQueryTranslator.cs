@@ -597,9 +597,9 @@ namespace ElasticLinq.Request.Visitors
         private void RebindPropertiesAndElasticFields(Expression selectExpression)
         {
             var projection = MemberProjectionExpressionVisitor.Rebind(mapping, selectExpression);
-            var compiled = Expression.Lambda(projection.Materializer, projection.Parameter).Compile();
+            var compiled = Expression.Lambda(projection.Expression, projection.Parameter).Compile();
             itemProjector = h => compiled.DynamicInvoke(h);
-            searchRequest.Fields.AddRange(projection.FieldNames);
+            searchRequest.Fields.AddRange(projection.Collected);
             finalItemType = selectExpression.Type;
         }
 

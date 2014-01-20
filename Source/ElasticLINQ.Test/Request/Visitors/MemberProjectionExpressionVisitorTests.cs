@@ -41,8 +41,8 @@ namespace ElasticLinq.Test.Request.Visitors
             var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(s => s.Name);
             var rebound = MemberProjectionExpressionVisitor.Rebind(validMapping, source.Expression);
 
-            Assert.Contains("name", rebound.FieldNames);
-            Assert.Equal(1, rebound.FieldNames.Count());
+            Assert.Contains("name", rebound.Collected);
+            Assert.Equal(1, rebound.Collected.Count());
         }
 
         [Fact]
@@ -51,9 +51,9 @@ namespace ElasticLinq.Test.Request.Visitors
             var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(s => new { s.Name, s.Id });
             var rebound = MemberProjectionExpressionVisitor.Rebind(validMapping, source.Expression);
 
-            Assert.Contains("name", rebound.FieldNames);
-            Assert.Contains("id", rebound.FieldNames);
-            Assert.Equal(2, rebound.FieldNames.Count());
+            Assert.Contains("name", rebound.Collected);
+            Assert.Contains("id", rebound.Collected);
+            Assert.Equal(2, rebound.Collected.Count());
         }
 
         [Fact]
@@ -62,9 +62,9 @@ namespace ElasticLinq.Test.Request.Visitors
             var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(s => Tuple.Create(s.Name, s.Id));
             var rebound = MemberProjectionExpressionVisitor.Rebind(validMapping, source.Expression);
 
-            Assert.Contains("name", rebound.FieldNames);
-            Assert.Contains("id", rebound.FieldNames);
-            Assert.Equal(2, rebound.FieldNames.Count());
+            Assert.Contains("name", rebound.Collected);
+            Assert.Contains("id", rebound.Collected);
+            Assert.Equal(2, rebound.Collected.Count());
         }
 
         [Fact]

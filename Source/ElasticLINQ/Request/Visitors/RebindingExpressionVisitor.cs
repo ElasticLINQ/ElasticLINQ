@@ -2,12 +2,9 @@
 
 using ElasticLinq.Mapping;
 using ElasticLinq.Utility;
-using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 
 namespace ElasticLinq.Request.Visitors
 {
@@ -41,17 +38,6 @@ namespace ElasticLinq.Request.Visitors
 
             BindingParameter = bindingParameter;
             Mapping = mapping;
-        }
-
-        internal static object GetDictionaryValueOrDefault(IDictionary<string, JToken> dictionary, string key, Type expectedType)
-        {
-            JToken token;
-            if (dictionary.TryGetValue(key, out token))
-                return token.ToObject(expectedType);
-
-            return expectedType.IsValueType
-                ? Activator.CreateInstance(expectedType)
-                : null;
         }
 
         protected static Expression StripQuotes(Expression e)
