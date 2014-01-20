@@ -70,5 +70,15 @@ namespace ElasticLinq.Response.Materializers
 
         public object Key { get { return key; } }
         public IReadOnlyList<AggregateField> Fields { get { return fields; } }
+
+        internal static object GetValue(AggregateRow row, string name, string operation)
+        {
+            return row.Fields.FirstOrDefault(f => f.Column.Name == name && f.Column.Operation == operation);
+        }
+
+        internal static object GetKey(AggregateRow row)
+        {
+            return row.Key;
+        }
     }
 }

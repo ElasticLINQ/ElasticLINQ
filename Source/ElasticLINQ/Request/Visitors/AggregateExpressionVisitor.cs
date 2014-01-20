@@ -2,7 +2,7 @@
 
 using ElasticLinq.Mapping;
 using ElasticLinq.Request.Facets;
-using ElasticLinq.Response.Model;
+using ElasticLinq.Response.Materializers;
 using ElasticLinq.Utility;
 using System;
 using System.Collections.Generic;
@@ -33,8 +33,8 @@ namespace ElasticLinq.Request.Visitors
     /// </summary>
     internal class AggregateExpressionVisitor : RebindingExpressionVisitor
     {
-        private static readonly MethodInfo getFacetFromResponseMethod = typeof(AggregateExpressionVisitor)
-            .GetMethod("GetFacetFromResponse", BindingFlags.Static | BindingFlags.NonPublic);
+        private static readonly MethodInfo getValueFromRow = typeof(AggregateRow).GetMethod("GetValue", BindingFlags.Static | BindingFlags.NonPublic);
+        private static readonly MethodInfo getKeyFromRow = typeof(AggregateRow).GetMethod("GetKey", BindingFlags.Static | BindingFlags.NonPublic);
 
         private static readonly Dictionary<string, string> methodToFacetSlice = new Dictionary<string, string>
         {
@@ -77,38 +77,45 @@ namespace ElasticLinq.Request.Visitors
             if (sourceMethodCall != null && sourceMethodCall.Method.Name == "GroupBy")
                 StoreGroupByMemberInfo(sourceMethodCall);
 
-            if (m.Method.DeclaringType == typeof(Enumerable))
+            if (m.Method.DeclaringType == typeof(Enumerable) || m.Method.DeclaringType == typeof(Queryable))
             {
+                if (m.Method.Name == "Key")
+                    return VisitAggregateKey(m.Method.ReturnType);
+
                 string slice;
                 if (methodToFacetSlice.TryGetValue(m.Method.Name, out slice))
                 {
-                    if (m.Arguments.Count == 1)
-                        return VisitAggregateTerm((ParameterExpression)m.Arguments[0], slice, m.Method.ReturnType);
+                    if (m.Arguments.Count == 2)
+                        return VisitAggregateTerm((ParameterExpression)m.Arguments[0], (LambdaExpression) m.Arguments[1], slice, m.Method.ReturnType);
                 }
             }
 
             return base.VisitMethodCall(m);
         }
 
-        private Expression VisitAggregateTerm(ParameterExpression parameter, string slice, Type returnType)
+        private Expression VisitAggregateKey(Type returnType)
         {
-            // Create the term facet
-            var groupByMemberInfo = groupByMembers[parameter.Name];
-            var keyField = Mapping.GetFieldName(groupByMemberInfo);
-            facets[keyField] = new TermsFacet(keyField, keyField);
+            var getFacetExpression = Expression.Call(null, getKeyFromRow, BindingParameter);
+            return Expression.Convert(getFacetExpression, returnType);
+        }
+
+        private Expression VisitAggregateTerm(ParameterExpression parameter, LambdaExpression property, string operation, Type returnType)
+        {
+            var termsStatsFacet = CreateTermsStatsFacet(parameter, property);
+            facets[termsStatsFacet.Name] = termsStatsFacet;
 
             // Rebind the property to the correct ElasticResponse node
-            var getFacetExpression = Expression.Call(null, getFacetFromResponseMethod, BindingParameter,
-                Expression.Constant(keyField), Expression.Constant(slice), Expression.Constant(returnType));
+            var getFacetExpression = Expression.Call(null, getValueFromRow, BindingParameter, Expression.Constant(termsStatsFacet.Name), Expression.Constant(operation));
 
             return Expression.Convert(getFacetExpression, returnType);
         }
 
-        internal static object GetFacetFromResponse(ElasticResponse r, string key, string slice, Type expectedType)
+        private TermsStatsFacet CreateTermsStatsFacet(ParameterExpression parameter, LambdaExpression property)
         {
-            return 1;
-            // TODO: Handle missing values
-            return r.facets[key][slice].ToObject(expectedType);
+            var keyField = Mapping.GetFieldName(groupByMembers[parameter.Name]);
+            var valueExpression = (MemberExpression)Visit(property.Body);
+            var valueField = Mapping.GetFieldName(valueExpression.Member);
+            return new TermsStatsFacet(valueField, keyField, valueField);
         }
     }
 }
