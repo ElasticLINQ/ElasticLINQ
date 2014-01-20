@@ -78,7 +78,9 @@ namespace ElasticLinq.Request
             {
                 var stopwatch = Stopwatch.StartNew();
                 var results = new JsonSerializer().Deserialize<ElasticResponse>(new JsonTextReader(streamReader));
-                var resultCount = results == null ? 0 : results.hits.hits.Count;
+                var resultCount = results == null || results.hits == null || results.hits.hits == null
+                    ? 0
+                    : results.hits.hits.Count;
                 stopwatch.Stop();
 
                 if (log != null)
