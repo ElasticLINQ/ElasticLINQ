@@ -1,6 +1,8 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using System;
 using ElasticLinq.Mapping;
+using ElasticLinq.Response.Model;
 using ElasticLinq.Utility;
 using System.Linq.Expressions;
 
@@ -17,11 +19,12 @@ namespace ElasticLinq.Request.Visitors
         {
         }
 
-        internal static Expression Rebind(ParameterExpression parameter, IElasticMapping mapping, Expression selector)
+        internal static Tuple<Expression, ParameterExpression> Rebind(IElasticMapping mapping, Expression selector)
         {
+            var parameter = Expression.Parameter(typeof(Hit), "h");
             var visitor = new ElasticFieldsRebindingExpressionVisitor(parameter, mapping);
             Argument.EnsureNotNull("selector", selector);
-            return visitor.Visit(selector);
+            return Tuple.Create(visitor.Visit(selector), parameter);
         }
 
         protected override Expression VisitMember(MemberExpression m)

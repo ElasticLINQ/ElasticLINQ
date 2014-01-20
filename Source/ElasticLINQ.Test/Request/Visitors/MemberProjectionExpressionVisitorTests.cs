@@ -24,29 +24,22 @@ namespace ElasticLinq.Test.Request.Visitors
         private readonly IElasticMapping validMapping = new TrivialElasticMapping();
 
         [Fact]
-        public void RebindThrowsArgumentNullExceptionIfParameterIsNull()
-        {
-            Assert.Throws<ArgumentNullException>(() => MemberProjectionExpressionVisitor.Rebind(null, validMapping, Expression.Constant(1)));
-        }
-
-        [Fact]
         public void RebindThrowsArgumentNullExceptionIfMappingIsNull()
         {
-            Assert.Throws<ArgumentNullException>(() => MemberProjectionExpressionVisitor.Rebind(validParameter, null, Expression.Constant(1)));
+            Assert.Throws<ArgumentNullException>(() => MemberProjectionExpressionVisitor.Rebind(null, Expression.Constant(1)));
         }
 
         [Fact]
         public void RebindThrowsArgumentNullExceptionIfSelectorIsNull()
         {
-            Assert.Throws<ArgumentNullException>(() => MemberProjectionExpressionVisitor.Rebind(validParameter, validMapping, null));
+            Assert.Throws<ArgumentNullException>(() => MemberProjectionExpressionVisitor.Rebind(validMapping, null));
         }
 
         [Fact]
         public void RebindCollectsSinglePropertyFieldName()
         {
             var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(s => s.Name);
-            var hitParameter = Expression.Parameter(typeof(Hit));
-            var rebound = MemberProjectionExpressionVisitor.Rebind(hitParameter, validMapping, source.Expression);
+            var rebound = MemberProjectionExpressionVisitor.Rebind(validMapping, source.Expression);
 
             Assert.Contains("name", rebound.FieldNames);
             Assert.Equal(1, rebound.FieldNames.Count());
@@ -56,8 +49,7 @@ namespace ElasticLinq.Test.Request.Visitors
         public void RebindCollectsAnonymousProjectionPropertiesFieldNames()
         {
             var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(s => new { s.Name, s.Id });
-            var hitParameter = Expression.Parameter(typeof(Hit));
-            var rebound = MemberProjectionExpressionVisitor.Rebind(hitParameter, validMapping, source.Expression);
+            var rebound = MemberProjectionExpressionVisitor.Rebind(validMapping, source.Expression);
 
             Assert.Contains("name", rebound.FieldNames);
             Assert.Contains("id", rebound.FieldNames);
@@ -68,8 +60,7 @@ namespace ElasticLinq.Test.Request.Visitors
         public void RebindCollectsTupleCreateProjectionPropertiesFieldNames()
         {
             var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(s => Tuple.Create(s.Name, s.Id));
-            var hitParameter = Expression.Parameter(typeof(Hit));
-            var rebound = MemberProjectionExpressionVisitor.Rebind(hitParameter, validMapping, source.Expression);
+            var rebound = MemberProjectionExpressionVisitor.Rebind(validMapping, source.Expression);
 
             Assert.Contains("name", rebound.FieldNames);
             Assert.Contains("id", rebound.FieldNames);

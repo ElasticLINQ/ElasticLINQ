@@ -12,22 +12,6 @@ using System.Reflection;
 
 namespace ElasticLinq.Request.Visitors
 {
-    internal class AggregateRebindResult
-    {
-        private readonly Expression expression;
-        private readonly List<IFacet> facets;
-
-        public AggregateRebindResult(Expression expression, List<IFacet> facets)
-        {
-            this.expression = expression;
-            this.facets = facets;
-        }
-
-        public Expression Expression { get { return expression; } }
-
-        public IReadOnlyList<IFacet> Facets { get { return facets.AsReadOnly(); } }
-    }
-
     /// <summary>
     /// Rebinds aggregate method accesses to JObject facet fields.
     /// </summary>
@@ -54,11 +38,12 @@ namespace ElasticLinq.Request.Visitors
         {
         }
 
-        internal static AggregateRebindResult Rebind(ParameterExpression parameter, IElasticMapping mapping, Expression expression)
+        internal static RebindingResult<IFacet> Rebind(IElasticMapping mapping, Expression expression)
         {
+            var parameter = Expression.Parameter(typeof(AggregateRow), "r");
             var visitor = new AggregateExpressionVisitor(parameter, mapping);
             Argument.EnsureNotNull("expression", expression);
-            return new AggregateRebindResult(visitor.Visit(expression), visitor.facets.Values.ToList());
+            return new RebindingResult<IFacet>(visitor.Visit(expression), new HashSet<IFacet>(visitor.facets.Values), parameter);
         }
 
         private void StoreGroupByMemberInfo(MethodCallExpression m)

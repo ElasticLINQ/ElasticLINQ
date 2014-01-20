@@ -42,9 +42,7 @@ namespace ElasticLinq.Request.Visitors
         private ElasticTranslateResult Translate(Expression e)
         {
             var evaluated = PartialEvaluator.Evaluate(e);
-
-            var aggregateRowParameter = Expression.Parameter(typeof(AggregateRow), "r");
-            var aggregated = AggregateExpressionVisitor.Rebind(aggregateRowParameter, mapping, evaluated);
+            var aggregated = AggregateExpressionVisitor.Rebind(mapping, evaluated);
             
             Visit(aggregated.Expression);
 
@@ -53,7 +51,7 @@ namespace ElasticLinq.Request.Visitors
             if (searchRequest.Filter == null && searchRequest.Query == null)
                 searchRequest.Filter = mapping.GetTypeSelectionCriteria(type);
 
-            if (aggregated.Facets.Any())
+            if (aggregated.Collected.Any())
                 searchRequest.SearchType = "count"; // Suppress hits for aggregate queries
 
             if (materializer == null)
@@ -585,9 +583,8 @@ namespace ElasticLinq.Request.Visitors
         /// <param name="entityParameter">Parameter that references the whole entity.</param>
         private void RebindElasticFieldsAndChainProjector(Expression selectExpression, ParameterExpression entityParameter)
         {
-            var hitParameter = Expression.Parameter(typeof(Hit), "h");
-            var projection = ElasticFieldsRebindingExpressionVisitor.Rebind(hitParameter, mapping, selectExpression);
-            var compiled = Expression.Lambda(projection, entityParameter, hitParameter).Compile();
+            var projection = ElasticFieldsRebindingExpressionVisitor.Rebind(mapping, selectExpression);
+            var compiled = Expression.Lambda(projection.Item1, entityParameter, projection.Item2).Compile();
             itemProjector = h => compiled.DynamicInvoke(DefaultItemProjector(h), h);
             finalItemType = selectExpression.Type;
         }
@@ -599,9 +596,8 @@ namespace ElasticLinq.Request.Visitors
         /// <param name="selectExpression">Select expression to rebind.</param>
         private void RebindPropertiesAndElasticFields(Expression selectExpression)
         {
-            var hitParameter = Expression.Parameter(typeof(Hit), "h");
-            var projection = MemberProjectionExpressionVisitor.Rebind(hitParameter, mapping, selectExpression);
-            var compiled = Expression.Lambda(projection.Materializer, hitParameter).Compile();
+            var projection = MemberProjectionExpressionVisitor.Rebind(mapping, selectExpression);
+            var compiled = Expression.Lambda(projection.Materializer, projection.Parameter).Compile();
             itemProjector = h => compiled.DynamicInvoke(h);
             searchRequest.Fields.AddRange(projection.FieldNames);
             finalItemType = selectExpression.Type;

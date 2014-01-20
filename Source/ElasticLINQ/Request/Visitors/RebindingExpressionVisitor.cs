@@ -5,18 +5,34 @@ using ElasticLinq.Utility;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
 namespace ElasticLinq.Request.Visitors
 {
+    internal class RebindingResult<T>
+    {
+        private readonly Expression expression;
+        private readonly HashSet<T> collected;
+        private readonly ParameterExpression parameter;
+
+        public RebindingResult(Expression expression, HashSet<T> collected, ParameterExpression parameter)
+        {
+            this.expression = expression;
+            this.collected = collected;
+            this.parameter = parameter;
+        }
+
+        public Expression Expression { get { return expression; } }
+        public ParameterExpression Parameter { get { return parameter; } }
+        public IReadOnlyList<T> Collected { get { return collected.ToList().AsReadOnly(); } }
+    }
+
     internal abstract class RebindingExpressionVisitor : ExpressionVisitor
     {
         protected readonly ParameterExpression BindingParameter;
         protected readonly IElasticMapping Mapping;
-
-        protected static readonly MethodInfo GetDictionaryValueMethod = typeof(RebindingExpressionVisitor)
-            .GetMethod("GetDictionaryValueOrDefault", BindingFlags.Static | BindingFlags.NonPublic);
 
         protected RebindingExpressionVisitor(ParameterExpression bindingParameter, IElasticMapping mapping)
         {
