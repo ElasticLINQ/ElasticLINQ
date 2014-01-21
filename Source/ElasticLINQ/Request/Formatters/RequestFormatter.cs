@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using ElasticLinq.Utility;
 
 namespace ElasticLinq.Request.Formatters
 {
@@ -38,28 +39,14 @@ namespace ElasticLinq.Request.Formatters
 
             if (!String.IsNullOrEmpty(SearchRequest.SearchType))
             {
-                var parameters = QueryStringToDictionary(builder);
+                var parameters = builder.GetQueryParameters();
                 parameters["search_type"] = SearchRequest.SearchType;
-                builder.Query = DictionaryToQueryString(parameters);
+                builder.SetQueryParameters(parameters);
             }
 
             CompleteSearchUri(builder);
 
             return builder.Uri;
-        }
-
-        protected static Dictionary<string, string> QueryStringToDictionary(UriBuilder builder)
-        {
-            return (builder.Query + " ").Substring(1)
-                .Trim()
-                .Split('&')
-                .Select(p => p.Split('='))
-                .ToDictionary(k => k[0], v => v.Length > 1 ? v[1] : "");
-        }
-
-        protected static string DictionaryToQueryString(Dictionary<string, string> dictionary)
-        {
-            return string.Join("&", dictionary.Select(q => q.Key + "=" + q.Value));
         }
 
         internal static string Format(TimeSpan timeSpan)
