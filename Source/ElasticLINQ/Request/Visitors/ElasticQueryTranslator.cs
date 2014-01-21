@@ -3,6 +3,7 @@
 using ElasticLinq.Mapping;
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Expressions;
+using ElasticLinq.Request.Facets;
 using ElasticLinq.Response.Materializers;
 using ElasticLinq.Response.Model;
 using ElasticLinq.Utility;
@@ -43,16 +44,12 @@ namespace ElasticLinq.Request.Visitors
         {
             var evaluated = PartialEvaluator.Evaluate(e);
             var aggregated = AggregateExpressionVisitor.Rebind(mapping, evaluated);
-            
             Visit(aggregated.Expression);
 
             searchRequest.Type = mapping.GetTypeName(type);
 
             if (searchRequest.Filter == null && searchRequest.Query == null)
                 searchRequest.Filter = mapping.GetTypeSelectionCriteria(type);
-
-            if (aggregated.Collected.Any())
-                searchRequest.SearchType = "count"; // Suppress hits for aggregate queries
 
             if (materializer == null)
                 materializer = new ElasticManyHitsMaterializer(itemProjector ?? DefaultItemProjector, finalItemType ?? type);
@@ -102,7 +99,7 @@ namespace ElasticLinq.Request.Visitors
             if (cm != null)
                 return new CriteriaExpression(new PrefixCriteria(mapping.GetFieldName(cm.MemberExpression.Member), cm.ConstantExpression.Value));
 
-            throw new NotSupportedException("Prefix must be between a Member and a Constant");            
+            throw new NotSupportedException("Prefix must be between a Member and a Constant");
         }
 
         private Expression VisitRegexp(Expression left, Expression right)
@@ -112,7 +109,7 @@ namespace ElasticLinq.Request.Visitors
             if (cm != null)
                 return new CriteriaExpression(new RegexpCriteria(mapping.GetFieldName(cm.MemberExpression.Member), cm.ConstantExpression.Value.ToString()));
 
-            throw new NotSupportedException("Regexp must be between a Member and a Constant");            
+            throw new NotSupportedException("Regexp must be between a Member and a Constant");
         }
 
         private Expression VisitCommonMethodCall(MethodCallExpression m)
@@ -299,7 +296,7 @@ namespace ElasticLinq.Request.Visitors
                     return m;
 
                 case ExpressionType.MemberAccess:
-                    if (m.Member.Name == "HasValue" && TypeHelper.IsNullableType(m.Member.DeclaringType))
+                    if (m.Member.Name == "HasValue" && m.Member.DeclaringType.IsGenericOf(typeof(Nullable<>)))
                         return m;
                     break;
             }
@@ -517,7 +514,7 @@ namespace ElasticLinq.Request.Visitors
             if (final != null)
             {
                 var fieldName = mapping.GetFieldName(final.Member);
-                var ignoreUnmapped = TypeHelper.IsNullableType(final.Type); // Consider a config switch?
+                var ignoreUnmapped = final.Type.IsGenericOf(typeof(Nullable<>)); // Consider a config switch?
                 searchRequest.SortOptions.Insert(0, new SortOption(fieldName, ascending, ignoreUnmapped));
             }
 
@@ -533,46 +530,29 @@ namespace ElasticLinq.Request.Visitors
         private Expression VisitSelect(Expression source, Expression selectExpression)
         {
             var lambda = (LambdaExpression)StripQuotes(selectExpression);
-            var selectBody = Visit(lambda.Body);
+            var selectBody = lambda.Body;
 
             if (selectBody is MemberExpression)
-                return VisitSelectMember(source, (MemberExpression)selectBody);
+                RebindPropertiesAndElasticFields(selectBody);
 
             if (selectBody is NewExpression)
-                return VisitSelectNew(source, (NewExpression)selectBody, lambda.Parameters);
+                RebindSelectBody(selectBody, ((NewExpression)selectBody).Arguments, lambda.Parameters);
 
             if (selectBody is MethodCallExpression)
-                return VisitSelectMethodCall(source, (MethodCallExpression)selectBody, lambda.Parameters);
+                RebindSelectBody(selectBody, ((MethodCallExpression)selectBody).Arguments, lambda.Parameters);
+
+            finalItemType = selectExpression.Type;
 
             return Visit(source);
         }
 
-        private Expression VisitSelectMember(Expression source, MemberExpression selectExpression)
+        private void RebindSelectBody(Expression selectExpression, IEnumerable<Expression> arguments, IEnumerable<ParameterExpression> parameters)
         {
-            RebindPropertiesAndElasticFields(selectExpression);
-            return Visit(source);
-        }
-
-        private Expression VisitSelectMethodCall(Expression source, MethodCallExpression selectExpression, IEnumerable<ParameterExpression> parameters)
-        {
-            var entityParameter = selectExpression.Arguments.SingleOrDefault(parameters.Contains) as ParameterExpression;
+            var entityParameter = arguments.SingleOrDefault(parameters.Contains) as ParameterExpression;
             if (entityParameter == null)
                 RebindPropertiesAndElasticFields(selectExpression);
             else
                 RebindElasticFieldsAndChainProjector(selectExpression, entityParameter);
-
-            return Visit(source);
-        }
-
-        private Expression VisitSelectNew(Expression source, NewExpression selectExpression, IEnumerable<ParameterExpression> parameters)
-        {
-            var entityParameter = selectExpression.Arguments.SingleOrDefault(parameters.Contains) as ParameterExpression;
-            if (entityParameter == null)
-                RebindPropertiesAndElasticFields(selectExpression);
-            else
-                RebindElasticFieldsAndChainProjector(selectExpression, entityParameter);
-
-            return Visit(source);
         }
 
         /// <summary>
@@ -586,7 +566,6 @@ namespace ElasticLinq.Request.Visitors
             var projection = ElasticFieldsExpressionVisitor.Rebind(mapping, selectExpression);
             var compiled = Expression.Lambda(projection.Item1, entityParameter, projection.Item2).Compile();
             itemProjector = h => compiled.DynamicInvoke(DefaultItemProjector(h), h);
-            finalItemType = selectExpression.Type;
         }
 
         /// <summary>
@@ -600,7 +579,6 @@ namespace ElasticLinq.Request.Visitors
             var compiled = Expression.Lambda(projection.Expression, projection.Parameter).Compile();
             itemProjector = h => compiled.DynamicInvoke(h);
             searchRequest.Fields.AddRange(projection.Collected);
-            finalItemType = selectExpression.Type;
         }
 
         private Expression VisitSkip(Expression source, Expression skipExpression)
