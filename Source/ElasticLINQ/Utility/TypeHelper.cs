@@ -50,7 +50,8 @@ namespace ElasticLinq.Utility
 
         public static bool IsGenericOf(this Type type, Type genericType)
         {
-            return type != null && type.IsGenericType && type.GetGenericTypeDefinition() == genericType;
+            return type != null && genericType != null
+                && type.IsGenericType && type.GetGenericTypeDefinition() == genericType;
         }
     }
 }
