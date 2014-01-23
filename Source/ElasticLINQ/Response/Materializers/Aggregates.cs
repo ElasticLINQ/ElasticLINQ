@@ -85,6 +85,9 @@ namespace ElasticLinq.Response.Materializers
                     if (valueType == typeof(Single))
                         return Single.PositiveInfinity;
 
+                    if (valueType == typeof(decimal?))
+                        return null;
+
                     break;
                 }
 
@@ -95,6 +98,9 @@ namespace ElasticLinq.Response.Materializers
 
                     if (valueType == typeof(Single))
                         return Single.NegativeInfinity;
+
+                    if (valueType == typeof(decimal?))
+                        return null;
 
                     break;
                 }

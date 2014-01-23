@@ -26,10 +26,10 @@ namespace TestConsoleApp.Utility
             }
 
             foreach (var property in value.GetType().GetProperties())
-                Console.WriteLine(property.Name + " : " + property.GetValue(value));
+                Console.WriteLine(property.Name + " : " + (property.GetValue(value) ?? "<null>"));
 
             foreach (var field in value.GetType().GetFields())
-                Console.WriteLine(field.Name + " : " + field.GetValue(value));
+                Console.WriteLine(field.Name + " : " + (field.GetValue(value) ?? "<null>"));
         }
     }
 }

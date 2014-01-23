@@ -6,6 +6,6 @@
         public string Director { get; set; }
         public int Year { get; set; }
         public string[] Genres { get; set; }
-        public double Rating { get; set; }
+        public decimal? Rating { get; set; }
     }
 }
