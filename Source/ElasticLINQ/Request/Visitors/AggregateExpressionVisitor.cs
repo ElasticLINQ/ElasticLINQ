@@ -13,7 +13,7 @@ using System.Reflection;
 namespace ElasticLinq.Request.Visitors
 {
     /// <summary>
-    /// Rebinds aggregate method accesses to JObject facet fields.
+    /// Converts aggregate expressions into ElasticSearch facets.
     /// </summary>
     internal class AggregateExpressionVisitor : ExpressionVisitor
     {
@@ -31,14 +31,13 @@ namespace ElasticLinq.Request.Visitors
         };
 
         private readonly HashSet<MemberInfo> aggregateMembers = new HashSet<MemberInfo>();
-        private readonly ParameterExpression bindingParameter;
+        private readonly ParameterExpression bindingParameter = Expression.Parameter(typeof(AggregateRow), "r");
         private readonly IElasticMapping mapping;
 
         private MemberInfo groupByMember;
 
-        private AggregateExpressionVisitor(ParameterExpression bindingParameter, IElasticMapping mapping)
+        private AggregateExpressionVisitor(IElasticMapping mapping)
         {
-            this.bindingParameter = bindingParameter;
             this.mapping = mapping;
         }
 
@@ -47,10 +46,9 @@ namespace ElasticLinq.Request.Visitors
             Argument.EnsureNotNull("mapping", mapping);
             Argument.EnsureNotNull("expression", expression);
 
-            var parameter = Expression.Parameter(typeof(AggregateRow), "r");
-            var visitor = new AggregateExpressionVisitor(parameter, mapping);
+            var visitor = new AggregateExpressionVisitor(mapping);
 
-            return new RebindCollectionResult<IFacet>(visitor.Visit(expression), new HashSet<IFacet>(visitor.GetFacets()), parameter, visitor.selectProjection);
+            return new RebindCollectionResult<IFacet>(visitor.Visit(expression), new HashSet<IFacet>(visitor.GetFacets()), visitor.bindingParameter, visitor.selectProjection);
         }
 
         private IEnumerable<IFacet> GetFacets()
@@ -131,7 +129,7 @@ namespace ElasticLinq.Request.Visitors
             return Expression.Convert(getFacetExpression, returnType);
         }
 
-        protected static Expression StripQuotes(Expression e)
+        private static Expression StripQuotes(Expression e)
         {
             while (e.NodeType == ExpressionType.Quote)
                 e = ((UnaryExpression)e).Operand;

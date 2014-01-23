@@ -3,6 +3,7 @@
 using ElasticLinq.Mapping;
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Expressions;
+using ElasticLinq.Request.Facets;
 using ElasticLinq.Response.Materializers;
 using ElasticLinq.Response.Model;
 using ElasticLinq.Utility;
@@ -43,26 +44,35 @@ namespace ElasticLinq.Request.Visitors
         {
             var evaluated = PartialEvaluator.Evaluate(e);
             var aggregated = AggregateExpressionVisitor.Rebind(mapping, evaluated);
-            Visit(aggregated.Expression);
 
-            searchRequest.Type = mapping.GetTypeName(type);
-
-            if (aggregated.Collected.Count == 0)
-            {
-                if (searchRequest.Filter == null && searchRequest.Query == null)
-                    searchRequest.Filter = mapping.GetTypeSelectionCriteria(type);
-
-                if (materializer == null)
-                    materializer = new ElasticManyHitsMaterializer(itemProjector ?? DefaultItemProjector, finalItemType ?? type);
-            }
+            if (aggregated.Collected.Count > 0)
+                CompleteFacetTranslation(aggregated);
             else
-            {
-                searchRequest.Facets = aggregated.Collected.ToList();
-                searchRequest.SearchType = "count"; // We only want facets, not hits
-                materializer = new ElasticFacetsMaterializer(r => aggregated.Projector.Compile().DynamicInvoke(r), aggregated.Projector.ReturnType);
-            }
+                CompleteHitTranslation(evaluated);
 
             return new ElasticTranslateResult(searchRequest, materializer);
+        }
+
+        private void CompleteHitTranslation(Expression evaluated)
+        {
+            Visit(evaluated);
+            searchRequest.Type = mapping.GetTypeName(type);
+
+            if (searchRequest.Filter == null && searchRequest.Query == null)
+                searchRequest.Filter = mapping.GetTypeSelectionCriteria(type);
+
+            if (materializer == null)
+                materializer = new ElasticManyHitsMaterializer(itemProjector ?? DefaultItemProjector, finalItemType ?? type);
+        }
+
+        private void CompleteFacetTranslation(RebindCollectionResult<IFacet> aggregated)
+        {
+            Visit(aggregated.Expression);
+            searchRequest.Type = mapping.GetTypeName(type);
+
+            searchRequest.Facets = aggregated.Collected.ToList();
+            searchRequest.SearchType = "count"; // We only want facets, not hits
+            materializer = new ElasticFacetsMaterializer(r => aggregated.Projection.Compile().DynamicInvoke(r), aggregated.Projection.ReturnType);
         }
 
         protected override Expression VisitMethodCall(MethodCallExpression m)

@@ -1,15 +1,15 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
-using System;
 using ElasticLinq.Utility;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
 namespace ElasticLinq.Response.Materializers
 {
-    [DebuggerDisplay("Column {Name},{Operation} ")]
+    [DebuggerDisplay("Column {Name},{Operation}")]
     internal class AggregateColumn
     {
         private readonly string name;
@@ -59,15 +59,48 @@ namespace ElasticLinq.Response.Materializers
         public object Key { get { return key; } }
         public IReadOnlyList<AggregateField> Fields { get { return fields; } }
 
-        internal static object GetValue(AggregateRow row, string name, string operation, Type type)
+        internal static object GetValue(AggregateRow row, string name, string operation, Type valueType)
         {
             var field = row.Fields.FirstOrDefault(f => f.Column.Name == name && f.Column.Operation == operation);
-            return field != null ? field.Token.ToObject(type) : TypeHelper.CreateDefault(type);
+
+            return field == null
+                ? TypeHelper.CreateDefault(valueType)
+                : ParseValue(field.Token, valueType);
         }
 
         internal static object GetKey(AggregateRow row)
         {
             return row.Key.ToString();
+        }
+
+        internal static object ParseValue(JToken token, Type valueType)
+        {
+            switch (token.ToString())
+            {
+                case "Infinity":
+                {
+                    if (valueType == typeof(Double))
+                        return Double.PositiveInfinity;
+
+                    if (valueType == typeof(Single))
+                        return Single.PositiveInfinity;
+
+                    break;
+                }
+
+                case "-Infinity":
+                {
+                    if (valueType == typeof(Double))
+                        return Double.NegativeInfinity;
+
+                    if (valueType == typeof(Single))
+                        return Single.NegativeInfinity;
+
+                    break;
+                }
+            }
+
+            return token.ToObject(valueType);
         }
     }
 }
