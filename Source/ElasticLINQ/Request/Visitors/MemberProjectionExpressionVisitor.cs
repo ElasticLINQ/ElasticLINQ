@@ -33,7 +33,7 @@ namespace ElasticLinq.Request.Visitors
             var visitor = new MemberProjectionExpressionVisitor(parameter, mapping);
             Argument.EnsureNotNull("selector", selector);
             var materializer = visitor.Visit(selector);
-            return new RebindCollectionResult<string>(materializer, visitor.fieldNames, parameter);
+            return new RebindCollectionResult<string>(materializer, visitor.fieldNames, parameter, null);
         }
 
         protected override Expression VisitMember(MemberExpression m)

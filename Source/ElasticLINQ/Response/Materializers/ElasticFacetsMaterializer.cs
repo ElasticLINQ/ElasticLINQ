@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace ElasticLinq.Response.Materializers
 {
@@ -13,27 +14,40 @@ namespace ElasticLinq.Response.Materializers
     /// </summary>
     internal class ElasticFacetsMaterializer : IElasticMaterializer
     {
-        private readonly Func<AggregateRow, object> itemCreator;
+        private static readonly MethodInfo manyMethodInfo =
+            typeof(ElasticFacetsMaterializer).GetMethod("Many", BindingFlags.NonPublic | BindingFlags.Static);
+
+        private readonly Func<AggregateRow, object> projector;
         private readonly Type elementType;
 
-        public ElasticFacetsMaterializer(Func<AggregateRow, object> itemCreator, Type elementType)
+        public ElasticFacetsMaterializer(Func<AggregateRow, object> projector, Type elementType)
         {
-            this.itemCreator = itemCreator;
+            this.projector = projector;
             this.elementType = elementType;
         }
 
         public object Materialize(ElasticResponse elasticResponse)
         {
+            return manyMethodInfo
+                .MakeGenericMethod(elementType)
+                .Invoke(null, new object[] { elasticResponse, projector });
+        }
+
+        internal static List<T> Many<T>(ElasticResponse elasticResponse, Func<AggregateRow, object> projector)
+        {
+            if (elasticResponse.facets == null || elasticResponse.facets.Count == 0)
+                return new List<T>();
+
             var rows = FlattenToAggregateRows(elasticResponse.facets);
-            return rows.Select(itemCreator).ToList(); // TOOD: Cast dynamically with reflection
+            return rows.Select(projector).Cast<T>().ToList();
         }
 
         /// <summary>
-        /// The results from ElasticSearch for facets come back in a structure where each facet
-        /// is completely independent from each other and contains all possible operations for
-        /// that facets. Terms may also be present in one facet but not another. This query
-        /// converts that structure into something more row-based that allows the rebinding of the
-        /// select projection to it.
+        /// A facet response from ElasticSearch comes back with each field in an independent
+        /// block containing all possible aggregates for that field. Multiple fields requires
+        /// multiple blocks each of which may or may not have all possible terms.
+        /// This query converts that structure into something row-based that allows rebinding
+        /// the select projection to it.
         /// </summary>
         /// <param name="facets">Facets JSON object as returned from ElasticSearch.</param>
         /// <returns>An enumeration of AggregateRows containing appropriate keys and fields.</returns>
@@ -43,9 +57,23 @@ namespace ElasticLinq.Response.Materializers
                 .Values()
                 .SelectMany(x => x["terms"])
                 .GroupBy(x => x["term"])
-                .Select(c => new AggregateRow(c.Key, c.SelectMany(v => v.Cast<JProperty>()
-                .Select(z => new AggregateField(new AggregateColumn(((JProperty)v.Parent.Parent.Parent.Parent).Name, z.Name), z.Value)))
-            ));
+                .Select(CreateRow)
+                .ToList();
+        }
+
+        private static AggregateRow CreateRow(IGrouping<JToken, JToken> c)
+        {
+            return new AggregateRow(c.Key, c.SelectMany(v => v.Cast<JProperty>().Select(z => AggregateField(v, z))));
+        }
+
+        private static AggregateField AggregateField(JToken v, JProperty z)
+        {
+            return new AggregateField(CreateColumn(v, z), z.Value);
+        }
+
+        private static AggregateColumn CreateColumn(JToken v, JProperty z)
+        {
+            return new AggregateColumn(((JProperty)v.Parent.Parent.Parent.Parent).Name, z.Name);
         }
     }
 }

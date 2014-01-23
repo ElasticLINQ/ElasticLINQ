@@ -2,6 +2,7 @@
 
 using ElasticLinq.Response.Model;
 using System;
+using ElasticLinq.Utility;
 
 namespace ElasticLinq.Response.Materializers
 {
@@ -10,14 +11,14 @@ namespace ElasticLinq.Response.Materializers
     /// </summary>
     internal class ElasticOneHitMaterializer : IElasticMaterializer
     {
-        private readonly Func<Hit, object> itemCreator;
+        private readonly Func<Hit, object> projector;
         private readonly Type elementType;
         private readonly bool throwIfMoreThanOne;
         private readonly bool defaultIfNone;
 
-        public ElasticOneHitMaterializer(Func<Hit, object> itemCreator, Type elementType, bool throwIfMoreThanOne, bool defaultIfNone)
+        public ElasticOneHitMaterializer(Func<Hit, object> projector, Type elementType, bool throwIfMoreThanOne, bool defaultIfNone)
         {
-            this.itemCreator = itemCreator;
+            this.projector = projector;
             this.elementType = elementType;
             this.throwIfMoreThanOne = throwIfMoreThanOne;
             this.defaultIfNone = defaultIfNone;
@@ -29,7 +30,7 @@ namespace ElasticLinq.Response.Materializers
 
             if (!enumerator.MoveNext())
                 if (defaultIfNone)
-                    return elementType.IsValueType ? Activator.CreateInstance(elementType) : null;
+                    return TypeHelper.CreateDefault(elementType);
                 else
                     throw new InvalidOperationException("Sequence contains no elements");
 
@@ -38,7 +39,7 @@ namespace ElasticLinq.Response.Materializers
             if (throwIfMoreThanOne && enumerator.MoveNext())
                 throw new InvalidOperationException("Sequence contains more than one element");
 
-            return itemCreator(current);
+            return projector(current);
         }
     }
 }

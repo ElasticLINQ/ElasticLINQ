@@ -11,16 +11,19 @@ namespace ElasticLinq.Request.Visitors
         private readonly Expression expression;
         private readonly HashSet<T> collected;
         private readonly ParameterExpression parameter;
+        private readonly LambdaExpression projector;
 
-        public RebindCollectionResult(Expression expression, HashSet<T> collected, ParameterExpression parameter)
+        public RebindCollectionResult(Expression expression, HashSet<T> collected, ParameterExpression parameter, LambdaExpression projector)
         {
             this.expression = expression;
             this.collected = collected;
             this.parameter = parameter;
+            this.projector = projector;
         }
 
         public Expression Expression { get { return expression; } }
         public ParameterExpression Parameter { get { return parameter; } }
         public IReadOnlyList<T> Collected { get { return collected.ToList().AsReadOnly(); } }
+        public LambdaExpression Projector { get { return projector; } }
     }
 }

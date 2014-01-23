@@ -1,15 +1,17 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
-using ElasticLinq.Utility;
 using System;
+using ElasticLinq.Utility;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace ElasticLinq.Response.Materializers
 {
-    internal class AggregateColumn : IEquatable<AggregateColumn>
+    [DebuggerDisplay("Column {Name},{Operation} ")]
+    internal class AggregateColumn
     {
-        private readonly int hashCode;
         private readonly string name;
         private readonly string operation;
 
@@ -20,43 +22,29 @@ namespace ElasticLinq.Response.Materializers
 
             this.name = name;
             this.operation = operation;
-            hashCode = 17 * (23 + name.GetHashCode()) * (23 + operation.GetHashCode());
         }
 
         public string Name { get { return name; } }
         public string Operation { get { return operation; } }
-
-        public bool Equals(AggregateColumn other)
-        {
-            return other.hashCode == hashCode && other.name == name && other.Operation == operation;
-        }
-
-        public override bool Equals(object other)
-        {
-            return (other is AggregateColumn) && Equals((AggregateColumn)other);
-        }
-
-        public override int GetHashCode()
-        {
-            return hashCode;
-        }
     }
 
+    [DebuggerDisplay("Field {Column.Name},{Column.Operation} = {Token.Value}")]
     internal class AggregateField
     {
         private readonly AggregateColumn column;
-        private readonly object value;
+        private readonly JToken token;
 
-        public AggregateField(AggregateColumn column, object value)
+        public AggregateField(AggregateColumn column, JToken token)
         {
             this.column = column;
-            this.value = value;
+            this.token = token;
         }
 
         public AggregateColumn Column { get { return column; } }
-        public object Value { get { return value; } }
+        public JToken Token { get { return token; } }
     }
 
+    [DebuggerDisplay("Row {Key} Fields({Fields.Count})")]
     internal class AggregateRow
     {
         private readonly object key;
@@ -71,14 +59,15 @@ namespace ElasticLinq.Response.Materializers
         public object Key { get { return key; } }
         public IReadOnlyList<AggregateField> Fields { get { return fields; } }
 
-        internal static object GetValue(AggregateRow row, string name, string operation)
+        internal static object GetValue(AggregateRow row, string name, string operation, Type type)
         {
-            return row.Fields.FirstOrDefault(f => f.Column.Name == name && f.Column.Operation == operation);
+            var field = row.Fields.FirstOrDefault(f => f.Column.Name == name && f.Column.Operation == operation);
+            return field != null ? field.Token.ToObject(type) : TypeHelper.CreateDefault(type);
         }
 
         internal static object GetKey(AggregateRow row)
         {
-            return row.Key;
+            return row.Key.ToString();
         }
     }
 }

@@ -3,7 +3,6 @@
 using ElasticLinq.Mapping;
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Expressions;
-using ElasticLinq.Request.Facets;
 using ElasticLinq.Response.Materializers;
 using ElasticLinq.Response.Model;
 using ElasticLinq.Utility;
@@ -48,11 +47,20 @@ namespace ElasticLinq.Request.Visitors
 
             searchRequest.Type = mapping.GetTypeName(type);
 
-            if (searchRequest.Filter == null && searchRequest.Query == null)
-                searchRequest.Filter = mapping.GetTypeSelectionCriteria(type);
+            if (aggregated.Collected.Count == 0)
+            {
+                if (searchRequest.Filter == null && searchRequest.Query == null)
+                    searchRequest.Filter = mapping.GetTypeSelectionCriteria(type);
 
-            if (materializer == null)
-                materializer = new ElasticManyHitsMaterializer(itemProjector ?? DefaultItemProjector, finalItemType ?? type);
+                if (materializer == null)
+                    materializer = new ElasticManyHitsMaterializer(itemProjector ?? DefaultItemProjector, finalItemType ?? type);
+            }
+            else
+            {
+                searchRequest.Facets = aggregated.Collected.ToList();
+                searchRequest.SearchType = "count"; // We only want facets, not hits
+                materializer = new ElasticFacetsMaterializer(r => aggregated.Projector.Compile().DynamicInvoke(r), aggregated.Projector.ReturnType);
+            }
 
             return new ElasticTranslateResult(searchRequest, materializer);
         }
@@ -202,6 +210,11 @@ namespace ElasticLinq.Request.Visitors
         {
             switch (m.Method.Name)
             {
+                case "GroupBy":
+                    if (m.Arguments.Count == 2)
+                        return Visit(m.Arguments[0]); // Already handled by aggregator
+                    break;
+
                 case "Select":
                     if (m.Arguments.Count == 2)
                         return VisitSelect(m.Arguments[0], m.Arguments[1]);
@@ -541,7 +554,7 @@ namespace ElasticLinq.Request.Visitors
             if (selectBody is MethodCallExpression)
                 RebindSelectBody(selectBody, ((MethodCallExpression)selectBody).Arguments, lambda.Parameters);
 
-            finalItemType = selectExpression.Type;
+            finalItemType = selectBody.Type;
 
             return Visit(source);
         }

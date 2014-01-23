@@ -14,14 +14,17 @@ namespace TestConsoleApp
             var connection = new ElasticConnection(new Uri("http://192.168.2.14:9200")) { Index = "tier3" };
             var context = new ElasticContext(connection, new CouchbaseElasticMapping()) { Log = Console.Out };
 
-            context
-                .Query<Activity>()
-                .GroupBy(a => a.EntityType)
-                .Select(a => new { a.Key, Avg = a.Max(b => b.CreatedDate) })
+            var movieConnection = new ElasticConnection(new Uri("http://192.168.2.14:9200"));
+            var movieContext = new ElasticContext(movieConnection, new TrivialElasticMapping()) { Log = Console.Out };
+
+            movieContext
+                .Query<Movie>()
+                .GroupBy(a => a.Director)
+                .Select(a => new { a.Key, First = a.Min(b => b.Year), Last = a.Max(b => b.Year) })
                 .WriteToConsole();
 
-            DocumentQueries(context);
-            BasicSampleQueries(context);
+            //DocumentQueries(context);
+            //BasicSampleQueries(context);
 
             Console.Write("\n\nComplete.");
             Console.ReadKey();

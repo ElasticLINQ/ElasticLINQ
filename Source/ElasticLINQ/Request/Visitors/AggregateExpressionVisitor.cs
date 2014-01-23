@@ -50,7 +50,7 @@ namespace ElasticLinq.Request.Visitors
             var parameter = Expression.Parameter(typeof(AggregateRow), "r");
             var visitor = new AggregateExpressionVisitor(parameter, mapping);
 
-            return new RebindCollectionResult<IFacet>(visitor.Visit(expression), new HashSet<IFacet>(visitor.GetFacets()), parameter);
+            return new RebindCollectionResult<IFacet>(visitor.Visit(expression), new HashSet<IFacet>(visitor.GetFacets()), parameter, visitor.selectProjection);
         }
 
         private IEnumerable<IFacet> GetFacets()
@@ -61,7 +61,7 @@ namespace ElasticLinq.Request.Visitors
                 foreach (var member in aggregateMembers)
                 {
                     var valueField = mapping.GetFieldName(member);
-                    yield return new TermsStatsFacet(valueField + "-by-" + groupByField, groupByField, valueField);
+                    yield return new TermsStatsFacet(valueField, groupByField, valueField);
                 }
             }
         }
@@ -74,12 +74,22 @@ namespace ElasticLinq.Request.Visitors
             return base.VisitMember(m);
         }
 
+        private LambdaExpression selectProjection;
+
         protected override Expression VisitMethodCall(MethodCallExpression m)
         {
             if (m.Method.DeclaringType == typeof(Enumerable) || m.Method.DeclaringType == typeof(Queryable))
             {
                 if (m.Method.Name == "GroupBy" && m.Arguments.Count == 2)
                     groupByMember = GetMemberInfoFromLambda(m.Arguments[1]);
+
+                if (m.Method.Name == "Select" && m.Arguments.Count == 2)
+                {
+                    var y = (LambdaExpression)StripQuotes(Visit(m.Arguments[1]));
+                    selectProjection = Expression.Lambda(y.Body, bindingParameter);
+
+                    return Visit(m.Arguments[0]);
+                }
 
                 string slice;
                 if (methodToFacetSlice.TryGetValue(m.Method.Name, out slice) && m.Arguments.Count == 2)
@@ -115,7 +125,8 @@ namespace ElasticLinq.Request.Visitors
             aggregateMembers.Add(member);
 
             // Rebind the property to the correct ElasticResponse node
-            var getFacetExpression = Expression.Call(null, getValueFromRow, bindingParameter, Expression.Constant(valueField), Expression.Constant(operation));
+            var getFacetExpression = Expression.Call(null, getValueFromRow, bindingParameter,
+                Expression.Constant(valueField), Expression.Constant(operation), Expression.Constant(returnType));
 
             return Expression.Convert(getFacetExpression, returnType);
         }

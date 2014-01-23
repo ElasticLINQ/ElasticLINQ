@@ -53,5 +53,10 @@ namespace ElasticLinq.Utility
             return type != null && genericType != null
                 && type.IsGenericType && type.GetGenericTypeDefinition() == genericType;
         }
+
+        public static object CreateDefault(Type type)
+        {
+            return type.IsValueType ? Activator.CreateInstance(type) : null;
+        }
     }
 }
