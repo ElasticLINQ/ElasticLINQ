@@ -1,11 +1,8 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
-using System.Collections;
-using System.Collections.Generic;
 using ElasticLinq.Request;
 using ElasticLinq.Request.Visitors;
-using ElasticLinq.Response.Model;
-using System;
+using ElasticLinq.Response.Materializers;
 using Xunit;
 
 namespace ElasticLinq.Test.Request.Visitors
@@ -16,36 +13,12 @@ namespace ElasticLinq.Test.Request.Visitors
         public void ConstructorSetsProperties()
         {
             var expectedSearch = new ElasticSearchRequest { Type = "someType" };
-            Func<Hit, object> expectedProjector = h => null;
-            Func<IList, object> expectedFinalTransform = a => a;
+            var expectedMaterializer = new ElasticManyHitsMaterializer(o => o, typeof(ElasticConnectionTests));
 
-            var result = new ElasticTranslateResult(expectedSearch, expectedProjector, expectedFinalTransform);
-
-            Assert.Same(expectedSearch, result.SearchRequest);
-            Assert.Same(expectedProjector, result.Projector);
-            Assert.Same(expectedFinalTransform, result.FinalTransform);
-
-            Assert.Null(expectedProjector.Invoke(new Hit())); // For code coverage only
-            Assert.Null(expectedFinalTransform.Invoke(null)); // For code coverage only
-        }
-
-        [Fact]
-        public void ConstructorDefaultsFinalTransformToNonTransforming()
-        {
-            var expectedSearch = new ElasticSearchRequest { Type = "someType" };
-            Func<Hit, object> expectedProjector = h => null;
-
-            var result = new ElasticTranslateResult(expectedSearch, expectedProjector);
+            var result = new ElasticTranslateResult(expectedSearch, expectedMaterializer);
 
             Assert.Same(expectedSearch, result.SearchRequest);
-            Assert.Same(expectedProjector, result.Projector);
-
-            Assert.NotNull(result.FinalTransform);
-            var transforming = new List<string>();
-            var afterTransforming = result.FinalTransform.Invoke(transforming);
-            Assert.Same(transforming, afterTransforming);
-
-            Assert.Null(expectedProjector.Invoke(new Hit())); // For code coverage only
+            Assert.Same(expectedMaterializer, result.Materializer);
         }
     }
 }

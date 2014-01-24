@@ -3,7 +3,9 @@
 using ElasticLinq.Mapping;
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Visitors;
+using ElasticLinq.Response.Model;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 using Xunit.Extensions;
@@ -13,7 +15,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
     public class ElasticQueryTranslationTests : ElasticQueryTranslationTestsBase
     {
         [Fact]
-        public void TypeIsSetFromType()
+        public void SearchRequestTypeIsSetFromType()
         {
             var actual = Mapping.GetTypeName(typeof(Robot));
 
@@ -66,5 +68,17 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
             Assert.Equal(expectedSize, translation.SearchRequest.Size);
         }
-   }
+
+        [Fact]
+        public void SimpleSelectProducesValidMaterializer()
+        {
+            var translation = ElasticQueryTranslator.Translate(Mapping, Robots.Expression);
+            var response = new ElasticResponse { hits = new Hits { hits = new List<Hit>() } };
+
+            Assert.NotNull(translation.Materializer);
+            var materialized = translation.Materializer.Materialize(response);
+            Assert.IsAssignableFrom<IEnumerable<Robot>>(materialized);
+            Assert.Empty((IEnumerable<Robot>)materialized);
+        }
+    }
 }

@@ -1,27 +1,24 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
-using ElasticLinq.Response.Model;
-using System;
-using System.Collections;
+using ElasticLinq.Response.Materializers;
 
 namespace ElasticLinq.Request.Visitors
 {
     /// <summary>
-    /// Represents the result of a query transation including both
-    /// the remote <see cref="ElasticSearchRequest"/> and the local
-    /// projection and transform functions.
+    /// Represents the result of a translated query including the
+    /// remote <see cref="ElasticSearchRequest"/> to select the data
+    /// and the local <see cref="IElasticMaterializer"/> necessary to
+    /// instantiate objects.
     /// </summary>
     internal class ElasticTranslateResult
     {
         private readonly ElasticSearchRequest searchRequest;
-        private readonly Func<Hit, object> projector;
-        private readonly Func<IList, object> finalTransform; 
+        private readonly IElasticMaterializer materializer;
 
-        public ElasticTranslateResult(ElasticSearchRequest searchRequest, Func<Hit, object> projector, Func<IList, object> finalTransform = null)
+        public ElasticTranslateResult(ElasticSearchRequest searchRequest, IElasticMaterializer materializer)
         {
             this.searchRequest = searchRequest;
-            this.projector = projector;
-            this.finalTransform = finalTransform ?? (o => o);
+            this.materializer = materializer;
         }
 
         public ElasticSearchRequest SearchRequest
@@ -29,14 +26,9 @@ namespace ElasticLinq.Request.Visitors
             get { return searchRequest; }
         }
 
-        public Func<Hit, object> Projector
+        public IElasticMaterializer Materializer
         {
-            get { return projector; }
-        }
-
-        public Func<IList, object> FinalTransform
-        {
-            get { return finalTransform; }
+            get { return materializer; }
         }
     }
 }

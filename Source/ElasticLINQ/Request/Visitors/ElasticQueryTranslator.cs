@@ -3,7 +3,7 @@
 using ElasticLinq.Mapping;
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Expressions;
-using ElasticLinq.Response;
+using ElasticLinq.Response.Materializers;
 using ElasticLinq.Response.Model;
 using ElasticLinq.Utility;
 using System;
@@ -22,12 +22,13 @@ namespace ElasticLinq.Request.Visitors
     internal class ElasticQueryTranslator : ExpressionVisitor
     {
         private readonly ElasticSearchRequest searchRequest = new ElasticSearchRequest();
-        private readonly IElasticMapping mapping;
         private readonly ParameterExpression projectionParameter = Expression.Parameter(typeof(Hit), "h");
+        private readonly IElasticMapping mapping;
 
         private Type type;
-        private Func<Hit, Object> projector;
-        private Func<IList, object> finalTransform;
+        private Type finalItemType;
+        private Func<Hit, Object> itemProjector;
+        private IElasticMaterializer materializer;
 
         private ElasticQueryTranslator(IElasticMapping mapping)
         {
@@ -48,7 +49,10 @@ namespace ElasticLinq.Request.Visitors
             if (searchRequest.Filter == null && searchRequest.Query == null)
                 searchRequest.Filter = mapping.GetTypeSelectionCriteria(type);
 
-            return new ElasticTranslateResult(searchRequest, projector ?? DefaultProjector, finalTransform);
+            if (materializer == null)
+                materializer = new ElasticManyHitsMaterializer(itemProjector ?? DefaultItemProjector, finalItemType ?? type);
+
+            return new ElasticTranslateResult(searchRequest, materializer);
         }
 
         protected override Expression VisitMethodCall(MethodCallExpression m)
@@ -203,18 +207,12 @@ namespace ElasticLinq.Request.Visitors
 
                 case "First":
                 case "FirstOrDefault":
-                    if (m.Arguments.Count == 1)
-                        return VisitFirst(m.Arguments[0], null, m.Method.Name);
-                    if (m.Arguments.Count == 2)
-                        return VisitFirst(m.Arguments[0], m.Arguments[1], m.Method.Name);
-                    break;
-
                 case "Single":
                 case "SingleOrDefault":
                     if (m.Arguments.Count == 1)
-                        return VisitSingle(m.Arguments[0], null, m.Method.Name);
+                        return VisitFirstOrSingle(m.Arguments[0], null, m.Method.Name);
                     if (m.Arguments.Count == 2)
-                        return VisitSingle(m.Arguments[0], m.Arguments[1], m.Method.Name);
+                        return VisitFirstOrSingle(m.Arguments[0], m.Arguments[1], m.Method.Name);
                     break;
 
                 case "Where":
@@ -244,20 +242,14 @@ namespace ElasticLinq.Request.Visitors
             throw new NotSupportedException(string.Format("The Queryable method '{0}' is not supported", m.Method.Name));
         }
 
-        private Expression VisitFirst(Expression source, Expression predicate, string methodName)
+        private Expression VisitFirstOrSingle(Expression source, Expression predicate, string methodName)
         {
-            searchRequest.Size = 1;
-            finalTransform = o => ElasticResponseMaterializer.First(o, methodName.EndsWith("Default"));
+            var single = methodName.StartsWith("Single");
+            var orDefault = methodName.EndsWith("OrDefault");
 
-            return predicate != null
-                ? VisitWhere(source, predicate)
-                : Visit(source);
-        }
-
-        private Expression VisitSingle(Expression source, Expression predicate, string methodName)
-        {
-            searchRequest.Size = 2;
-            finalTransform = o => ElasticResponseMaterializer.Single(o, methodName.EndsWith("Default"));
+            searchRequest.Size = single ? 2 : 1;
+            finalItemType = source.Type;
+            materializer = new ElasticOneHitMaterializer(itemProjector ?? DefaultItemProjector, finalItemType, single, orDefault);
 
             return predicate != null
                 ? VisitWhere(source, predicate)
@@ -579,7 +571,7 @@ namespace ElasticLinq.Request.Visitors
         }
 
         /// <summary>
-        /// We are using the whole entity in a new select projection. REbind any ElasticField references to JObject
+        /// We are using the whole entity in a new select projection. Rebind any ElasticField references to JObject
         /// and ensure the entity parameter is a freshly materialized entity object from our default materializer.
         /// </summary>
         /// <param name="selectExpression">Select expression to rebind.</param>
@@ -588,7 +580,8 @@ namespace ElasticLinq.Request.Visitors
         {
             var projection = ElasticFieldsProjectionExpressionVisitor.Rebind(projectionParameter, mapping, selectExpression);
             var compiled = Expression.Lambda(projection, entityParameter, projectionParameter).Compile();
-            projector = h => compiled.DynamicInvoke(DefaultProjector(h), h);
+            itemProjector = h => compiled.DynamicInvoke(DefaultItemProjector(h), h);
+            finalItemType = selectExpression.Type;
         }
 
         /// <summary>
@@ -600,8 +593,9 @@ namespace ElasticLinq.Request.Visitors
         {
             var projection = ProjectionExpressionVisitor.Rebind(projectionParameter, mapping, selectExpression);
             var compiled = Expression.Lambda(projection.Materialization, projectionParameter).Compile();
-            projector = h => compiled.DynamicInvoke(h);
+            itemProjector = h => compiled.DynamicInvoke(h);
             searchRequest.Fields.AddRange(projection.FieldNames);
+            finalItemType = selectExpression.Type;
         }
 
         private Expression VisitSkip(Expression source, Expression skipExpression)
@@ -627,7 +621,7 @@ namespace ElasticLinq.Request.Visitors
             return Visit(source);
         }
 
-        private Func<Hit, Object> DefaultProjector
+        private Func<Hit, Object> DefaultItemProjector
         {
             get { return hit => mapping.GetObjectSource(type, hit).ToObject(type); }
         }
