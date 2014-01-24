@@ -20,7 +20,7 @@ namespace TestConsoleApp
             movieContext
                 .Query<Movie>()
                 .GroupBy(a => a.Director)
-                .Select(a => new { a.Key, First = a.Min(b => b.Year), TopRated = a.Max(b => b.Rating) })
+                .Select(a => new { a.Key, First = a.Min(b => b.Year), TopRated = a.Max(b => b.Rating), Count = a.Count() })
                 .WriteToConsole();
 
             DocumentQueries(context);

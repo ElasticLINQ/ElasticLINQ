@@ -14,8 +14,7 @@ namespace ElasticLinq.Response.Materializers
     /// </summary>
     internal class ElasticFacetsMaterializer : IElasticMaterializer
     {
-        private static readonly MethodInfo manyMethodInfo =
-            typeof(ElasticFacetsMaterializer).GetMethod("Many", BindingFlags.NonPublic | BindingFlags.Static);
+        private static readonly MethodInfo manyMethodInfo = typeof(ElasticFacetsMaterializer).GetMethod("Many", BindingFlags.NonPublic | BindingFlags.Static);
 
         private readonly Func<AggregateRow, object> projector;
         private readonly Type elementType;

@@ -17,15 +17,21 @@ namespace ElasticLinq.Request.Visitors
     /// </summary>
     internal class AggregateExpressionVisitor : ExpressionVisitor
     {
+        private const string GroupKeyTermsName = "GroupKey";
+
         private static readonly MethodInfo getValueFromRow = typeof(AggregateRow).GetMethod("GetValue", BindingFlags.Static | BindingFlags.NonPublic);
         private static readonly MethodInfo getKeyFromRow = typeof(AggregateRow).GetMethod("GetKey", BindingFlags.Static | BindingFlags.NonPublic);
 
-        private static readonly Dictionary<string, string> methodToFacetSlice = new Dictionary<string, string>
+        private static readonly Dictionary<string, string> groupMemberOperations = new Dictionary<string, string>
         {
             { "Min", "min" },
             { "Max", "max" },
             { "Sum", "total" },
             { "Average", "mean" },
+        };
+
+        private static readonly Dictionary<string, string> groupOperations = new Dictionary<string, string>
+        {
             { "Count", "count" },
             { "LongCount", "count" }
         };
@@ -35,6 +41,8 @@ namespace ElasticLinq.Request.Visitors
         private readonly IElasticMapping mapping;
 
         private MemberInfo groupByMember;
+        private LambdaExpression selectProjection;
+        private bool includeGroupKeyTerms;
 
         private AggregateExpressionVisitor(IElasticMapping mapping)
         {
@@ -53,26 +61,23 @@ namespace ElasticLinq.Request.Visitors
 
         private IEnumerable<IFacet> GetFacets()
         {
-            if (groupByMember != null)
-            {
-                var groupByField = mapping.GetFieldName(groupByMember);
-                foreach (var member in aggregateMembers)
-                {
-                    var valueField = mapping.GetFieldName(member);
-                    yield return new TermsStatsFacet(valueField, groupByField, valueField);
-                }
-            }
+            if (groupByMember == null) yield break;
+
+            var groupByField = mapping.GetFieldName(groupByMember);
+            foreach (var valueField in aggregateMembers.Select(member => mapping.GetFieldName(member)))
+                yield return new TermsStatsFacet(valueField, groupByField, valueField);
+
+            if (includeGroupKeyTerms)
+                yield return new TermsFacet(GroupKeyTermsName, groupByField);
         }
 
         protected override Expression VisitMember(MemberExpression m)
         {
             if (m.Member.Name == "Key" && m.Member.DeclaringType.IsGenericOf(typeof(IGrouping<,>)))
-                return VisitAggregateKey(m.Type);
+                return VisitGroupKey(m.Type);
 
             return base.VisitMember(m);
         }
-
-        private LambdaExpression selectProjection;
 
         protected override Expression VisitMethodCall(MethodCallExpression m)
         {
@@ -89,12 +94,43 @@ namespace ElasticLinq.Request.Visitors
                     return Visit(m.Arguments[0]);
                 }
 
-                string slice;
-                if (methodToFacetSlice.TryGetValue(m.Method.Name, out slice) && m.Arguments.Count == 2)
-                    return VisitAggregateTerm(m.Arguments[1], slice, m.Method.ReturnType);
+                string operation;
+                if (groupOperations.TryGetValue(m.Method.Name, out operation) && m.Arguments.Count == 1)
+                    return VisitGroupOperation(operation, m.Method.ReturnType);
+
+                if (groupMemberOperations.TryGetValue(m.Method.Name, out operation) && m.Arguments.Count == 2)
+                    return VisitGroupMemberOperation(m.Arguments[1], operation, m.Method.ReturnType);
             }
 
             return base.VisitMethodCall(m);
+        }
+
+        private Expression VisitGroupKey(Type returnType)
+        {
+            var getKeyExpression = Expression.Call(null, getKeyFromRow, bindingParameter);
+            return Expression.Convert(getKeyExpression, returnType);
+        }
+
+        private Expression VisitGroupOperation(string operation, Type returnType)
+        {
+            includeGroupKeyTerms = true;
+
+            var getValueExpression = Expression.Call(null, getValueFromRow, bindingParameter,
+                Expression.Constant(GroupKeyTermsName), Expression.Constant(operation), Expression.Constant(returnType));
+
+            return Expression.Convert(getValueExpression, returnType);
+        }
+
+        private Expression VisitGroupMemberOperation(Expression property, string operation, Type returnType)
+        {
+            var member = GetMemberInfoFromLambda(property);
+            var valueField = mapping.GetFieldName(member);
+            aggregateMembers.Add(member);
+
+            var getValueExpression = Expression.Call(null, getValueFromRow, bindingParameter,
+                Expression.Constant(valueField), Expression.Constant(operation), Expression.Constant(returnType));
+
+            return Expression.Convert(getValueExpression, returnType);
         }
 
         private static MemberInfo GetMemberInfoFromLambda(Expression expression)
@@ -108,25 +144,6 @@ namespace ElasticLinq.Request.Visitors
                 throw new NotSupportedException("GroupBy must be specified against a member of the entity");
 
             return memberExpressionBody.Member;
-        }
-
-        private Expression VisitAggregateKey(Type returnType)
-        {
-            var getFacetExpression = Expression.Call(null, getKeyFromRow, bindingParameter);
-            return Expression.Convert(getFacetExpression, returnType);
-        }
-
-        private Expression VisitAggregateTerm(Expression property, string operation, Type returnType)
-        {
-            var member = GetMemberInfoFromLambda(property);
-            var valueField = mapping.GetFieldName(member);
-            aggregateMembers.Add(member);
-
-            // Rebind the property to the correct ElasticResponse node
-            var getFacetExpression = Expression.Call(null, getValueFromRow, bindingParameter,
-                Expression.Constant(valueField), Expression.Constant(operation), Expression.Constant(returnType));
-
-            return Expression.Convert(getFacetExpression, returnType);
         }
 
         private static Expression StripQuotes(Expression e)
