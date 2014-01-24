@@ -27,16 +27,17 @@ namespace TestConsoleApp
             var movieConnection = new ElasticConnection(new Uri("http://192.168.2.14:9200"));
             var movieContext = new ElasticContext(movieConnection, new TrivialElasticMapping()) { Log = Console.Out };
 
-            //movieContext
-            //    .Query<Movie>()
-            //    .GroupBy(a => a.Director)
-            //    .Select(a => new { a.Key, First = a.Min(b => b.Year), TopRated = a.Max(b => b.Rating), Count = a.Count() })
-            //    .WriteToConsole();
-
-            var z = movieContext
+            movieContext
                 .Query<Movie>()
-                .Sum(a => a.Rating);
-            Write.ToConsole(z);
+                .Where(a => a.Director == "David Lean")
+                .GroupBy(a => a.Director)
+                .Select(a => new { a.Key, First = a.Min(b => b.Year), TopRated = a.Max(b => b.Rating), Count = a.Count() })
+                .WriteToConsole();
+
+            //var z = movieContext
+            //    .Query<Movie>()
+            //    .Sum(a => a.Rating);
+            //Write.ToConsole(z);
         }
 
         private static void DocumentQueries(ElasticContext context)

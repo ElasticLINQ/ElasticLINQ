@@ -47,7 +47,8 @@ namespace ElasticLinq.Request.Formatters
             if (SearchRequest.Query != null)
                 root.Add("query", Build(SearchRequest.Query));
 
-            if (SearchRequest.Filter != null)
+            // Filters are pushed down to the facets for aggregate queries
+            if (SearchRequest.Filter != null && !SearchRequest.Facets.Any())
                 root.Add("filter", Build(SearchRequest.Filter));
 
             if (SearchRequest.SortOptions.Any())
@@ -60,7 +61,7 @@ namespace ElasticLinq.Request.Formatters
                 root.Add("size", SearchRequest.Size.Value);
 
             if (SearchRequest.Facets.Any())
-                root.Add("facets", Build(SearchRequest.Facets));
+                root.Add("facets", Build(SearchRequest.Facets, SearchRequest.Filter));
 
             if (Connection.Timeout != TimeSpan.Zero)
                 root.Add("timeout", Format(Connection.Timeout));
@@ -68,28 +69,33 @@ namespace ElasticLinq.Request.Formatters
             return root;
         }
 
-        private static JToken Build(IEnumerable<IFacet> facets)
+        private static JToken Build(IEnumerable<IFacet> facets, ICriteria filter)
         {
-            return new JObject(facets.Select(Build));
+            return new JObject(facets.Select(facet => Build(facet, filter)));
         }
 
-        private static JProperty Build(IFacet facet)
+        private static JProperty Build(IFacet facet, ICriteria filter)
         {
-            JToken facetBody = null;
+            JToken bodyBelowType = null;
 
             if (facet is StatisticalFacet)
-                facetBody = Build((StatisticalFacet)facet);
+                bodyBelowType = Build((StatisticalFacet)facet);
 
             if (facet is TermsStatsFacet)
-                facetBody = Build((TermsStatsFacet)facet);
+                bodyBelowType = Build((TermsStatsFacet)facet);
 
             if (facet is TermsFacet)
-                facetBody = Build((TermsFacet)facet);
+                bodyBelowType = Build((TermsFacet)facet);
 
-            if (facetBody != null)
-                return new JProperty(facet.Name, new JObject(new JProperty(facet.Type, facetBody)));
+            if (bodyBelowType == null)
+                throw new InvalidOperationException("Unknown type of IFacet");
 
-            throw new InvalidOperationException("Unknown class of IFacet");
+            var bodyBelowName = new JObject(new JProperty(facet.Type, bodyBelowType));
+
+            if (filter != null)
+                bodyBelowName.Add("facet_filter", Build(filter));
+
+            return new JProperty(facet.Name, bodyBelowName);
         }
 
         private static JToken Build(StatisticalFacet statisticalFacet)
