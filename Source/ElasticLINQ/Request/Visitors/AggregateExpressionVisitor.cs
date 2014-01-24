@@ -22,7 +22,7 @@ namespace ElasticLinq.Request.Visitors
         private static readonly MethodInfo getValueFromRow = typeof(AggregateRow).GetMethod("GetValue", BindingFlags.Static | BindingFlags.NonPublic);
         private static readonly MethodInfo getKeyFromRow = typeof(AggregateRow).GetMethod("GetKey", BindingFlags.Static | BindingFlags.NonPublic);
 
-        private static readonly Dictionary<string, string> groupMemberOperations = new Dictionary<string, string>
+        private static readonly Dictionary<string, string> aggregateMemberOperations = new Dictionary<string, string>
         {
             { "Min", "min" },
             { "Max", "max" },
@@ -30,7 +30,7 @@ namespace ElasticLinq.Request.Visitors
             { "Average", "mean" },
         };
 
-        private static readonly Dictionary<string, string> groupOperations = new Dictionary<string, string>
+        private static readonly Dictionary<string, string> aggregateOperations = new Dictionary<string, string>
         {
             { "Count", "count" },
             { "LongCount", "count" }
@@ -61,14 +61,20 @@ namespace ElasticLinq.Request.Visitors
 
         private IEnumerable<IFacet> GetFacets()
         {
-            if (groupByMember == null) yield break;
+            if (groupByMember == null)
+            {
+                foreach (var valueField in aggregateMembers.Select(member => mapping.GetFieldName(member)))
+                    yield return new StatisticalFacet(valueField, valueField);                   
+            }
+            else
+            {
+                var groupByField = mapping.GetFieldName(groupByMember);
+                foreach (var valueField in aggregateMembers.Select(member => mapping.GetFieldName(member)))
+                    yield return new TermsStatsFacet(valueField, groupByField, valueField);
 
-            var groupByField = mapping.GetFieldName(groupByMember);
-            foreach (var valueField in aggregateMembers.Select(member => mapping.GetFieldName(member)))
-                yield return new TermsStatsFacet(valueField, groupByField, valueField);
-
-            if (includeGroupKeyTerms)
-                yield return new TermsFacet(GroupKeyTermsName, groupByField);
+                if (includeGroupKeyTerms)
+                    yield return new TermsFacet(GroupKeyTermsName, groupByField);
+            }
         }
 
         protected override Expression VisitMember(MemberExpression m)
@@ -95,11 +101,11 @@ namespace ElasticLinq.Request.Visitors
                 }
 
                 string operation;
-                if (groupOperations.TryGetValue(m.Method.Name, out operation) && m.Arguments.Count == 1)
-                    return VisitGroupOperation(operation, m.Method.ReturnType);
+                if (aggregateOperations.TryGetValue(m.Method.Name, out operation) && m.Arguments.Count == 1)
+                    return VisitAggregateOperation(operation, m.Method.ReturnType);
 
-                if (groupMemberOperations.TryGetValue(m.Method.Name, out operation) && m.Arguments.Count == 2)
-                    return VisitGroupMemberOperation(m.Arguments[1], operation, m.Method.ReturnType);
+                if (aggregateMemberOperations.TryGetValue(m.Method.Name, out operation) && m.Arguments.Count == 2)
+                    return VisitAggregateMemberOperations(m.Arguments[1], operation, m.Method.ReturnType);
             }
 
             return base.VisitMethodCall(m);
@@ -111,7 +117,7 @@ namespace ElasticLinq.Request.Visitors
             return Expression.Convert(getKeyExpression, returnType);
         }
 
-        private Expression VisitGroupOperation(string operation, Type returnType)
+        private Expression VisitAggregateOperation(string operation, Type returnType)
         {
             includeGroupKeyTerms = true;
 
@@ -121,7 +127,7 @@ namespace ElasticLinq.Request.Visitors
             return Expression.Convert(getValueExpression, returnType);
         }
 
-        private Expression VisitGroupMemberOperation(Expression property, string operation, Type returnType)
+        private Expression VisitAggregateMemberOperations(Expression property, string operation, Type returnType)
         {
             var member = GetMemberInfoFromLambda(property);
             var valueField = mapping.GetFieldName(member);

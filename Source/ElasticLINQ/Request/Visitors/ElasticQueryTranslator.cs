@@ -25,7 +25,7 @@ namespace ElasticLinq.Request.Visitors
         private readonly ElasticSearchRequest searchRequest = new ElasticSearchRequest();
         private readonly IElasticMapping mapping;
 
-        private Type type;
+        private Type sourceType;
         private Type finalItemType;
         private Func<Hit, Object> itemProjector;
         private IElasticMaterializer materializer;
@@ -56,19 +56,19 @@ namespace ElasticLinq.Request.Visitors
         private void CompleteHitTranslation(Expression evaluated)
         {
             Visit(evaluated);
-            searchRequest.Type = mapping.GetTypeName(type);
+            searchRequest.Type = mapping.GetTypeName(sourceType);
 
             if (searchRequest.Filter == null && searchRequest.Query == null)
-                searchRequest.Filter = mapping.GetTypeSelectionCriteria(type);
+                searchRequest.Filter = mapping.GetTypeSelectionCriteria(sourceType);
 
             if (materializer == null)
-                materializer = new ElasticManyHitsMaterializer(itemProjector ?? DefaultItemProjector, finalItemType ?? type);
+                materializer = new ElasticManyHitsMaterializer(itemProjector ?? DefaultItemProjector, finalItemType ?? sourceType);
         }
 
         private void CompleteFacetTranslation(RebindCollectionResult<IFacet> aggregated)
         {
             Visit(aggregated.Expression);
-            searchRequest.Type = mapping.GetTypeName(type);
+            searchRequest.Type = mapping.GetTypeName(sourceType);
 
             searchRequest.Facets = aggregated.Collected.ToList();
             searchRequest.SearchType = "count"; // We only want facets, not hits
@@ -284,7 +284,7 @@ namespace ElasticLinq.Request.Visitors
         protected override Expression VisitConstant(ConstantExpression c)
         {
             if (c.Value is IQueryable)
-                type = ((IQueryable)c.Value).ElementType;
+                sourceType = ((IQueryable)c.Value).ElementType;
 
             return c;
         }
@@ -622,7 +622,7 @@ namespace ElasticLinq.Request.Visitors
 
         private Func<Hit, Object> DefaultItemProjector
         {
-            get { return hit => mapping.GetObjectSource(type, hit).ToObject(type); }
+            get { return hit => mapping.GetObjectSource(sourceType, hit).ToObject(sourceType); }
         }
     }
 }

@@ -14,20 +14,29 @@ namespace TestConsoleApp
             var connection = new ElasticConnection(new Uri("http://192.168.2.14:9200")) { Index = "tier3" };
             var context = new ElasticContext(connection, new CouchbaseElasticMapping()) { Log = Console.Out };
 
-            var movieConnection = new ElasticConnection(new Uri("http://192.168.2.14:9200"));
-            var movieContext = new ElasticContext(movieConnection, new TrivialElasticMapping()) { Log = Console.Out };
-
-            movieContext
-                .Query<Movie>()
-                .GroupBy(a => a.Director)
-                .Select(a => new { a.Key, First = a.Min(b => b.Year), TopRated = a.Max(b => b.Rating), Count = a.Count() })
-                .WriteToConsole();
-
-            DocumentQueries(context);
-            BasicSampleQueries(context);
+            AggregateQueries();
+            //DocumentQueries(context);
+            //BasicSampleQueries(context);
 
             Console.Write("\n\nComplete.");
             Console.ReadKey();
+        }
+
+        private static void AggregateQueries()
+        {
+            var movieConnection = new ElasticConnection(new Uri("http://192.168.2.14:9200"));
+            var movieContext = new ElasticContext(movieConnection, new TrivialElasticMapping()) { Log = Console.Out };
+
+            //movieContext
+            //    .Query<Movie>()
+            //    .GroupBy(a => a.Director)
+            //    .Select(a => new { a.Key, First = a.Min(b => b.Year), TopRated = a.Max(b => b.Rating), Count = a.Count() })
+            //    .WriteToConsole();
+
+            var z = movieContext
+                .Query<Movie>()
+                .Sum(a => a.Rating);
+            Write.ToConsole(z);
         }
 
         private static void DocumentQueries(ElasticContext context)
