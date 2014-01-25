@@ -50,6 +50,9 @@
     <Compile Include="ElasticQueryProvider.cs" />
     <Compile Include="IElasticContext.cs" />
     <Compile Include="IElasticQuery.cs" />
+    <Compile Include="Logging\ILog.cs" />
+    <Compile Include="Logging\LogExtensions.cs" />
+    <Compile Include="Logging\NullLog.cs" />
     <Compile Include="Mapping\CouchbaseElasticMapping.cs" />
     <Compile Include="Mapping\ElasticFieldsMappingWrapper.cs" />
     <Compile Include="Mapping\MappingHelpers.cs" />
@@ -81,6 +84,11 @@
     <Compile Include="Request\Visitors\EvaluatingExpressionVisitor.cs" />
     <Compile Include="Request\Visitors\PartialEvaluator.cs" />
     <Compile Include="Response\Materializers\IElasticMaterializer.cs" />
+    <Compile Include="Retry\NullDelay.cs" />
+    <Compile Include="Retry\RetryFailedException.cs" />
+    <Compile Include="Retry\RetryPolicy.cs" />
+    <Compile Include="Retry\Delay.cs" />
+    <Compile Include="Retry\IRetryPolicy.cs" />
     <Compile Include="Test\TestableElasticContext.cs" />
     <Compile Include="Test\TestableElasticQuery.cs" />
     <Compile Include="Test\TestableElasticQueryProvider.cs" />

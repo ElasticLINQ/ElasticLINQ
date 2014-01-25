@@ -95,11 +95,15 @@
     <Compile Include="Response\Materializers\MaterializerTestHelper.cs" />
     <Compile Include="Response\Materializers\ElasticOneHitMaterializerTests.cs" />
     <Compile Include="Response\Materializers\ElasticManyHitsMaterializerTests.cs" />
+    <Compile Include="Retry\RetryPolicyTests.cs" />
     <Compile Include="TestSupport\FlatteningExpressionVisitor.cs" />
     <Compile Include="TestSupport\HttpStub.cs" />
     <Compile Include="TestSupport\FakeElasticMapping.cs" />
     <Compile Include="TestSupport\FakeQuery.cs" />
     <Compile Include="TestSupport\FakeQueryProvider.cs" />
+    <Compile Include="TestSupport\NSubstituteExtensions.cs" />
+    <Compile Include="TestSupport\NullRetryPolicy.cs" />
+    <Compile Include="TestSupport\SpyLog.cs" />
     <Compile Include="Utility\ArgumentTests.cs" />
     <Compile Include="Utility\SpyMessageHandler.cs" />
     <Compile Include="Utility\TypeHelperTests.cs" />

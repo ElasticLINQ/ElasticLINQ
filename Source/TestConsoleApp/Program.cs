@@ -1,6 +1,8 @@
 ﻿using ElasticLinq;
 using ElasticLinq.Mapping;
+using ElasticLinq.Retry;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using TestConsoleApp.Models;
 using TestConsoleApp.Utility;
@@ -12,7 +14,8 @@ namespace TestConsoleApp
         private static void Main()
         {
             var connection = new ElasticConnection(new Uri("http://192.168.2.14:9200")) { Index = "tier3" };
-            var context = new ElasticContext(connection, new CouchbaseElasticMapping()) { Log = Console.Out };
+            var log = new ConsoleLog();
+            var context = new ElasticContext(connection, new CouchbaseElasticMapping(), log);
 
             DocumentQueries(context);
             BasicSampleQueries(context);

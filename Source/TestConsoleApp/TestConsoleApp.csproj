@@ -38,6 +38,7 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConsoleLog.cs" />
     <Compile Include="Models\AccountSubscription.cs" />
     <Compile Include="Models\Activity.cs" />
     <Compile Include="Program.cs" />

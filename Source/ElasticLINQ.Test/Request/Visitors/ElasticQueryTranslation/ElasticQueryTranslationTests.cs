@@ -80,5 +80,5 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             Assert.IsAssignableFrom<IEnumerable<Robot>>(materialized);
             Assert.Empty((IEnumerable<Robot>)materialized);
         }
-    }
+   }
 }

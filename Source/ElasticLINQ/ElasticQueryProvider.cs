@@ -1,11 +1,12 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using ElasticLinq.Logging;
 using ElasticLinq.Mapping;
 using ElasticLinq.Request;
 using ElasticLinq.Request.Visitors;
+using ElasticLinq.Retry;
 using ElasticLinq.Utility;
 using System;
-using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -18,29 +19,26 @@ namespace ElasticLinq
     /// </summary>
     public sealed class ElasticQueryProvider : IQueryProvider
     {
-        private readonly ElasticConnection connection;
-        private readonly IElasticMapping mapping;
-
-        public TextWriter Log { get; set; }
-
-        public ElasticQueryProvider(ElasticConnection connection, IElasticMapping mapping)
+        public ElasticQueryProvider(ElasticConnection connection, IElasticMapping mapping, ILog log, IRetryPolicy retryPolicy)
         {
             Argument.EnsureNotNull("connection", connection);
             Argument.EnsureNotNull("mapping", mapping);
+            Argument.EnsureNotNull("log", log);
+            Argument.EnsureNotNull("retryPolicy", retryPolicy);
 
-            this.connection = connection;
-            this.mapping = mapping;
+            Connection = connection;
+            Mapping = mapping;
+            Log = log;
+            RetryPolicy = retryPolicy;
         }
 
-        internal ElasticConnection Connection
-        {
-            get { return connection; }
-        }
+        internal ElasticConnection Connection { get; private set; }
 
-        internal IElasticMapping Mapping
-        {
-            get { return mapping; }
-        }
+        internal ILog Log { get; private set; }
+
+        internal IElasticMapping Mapping { get; private set; }
+
+        internal IRetryPolicy RetryPolicy { get; private set; }
 
         public IQueryable<T> CreateQuery<T>(Expression expression)
         {
@@ -85,15 +83,14 @@ namespace ElasticLinq
 
         private object ExecuteInternal(Expression expression)
         {
-            var translation = ElasticQueryTranslator.Translate(mapping, expression);
+            var translation = ElasticQueryTranslator.Translate(Mapping, expression);
             var elementType = TypeHelper.GetSequenceElementType(expression.Type);
 
-            if (Log != null)
-                Log.WriteLine("Type is " + elementType);
+            Log.Debug(null, null, "Executing query against type {0}", elementType);
 
             try
             {
-                var response = AsyncHelper.RunSync(() => new ElasticRequestProcessor(connection, Log).SearchAsync(translation.SearchRequest));
+                var response = AsyncHelper.RunSync(() => new ElasticRequestProcessor(Connection, Log, RetryPolicy).SearchAsync(translation.SearchRequest));
                 if (response == null)
                     throw new InvalidOperationException("No HTTP response received.");
 

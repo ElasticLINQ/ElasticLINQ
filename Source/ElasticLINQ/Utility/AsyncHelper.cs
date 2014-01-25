@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
+
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,14 +14,6 @@ namespace ElasticLinq.Utility
                 return Task.Run(async () => await action()).GetAwaiter().GetResult();
             else
                 return action().GetAwaiter().GetResult();
-        }
-
-        public static void RunSync(Func<Task> action)
-        {
-            if (SynchronizationContext.Current != null)
-                Task.Run(async () => await action()).GetAwaiter().GetResult();
-            else
-                action().GetAwaiter().GetResult();
         }
     }
 }
