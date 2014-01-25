@@ -1,7 +1,7 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
-using ElasticLinq.Request.Expressions;
 using ElasticLinq.Request.Criteria;
+using ElasticLinq.Request.Expressions;
 using Xunit;
 
 namespace ElasticLinq.Test.Request.Expressions

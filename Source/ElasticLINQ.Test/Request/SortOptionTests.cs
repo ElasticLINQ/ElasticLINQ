@@ -1,7 +1,7 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
-using System;
 using ElasticLinq.Request;
+using System;
 using Xunit;
 
 namespace ElasticLinq.Test.Request

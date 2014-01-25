@@ -2,11 +2,9 @@
 
 using ElasticLinq.Logging;
 using ElasticLinq.Request;
-using ElasticLinq.Response.Model;
 using ElasticLinq.Retry;
 using ElasticLinq.Test.Utility;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;

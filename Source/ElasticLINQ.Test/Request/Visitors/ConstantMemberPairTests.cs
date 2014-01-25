@@ -1,8 +1,8 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
-using System.Reflection;
 using ElasticLinq.Request.Visitors;
 using System.Linq.Expressions;
+using System.Reflection;
 using Xunit;
 
 namespace ElasticLinq.Test.Request.Visitors

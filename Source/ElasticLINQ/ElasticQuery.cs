@@ -1,13 +1,13 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using ElasticLinq.Request.Formatter;
+using ElasticLinq.Request.Visitors;
 using ElasticLinq.Utility;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using ElasticLinq.Request.Visitors;
-using ElasticLinq.Request.Formatter;
 
 namespace ElasticLinq
 {

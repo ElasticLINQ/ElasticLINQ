@@ -1,8 +1,6 @@
 ﻿using ElasticLinq;
 using ElasticLinq.Mapping;
-using ElasticLinq.Retry;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using TestConsoleApp.Models;
 using TestConsoleApp.Utility;
