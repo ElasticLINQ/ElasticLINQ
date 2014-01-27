@@ -1,6 +1,8 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using ElasticLinq.Logging;
 using ElasticLinq.Mapping;
+using ElasticLinq.Retry;
 using ElasticLinq.Test.TestSupport;
 using System;
 using System.Collections;
@@ -14,6 +16,8 @@ namespace ElasticLinq.Test.Integration
     public class BasicConnectionTests
     {
         private static readonly IElasticMapping mapping = new TrivialElasticMapping();
+        private static readonly ILog log = NullLog.Instance;
+        private static readonly IRetryPolicy retryPolicy = NullRetryPolicy.Instance;
 
         class Robot
         {
@@ -56,7 +60,7 @@ namespace ElasticLinq.Test.Integration
         {
             using (var httpStub = new HttpStub(ZeroHits))
             {
-                var provider = new ElasticQueryProvider(new ElasticConnection(httpStub.Uri), mapping);
+                var provider = new ElasticQueryProvider(new ElasticConnection(httpStub.Uri), mapping, log, retryPolicy);
                 var query = new ElasticQuery<Robot>(provider);
 
                 provider.Execute(query.Expression);
@@ -72,7 +76,7 @@ namespace ElasticLinq.Test.Integration
         {
             using (var httpStub = new HttpStub(ZeroHits))
             {
-                var provider = new ElasticQueryProvider(new ElasticConnection(httpStub.Uri), mapping);
+                var provider = new ElasticQueryProvider(new ElasticConnection(httpStub.Uri), mapping, log, retryPolicy);
                 var query = new ElasticQuery<Robot>(provider);
 
                 provider.Execute<IEnumerable<Robot>>(query.Expression);
@@ -88,7 +92,7 @@ namespace ElasticLinq.Test.Integration
         {
             using (var httpStub = new HttpStub(ZeroHits))
             {
-                var provider = new ElasticQueryProvider(new ElasticConnection(httpStub.Uri), mapping);
+                var provider = new ElasticQueryProvider(new ElasticConnection(httpStub.Uri), mapping, log, retryPolicy);
                 var query = new ElasticQuery<Robot>(provider);
 
                 var enumerator = query.GetEnumerator();
@@ -105,7 +109,7 @@ namespace ElasticLinq.Test.Integration
         {
             using (var httpStub = new HttpStub(ZeroHits))
             {
-                var provider = new ElasticQueryProvider(new ElasticConnection(httpStub.Uri), mapping);
+                var provider = new ElasticQueryProvider(new ElasticConnection(httpStub.Uri), mapping, log, retryPolicy);
                 var query = new ElasticQuery<Robot>(provider);
 
                 var enumerator = ((IEnumerable)query).GetEnumerator();
@@ -119,7 +123,7 @@ namespace ElasticLinq.Test.Integration
 
         private static ElasticContext MakeElasticContext(Uri uri)
         {
-            return new ElasticContext(new ElasticConnection(uri), mapping);
+            return new ElasticContext(new ElasticConnection(uri), mapping, log, retryPolicy);
         }
 
         private static void ZeroHits(HttpListenerContext context)

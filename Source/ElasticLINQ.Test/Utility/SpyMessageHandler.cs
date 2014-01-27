@@ -10,7 +10,7 @@ namespace ElasticLinq.Test.Utility
     public class SpyMessageHandler : HttpMessageHandler
     {
         public HttpRequestMessage Request;
-        public HttpResponseMessage Response = new HttpResponseMessage(HttpStatusCode.NotFound) { Content = new StringContent("") };
+        public HttpResponseMessage Response = new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("") };
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {

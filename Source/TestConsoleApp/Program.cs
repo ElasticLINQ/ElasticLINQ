@@ -12,11 +12,11 @@ namespace TestConsoleApp
         private static void Main()
         {
             var connection = new ElasticConnection(new Uri("http://192.168.2.14:9200")) { Index = "tier3" };
-            var context = new ElasticContext(connection, new CouchbaseElasticMapping()) { Log = Console.Out };
+            var context = new ElasticContext(connection, new CouchbaseElasticMapping(), new ConsoleLog());
 
-            AggregateQueries();
-            //DocumentQueries(context);
-            //BasicSampleQueries(context);
+            //AggregateQueries();
+            DocumentQueries(context);
+            BasicSampleQueries(context);
 
             Console.Write("\n\nComplete.");
             Console.ReadKey();
@@ -25,7 +25,7 @@ namespace TestConsoleApp
         private static void AggregateQueries()
         {
             var movieConnection = new ElasticConnection(new Uri("http://192.168.2.14:9200"));
-            var movieContext = new ElasticContext(movieConnection, new TrivialElasticMapping()) { Log = Console.Out };
+            var movieContext = new ElasticContext(movieConnection, new TrivialElasticMapping(), new ConsoleLog());
 
             movieContext
                 .Query<Movie>()

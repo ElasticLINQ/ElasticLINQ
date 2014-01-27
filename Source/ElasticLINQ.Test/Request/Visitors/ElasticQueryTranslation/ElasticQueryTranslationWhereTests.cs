@@ -1,10 +1,10 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
-using System.Diagnostics.CodeAnalysis;
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Visitors;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Xunit;
 

@@ -1,41 +1,53 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using ElasticLinq.Logging;
 using ElasticLinq.Request;
+using ElasticLinq.Retry;
 using ElasticLinq.Test.Utility;
-using NSubstitute;
-using Xunit;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Net;
+using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Xunit;
 
 namespace ElasticLinq.Test.Request
 {
     public class ElasticRequestProcessorTests
     {
-        private static readonly ElasticConnection connection = new ElasticConnection(new Uri("http://localhost"));
+        private static readonly ElasticConnection connection = new ElasticConnection(new Uri("http://localhost")) { Index = "SearchIndex" };
+        private static readonly ILog log = NullLog.Instance;
+        private static readonly IRetryPolicy retryPolicy = NullRetryPolicy.Instance;
 
         [Fact]
         [ExcludeFromCodeCoverage] // Expression isn't "executed"
-        public void ConstructorThrowsArgumentNullExceptionWhenConnectionIsNull()
+        public static void ConstructorThrowsArgumentNullExceptionWhenConnectionIsNull()
         {
-            Assert.Throws<ArgumentNullException>(() => new ElasticRequestProcessor(null, StreamWriter.Null));
+            Assert.Throws<ArgumentNullException>(() => new ElasticRequestProcessor(null, log, retryPolicy));
         }
 
         [Fact]
         [ExcludeFromCodeCoverage] // Expression isn't "executed"
-        public void ConstructorDoesntThrowWithValidParameters()
+        public static void ConstructorThrowsArgumentNullExceptionWhenLogIsNull()
         {
-            Assert.DoesNotThrow(() => new ElasticRequestProcessor(connection, StreamWriter.Null));
+            Assert.Throws<ArgumentNullException>(() => new ElasticRequestProcessor(connection, null, retryPolicy));
+        }
+
+        [Fact]
+        [ExcludeFromCodeCoverage] // Expression isn't "executed"
+        public static void ConstructorThrowsArgumentNullExceptionWhenRetryPolicyIsNull()
+        {
+            Assert.Throws<ArgumentNullException>(() => new ElasticRequestProcessor(connection, log, null));
         }
 
         [Fact]
         public static async Task NoAuthorizationWithEmptyUserName()
         {
-            var log = Substitute.For<TextWriter>();
             var messageHandler = new SpyMessageHandler();
-            var processor = new ElasticRequestProcessor(connection, log, messageHandler);
+            var processor = new ElasticRequestProcessor(connection, log, retryPolicy, messageHandler);
             var request = new ElasticSearchRequest { Type = "docType" };
 
             await processor.SearchAsync(request);
@@ -46,10 +58,9 @@ namespace ElasticLinq.Test.Request
         [Fact]
         public static async Task ForcesBasicAuthorizationWhenProvidedWithUsernameAndPassword()
         {
-            var log = Substitute.For<TextWriter>();
             var localConnection = new ElasticConnection(new Uri("http://localhost"), "myUser", "myPass");
             var messageHandler = new SpyMessageHandler();
-            var processor = new ElasticRequestProcessor(localConnection, log, messageHandler);
+            var processor = new ElasticRequestProcessor(localConnection, log, retryPolicy, messageHandler);
             var request = new ElasticSearchRequest { Type = "docType" };
 
             await processor.SearchAsync(request);
@@ -61,7 +72,21 @@ namespace ElasticLinq.Test.Request
         }
 
         [Fact]
-        public void ParseResponseReturnsParsedResponseGivenValidStream()
+        public static void NonSuccessfulHttpRequestThrows()
+        {
+            var messageHandler = new SpyMessageHandler();
+            messageHandler.Response.StatusCode = HttpStatusCode.NotFound;
+            var processor = new ElasticRequestProcessor(connection, log, retryPolicy, messageHandler);
+            var request = new ElasticSearchRequest { Type = "docType" };
+
+            var ex = Record.Exception(() => processor.SearchAsync(request).GetAwaiter().GetResult());
+
+            Assert.IsType<HttpRequestException>(ex);
+            Assert.Equal("Response status code does not indicate success: 404 (Not Found).", ex.Message);
+        }
+
+        [Fact]
+        public static void ParseResponseReturnsParsedResponseGivenValidStream()
         {
             const int took = 2;
             const int shards = 1;
@@ -75,7 +100,7 @@ namespace ElasticLinq.Test.Request
 
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(responseString)))
             {
-                var response = ElasticRequestProcessor.ParseResponse(stream, StreamWriter.Null);
+                var response = ElasticRequestProcessor.ParseResponse(stream, log);
                 Assert.NotNull(response);
                 Assert.Equal(took, response.took);
                 Assert.Equal(shards, response._shards.successful);
@@ -91,6 +116,25 @@ namespace ElasticLinq.Test.Request
                 Assert.Equal(type, response.hits.hits[0]._type);
                 Assert.Equal(id, response.hits.hits[0]._id);
             }
+        }
+
+        [Fact]
+        public static async Task LogsDebugMessagesDuringExecution()
+        {
+            var responseString = BuildResponseString(2, 1, 1, 0.3141, "testIndex", "testType", "testId");
+            var messageHandler = new SpyMessageHandler();
+            var log = new SpyLog();
+            messageHandler.Response.Content = new StringContent(responseString);
+            var processor = new ElasticRequestProcessor(connection, log, retryPolicy, messageHandler);
+            var request = new ElasticSearchRequest { Type = "abc123", Size = 2112 };
+
+            await processor.SearchAsync(request);
+
+            Assert.Equal(4, log.Messages.Count);
+            Assert.Equal(@"[VERBOSE] Request: POST http://localhost/SearchIndex/abc123/_search", log.Messages[0]);
+            Assert.Equal(@"[VERBOSE] Body: {""size"":2112,""timeout"":""10s""}", log.Messages[1]);
+            Assert.True(new Regex(@"\[VERBOSE\] Response: 200 OK \(in \d+ms\)").Match(log.Messages[2]).Success);
+            Assert.True(new Regex(@"\[VERBOSE\] De-serialized \d+ bytes into 1 hits in \d+ms").Match(log.Messages[3]).Success);
         }
 
         private static string BuildResponseString(int took, int shards, int hits, double score, string index, string type, string id)

@@ -10,7 +10,7 @@ namespace ElasticLinq.Response.Model
     /// Top-level response from ElasticSearch.
     /// </summary>
     [DebuggerDisplay("{hits.hits.Count} hits in {took} ms")]
-    internal class ElasticResponse
+    public class ElasticResponse
     {
         public int took;
         public bool timed_out;

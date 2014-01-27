@@ -1,8 +1,8 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
-using System;
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Visitors;
+using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;

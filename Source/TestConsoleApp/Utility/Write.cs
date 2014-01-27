@@ -7,10 +7,6 @@ namespace TestConsoleApp.Utility
     {
         public static void WriteToConsole<T>(this IQueryable<T> query)
         {
-            Console.WriteLine(query);
-
-            Console.WriteLine("\nResults:");
-
             foreach (var item in query)
                 ToConsole(item);
         }
@@ -26,10 +22,10 @@ namespace TestConsoleApp.Utility
             }
 
             foreach (var property in value.GetType().GetProperties())
-                Console.WriteLine(property.Name + " : " + (property.GetValue(value) ?? "<null>"));
+                Console.WriteLine("{0} : {1}", property.Name, property.GetValue(value) ?? "<null>");
 
             foreach (var field in value.GetType().GetFields())
-                Console.WriteLine(field.Name + " : " + (field.GetValue(value) ?? "<null>"));
+                Console.WriteLine("{0} : {1}", field.Name, field.GetValue(value) ?? "<null>");
         }
     }
 }

@@ -182,7 +182,6 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             Assert.NotNull(sortOptions);
             Assert.Equal(1, sortOptions.Count);
             Assert.True(sortOptions[0].IgnoreUnmapped);
-        } 
- 
+        }
     }
 }

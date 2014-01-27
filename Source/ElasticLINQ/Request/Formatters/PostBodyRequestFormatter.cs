@@ -17,9 +17,12 @@ namespace ElasticLinq.Request.Formatters
     /// </summary>
     internal class PostBodyRequestFormatter : RequestFormatter
     {
+        readonly Lazy<string> body;
+
         public PostBodyRequestFormatter(ElasticConnection connection, ElasticSearchRequest searchRequest)
             : base(connection, searchRequest)
         {
+            body = new Lazy<string>(() => CreateJsonPayload().ToString(Formatting.None));
         }
 
         protected override void CompleteSearchUri(UriBuilder builder)
@@ -34,7 +37,7 @@ namespace ElasticLinq.Request.Formatters
 
         public string Body
         {
-            get { return CreateJsonPayload().ToString(Formatting.None); }
+            get { return body.Value; }
         }
 
         private JObject CreateJsonPayload()
