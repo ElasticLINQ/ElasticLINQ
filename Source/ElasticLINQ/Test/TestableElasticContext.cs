@@ -46,7 +46,7 @@ namespace ElasticLinq.Test
             SetData((IEnumerable<T>)values);
         }
 
-        public IElasticQuery<T> Query<T>()
+        public IQueryable<T> Query<T>()
         {
             return new TestableElasticQuery<T>(this);
         }

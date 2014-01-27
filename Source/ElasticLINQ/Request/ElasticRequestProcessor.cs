@@ -74,17 +74,17 @@ namespace ElasticLinq.Request
 
         internal static ElasticResponse ParseResponse(Stream responseStream, TextWriter log)
         {
+            var stopwatch = Stopwatch.StartNew();
+
             using (var streamReader = new StreamReader(responseStream))
+            using (var textReader = new JsonTextReader(streamReader))
             {
-                var stopwatch = Stopwatch.StartNew();
-                var results = new JsonSerializer().Deserialize<ElasticResponse>(new JsonTextReader(streamReader));
-                var resultCount = results == null || results.hits == null || results.hits.hits == null
-                    ? 0
-                    : results.hits.hits.Count;
+                var results = new JsonSerializer().Deserialize<ElasticResponse>(textReader);
+                var resultCount = results == null ? 0 : results.hits.hits.Count;
                 stopwatch.Stop();
 
                 if (log != null)
-                    log.WriteLine("Deserialized {0} bytes into {1} objects in {2}ms",
+                    log.WriteLine("Deserialized {0} bytes into {1} hits in {2}ms",
                         responseStream.Length, resultCount, stopwatch.ElapsedMilliseconds);
 
                 return results;

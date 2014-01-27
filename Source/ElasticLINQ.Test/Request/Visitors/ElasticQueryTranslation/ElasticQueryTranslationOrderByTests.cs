@@ -149,6 +149,40 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             Assert.True(sortOptions[1].Ascending && sortOptions[1].Name == "_score");
             Assert.True(sortOptions[2].Ascending && sortOptions[2].Name == "cost");
             Assert.Equal(3, sortOptions.Count);
+        }
+
+        [Fact]
+        public void OrderByStringSpecifiesIgnoreUnmappedSortOption()
+        {
+            var ordered = Robots.OrderBy(e => e.Name);
+            var sortOptions = ElasticQueryTranslator.Translate(Mapping, ordered.Expression).SearchRequest.SortOptions;
+
+            Assert.NotNull(sortOptions);
+            Assert.Equal(1, sortOptions.Count);
+            Assert.True(sortOptions[0].IgnoreUnmapped);
+        }
+
+        [Fact]
+        public void OrderByDecimalDoesNotSpecifyIgnoreUnmappedSortOption()
+        {
+            var ordered = Robots.OrderBy(e => e.EnergyUse);
+            var sortOptions = ElasticQueryTranslator.Translate(Mapping, ordered.Expression).SearchRequest.SortOptions;
+
+            Assert.NotNull(sortOptions);
+            Assert.Equal(1, sortOptions.Count);
+            Assert.False(sortOptions[0].IgnoreUnmapped);
+        }
+
+        [Fact]
+        public void OrderByNullableIntSpecifiesIgnoreUnmappedSortOption()
+        {
+            var ordered = Robots.OrderBy(e => e.Zone);
+            var sortOptions = ElasticQueryTranslator.Translate(Mapping, ordered.Expression).SearchRequest.SortOptions;
+
+            Assert.NotNull(sortOptions);
+            Assert.Equal(1, sortOptions.Count);
+            Assert.True(sortOptions[0].IgnoreUnmapped);
         } 
+ 
     }
 }

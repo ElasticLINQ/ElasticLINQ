@@ -537,7 +537,7 @@ namespace ElasticLinq.Request.Visitors
             if (final != null)
             {
                 var fieldName = mapping.GetFieldName(final.Member);
-                var ignoreUnmapped = final.Type.IsGenericOf(typeof(Nullable<>)); // Consider a config switch?
+                var ignoreUnmapped = final.Type.IsNullable();
                 searchRequest.SortOptions.Insert(0, new SortOption(fieldName, ascending, ignoreUnmapped));
             }
 
@@ -616,7 +616,14 @@ namespace ElasticLinq.Request.Visitors
         {
             var takeConstant = Visit(takeExpression) as ConstantExpression;
             if (takeConstant != null)
-                searchRequest.Size = (int)takeConstant.Value;
+            {
+                var takeValue = (int)takeConstant.Value;
+
+                if (searchRequest.Size.HasValue)
+                    searchRequest.Size = Math.Min(searchRequest.Size.GetValueOrDefault(), takeValue);
+                else
+                    searchRequest.Size = takeValue;
+            }
             return Visit(source);
         }
 

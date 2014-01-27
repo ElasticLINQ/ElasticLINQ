@@ -124,7 +124,7 @@ namespace ElasticLinq.Test.Utility
         }
 
         [Fact]
-        public void IsNullableTypeReturnsTrueIfTypeIsGenericOf()
+        public void IsGenericOfReturnsTrueIfTypeIsGenericOf()
         {
             var isNullable = typeof(int?).IsGenericOf(typeof(Nullable<>));
 

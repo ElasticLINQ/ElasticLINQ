@@ -3,6 +3,7 @@
 using ElasticLinq.Mapping;
 using ElasticLinq.Utility;
 using System.IO;
+using System.Linq;
 
 namespace ElasticLinq
 {
@@ -25,7 +26,7 @@ namespace ElasticLinq
             provider = new ElasticQueryProvider(connection, mapping);
         }
 
-        public IElasticQuery<T> Query<T>()
+        public virtual IQueryable<T> Query<T>()
         {
             return new ElasticQuery<T>(provider);
         }
