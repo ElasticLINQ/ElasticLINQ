@@ -14,7 +14,10 @@ namespace ElasticLinq.Response.Materializers
     /// </summary>
     internal class ElasticFacetsMaterializer : IElasticMaterializer
     {
-        private static readonly MethodInfo manyMethodInfo = typeof(ElasticFacetsMaterializer).GetMethod("Many", BindingFlags.NonPublic | BindingFlags.Static);
+        private static readonly string[] termsFacetTypes = { "terms_stats", "terms" };
+
+        private static readonly MethodInfo manyMethodInfo =
+            typeof(ElasticFacetsMaterializer).GetMethod("Many", BindingFlags.NonPublic | BindingFlags.Static);
 
         private readonly Func<AggregateRow, object> projector;
         private readonly Type elementType;
@@ -32,21 +35,22 @@ namespace ElasticLinq.Response.Materializers
                 .Invoke(null, new object[] { elasticResponse.facets, projector });
         }
 
-
-        private static readonly string[] termsFacetTypes = { "terms_stats", "terms" };
-
         internal static List<T> Many<T>(JObject facets, Func<AggregateRow, object> projector)
         {
-            if (facets == null || facets.Count == 0)
-                return new List<T>();
+            if (facets != null && facets.Count != 0)
+            {
+                var termsStats = facets.Values().Where(x => termsFacetTypes.Contains(x["_type"].ToString())).ToList();
+                if (termsStats.Any())
+                    return FlattenTermsStatsToAggregateRows(termsStats).Select(projector).Cast<T>().ToList();
 
-            var termsStats = facets.Values().Where(x => termsFacetTypes.Contains(x["_type"].ToString())).ToList();
-            if (termsStats.Any())
-                return FlattenTermsStatsToAggregateRows(termsStats).Select(projector).Cast<T>().ToList();
-
-            var statistical = facets.Values().Where(x => x["_type"].ToString() == "statistical").ToList();
-            if (statistical.Any())
-                return FlattenStatisticalToAggregateRows(statistical).Select(projector).Cast<T>().ToList();
+                var statistical = facets.Values().Where(x => x["_type"].ToString() == "statistical").ToList();
+                if (statistical.Any())
+                    return Enumerable.Range(1, 1)
+                        .Select(r => new AggregateStatisticalRow(facets))
+                        .Select(projector)
+                        .Cast<T>()
+                        .ToList();
+            }
 
             return new List<T>();
         }
@@ -59,29 +63,14 @@ namespace ElasticLinq.Response.Materializers
         /// </summary>
         /// <param name="termsStats">Facets of type terms or terms_stats.</param>
         /// <returns>An enumeration of AggregateRows containing appropriate keys and fields.</returns>
-        internal static IEnumerable<AggregateRow> FlattenTermsStatsToAggregateRows(IEnumerable<JToken> termsStats)
+        internal static IEnumerable<AggregateTermRow> FlattenTermsStatsToAggregateRows(IEnumerable<JToken> termsStats)
         {
             return termsStats
                 .SelectMany(t => t["terms"])
                 .GroupBy(t => t["term"])
-                .Select(g => new AggregateRow(g.Key,
-                    g.SelectMany(v => v.Cast<JProperty>().Select(z => new AggregateField(((JProperty)v.Parent.Parent.Parent.Parent).Name, z.Name, z.Value)))));
-        }
-
-        /// <summary>
-        /// statistical facets don't have terms - they are without a groupby. We map constant GroupBy's to this
-        /// for efficiency and ease of use.
-        /// </summary>
-        /// <param name="statistical">Facets of type statistical.</param>
-        /// <returns>An enumeration of AggregateRows containing appropriate keys and fields.</returns>
-        internal static IEnumerable<AggregateRow> FlattenStatisticalToAggregateRows(IEnumerable<JToken> statistical)
-        {
-            var x = statistical
-                .SelectMany(t => t.Values())
-                .Select(s => new AggregateRow("", s.OfType<JProperty>().Select(z => new AggregateField(s.Parent.Parent.Path, z.Name, z.Value))))
-                .ToList();
-
-            return x;
+                .Select(g => new AggregateTermRow(g.Key,
+                    g.SelectMany(v => v.Cast<JProperty>().Select(z =>
+                        new AggregateField(((JProperty)v.Parent.Parent.Parent.Parent).Name, z.Name, z.Value)))));
         }
     }
 }

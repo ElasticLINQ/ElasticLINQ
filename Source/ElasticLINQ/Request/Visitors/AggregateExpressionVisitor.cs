@@ -13,14 +13,13 @@ using System.Reflection;
 namespace ElasticLinq.Request.Visitors
 {
     /// <summary>
-    /// Converts aggregate expressions into ElasticSearch facets.
+    /// Gathers and rebinds aggregate operations into ElasticSearch facets.
     /// </summary>
     internal class AggregateExpressionVisitor : ExpressionVisitor
     {
         private const string GroupKeyTermsName = "GroupKey";
-
-        private static readonly MethodInfo getValueFromRow = typeof(AggregateRow).GetMethod("GetValue", BindingFlags.Static | BindingFlags.NonPublic);
-        private static readonly MethodInfo getKeyFromRow = typeof(AggregateRow).GetMethod("GetKey", BindingFlags.Static | BindingFlags.NonPublic);
+        private static readonly MethodInfo getValue = typeof(AggregateRow).GetMethod("GetValue", BindingFlags.Static | BindingFlags.NonPublic);
+        private static readonly MethodInfo getKey = typeof(AggregateRow).GetMethod("GetKey", BindingFlags.Static | BindingFlags.NonPublic);
 
         private static readonly Dictionary<string, string> aggregateMemberOperations = new Dictionary<string, string>
         {
@@ -55,8 +54,10 @@ namespace ElasticLinq.Request.Visitors
             Argument.EnsureNotNull("expression", expression);
 
             var visitor = new AggregateExpressionVisitor(mapping);
+            var visitedExpression = visitor.Visit(expression);
+            var facets = new HashSet<IFacet>(visitor.GetFacets());
 
-            return new RebindCollectionResult<IFacet>(visitor.Visit(expression), new HashSet<IFacet>(visitor.GetFacets()), visitor.bindingParameter, visitor.selectProjection);
+            return new RebindCollectionResult<IFacet>(visitedExpression, facets, visitor.bindingParameter, visitor.selectProjection);
         }
 
         private IEnumerable<IFacet> GetFacets()
@@ -92,7 +93,7 @@ namespace ElasticLinq.Request.Visitors
         protected override Expression VisitMember(MemberExpression m)
         {
             if (m.Member.Name == "Key" && m.Member.DeclaringType.IsGenericOf(typeof(IGrouping<,>)))
-                return VisitGroupKey(m.Type);
+                return VisitGroupKeyAccess(m.Type);
 
             return base.VisitMember(m);
         }
@@ -108,46 +109,43 @@ namespace ElasticLinq.Request.Visitors
                 {
                     var y = Visit(m.Arguments[1]).GetLambda();
                     selectProjection = Expression.Lambda(y.Body, bindingParameter);
-
                     return Visit(m.Arguments[0]);
                 }
 
                 string operation;
                 if (aggregateOperations.TryGetValue(m.Method.Name, out operation) && m.Arguments.Count == 1)
-                    return VisitAggregateOperation(operation, m.Method.ReturnType);
+                    return VisitAggregateGroupOperation(operation, m.Method.ReturnType);
 
                 if (aggregateMemberOperations.TryGetValue(m.Method.Name, out operation) && m.Arguments.Count == 2)
-                    return VisitAggregateMemberOperations(m.Arguments[1], operation, m.Method.ReturnType);
+                    return VisitAggregateMemberOperation(m.Arguments[1], operation, m.Method.ReturnType);
             }
 
             return base.VisitMethodCall(m);
         }
 
-        private Expression VisitGroupKey(Type returnType)
+        private Expression VisitGroupKeyAccess(Type returnType)
         {
-            var getKeyExpression = Expression.Call(null, getKeyFromRow, bindingParameter);
+            var getKeyExpression = Expression.Call(null, getKey, bindingParameter);
             return Expression.Convert(getKeyExpression, returnType);
         }
 
-        private Expression VisitAggregateOperation(string operation, Type returnType)
+        private Expression VisitAggregateGroupOperation(string operation, Type returnType)
         {
             includeGroupKeyTerms = true;
-
-            var getValueExpression = Expression.Call(null, getValueFromRow, bindingParameter,
-                Expression.Constant(GroupKeyTermsName), Expression.Constant(operation), Expression.Constant(returnType));
-
-            return Expression.Convert(getValueExpression, returnType);
+            return RebindValue(GroupKeyTermsName, operation, returnType);
         }
 
-        private Expression VisitAggregateMemberOperations(Expression property, string operation, Type returnType)
+        private Expression VisitAggregateMemberOperation(Expression property, string operation, Type returnType)
         {
             var member = GetMemberInfoFromLambda(property);
-            var valueField = mapping.GetFieldName(member);
             aggregateMembers.Add(member);
+            return RebindValue(mapping.GetFieldName(member), operation, returnType);
+        }
 
-            var getValueExpression = Expression.Call(null, getValueFromRow, bindingParameter,
+        private Expression RebindValue(string valueField, string operation, Type returnType)
+        {
+            var getValueExpression = Expression.Call(null, getValue, bindingParameter,
                 Expression.Constant(valueField), Expression.Constant(operation), Expression.Constant(returnType));
-
             return Expression.Convert(getValueExpression, returnType);
         }
 
@@ -155,7 +153,7 @@ namespace ElasticLinq.Request.Visitors
         {
             var lambda = expression.StripQuotes() as LambdaExpression;
             if (lambda == null)
-                throw new NotSupportedException(String.Format("Require a lambda with member access not {0}", expression));
+                throw new NotSupportedException(String.Format("Aggregate requrired Lambda expression, {0} expression encountered.", expression.NodeType));
 
             var memberExpressionBody = lambda.Body as MemberExpression;
             if (memberExpressionBody == null)

@@ -1,5 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using System.Net.Sockets;
 using ElasticLinq.Utility;
 using Newtonsoft.Json.Linq;
 using System;
@@ -28,33 +29,20 @@ namespace ElasticLinq.Response.Materializers
         public JToken Token { get { return token; } }
     }
 
-    [DebuggerDisplay("Row {Key} Fields({Fields.Count})")]
-    internal class AggregateRow
+    internal abstract class AggregateRow
     {
-        private readonly object key;
-        private readonly AggregateField[] fields;
-
-        public AggregateRow(object key, IEnumerable<AggregateField> fields)
-        {
-            this.key = key;
-            this.fields = fields.ToArray();
-        }
-
-        public object Key { get { return key; } }
-        public IReadOnlyList<AggregateField> Fields { get { return fields; } }
-
         internal static object GetValue(AggregateRow row, string name, string operation, Type valueType)
         {
-            var field = row.Fields.FirstOrDefault(f => f.Name == name && f.Operation == operation);
-
-            return field == null
-                ? TypeHelper.CreateDefault(valueType)
-                : ParseValue(field.Token, valueType);
+            return row.GetValue(name, operation, valueType);
         }
+
+        internal abstract object GetValue(string name, string operation, Type valueType);
 
         internal static object GetKey(AggregateRow row)
         {
-            return row.Key.ToString();
+            return row is AggregateTermRow
+                ? ((AggregateTermRow) row).Key
+                : null;
         }
 
         internal static object ParseValue(JToken token, Type valueType)
@@ -91,6 +79,59 @@ namespace ElasticLinq.Response.Materializers
             }
 
             return token.ToObject(valueType);
+        }
+    }
+
+    [DebuggerDisplay("Statistical Row")]
+    internal class AggregateStatisticalRow : AggregateRow
+    {
+        private readonly JObject facets;
+
+        public AggregateStatisticalRow(JObject facets)
+        {
+            this.facets = facets;
+        }
+
+        internal override object GetValue(string name, string operation, Type valueType)
+        {
+            JToken facetObject, operationObject;
+            return facets.TryGetValue(name, out facetObject)
+                   && facetObject is JObject
+                   && ((JObject) facetObject).TryGetValue(operation, out operationObject)
+                ? ParseValue(operationObject, valueType)
+                : TypeHelper.CreateDefault(valueType);
+        }
+    }
+
+    [DebuggerDisplay("Term Row {Key} Fields({Fields.Count})")]
+    internal class AggregateTermRow : AggregateRow
+    {
+        private readonly object key;
+        private readonly AggregateField[] fields;
+
+        public AggregateTermRow(object key, IEnumerable<AggregateField> fields)
+        {
+            this.key = key;
+            this.fields = fields.ToArray();
+        }
+
+        public object Key
+        {
+            get { return key; }
+        }
+
+        public IReadOnlyList<AggregateField> Fields
+        {
+            get { return fields; }
+        }
+
+        internal override object GetValue(string name, string operation, Type valueType)
+        {
+            var field = fields.FirstOrDefault(f => f.Name == name && f.Operation == operation);
+
+            return field == null
+                ? TypeHelper.CreateDefault(valueType)
+                : ParseValue(field.Token, valueType);
         }
     }
 }

@@ -9,10 +9,11 @@ namespace TestConsoleApp
 {
     internal class Program
     {
+        private static readonly Uri uri = new Uri("http://192.168.1.16:9200");
+
         private static void Main()
         {
-            var connection = new ElasticConnection(new Uri("http://192.168.2.14:9200")) { Index = "tier3" };
-            var context = new ElasticContext(connection, new CouchbaseElasticMapping(), new ConsoleLog());
+            var context = new ElasticContext(new ElasticConnection(uri) { Index = "tier3" }, new CouchbaseElasticMapping(), new ConsoleLog());
 
             AggregateQueries();
             //DocumentQueries(context);
@@ -24,13 +25,12 @@ namespace TestConsoleApp
 
         private static void AggregateQueries()
         {
-            var movieConnection = new ElasticConnection(new Uri("http://192.168.2.14:9200"));
-            var movieContext = new ElasticContext(movieConnection, new TrivialElasticMapping(), new ConsoleLog());
+            var movieContext = new ElasticContext(new ElasticConnection(uri), new TrivialElasticMapping(), new ConsoleLog());
 
             movieContext
                 .Query<Movie>()
-                .GroupBy(a => 1)
-                .Select(a => new { First = a.Min(b => b.Year), TopRated = a.Max(b => b.Rating), Count = a.Count() })
+                .GroupBy(a => "")
+                .Select(a => new { a.Key, First = a.Min(b => b.Year), TopRated = a.Max(b => b.Rating), Count = a.Count() })
                 .WriteToConsole();
 
             //var z = movieContext
