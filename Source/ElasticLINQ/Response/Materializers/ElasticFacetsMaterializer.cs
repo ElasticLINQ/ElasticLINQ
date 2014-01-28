@@ -29,50 +29,59 @@ namespace ElasticLinq.Response.Materializers
         {
             return manyMethodInfo
                 .MakeGenericMethod(elementType)
-                .Invoke(null, new object[] { elasticResponse, projector });
+                .Invoke(null, new object[] { elasticResponse.facets, projector });
         }
 
-        internal static List<T> Many<T>(ElasticResponse elasticResponse, Func<AggregateRow, object> projector)
+
+        private static readonly string[] termsFacetTypes = { "terms_stats", "terms" };
+
+        internal static List<T> Many<T>(JObject facets, Func<AggregateRow, object> projector)
         {
-            if (elasticResponse.facets == null || elasticResponse.facets.Count == 0)
+            if (facets == null || facets.Count == 0)
                 return new List<T>();
 
-            var rows = FlattenToAggregateRows(elasticResponse.facets);
-            return rows.Select(projector).Cast<T>().ToList();
+            var termsStats = facets.Values().Where(x => termsFacetTypes.Contains(x["_type"].ToString())).ToList();
+            if (termsStats.Any())
+                return FlattenTermsStatsToAggregateRows(termsStats).Select(projector).Cast<T>().ToList();
+
+            var statistical = facets.Values().Where(x => x["_type"].ToString() == "statistical").ToList();
+            if (statistical.Any())
+                return FlattenStatisticalToAggregateRows(statistical).Select(projector).Cast<T>().ToList();
+
+            return new List<T>();
         }
 
         /// <summary>
-        /// A facet response from ElasticSearch comes back with each field in an independent
-        /// block containing all possible aggregates for that field. Multiple fields requires
-        /// multiple blocks each of which may or may not have all possible terms.
-        /// This query converts that structure into something row-based that allows rebinding
-        /// the select projection to it.
+        /// terms_stats and terms facet responses have each field in an independent object with all 
+        /// possible operations for that field. Multiple fields means multiple objects
+        /// each of which might not have all possible terms. Convert that structure into
+        /// a SQL-style row with one term per row containing each aggregate field and operation combination.
         /// </summary>
-        /// <param name="facets">Facets JSON object as returned from ElasticSearch.</param>
+        /// <param name="termsStats">Facets of type terms or terms_stats.</param>
         /// <returns>An enumeration of AggregateRows containing appropriate keys and fields.</returns>
-        internal static IEnumerable<AggregateRow> FlattenToAggregateRows(JObject facets)
+        internal static IEnumerable<AggregateRow> FlattenTermsStatsToAggregateRows(IEnumerable<JToken> termsStats)
         {
-            return facets
-                .Values()
-                .SelectMany(x => x["terms"])
-                .GroupBy(x => x["term"])
-                .Select(CreateRow)
+            return termsStats
+                .SelectMany(t => t["terms"])
+                .GroupBy(t => t["term"])
+                .Select(g => new AggregateRow(g.Key,
+                    g.SelectMany(v => v.Cast<JProperty>().Select(z => new AggregateField(((JProperty)v.Parent.Parent.Parent.Parent).Name, z.Name, z.Value)))));
+        }
+
+        /// <summary>
+        /// statistical facets don't have terms - they are without a groupby. We map constant GroupBy's to this
+        /// for efficiency and ease of use.
+        /// </summary>
+        /// <param name="statistical">Facets of type statistical.</param>
+        /// <returns>An enumeration of AggregateRows containing appropriate keys and fields.</returns>
+        internal static IEnumerable<AggregateRow> FlattenStatisticalToAggregateRows(IEnumerable<JToken> statistical)
+        {
+            var x = statistical
+                .SelectMany(t => t.Values())
+                .Select(s => new AggregateRow("", s.OfType<JProperty>().Select(z => new AggregateField(s.Parent.Parent.Path, z.Name, z.Value))))
                 .ToList();
-        }
 
-        private static AggregateRow CreateRow(IGrouping<JToken, JToken> c)
-        {
-            return new AggregateRow(c.Key, c.SelectMany(v => v.Cast<JProperty>().Select(z => AggregateField(v, z))));
-        }
-
-        private static AggregateField AggregateField(JToken v, JProperty z)
-        {
-            return new AggregateField(CreateColumn(v, z), z.Value);
-        }
-
-        private static AggregateColumn CreateColumn(JToken v, JProperty z)
-        {
-            return new AggregateColumn(((JProperty)v.Parent.Parent.Parent.Parent).Name, z.Name);
+            return x;
         }
     }
 }

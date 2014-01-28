@@ -40,7 +40,7 @@ namespace ElasticLinq.Request.Visitors
         private readonly ParameterExpression bindingParameter = Expression.Parameter(typeof(AggregateRow), "r");
         private readonly IElasticMapping mapping;
 
-        private MemberInfo groupByMember;
+        private Expression groupBy;
         private LambdaExpression selectProjection;
         private bool includeGroupKeyTerms;
 
@@ -61,19 +61,31 @@ namespace ElasticLinq.Request.Visitors
 
         private IEnumerable<IFacet> GetFacets()
         {
-            if (groupByMember == null)
-            {
-                foreach (var valueField in aggregateMembers.Select(member => mapping.GetFieldName(member)))
-                    yield return new StatisticalFacet(valueField, valueField);                   
-            }
-            else
-            {
-                var groupByField = mapping.GetFieldName(groupByMember);
-                foreach (var valueField in aggregateMembers.Select(member => mapping.GetFieldName(member)))
-                    yield return new TermsStatsFacet(valueField, groupByField, valueField);
+            if (groupBy == null)
+                yield break;
 
-                if (includeGroupKeyTerms)
-                    yield return new TermsFacet(GroupKeyTermsName, groupByField);
+            switch (groupBy.NodeType)
+            {
+                case ExpressionType.MemberAccess:
+                {
+                    var groupByField = mapping.GetFieldName(((MemberExpression)groupBy).Member);
+                    foreach (var valueField in aggregateMembers.Select(member => mapping.GetFieldName(member)))
+                        yield return new TermsStatsFacet(valueField, groupByField, valueField);
+
+                    if (includeGroupKeyTerms)
+                        yield return new TermsFacet(GroupKeyTermsName, groupByField);
+
+                    break;
+                }
+                case ExpressionType.Constant:
+                {
+                    foreach (var valueField in aggregateMembers.Select(member => mapping.GetFieldName(member)))
+                        yield return new StatisticalFacet(valueField, valueField);
+                    break;
+                }
+
+                default:
+                    throw new NotSupportedException(String.Format("GroupBy must be either a Member or a Constant not {0}", groupBy.NodeType));
             }
         }
 
@@ -90,11 +102,11 @@ namespace ElasticLinq.Request.Visitors
             if (m.Method.DeclaringType == typeof(Enumerable) || m.Method.DeclaringType == typeof(Queryable))
             {
                 if (m.Method.Name == "GroupBy" && m.Arguments.Count == 2)
-                    groupByMember = GetMemberInfoFromLambda(m.Arguments[1]);
+                    groupBy = m.Arguments[1].GetLambda().Body;
 
                 if (m.Method.Name == "Select" && m.Arguments.Count == 2)
                 {
-                    var y = (LambdaExpression)StripQuotes(Visit(m.Arguments[1]));
+                    var y = Visit(m.Arguments[1]).GetLambda();
                     selectProjection = Expression.Lambda(y.Body, bindingParameter);
 
                     return Visit(m.Arguments[0]);
@@ -141,22 +153,15 @@ namespace ElasticLinq.Request.Visitors
 
         private static MemberInfo GetMemberInfoFromLambda(Expression expression)
         {
-            var lambda = StripQuotes(expression) as LambdaExpression;
+            var lambda = expression.StripQuotes() as LambdaExpression;
             if (lambda == null)
                 throw new NotSupportedException(String.Format("Require a lambda with member access not {0}", expression));
 
             var memberExpressionBody = lambda.Body as MemberExpression;
             if (memberExpressionBody == null)
-                throw new NotSupportedException("GroupBy must be specified against a member of the entity");
+                throw new NotSupportedException(String.Format("Aggregates must be specified against a member of the entity not {0}", lambda.Body.Type));
 
             return memberExpressionBody.Member;
-        }
-
-        private static Expression StripQuotes(Expression e)
-        {
-            while (e.NodeType == ExpressionType.Quote)
-                e = ((UnaryExpression)e).Operand;
-            return e;
         }
     }
 }

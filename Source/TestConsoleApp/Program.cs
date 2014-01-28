@@ -14,9 +14,9 @@ namespace TestConsoleApp
             var connection = new ElasticConnection(new Uri("http://192.168.2.14:9200")) { Index = "tier3" };
             var context = new ElasticContext(connection, new CouchbaseElasticMapping(), new ConsoleLog());
 
-            //AggregateQueries();
-            DocumentQueries(context);
-            BasicSampleQueries(context);
+            AggregateQueries();
+            //DocumentQueries(context);
+            //BasicSampleQueries(context);
 
             Console.Write("\n\nComplete.");
             Console.ReadKey();
@@ -29,9 +29,8 @@ namespace TestConsoleApp
 
             movieContext
                 .Query<Movie>()
-                .Where(a => a.Director == "David Lean")
-                .GroupBy(a => a.Director)
-                .Select(a => new { a.Key, First = a.Min(b => b.Year), TopRated = a.Max(b => b.Rating), Count = a.Count() })
+                .GroupBy(a => 1)
+                .Select(a => new { First = a.Min(b => b.Year), TopRated = a.Max(b => b.Rating), Count = a.Count() })
                 .WriteToConsole();
 
             //var z = movieContext

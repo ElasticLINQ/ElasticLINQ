@@ -9,38 +9,22 @@ using System.Linq;
 
 namespace ElasticLinq.Response.Materializers
 {
-    [DebuggerDisplay("Column {Name},{Operation}")]
-    internal class AggregateColumn
+    [DebuggerDisplay("Field {Name}.{Operation} = {Token.Value}")]
+    internal class AggregateField
     {
         private readonly string name;
         private readonly string operation;
+        private readonly JToken token;
 
-        public AggregateColumn(string name, string operation)
+        public AggregateField(string name, string operation, JToken token)
         {
-            Argument.EnsureNotNull("name", name);
-            Argument.EnsureNotNull("operation", operation);
-
             this.name = name;
             this.operation = operation;
+            this.token = token;
         }
 
         public string Name { get { return name; } }
         public string Operation { get { return operation; } }
-    }
-
-    [DebuggerDisplay("Field {Column.Name},{Column.Operation} = {Token.Value}")]
-    internal class AggregateField
-    {
-        private readonly AggregateColumn column;
-        private readonly JToken token;
-
-        public AggregateField(AggregateColumn column, JToken token)
-        {
-            this.column = column;
-            this.token = token;
-        }
-
-        public AggregateColumn Column { get { return column; } }
         public JToken Token { get { return token; } }
     }
 
@@ -61,7 +45,7 @@ namespace ElasticLinq.Response.Materializers
 
         internal static object GetValue(AggregateRow row, string name, string operation, Type valueType)
         {
-            var field = row.Fields.FirstOrDefault(f => f.Column.Name == name && f.Column.Operation == operation);
+            var field = row.Fields.FirstOrDefault(f => f.Name == name && f.Operation == operation);
 
             return field == null
                 ? TypeHelper.CreateDefault(valueType)
@@ -78,32 +62,32 @@ namespace ElasticLinq.Response.Materializers
             switch (token.ToString())
             {
                 case "Infinity":
-                {
-                    if (valueType == typeof(Double))
-                        return Double.PositiveInfinity;
+                    {
+                        if (valueType == typeof(Double))
+                            return Double.PositiveInfinity;
 
-                    if (valueType == typeof(Single))
-                        return Single.PositiveInfinity;
+                        if (valueType == typeof(Single))
+                            return Single.PositiveInfinity;
 
-                    if (valueType == typeof(decimal?))
-                        return null;
+                        if (valueType == typeof(decimal?))
+                            return null;
 
-                    break;
-                }
+                        break;
+                    }
 
                 case "-Infinity":
-                {
-                    if (valueType == typeof(Double))
-                        return Double.NegativeInfinity;
+                    {
+                        if (valueType == typeof(Double))
+                            return Double.NegativeInfinity;
 
-                    if (valueType == typeof(Single))
-                        return Single.NegativeInfinity;
+                        if (valueType == typeof(Single))
+                            return Single.NegativeInfinity;
 
-                    if (valueType == typeof(decimal?))
-                        return null;
+                        if (valueType == typeof(decimal?))
+                            return null;
 
-                    break;
-                }
+                        break;
+                    }
             }
 
             return token.ToObject(valueType);

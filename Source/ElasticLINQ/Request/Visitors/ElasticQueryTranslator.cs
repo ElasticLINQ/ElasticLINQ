@@ -327,16 +327,9 @@ namespace ElasticLinq.Request.Visitors
             throw new NotSupportedException(string.Format("The MemberInfo '{0}' is not supported", m.Member.Name));
         }
 
-        private static Expression StripQuotes(Expression e)
-        {
-            while (e.NodeType == ExpressionType.Quote)
-                e = ((UnaryExpression)e).Operand;
-            return e;
-        }
-
         private Expression VisitQuery(Expression source, Expression predicate)
         {
-            var lambda = (LambdaExpression)StripQuotes(predicate);
+            var lambda = predicate.GetLambda();
             var body = BooleanMemberAccessBecomesEquals(Visit(lambda.Body));
 
             var criteriaExpression = body as CriteriaExpression;
@@ -350,7 +343,7 @@ namespace ElasticLinq.Request.Visitors
 
         private Expression VisitWhere(Expression source, Expression predicate)
         {
-            var lambda = (LambdaExpression)StripQuotes(predicate);
+            var lambda = predicate.GetLambda();
             var body = BooleanMemberAccessBecomesEquals(Visit(lambda.Body));
 
             var criteriaExpression = body as CriteriaExpression;
@@ -532,7 +525,7 @@ namespace ElasticLinq.Request.Visitors
 
         private Expression VisitOrderBy(Expression source, Expression orderByExpression, bool ascending)
         {
-            var lambda = (LambdaExpression)StripQuotes(orderByExpression);
+            var lambda = orderByExpression.GetLambda();
             var final = Visit(lambda.Body) as MemberExpression;
             if (final != null)
             {
@@ -552,7 +545,7 @@ namespace ElasticLinq.Request.Visitors
 
         private Expression VisitSelect(Expression source, Expression selectExpression)
         {
-            var lambda = (LambdaExpression)StripQuotes(selectExpression);
+            var lambda = selectExpression.GetLambda();
             var selectBody = lambda.Body;
 
             if (selectBody is MemberExpression)
