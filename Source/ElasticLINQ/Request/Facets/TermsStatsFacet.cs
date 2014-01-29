@@ -1,5 +1,7 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using ElasticLinq.Request.Criteria;
+
 namespace ElasticLinq.Request.Facets
 {
     internal class TermsStatsFacet : IFacet
@@ -15,12 +17,10 @@ namespace ElasticLinq.Request.Facets
             this.value = value;
         }
 
-        public string Name { get { return name; } }
-
         public string Type { get { return "terms_stats"; } }
-
+        public string Name { get { return name; } }
         public string Key { get { return key; } }
-
         public string Value { get { return value; } }
+        public ICriteria Filter { get; set; }
     }
 }

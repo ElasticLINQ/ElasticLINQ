@@ -9,7 +9,7 @@ namespace TestConsoleApp
 {
     internal class Program
     {
-        private static readonly Uri uri = new Uri("http://192.168.1.16:9200");
+        private static readonly Uri uri = new Uri("http://192.168.2.14:9200");
 
         private static void Main()
         {

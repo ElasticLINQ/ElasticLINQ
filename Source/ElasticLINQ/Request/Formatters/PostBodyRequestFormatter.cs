@@ -72,12 +72,12 @@ namespace ElasticLinq.Request.Formatters
             return root;
         }
 
-        private static JToken Build(IEnumerable<IFacet> facets, ICriteria filter)
+        private static JToken Build(IEnumerable<IFacet> facets, ICriteria primaryFilter)
         {
-            return new JObject(facets.Select(facet => Build(facet, filter)));
+            return new JObject(facets.Select(facet => Build(facet, primaryFilter)));
         }
 
-        private static JProperty Build(IFacet facet, ICriteria filter)
+        private static JProperty Build(IFacet facet, ICriteria primaryFilter)
         {
             JToken bodyBelowType = null;
 
@@ -95,8 +95,9 @@ namespace ElasticLinq.Request.Formatters
 
             var bodyBelowName = new JObject(new JProperty(facet.Type, bodyBelowType));
 
-            if (filter != null)
-                bodyBelowName.Add("facet_filter", Build(filter));
+            var finalFilter = AndCriteria.Combine(primaryFilter, facet.Filter);
+            if (finalFilter != null)
+                bodyBelowName.Add("facet_filter", Build(finalFilter));
 
             return new JProperty(facet.Name, bodyBelowName);
         }
