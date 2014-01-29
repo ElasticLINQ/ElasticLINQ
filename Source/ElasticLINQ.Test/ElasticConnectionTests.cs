@@ -12,15 +12,9 @@ namespace ElasticLinq.Test
         private const string UserName = "theUser";
 
         [Fact]
-        public void GuardClauses_Constructor()
+        public static void GuardClauses_Constructor()
         {
             Assert.Throws<ArgumentNullException>(() => new ElasticConnection(null));
-            Assert.Throws<ArgumentNullException>(() => new ElasticConnection(null, UserName, Password));
-            Assert.Throws<ArgumentNullException>(() => new ElasticConnection(endpoint, null, Password));
-            Assert.Throws<ArgumentNullException>(() => new ElasticConnection(endpoint, UserName, null));
-
-            Assert.Throws<ArgumentException>(() => new ElasticConnection(endpoint, "", Password));
-            Assert.Throws<ArgumentException>(() => new ElasticConnection(endpoint, UserName, ""));
         }
 
         [Fact]
