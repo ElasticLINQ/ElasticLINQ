@@ -1,6 +1,5 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
-using System.Net.Sockets;
 using ElasticLinq.Utility;
 using Newtonsoft.Json.Linq;
 using System;
@@ -10,7 +9,7 @@ using System.Linq;
 
 namespace ElasticLinq.Response.Materializers
 {
-    [DebuggerDisplay("Field {Name}.{Operation} = {Token.Value}")]
+    [DebuggerDisplay("Field {Name,nq}.{Operation,nq} = {Token}")]
     internal class AggregateField
     {
         private readonly string name;

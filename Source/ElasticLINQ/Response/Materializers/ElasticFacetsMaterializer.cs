@@ -68,7 +68,7 @@ namespace ElasticLinq.Response.Materializers
             return termsStats
                 .SelectMany(t => t["terms"])
                 .GroupBy(t => t["term"])
-                .Select(g => new AggregateTermRow(g.Key,
+                .Select(g => new AggregateTermRow((g.Key.ToObject<object>()),
                     g.SelectMany(v => v.Cast<JProperty>().Select(z =>
                         new AggregateField(((JProperty)v.Parent.Parent.Parent.Parent).Name, z.Name, z.Value)))));
         }
