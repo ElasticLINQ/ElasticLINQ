@@ -16,8 +16,8 @@ namespace TestConsoleApp
             var context = new ElasticContext(new ElasticConnection(uri) { Index = "tier3" }, new CouchbaseElasticMapping(), new ConsoleLog());
 
             AggregateQueries();
-            DocumentQueries(context);
-            BasicSampleQueries(context);
+            //DocumentQueries(context);
+            //BasicSampleQueries(context);
 
             Console.Write("\n\nComplete.");
             Console.ReadKey();
@@ -30,8 +30,10 @@ namespace TestConsoleApp
             movieContext
                 .Query<Movie>()
                 .Where(a => a.Year > 1900)
-                .GroupBy(a => a.Director)
-                .Select(a => new { a.Key, TopRated = a.Count(b => b.Rating >= 4.5), LowerRated = a.Count(b => b.Rating < 4.5) })
+                .GroupBy(a => 1)
+                .Select(a => new { TopRated = a.Count(b => b.Rating >= 4.5), LowerRated = a.Count(b => b.Rating < 4.5) })
+                //.GroupBy(a => a.Director)
+                //.Select(a => new { a.Key, TopRated = a.Count(b => b.Rating >= 4.5), LowerRated = a.Count(b => b.Rating < 4.5) })
                 .WriteToConsole();
 
             //var z = movieContext

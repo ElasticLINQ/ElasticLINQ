@@ -84,6 +84,9 @@ namespace ElasticLinq.Request.Visitors
                         foreach (var valueField in aggregateMembers.Select(member => Mapping.GetFieldName(member)))
                             yield return new StatisticalFacet(valueField, valueField);
 
+                        foreach (var criteria in aggregateCriteria)
+                            yield return new FilterFacet(criteria.Key) { Filter = criteria.Value };
+
                         break;
                     }
 

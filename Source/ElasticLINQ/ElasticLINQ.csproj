@@ -71,6 +71,7 @@
     <Compile Include="Request\Criteria\QueryStringCriteria.cs" />
     <Compile Include="Request\Criteria\TermCriteria.cs" />
     <Compile Include="Request\Expressions\FacetExpression.cs" />
+    <Compile Include="Request\Facets\FilterFacet.cs" />
     <Compile Include="Request\Facets\IFacet.cs" />
     <Compile Include="Request\Facets\StatisticalFacet.cs" />
     <Compile Include="Request\Facets\TermsFacet.cs" />

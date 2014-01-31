@@ -79,27 +79,32 @@ namespace ElasticLinq.Request.Formatters
 
         private static JProperty Build(IFacet facet, ICriteria primaryFilter)
         {
-            JToken bodyBelowType = null;
+            Argument.EnsureNotNull("facet", facet);
 
+            var combinedFilter = AndCriteria.Combine(primaryFilter, facet.Filter);
+            var body = new JObject(new JProperty(facet.Type, Build(facet)));
+
+            if (combinedFilter != null)
+                body[facet is FilterFacet ? "filter" : "facet_filter"] = Build(combinedFilter);
+
+            return new JProperty(facet.Name, body);
+        }
+
+        private static JToken Build(IFacet facet)
+        {
             if (facet is StatisticalFacet)
-                bodyBelowType = Build((StatisticalFacet)facet);
+                return Build((StatisticalFacet)facet);
 
             if (facet is TermsStatsFacet)
-                bodyBelowType = Build((TermsStatsFacet)facet);
+                return Build((TermsStatsFacet)facet);
 
             if (facet is TermsFacet)
-                bodyBelowType = Build((TermsFacet)facet);
+                return Build((TermsFacet)facet);
 
-            if (bodyBelowType == null)
-                throw new InvalidOperationException("Unknown type of IFacet");
+            if (facet is FilterFacet)
+                return new JObject();
 
-            var bodyBelowName = new JObject(new JProperty(facet.Type, bodyBelowType));
-
-            var finalFilter = AndCriteria.Combine(primaryFilter, facet.Filter);
-            if (finalFilter != null)
-                bodyBelowName.Add("facet_filter", Build(finalFilter));
-
-            return new JProperty(facet.Name, bodyBelowName);
+            throw new InvalidOperationException(string.Format("Unknown implementation of IFacet {0} can not be formatted", facet.GetType().Name));
         }
 
         private static JToken Build(StatisticalFacet statisticalFacet)
