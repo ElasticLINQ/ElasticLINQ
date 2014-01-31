@@ -153,6 +153,11 @@ namespace ElasticLinq.Request.Visitors
 
         protected Expression BooleanMemberAccessBecomesEquals(Expression e)
         {
+            if (e is CriteriaExpression)
+                return e;
+
+            e = Visit(e);
+
             var wasNegative = e.NodeType == ExpressionType.Not;
 
             if (e is UnaryExpression)
@@ -215,11 +220,10 @@ namespace ElasticLinq.Request.Visitors
         {
             foreach (var expression in expressions.Select(BooleanMemberAccessBecomesEquals))
             {
-                var reducedExpression = expression is CriteriaExpression ? expression : Visit(expression);
-                if ((reducedExpression as T) == null)
-                    throw new NotSupportedException(string.Format("Unexpected binary expression '{0}'", reducedExpression));
+                if ((expression as T) == null)
+                    throw new NotSupportedException(string.Format("Unexpected binary expression '{0}'", expression));
 
-                yield return (T)reducedExpression;
+                yield return (T)expression;
             }
         }
 

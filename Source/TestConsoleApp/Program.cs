@@ -29,8 +29,9 @@ namespace TestConsoleApp
 
             movieContext
                 .Query<Movie>()
-                .GroupBy(a => "")
-                .Select(a => new { a.Key, First = a.Min(b => b.Year), TopRated = a.Max(b => b.Rating), Count = a.Count() })
+                .Where(a => a.Year > 1900)
+                .GroupBy(a => a.Director)
+                .Select(a => new { a.Key, TopRated = a.Count(b => b.Rating >= 4.5), LowerRated = a.Count(b => b.Rating < 4.5) })
                 .WriteToConsole();
 
             //var z = movieContext

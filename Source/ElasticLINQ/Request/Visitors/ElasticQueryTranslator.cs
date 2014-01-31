@@ -238,7 +238,7 @@ namespace ElasticLinq.Request.Visitors
         private Expression VisitQuery(Expression source, Expression predicate)
         {
             var lambda = predicate.GetLambda();
-            var body = BooleanMemberAccessBecomesEquals(Visit(lambda.Body));
+            var body = BooleanMemberAccessBecomesEquals(lambda.Body);
 
             var criteriaExpression = body as CriteriaExpression;
             if (criteriaExpression == null)
@@ -252,7 +252,8 @@ namespace ElasticLinq.Request.Visitors
         private Expression VisitWhere(Expression source, Expression predicate)
         {
             var lambda = predicate.GetLambda();
-            var body = BooleanMemberAccessBecomesEquals(Visit(lambda.Body));
+
+            var body = BooleanMemberAccessBecomesEquals(lambda.Body);
 
             var criteriaExpression = body as CriteriaExpression;
             if (criteriaExpression == null)

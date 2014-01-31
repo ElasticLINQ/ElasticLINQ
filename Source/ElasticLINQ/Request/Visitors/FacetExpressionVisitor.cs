@@ -139,7 +139,7 @@ namespace ElasticLinq.Request.Visitors
         private Expression VisitAggregateGroupPredicateOperation(Expression predicate, string operation, Type returnType)
         {
             var lambda = predicate.GetLambda();
-            var body = BooleanMemberAccessBecomesEquals(Visit(lambda.Body));
+            var body = BooleanMemberAccessBecomesEquals(lambda.Body);
 
             var criteriaExpression = body as CriteriaExpression;
             if (criteriaExpression == null)
