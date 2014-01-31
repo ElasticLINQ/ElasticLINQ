@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace ElasticLinq.Request.Formatters
@@ -81,13 +82,18 @@ namespace ElasticLinq.Request.Formatters
         {
             Argument.EnsureNotNull("facet", facet);
 
+            var specificBody = Build(facet);
+            var orderableFacet = facet as IOrderableFacet;
+            if (orderableFacet != null && orderableFacet.Size.HasValue)
+                specificBody["size"] = orderableFacet.Size.Value.ToString(CultureInfo.InvariantCulture);
+            
+            var namedBody = new JObject(new JProperty(facet.Type, specificBody));
+
             var combinedFilter = AndCriteria.Combine(primaryFilter, facet.Filter);
-            var body = new JObject(new JProperty(facet.Type, Build(facet)));
-
             if (combinedFilter != null)
-                body[facet is FilterFacet ? "filter" : "facet_filter"] = Build(combinedFilter);
+                namedBody[facet is FilterFacet ? "filter" : "facet_filter"] = Build(combinedFilter);
 
-            return new JProperty(facet.Name, body);
+            return new JProperty(facet.Name, namedBody);
         }
 
         private static JToken Build(IFacet facet)

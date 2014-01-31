@@ -4,16 +4,18 @@ using ElasticLinq.Request.Criteria;
 
 namespace ElasticLinq.Request.Facets
 {
-    internal class TermsStatsFacet : IFacet
+    internal class TermsStatsFacet : IOrderableFacet
     {
         private readonly string name;
         private readonly ICriteria criteria;
         private readonly string key;
         private readonly string value;
+        private readonly int? size;
 
-        public TermsStatsFacet(string name, string key, string value)
+        public TermsStatsFacet(string name, string key, string value, int? size)
             : this(name, null, key, value)
         {
+            this.size = size;
         }
 
         public TermsStatsFacet(string name, ICriteria criteria, string key, string value)
@@ -29,5 +31,6 @@ namespace ElasticLinq.Request.Facets
         public ICriteria Filter { get { return criteria; } }
         public string Key { get { return key; } }
         public string Value { get { return value; } }
+        public int? Size { get { return size; } }
     }
 }

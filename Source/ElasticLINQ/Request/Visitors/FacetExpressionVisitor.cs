@@ -42,6 +42,7 @@ namespace ElasticLinq.Request.Visitors
         private readonly ParameterExpression bindingParameter = Expression.Parameter(typeof(AggregateRow), "r");
 
         private Expression groupBy;
+        private int? size;
         private LambdaExpression selectProjection;
 
         private FacetExpressionVisitor(IElasticMapping mapping)
@@ -72,10 +73,10 @@ namespace ElasticLinq.Request.Visitors
                     {
                         var groupByField = Mapping.GetFieldName(((MemberExpression)groupBy).Member);
                         foreach (var valueField in aggregateMembers.Select(member => Mapping.GetFieldName(member)))
-                            yield return new TermsStatsFacet(valueField, groupByField, valueField);
+                            yield return new TermsStatsFacet(valueField, groupByField, valueField, size);
 
                         foreach (var criteria in aggregateCriteria)
-                            yield return new TermsFacet(criteria.Key, criteria.Value, groupByField);
+                            yield return new TermsFacet(criteria.Key, criteria.Value, size, groupByField);
 
                         break;
                     }
@@ -122,6 +123,9 @@ namespace ElasticLinq.Request.Visitors
                     return Visit(source);
                 }
 
+                if (m.Method.Name == "Take" && m.Arguments.Count == 2)
+                    return VisitTake(m.Arguments[0], m.Arguments[1]);
+
                 string operation;
                 if (aggregateOperations.TryGetValue(m.Method.Name, out operation))
                     switch (m.Arguments.Count)
@@ -137,6 +141,17 @@ namespace ElasticLinq.Request.Visitors
             }
 
             return base.VisitMethodCall(m);
+        }
+
+        private Expression VisitTake(Expression source, Expression takeExpression)
+        {
+            var takeConstant = Visit(takeExpression) as ConstantExpression;
+            if (takeConstant != null)
+            {
+                var takeValue = (int)takeConstant.Value;
+                size = size.HasValue ? Math.Min(size.GetValueOrDefault(), takeValue) : takeValue;
+            }
+            return Visit(source);
         }
 
         private Expression VisitAggregateGroupPredicateOperation(Expression predicate, string operation, Type returnType)

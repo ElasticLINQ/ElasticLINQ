@@ -10,4 +10,9 @@ namespace ElasticLinq.Request.Facets
         string Type { get; }
         ICriteria Filter { get; }
     }
+
+    internal interface IOrderableFacet : IFacet
+    {
+        int? Size { get; }
+    }
 }
