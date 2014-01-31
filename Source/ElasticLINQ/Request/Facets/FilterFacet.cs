@@ -7,14 +7,16 @@ namespace ElasticLinq.Request.Facets
     internal class FilterFacet : IFacet
     {
         private readonly string name;
+        private readonly ICriteria filter;
 
-        public FilterFacet(string name)
+        public FilterFacet(string name, ICriteria filter)
         {
             this.name = name;
+            this.filter = filter;
         }
 
         public string Type { get { return "filter"; } }
         public string Name { get { return name; } }
-        public ICriteria Filter { get; set; }
+        public ICriteria Filter { get { return filter; } }
     }
 }

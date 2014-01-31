@@ -38,7 +38,7 @@ namespace ElasticLinq.Request.Visitors
         };
 
         private readonly HashSet<MemberInfo> aggregateMembers = new HashSet<MemberInfo>();
-        private readonly Dictionary<string, ICriteria> aggregateCriteria = new Dictionary<string, ICriteria>(); 
+        private readonly Dictionary<string, ICriteria> aggregateCriteria = new Dictionary<string, ICriteria>();
         private readonly ParameterExpression bindingParameter = Expression.Parameter(typeof(AggregateRow), "r");
 
         private Expression groupBy;
@@ -75,7 +75,7 @@ namespace ElasticLinq.Request.Visitors
                             yield return new TermsStatsFacet(valueField, groupByField, valueField);
 
                         foreach (var criteria in aggregateCriteria)
-                            yield return new TermsFacet(criteria.Key, groupByField) { Filter = criteria.Value };
+                            yield return new TermsFacet(criteria.Key, criteria.Value, groupByField);
 
                         break;
                     }
@@ -85,7 +85,7 @@ namespace ElasticLinq.Request.Visitors
                             yield return new StatisticalFacet(valueField, valueField);
 
                         foreach (var criteria in aggregateCriteria)
-                            yield return new FilterFacet(criteria.Key) { Filter = criteria.Value };
+                            yield return new FilterFacet(criteria.Key, criteria.Value);
 
                         break;
                     }
