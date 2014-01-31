@@ -42,7 +42,7 @@ namespace ElasticLinq.Request
         {
             var formatter = new PostBodyRequestFormatter(connection, searchRequest);
             log.Debug(null, null, "Request: POST {0}", formatter.Uri);
-            log.Debug(null, null, "Body: {0}", formatter.Body);
+            log.Debug(null, null, "Body: \n{0}", formatter.Body);
 
             using (var httpClient = new HttpClient(new ForcedAuthHandler(connection.UserName, connection.Password, innerMessageHandler)) { Timeout = connection.Timeout })
                 return await retryPolicy.ExecuteAsync(
