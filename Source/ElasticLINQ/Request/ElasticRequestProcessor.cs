@@ -81,10 +81,15 @@ namespace ElasticLinq.Request
             using (var textReader = new JsonTextReader(streamReader))
             {
                 var results = new JsonSerializer().Deserialize<ElasticResponse>(textReader);
-                var resultCount = results == null ? 0 : results.hits.hits.Count;
                 stopwatch.Stop();
 
-                log.Debug(null, null, "De-serialized {0} bytes into {1} hits in {2}ms", responseStream.Length, resultCount, stopwatch.ElapsedMilliseconds);
+                if (results != null)
+                {
+                    var resultMessage = results.hits.hits.Count > 0
+                        ? results.hits.hits.Count + " hits"
+                        : results.facets.Count + " facets";
+                    log.Debug(null, null, "De-serialized {0} bytes into {1} in {2}ms", responseStream.Length, resultMessage, stopwatch.ElapsedMilliseconds);
+                }
 
                 return results;
             }
