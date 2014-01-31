@@ -16,8 +16,8 @@ namespace TestConsoleApp
             var context = new ElasticContext(new ElasticConnection(uri) { Index = "tier3" }, new CouchbaseElasticMapping(), new ConsoleLog());
 
             AggregateQueries();
-            //DocumentQueries(context);
-            //BasicSampleQueries(context);
+            DocumentQueries(context);
+            BasicSampleQueries(context);
 
             Console.Write("\n\nComplete.");
             Console.ReadKey();

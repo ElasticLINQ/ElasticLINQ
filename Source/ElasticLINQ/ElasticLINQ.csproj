@@ -77,7 +77,8 @@
     <Compile Include="Request\Facets\TermsStatsFacet.cs" />
     <Compile Include="Request\Formatters\PostBodyRequestFormatter.cs" />
     <Compile Include="Request\Formatters\RequestFormatter.cs" />
-    <Compile Include="Request\Visitors\AggregateExpressionVisitor.cs" />
+    <Compile Include="Request\Visitors\FacetExpressionVisitor.cs" />
+    <Compile Include="Request\Visitors\CriteriaExpressionVisitor.cs" />
     <Compile Include="Response\Materializers\Aggregates.cs" />
     <Compile Include="Response\Materializers\ElasticFacetsMaterializer.cs" />
     <Compile Include="Response\Materializers\ElasticOneHitMaterializer.cs" />

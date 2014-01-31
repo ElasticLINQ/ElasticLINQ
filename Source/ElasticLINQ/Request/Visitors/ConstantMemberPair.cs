@@ -1,8 +1,8 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using ElasticLinq.Utility;
 using System;
 using System.Diagnostics;
-using ElasticLinq.Utility;
 using System.Linq.Expressions;
 
 namespace ElasticLinq.Request.Visitors

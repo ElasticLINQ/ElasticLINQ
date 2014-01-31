@@ -8,11 +8,9 @@ using ElasticLinq.Response.Materializers;
 using ElasticLinq.Response.Model;
 using ElasticLinq.Utility;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 
 namespace ElasticLinq.Request.Visitors
 {
@@ -20,10 +18,9 @@ namespace ElasticLinq.Request.Visitors
     /// Expression visitor to translate a LINQ query into a <see cref="ElasticTranslateResult"/>
     /// that captures remote and local semantics.
     /// </summary>
-    internal class ElasticQueryTranslator : ExpressionVisitor
+    internal class ElasticQueryTranslator : CriteriaExpressionVisitor
     {
         private readonly ElasticSearchRequest searchRequest = new ElasticSearchRequest();
-        private readonly IElasticMapping mapping;
 
         private Type sourceType;
         private Type finalItemType;
@@ -31,8 +28,8 @@ namespace ElasticLinq.Request.Visitors
         private IElasticMaterializer materializer;
 
         private ElasticQueryTranslator(IElasticMapping mapping)
+            : base(mapping)
         {
-            this.mapping = new ElasticFieldsMappingWrapper(mapping);
         }
 
         internal static ElasticTranslateResult Translate(IElasticMapping mapping, Expression e)
@@ -43,7 +40,7 @@ namespace ElasticLinq.Request.Visitors
         private ElasticTranslateResult Translate(Expression e)
         {
             var evaluated = PartialEvaluator.Evaluate(e);
-            var aggregated = AggregateExpressionVisitor.Rebind(mapping, evaluated);
+            var aggregated = FacetExpressionVisitor.Rebind(Mapping, evaluated);
 
             if (aggregated.Collected.Count > 0)
                 CompleteFacetTranslation(aggregated);
@@ -56,10 +53,10 @@ namespace ElasticLinq.Request.Visitors
         private void CompleteHitTranslation(Expression evaluated)
         {
             Visit(evaluated);
-            searchRequest.Type = mapping.GetTypeName(sourceType);
+            searchRequest.Type = Mapping.GetTypeName(sourceType);
 
             if (searchRequest.Filter == null && searchRequest.Query == null)
-                searchRequest.Filter = mapping.GetTypeSelectionCriteria(sourceType);
+                searchRequest.Filter = Mapping.GetTypeSelectionCriteria(sourceType);
 
             if (materializer == null)
                 materializer = new ElasticManyHitsMaterializer(itemProjector ?? DefaultItemProjector, finalItemType ?? sourceType);
@@ -68,7 +65,7 @@ namespace ElasticLinq.Request.Visitors
         private void CompleteFacetTranslation(RebindCollectionResult<IFacet> aggregated)
         {
             Visit(aggregated.Expression);
-            searchRequest.Type = mapping.GetTypeName(sourceType);
+            searchRequest.Type = Mapping.GetTypeName(sourceType);
 
             searchRequest.Facets = aggregated.Collected.ToList();
             searchRequest.SearchType = "count"; // We only want facets, not hits
@@ -80,105 +77,16 @@ namespace ElasticLinq.Request.Visitors
             if (m.Method.DeclaringType == typeof(Queryable))
                 return VisitQueryableMethodCall(m);
 
-            if (m.Method.DeclaringType == typeof(Enumerable))
-                return VisitEnumerableMethodCall(m);
-
             if (m.Method.DeclaringType == typeof(ElasticQueryExtensions))
                 return VisitElasticQueryExtensionsMethodCall(m);
 
             if (m.Method.DeclaringType == typeof(ElasticMethods))
                 return VisitElasticMethodsMethodCall(m);
 
-            return VisitCommonMethodCall(m);
-        }
+            if (m.Method.Name == "Create")
+                return m;
 
-        private Expression VisitElasticMethodsMethodCall(MethodCallExpression m)
-        {
-            switch (m.Method.Name)
-            {
-                case "Regexp":
-                    if (m.Arguments.Count == 2)
-                        return VisitRegexp(m.Arguments[0], m.Arguments[1]);
-                    break;
-
-                case "Prefix":
-                    if (m.Arguments.Count == 2)
-                        return VisitPrefix(m.Arguments[0], m.Arguments[1]);
-                    break;
-            }
-
-            throw new NotSupportedException(string.Format("The ElasticMethods method '{0}' is not supported", m.Method.Name));
-        }
-
-        private Expression VisitPrefix(Expression left, Expression right)
-        {
-            var cm = ConstantMemberPair.Create(left, right);
-
-            if (cm != null)
-                return new CriteriaExpression(new PrefixCriteria(mapping.GetFieldName(cm.MemberExpression.Member), cm.ConstantExpression.Value));
-
-            throw new NotSupportedException("Prefix must be between a Member and a Constant");
-        }
-
-        private Expression VisitRegexp(Expression left, Expression right)
-        {
-            var cm = ConstantMemberPair.Create(left, right);
-
-            if (cm != null)
-                return new CriteriaExpression(new RegexpCriteria(mapping.GetFieldName(cm.MemberExpression.Member), cm.ConstantExpression.Value.ToString()));
-
-            throw new NotSupportedException("Regexp must be between a Member and a Constant");
-        }
-
-        private Expression VisitCommonMethodCall(MethodCallExpression m)
-        {
-            switch (m.Method.Name)
-            {
-                case "Equals":
-                    if (m.Arguments.Count == 1)
-                        return VisitEquals(Visit(m.Object), Visit(m.Arguments[0]));
-                    if (m.Arguments.Count == 2)
-                        return VisitEquals(Visit(m.Arguments[0]), Visit(m.Arguments[1]));
-                    break;
-
-                case "Contains":
-                    if (TypeHelper.FindIEnumerable(m.Method.DeclaringType) != null)
-                        return VisitEnumerableContainsMethodCall(m.Object, m.Arguments[0]);
-                    break;
-
-                case "Create":
-                    return m;
-            }
-
-            throw new NotSupportedException(string.Format("The method '{0}' is not supported", m.Method.Name));
-        }
-
-        private Expression VisitEnumerableMethodCall(MethodCallExpression m)
-        {
-            switch (m.Method.Name)
-            {
-                case "Contains":
-                    if (m.Arguments.Count == 2)
-                        return VisitEnumerableContainsMethodCall(m.Arguments[0], m.Arguments[1]);
-                    break;
-            }
-
-            throw new NotSupportedException(string.Format("The Enumerable method '{0}' is not supported", m.Method.Name));
-        }
-
-        private Expression VisitEnumerableContainsMethodCall(Expression source, Expression match)
-        {
-            var property = Visit(match);
-
-            if (source is ConstantExpression && property is MemberExpression)
-            {
-                var field = mapping.GetFieldName(((MemberExpression)property).Member);
-                var containsSource = ((IEnumerable)((ConstantExpression)source).Value).Cast<object>();
-                var values = new List<object>(containsSource);
-                return new CriteriaExpression(TermCriteria.FromIEnumerable(field, values.Distinct()));
-            }
-
-            throw new NotSupportedException(string.Format("Unknown source '{0}' for Contains operation", source));
+            return base.VisitMethodCall(m);
         }
 
         internal Expression VisitElasticQueryExtensionsMethodCall(MethodCallExpression m)
@@ -355,181 +263,13 @@ namespace ElasticLinq.Request.Visitors
             return Visit(source);
         }
 
-        private static ICriteria ApplyCriteria(ICriteria currentRoot, ICriteria newCriteria)
-        {
-            return currentRoot == null
-                ? newCriteria
-                : AndCriteria.Combine(currentRoot, newCriteria);
-        }
-
-        protected override Expression VisitBinary(BinaryExpression b)
-        {
-            switch (b.NodeType)
-            {
-                case ExpressionType.OrElse:
-                    return VisitOrElse(b);
-
-                case ExpressionType.AndAlso:
-                    return VisitAndAlso(b);
-
-                case ExpressionType.Equal:
-                case ExpressionType.NotEqual:
-                case ExpressionType.GreaterThan:
-                case ExpressionType.GreaterThanOrEqual:
-                case ExpressionType.LessThan:
-                case ExpressionType.LessThanOrEqual:
-                    return VisitComparisonBinary(b);
-
-                default:
-                    throw new NotSupportedException(string.Format("The binary expression '{0}' is not supported", b.NodeType));
-            }
-        }
-
-        private Expression VisitAndAlso(BinaryExpression b)
-        {
-            var criteria = AssertExpressionsOfType<CriteriaExpression>(b.Left, b.Right).Select(f => f.Criteria).ToArray();
-            return new CriteriaExpression(AndCriteria.Combine(criteria));
-        }
-
-        private Expression VisitOrElse(BinaryExpression b)
-        {
-            var criteria = AssertExpressionsOfType<CriteriaExpression>(b.Left, b.Right).Select(f => f.Criteria).ToArray();
-            return new CriteriaExpression(OrCriteria.Combine(criteria));
-        }
-
-        private IEnumerable<T> AssertExpressionsOfType<T>(params Expression[] expressions) where T : Expression
-        {
-            foreach (var expression in expressions.Select(BooleanMemberAccessBecomesEquals))
-            {
-                var reducedExpression = expression is CriteriaExpression ? expression : Visit(expression);
-                if ((reducedExpression as T) == null)
-                    throw new NotSupportedException(string.Format("Unexpected binary expression '{0}'", reducedExpression));
-
-                yield return (T)reducedExpression;
-            }
-        }
-
-        private Expression BooleanMemberAccessBecomesEquals(Expression e)
-        {
-            var wasNegative = e.NodeType == ExpressionType.Not;
-
-            if (e is UnaryExpression)
-                e = Visit(((UnaryExpression)e).Operand);
-
-            if (e is MemberExpression && e.Type == typeof(bool))
-                return Visit(Expression.Equal(e, Expression.Constant(!wasNegative)));
-
-            return e;
-        }
-
-        private Expression VisitComparisonBinary(BinaryExpression b)
-        {
-            var left = Visit(b.Left);
-            var right = Visit(b.Right);
-
-            switch (b.NodeType)
-            {
-                case ExpressionType.Equal:
-                    return VisitEquals(left, right);
-
-                case ExpressionType.NotEqual:
-                    return VisitNotEqual(left, right);
-
-                case ExpressionType.GreaterThan:
-                case ExpressionType.GreaterThanOrEqual:
-                case ExpressionType.LessThan:
-                case ExpressionType.LessThanOrEqual:
-                    return VisitRange(b.NodeType, left, right);
-
-                default:
-                    throw new NotSupportedException(string.Format("The binary expression '{0}' is not supported", b.NodeType));
-            }
-        }
-
-        private Expression CreateExists(ConstantMemberPair cm, bool positiveTest)
-        {
-            var fieldName = mapping.GetFieldName(UnwrapNullableMethodExpression(cm.MemberExpression));
-
-            var value = cm.ConstantExpression.Value ?? false;
-
-            if (value.Equals(positiveTest))
-                return new CriteriaExpression(new ExistsCriteria(fieldName));
-
-            if (value.Equals(!positiveTest))
-                return new CriteriaExpression(new MissingCriteria(fieldName));
-
-            throw new NotSupportedException("A null test Expression must have a member being compared to a bool or null");
-        }
-
-        private Expression VisitEquals(Expression left, Expression right)
-        {
-            var cm = ConstantMemberPair.Create(left, right);
-
-            if (cm != null)
-                return cm.IsNullTest
-                    ? CreateExists(cm, true)
-                    : new CriteriaExpression(new TermCriteria(mapping.GetFieldName(cm.MemberExpression.Member), cm.ConstantExpression.Value));
-
-            throw new NotSupportedException("Equality must be between a Member and a Constant");
-        }
-
-        private static MemberInfo UnwrapNullableMethodExpression(MemberExpression m)
-        {
-            if (m.Expression is MemberExpression)
-                return ((MemberExpression)(m.Expression)).Member;
-
-            return m.Member;
-        }
-
-        private Expression VisitNotEqual(Expression left, Expression right)
-        {
-            var cm = ConstantMemberPair.Create(left, right);
-
-            if (cm != null)
-                return cm.IsNullTest
-                    ? CreateExists(cm, false)
-                    : new CriteriaExpression(NotCriteria.Create(new TermCriteria(mapping.GetFieldName(cm.MemberExpression.Member), cm.ConstantExpression.Value)));
-
-            throw new NotSupportedException("A not-equal expression must consist of a constant and a member");
-        }
-
-        private Expression VisitRange(ExpressionType t, Expression left, Expression right)
-        {
-            var cm = ConstantMemberPair.Create(left, right);
-
-            if (cm != null)
-            {
-                var field = mapping.GetFieldName(cm.MemberExpression.Member);
-                return new CriteriaExpression(new RangeCriteria(field, ExpressionTypeToRangeType(t), cm.ConstantExpression.Value));
-            }
-
-            throw new NotSupportedException("A range must consist of a constant and a member");
-        }
-
-        private static RangeComparison ExpressionTypeToRangeType(ExpressionType expressionType)
-        {
-            switch (expressionType)
-            {
-                case ExpressionType.GreaterThan:
-                    return RangeComparison.GreaterThan;
-                case ExpressionType.GreaterThanOrEqual:
-                    return RangeComparison.GreaterThanOrEqual;
-                case ExpressionType.LessThan:
-                    return RangeComparison.LessThan;
-                case ExpressionType.LessThanOrEqual:
-                    return RangeComparison.LessThanOrEqual;
-            }
-
-            throw new ArgumentOutOfRangeException("expressionType");
-        }
-
         private Expression VisitOrderBy(Expression source, Expression orderByExpression, bool ascending)
         {
             var lambda = orderByExpression.GetLambda();
             var final = Visit(lambda.Body) as MemberExpression;
             if (final != null)
             {
-                var fieldName = mapping.GetFieldName(final.Member);
+                var fieldName = Mapping.GetFieldName(final.Member);
                 var ignoreUnmapped = final.Type.IsNullable();
                 searchRequest.SortOptions.Insert(0, new SortOption(fieldName, ascending, ignoreUnmapped));
             }
@@ -579,7 +319,7 @@ namespace ElasticLinq.Request.Visitors
         /// <param name="entityParameter">Parameter that references the whole entity.</param>
         private void RebindElasticFieldsAndChainProjector(Expression selectExpression, ParameterExpression entityParameter)
         {
-            var projection = ElasticFieldsExpressionVisitor.Rebind(mapping, selectExpression);
+            var projection = ElasticFieldsExpressionVisitor.Rebind(Mapping, selectExpression);
             var compiled = Expression.Lambda(projection.Item1, entityParameter, projection.Item2).Compile();
             itemProjector = h => compiled.DynamicInvoke(DefaultItemProjector(h), h);
         }
@@ -591,7 +331,7 @@ namespace ElasticLinq.Request.Visitors
         /// <param name="selectExpression">Select expression to rebind.</param>
         private void RebindPropertiesAndElasticFields(Expression selectExpression)
         {
-            var projection = MemberProjectionExpressionVisitor.Rebind(mapping, selectExpression);
+            var projection = MemberProjectionExpressionVisitor.Rebind(Mapping, selectExpression);
             var compiled = Expression.Lambda(projection.Expression, projection.Parameter).Compile();
             itemProjector = h => compiled.DynamicInvoke(h);
             searchRequest.Fields.AddRange(projection.Collected);
@@ -622,7 +362,7 @@ namespace ElasticLinq.Request.Visitors
 
         private Func<Hit, Object> DefaultItemProjector
         {
-            get { return hit => mapping.GetObjectSource(sourceType, hit).ToObject(sourceType); }
+            get { return hit => Mapping.GetObjectSource(sourceType, hit).ToObject(sourceType); }
         }
     }
 }

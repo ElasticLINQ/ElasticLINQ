@@ -15,7 +15,7 @@ namespace ElasticLinq.Request.Visitors
     /// <summary>
     /// Gathers and rebinds aggregate operations into ElasticSearch facets.
     /// </summary>
-    internal class AggregateExpressionVisitor : ExpressionVisitor
+    internal class FacetExpressionVisitor : ExpressionVisitor
     {
         private const string GroupKeyTermsName = "GroupKey";
         private static readonly MethodInfo getValue = typeof(AggregateRow).GetMethod("GetValue", BindingFlags.Static | BindingFlags.NonPublic);
@@ -43,7 +43,7 @@ namespace ElasticLinq.Request.Visitors
         private LambdaExpression selectProjection;
         private bool includeGroupKeyTerms;
 
-        private AggregateExpressionVisitor(IElasticMapping mapping)
+        private FacetExpressionVisitor(IElasticMapping mapping)
         {
             this.mapping = mapping;
         }
@@ -53,7 +53,7 @@ namespace ElasticLinq.Request.Visitors
             Argument.EnsureNotNull("mapping", mapping);
             Argument.EnsureNotNull("expression", expression);
 
-            var visitor = new AggregateExpressionVisitor(mapping);
+            var visitor = new FacetExpressionVisitor(mapping);
             var visitedExpression = visitor.Visit(expression);
             var facets = new HashSet<IFacet>(visitor.GetFacets());
 
