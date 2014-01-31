@@ -15,6 +15,7 @@ namespace ElasticLinq.Response.Materializers
     internal class ElasticFacetsMaterializer : IElasticMaterializer
     {
         private static readonly string[] termsFacetTypes = { "terms_stats", "terms" };
+        private static readonly string[] termlessFacetTypes = { "statistical", "filter" };
 
         private static readonly MethodInfo manyMethodInfo =
             typeof(ElasticFacetsMaterializer).GetMethod("Many", BindingFlags.NonPublic | BindingFlags.Static);
@@ -43,8 +44,8 @@ namespace ElasticLinq.Response.Materializers
                 if (termsStats.Any())
                     return FlattenTermsStatsToAggregateRows(termsStats).Select(projector).Cast<T>().ToList();
 
-                var statistical = facets.Values().Where(x => x["_type"].ToString() == "statistical").ToList();
-                if (statistical.Any())
+                var termlessStats = facets.Values().Where(x => termlessFacetTypes.Contains(x["_type"].ToString())).ToList();
+                if (termlessStats.Any())
                     return Enumerable.Range(1, 1)
                         .Select(r => new AggregateStatisticalRow(facets))
                         .Select(projector)
