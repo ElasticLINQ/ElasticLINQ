@@ -1,6 +1,8 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using ElasticLinq.Mapping;
+using ElasticLinq.Request.Criteria;
+using ElasticLinq.Request.Expressions;
 using ElasticLinq.Request.Facets;
 using ElasticLinq.Response.Materializers;
 using ElasticLinq.Utility;
@@ -15,9 +17,9 @@ namespace ElasticLinq.Request.Visitors
     /// <summary>
     /// Gathers and rebinds aggregate operations into ElasticSearch facets.
     /// </summary>
-    internal class FacetExpressionVisitor : ExpressionVisitor
+    internal class FacetExpressionVisitor : CriteriaExpressionVisitor
     {
-        private const string GroupKeyTermsName = "GroupKey";
+        private const string GroupKeyFacetFormat = "GroupKey.{0}";
         private static readonly MethodInfo getValue = typeof(AggregateRow).GetMethod("GetValue", BindingFlags.Static | BindingFlags.NonPublic);
         private static readonly MethodInfo getKey = typeof(AggregateRow).GetMethod("GetKey", BindingFlags.Static | BindingFlags.NonPublic);
 
@@ -36,16 +38,15 @@ namespace ElasticLinq.Request.Visitors
         };
 
         private readonly HashSet<MemberInfo> aggregateMembers = new HashSet<MemberInfo>();
+        private readonly Dictionary<string, ICriteria> aggregateCriteria = new Dictionary<string, ICriteria>(); 
         private readonly ParameterExpression bindingParameter = Expression.Parameter(typeof(AggregateRow), "r");
-        private readonly IElasticMapping mapping;
 
         private Expression groupBy;
         private LambdaExpression selectProjection;
-        private bool includeGroupKeyTerms;
 
         private FacetExpressionVisitor(IElasticMapping mapping)
+            : base(mapping)
         {
-            this.mapping = mapping;
         }
 
         internal static RebindCollectionResult<IFacet> Rebind(IElasticMapping mapping, Expression expression)
@@ -68,22 +69,23 @@ namespace ElasticLinq.Request.Visitors
             switch (groupBy.NodeType)
             {
                 case ExpressionType.MemberAccess:
-                {
-                    var groupByField = mapping.GetFieldName(((MemberExpression)groupBy).Member);
-                    foreach (var valueField in aggregateMembers.Select(member => mapping.GetFieldName(member)))
-                        yield return new TermsStatsFacet(valueField, groupByField, valueField);
+                    {
+                        var groupByField = Mapping.GetFieldName(((MemberExpression)groupBy).Member);
+                        foreach (var valueField in aggregateMembers.Select(member => Mapping.GetFieldName(member)))
+                            yield return new TermsStatsFacet(valueField, groupByField, valueField);
 
-                    if (includeGroupKeyTerms)
-                        yield return new TermsFacet(GroupKeyTermsName, groupByField);
+                        foreach (var criteria in aggregateCriteria)
+                            yield return new TermsFacet(criteria.Key, groupByField) { Filter = criteria.Value };
 
-                    break;
-                }
+                        break;
+                    }
                 case ExpressionType.Constant:
-                {
-                    foreach (var valueField in aggregateMembers.Select(member => mapping.GetFieldName(member)))
-                        yield return new StatisticalFacet(valueField, valueField);
-                    break;
-                }
+                    {
+                        foreach (var valueField in aggregateMembers.Select(member => Mapping.GetFieldName(member)))
+                            yield return new StatisticalFacet(valueField, valueField);
+
+                        break;
+                    }
 
                 default:
                     throw new NotSupportedException(String.Format("GroupBy must be either a Member or a Constant not {0}", groupBy.NodeType));
@@ -102,25 +104,50 @@ namespace ElasticLinq.Request.Visitors
         {
             if (m.Method.DeclaringType == typeof(Enumerable) || m.Method.DeclaringType == typeof(Queryable))
             {
+                var source = m.Arguments[0];
+
                 if (m.Method.Name == "GroupBy" && m.Arguments.Count == 2)
+                {
                     groupBy = m.Arguments[1].GetLambda().Body;
+                    return Visit(source);
+                }
 
                 if (m.Method.Name == "Select" && m.Arguments.Count == 2)
                 {
                     var y = Visit(m.Arguments[1]).GetLambda();
                     selectProjection = Expression.Lambda(y.Body, bindingParameter);
-                    return Visit(m.Arguments[0]);
+                    return Visit(source);
                 }
 
                 string operation;
-                if (aggregateOperations.TryGetValue(m.Method.Name, out operation) && m.Arguments.Count == 1)
-                    return VisitAggregateGroupOperation(operation, m.Method.ReturnType);
+                if (aggregateOperations.TryGetValue(m.Method.Name, out operation))
+                    switch (m.Arguments.Count)
+                    {
+                        case 1:
+                            return VisitAggregateGroupOperation(operation, m.Method.ReturnType);
+                        case 2:
+                            return VisitAggregateGroupPredicateOperation(m.Arguments[1], operation, m.Method.ReturnType);
+                    }
 
                 if (aggregateMemberOperations.TryGetValue(m.Method.Name, out operation) && m.Arguments.Count == 2)
                     return VisitAggregateMemberOperation(m.Arguments[1], operation, m.Method.ReturnType);
             }
 
             return base.VisitMethodCall(m);
+        }
+
+        private Expression VisitAggregateGroupPredicateOperation(Expression predicate, string operation, Type returnType)
+        {
+            var lambda = predicate.GetLambda();
+            var body = BooleanMemberAccessBecomesEquals(Visit(lambda.Body));
+
+            var criteriaExpression = body as CriteriaExpression;
+            if (criteriaExpression == null)
+                throw new NotSupportedException(string.Format("Unknown Aggregate predicate '{0}'", body));
+
+            var facetName = String.Format(GroupKeyFacetFormat, aggregateCriteria.Count + 1);
+            aggregateCriteria.Add(facetName, criteriaExpression.Criteria);
+            return RebindValue(facetName, operation, returnType);
         }
 
         private Expression VisitGroupKeyAccess(Type returnType)
@@ -131,15 +158,14 @@ namespace ElasticLinq.Request.Visitors
 
         private Expression VisitAggregateGroupOperation(string operation, Type returnType)
         {
-            includeGroupKeyTerms = true;
-            return RebindValue(GroupKeyTermsName, operation, returnType);
+            return RebindValue(GroupKeyFacetFormat, operation, returnType);
         }
 
         private Expression VisitAggregateMemberOperation(Expression property, string operation, Type returnType)
         {
             var member = GetMemberInfoFromLambda(property);
             aggregateMembers.Add(member);
-            return RebindValue(mapping.GetFieldName(member), operation, returnType);
+            return RebindValue(Mapping.GetFieldName(member), operation, returnType);
         }
 
         private Expression RebindValue(string valueField, string operation, Type returnType)

@@ -34,7 +34,22 @@ namespace ElasticLinq.Request.Visitors
             if (m.Method.DeclaringType == typeof(ElasticMethods))
                 return VisitElasticMethodsMethodCall(m);
 
-            return VisitCommonMethodCall(m);
+            switch (m.Method.Name)
+            {
+                case "Equals":
+                    if (m.Arguments.Count == 1)
+                        return VisitEquals(Visit(m.Object), Visit(m.Arguments[0]));
+                    if (m.Arguments.Count == 2)
+                        return VisitEquals(Visit(m.Arguments[0]), Visit(m.Arguments[1]));
+                    break;
+
+                case "Contains":
+                    if (TypeHelper.FindIEnumerable(m.Method.DeclaringType) != null)
+                        return VisitEnumerableContainsMethodCall(m.Object, m.Arguments[0]);
+                    break;
+            }
+
+            return base.VisitMethodCall(m);
         }
 
         protected static ICriteria ApplyCriteria(ICriteria currentRoot, ICriteria newCriteria)
@@ -60,26 +75,6 @@ namespace ElasticLinq.Request.Visitors
             }
 
             throw new NotSupportedException(string.Format("The ElasticMethods method '{0}' is not supported", m.Method.Name));
-        }
-
-        protected Expression VisitCommonMethodCall(MethodCallExpression m)
-        {
-            switch (m.Method.Name)
-            {
-                case "Equals":
-                    if (m.Arguments.Count == 1)
-                        return VisitEquals(Visit(m.Object), Visit(m.Arguments[0]));
-                    if (m.Arguments.Count == 2)
-                        return VisitEquals(Visit(m.Arguments[0]), Visit(m.Arguments[1]));
-                    break;
-
-                case "Contains":
-                    if (TypeHelper.FindIEnumerable(m.Method.DeclaringType) != null)
-                        return VisitEnumerableContainsMethodCall(m.Object, m.Arguments[0]);
-                    break;
-            }
-
-            throw new NotSupportedException(string.Format("The method '{0}' is not supported", m.Method.Name));
         }
 
         protected Expression VisitEnumerableMethodCall(MethodCallExpression m)
