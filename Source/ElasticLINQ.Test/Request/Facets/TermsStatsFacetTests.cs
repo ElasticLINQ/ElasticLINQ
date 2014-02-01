@@ -82,11 +82,11 @@ namespace ElasticLinq.Test.Request.Facets
         }
 
         [Fact]
-        public void TypePropertyIsAlwaysStatistical()
+        public void TypePropertyIsAlwaysTermStats()
         {
-            var facet = new TermsFacet(ExpectedName, ExpectedValue);
+            var facet = new TermsStatsFacet(ExpectedName, ExpectedKey, ExpectedValue, 1);
 
-            Assert.Equal("terms", facet.Type);
+            Assert.Equal("terms_stats", facet.Type);
         }
     }
 }
