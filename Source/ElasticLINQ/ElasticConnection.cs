@@ -20,18 +20,9 @@ namespace ElasticLinq
         private TimeSpan timeout = defaultTimeout;
         private readonly string userName;
 
-        public ElasticConnection(Uri endpoint)
+        public ElasticConnection(Uri endpoint, string userName = null, string password = null)
         {
             Argument.EnsureNotNull("endpoint", endpoint);
-
-            this.endpoint = endpoint;
-        }
-
-        public ElasticConnection(Uri endpoint, string userName, string password)
-            : this(endpoint)
-        {
-            Argument.EnsureNotBlank("userName", userName);
-            Argument.EnsureNotBlank("password", password);
 
             this.endpoint = endpoint;
             this.userName = userName;
