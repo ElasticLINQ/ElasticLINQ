@@ -3,9 +3,17 @@
 using ElasticLinq.Request.Criteria;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using ElasticLinq.Utility;
 
 namespace ElasticLinq.Request.Facets
 {
+    /// <summary>
+    /// Represents a terms facet in ElasticSearch.
+    /// Terms facets return count information for terms.
+    /// </summary>
+    /// <remarks>
+    /// Mapped to .GroupBy(a => a.Something).Select(a => a.Count())
+    /// </remarks>
     internal class TermsFacet : IOrderableFacet
     {
         private readonly string name;
@@ -20,6 +28,9 @@ namespace ElasticLinq.Request.Facets
 
         public TermsFacet(string name, ICriteria criteria, int? size, params string[] fields)
         {
+            Argument.EnsureNotBlank("name", name);
+            Argument.EnsureNotEmpty("fields", fields);
+
             this.name = name;
             this.criteria = criteria;
             this.size = size;

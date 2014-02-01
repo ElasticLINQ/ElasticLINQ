@@ -68,6 +68,7 @@
     <Compile Include="Mapping\TrivialElasticMappingTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Request\ElasticSearchRequestTests.cs" />
+    <Compile Include="Request\Expressions\FacetExpressionTests.cs" />
     <Compile Include="Request\Expressions\CriteriaExpressionTests.cs" />
     <Compile Include="Request\Criteria\AndCriteriaTests.cs" />
     <Compile Include="Request\Criteria\MissingCriteriaTests.cs" />
@@ -76,6 +77,10 @@
     <Compile Include="Request\Criteria\NotCriteriaTests.cs" />
     <Compile Include="Request\Criteria\ExistsCriteriaTests.cs" />
     <Compile Include="Request\Criteria\TermCriteriaTests.cs" />
+    <Compile Include="Request\Facets\StatisticalFacetTests.cs" />
+    <Compile Include="Request\Facets\TermsStatsFacetTests.cs" />
+    <Compile Include="Request\Facets\TermsFacetTests.cs" />
+    <Compile Include="Request\Facets\FilterFacetTests.cs" />
     <Compile Include="Request\Formatters\PostBodyRequestFormatterTests.cs" />
     <Compile Include="Request\Formatters\RequestFormatterTests.cs" />
     <Compile Include="Request\SortOptionTests.cs" />

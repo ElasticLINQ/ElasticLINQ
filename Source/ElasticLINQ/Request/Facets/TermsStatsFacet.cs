@@ -1,9 +1,18 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using ElasticLinq.Request.Criteria;
+using ElasticLinq.Utility;
 
 namespace ElasticLinq.Request.Facets
 {
+    /// <summary>
+    /// Represents a terms_stats facet in ElasticSearch.
+    /// Terms_stats facets return all statistical information for
+    /// a given field broken down by a term. 
+    /// </summary>
+    /// <remarks>
+    /// Mapped to .GroupBy(a => a.Term).Select(a => a.Sum(b => b.Field))
+    /// </remarks>
     internal class TermsStatsFacet : IOrderableFacet
     {
         private readonly string name;
@@ -20,6 +29,10 @@ namespace ElasticLinq.Request.Facets
 
         public TermsStatsFacet(string name, ICriteria criteria, string key, string value)
         {
+            Argument.EnsureNotBlank("name", name);
+            Argument.EnsureNotBlank("key", key);
+            Argument.EnsureNotBlank("value", value);
+
             this.name = name;
             this.criteria = criteria;
             this.key = key;
