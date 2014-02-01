@@ -197,7 +197,7 @@ namespace ElasticLinq.Request.Visitors
         {
             var lambda = expression.StripQuotes() as LambdaExpression;
             if (lambda == null)
-                throw new NotSupportedException(String.Format("Aggregate requrired Lambda expression, {0} expression encountered.", expression.NodeType));
+                throw new NotSupportedException(String.Format("Aggregate required Lambda expression, {0} expression encountered.", expression.NodeType));
 
             var memberExpressionBody = lambda.Body as MemberExpression;
             if (memberExpressionBody == null)
