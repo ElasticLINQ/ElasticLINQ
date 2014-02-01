@@ -1,7 +1,9 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
-using ElasticLinq.Request.Formatters;
+using System;
+using System.Collections;
 using ElasticLinq.Logging;
+using ElasticLinq.Request.Formatters;
 using ElasticLinq.Response.Model;
 using ElasticLinq.Retry;
 using ElasticLinq.Utility;
@@ -10,6 +12,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace ElasticLinq.Request
 {
@@ -42,7 +45,7 @@ namespace ElasticLinq.Request
         {
             var formatter = new PostBodyRequestFormatter(connection, searchRequest);
             log.Debug(null, null, "Request: POST {0}", formatter.Uri);
-            log.Debug(null, null, "Body: \n{0}", formatter.Body);
+            log.Debug(null, null, "Body:\n{0}", formatter.Body);
 
             using (var httpClient = new HttpClient(new ForcedAuthHandler(connection.UserName, connection.Password, innerMessageHandler)) { Timeout = connection.Timeout })
                 return await retryPolicy.ExecuteAsync(
@@ -83,15 +86,26 @@ namespace ElasticLinq.Request
                 var results = new JsonSerializer().Deserialize<ElasticResponse>(textReader);
                 stopwatch.Stop();
 
-                if (results != null)
-                {
-                    var resultMessage = results.hits.hits.Count > 0
-                        ? results.hits.hits.Count + " hits"
-                        : results.facets.Count + " facets";
-                    log.Debug(null, null, "De-serialized {0} bytes into {1} in {2}ms", responseStream.Length, resultMessage, stopwatch.ElapsedMilliseconds);
-                }
+                var resultSummary = String.Join(", ", GetResultSummary(results));
+                log.Debug(null, null, "Deserialized {0} bytes into {1} in {2}ms", responseStream.Length, resultSummary, stopwatch.ElapsedMilliseconds);
 
                 return results;
+            }
+        }
+
+        private static IEnumerable<string> GetResultSummary(ElasticResponse results)
+        {
+            if (results == null)
+            {
+                yield return "nothing";
+            }
+            else
+            {
+                if (results.hits != null && results.hits.hits != null & results.hits.hits.Count > 0)
+                    yield return results.hits.hits.Count + " hits";
+
+                if (results.facets != null && results.facets.Count > 0)
+                    yield return results.facets.Count + " facets";
             }
         }
     }
