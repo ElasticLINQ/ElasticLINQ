@@ -18,7 +18,7 @@ namespace ElasticLinq.Test
                                       int maxAttempts = 1,
                                       TimeSpan timeout = default(TimeSpan))
         {
-            Connection = new ElasticConnection(new Uri("http://localhost/")) { Timeout = timeout };
+            Connection = new ElasticConnection(new Uri("http://localhost/"), timeout: timeout);
             Mapping = mapping ?? new TrivialElasticMapping();
             Provider = new TestableElasticQueryProvider(this);
             Requests = new List<string>();
