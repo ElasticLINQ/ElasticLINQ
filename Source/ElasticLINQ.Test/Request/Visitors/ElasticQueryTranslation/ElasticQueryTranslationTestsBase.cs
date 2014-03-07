@@ -4,6 +4,7 @@ using ElasticLinq.Logging;
 using ElasticLinq.Mapping;
 using ElasticLinq.Retry;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
@@ -29,6 +30,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             public decimal Cost { get; set; }
             public double EnergyUse { get; set; }
             public int? Zone { get; set; }
+            public List<string> Aliases { get; set; }
         }
     }
 }

@@ -165,6 +165,20 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         }
 
         [Fact]
+        public void StringArrayExistingContainsGeneratesTermCriteria()
+        {
+            var where = Robots.Where(e => e.Aliases.Contains("Robbie"));
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+
+            Assert.IsType<TermCriteria>(criteria);
+            var termCriteria = (TermCriteria)criteria;
+            Assert.Equal("term", termCriteria.Name);
+            Assert.Equal("aliases", termCriteria.Field);
+            Assert.Equal(1, termCriteria.Values.Count);
+            Assert.Equal("Robbie", termCriteria.Values[0]);
+        }
+
+        [Fact]
         public void StringArrayInlineContainsGeneratesTermsCriteria()
         {
             var expectedNames = new[] { "Robbie", "Kryten", "IG-88", "Marvin" };

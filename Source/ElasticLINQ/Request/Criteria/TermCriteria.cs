@@ -21,6 +21,11 @@ namespace ElasticLinq.Request.Criteria
             return new TermCriteria(field, values);
         }
 
+        public static TermCriteria FromValue(string field, object value)
+        {
+            return new TermCriteria(field, value);
+        }
+
         public TermCriteria(string field, params object[] values)
             : this(field, values.AsEnumerable())
         {
@@ -30,7 +35,7 @@ namespace ElasticLinq.Request.Criteria
         {
             Argument.EnsureNotNull("value", values);
             this.field = field;
-            this.values = new HashSet<object>(values);            
+            this.values = new HashSet<object>(values);
         }
 
         public string Field
