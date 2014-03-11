@@ -76,6 +76,16 @@ namespace ElasticLinq.Request.Visitors
         {
             switch (m.Method.Name)
             {
+                case "ContainsAny":
+                    if (m.Arguments.Count == 2)
+                        return VisitContains("ContainsAny", m.Arguments[0], m.Arguments[1], TermsExecutionMode.@bool);
+                    break;
+
+                case "ContainsAll":
+                    if (m.Arguments.Count == 2)
+                        return VisitContains("ContainsAll", m.Arguments[0], m.Arguments[1], TermsExecutionMode.and);
+                    break;
+
                 case "Regexp":
                     if (m.Arguments.Count == 2)
                         return VisitRegexp(m.Arguments[0], m.Arguments[1]);
@@ -88,6 +98,19 @@ namespace ElasticLinq.Request.Visitors
             }
 
             throw new NotSupportedException(string.Format("The ElasticMethods method '{0}' is not supported", m.Method.Name));
+        }
+
+        private Expression VisitContains(string methodName, Expression left, Expression right, TermsExecutionMode executionMode)
+        {
+            var cm = ConstantMemberPair.Create(left, right);
+
+            if (cm != null)
+            {
+                var values = ((IEnumerable)cm.ConstantExpression.Value).Cast<object>().ToArray();
+                return new CriteriaExpression(new TermCriteria(mapping.GetFieldName(cm.MemberExpression.Member), values) { ExecutionMode = executionMode });
+            }
+
+            throw new NotSupportedException(methodName + " must be between a Member and a Constant");
         }
 
         private Expression VisitPrefix(Expression left, Expression right)

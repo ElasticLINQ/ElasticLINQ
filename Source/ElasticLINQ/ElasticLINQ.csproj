@@ -70,6 +70,7 @@
     <Compile Include="Request\Criteria\SingleFieldCriteria.cs" />
     <Compile Include="Request\Criteria\QueryStringCriteria.cs" />
     <Compile Include="Request\Criteria\TermCriteria.cs" />
+    <Compile Include="Request\Criteria\TermsExecutionMode.cs" />
     <Compile Include="Response\Materializers\ElasticOneHitMaterializer.cs" />
     <Compile Include="Response\Materializers\ElasticManyHitMaterializer.cs" />
     <Compile Include="Request\Formatter\PostBodyRequestFormatter.cs" />

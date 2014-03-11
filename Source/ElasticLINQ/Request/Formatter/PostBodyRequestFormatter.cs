@@ -143,7 +143,11 @@ namespace ElasticLinq.Request.Formatter
                 ? FormatTerm(criteria.Values[0])
                 : new JArray(criteria.Values.Select(FormatTerm).ToArray());
 
-            return new JObject(new JProperty(criteria.Name, new JObject(new JProperty(criteria.Field, formattedValue))));
+            var termCriteria = new JObject(new JProperty(criteria.Field, formattedValue));
+            if (criteria.Name == "terms" && criteria.ExecutionMode.HasValue)
+                termCriteria.Add(new JProperty("execution", criteria.ExecutionMode.GetValueOrDefault().ToString()));
+
+            return new JObject(new JProperty(criteria.Name, termCriteria));
         }
 
         private static JObject Build(SingleFieldCriteria criteria)

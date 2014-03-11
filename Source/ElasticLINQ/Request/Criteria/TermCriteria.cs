@@ -43,6 +43,22 @@ namespace ElasticLinq.Request.Criteria
             get { return field; }
         }
 
+        public bool IsOrCriteria
+        {
+            get
+            {
+                // ExecutionMode is irrelevant if this is a "term" request, so we say that
+                // it's Or-compatible so that OrCriteria will merge it.
+                return values.Count == 1
+                    || !ExecutionMode.HasValue
+                    || ExecutionMode == TermsExecutionMode.@bool
+                    || ExecutionMode == TermsExecutionMode.or
+                    || ExecutionMode == TermsExecutionMode.plain;
+            }
+        }
+
+        public TermsExecutionMode? ExecutionMode { get; set; }
+
         public IReadOnlyList<Object> Values
         {
             get { return values.ToList().AsReadOnly(); }
@@ -50,12 +66,16 @@ namespace ElasticLinq.Request.Criteria
 
         public string Name
         {
-            get { return Values.Count == 1 ? "term" : "terms"; }
+            get { return values.Count == 1 ? "term" : "terms"; }
         }
 
         public override string ToString()
         {
-            return String.Format("{0} {1} [{2}]", Name, Field, String.Join(",", values.ToArray()));
+            var value = String.Format("{0} {1} [{2}]", Name, Field, String.Join(",", values.ToArray()));
+            if (ExecutionMode.HasValue)
+                value += String.Format(" (execution = {0})", ExecutionMode.GetValueOrDefault());
+
+            return value;
         }
     }
 }

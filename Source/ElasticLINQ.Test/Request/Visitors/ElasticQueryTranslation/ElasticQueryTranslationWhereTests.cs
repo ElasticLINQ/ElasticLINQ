@@ -720,6 +720,74 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         }
 
         [Fact]
+        public static void ContainsAny_PropertyFirst_CreatesTermsQuery()
+        {
+            var matchNames = new[] { "Robbie", "Kryten", "IG-88", "Marvin" };
+            var where = Robots.Where(r => ElasticMethods.ContainsAny(r.Aliases, matchNames));
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+
+            var termCriteria = Assert.IsType<TermCriteria>(criteria);
+            Assert.Equal("terms", termCriteria.Name);
+            Assert.Equal("aliases", termCriteria.Field);
+            Assert.Contains("Robbie", termCriteria.Values);
+            Assert.Contains("Kryten", termCriteria.Values);
+            Assert.Contains("IG-88", termCriteria.Values);
+            Assert.Contains("Marvin", termCriteria.Values);
+            Assert.Equal(TermsExecutionMode.@bool, termCriteria.ExecutionMode);
+        }
+
+        [Fact]
+        public static void ContainsAny_ListFirst_CreatesTermsQuery()
+        {
+            var matchNames = new[] { "Robbie", "Kryten", "IG-88", "Marvin" };
+            var where = Robots.Where(r => ElasticMethods.ContainsAny(matchNames, r.Aliases));
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+
+            var termCriteria = Assert.IsType<TermCriteria>(criteria);
+            Assert.Equal("terms", termCriteria.Name);
+            Assert.Equal("aliases", termCriteria.Field);
+            Assert.Contains("Robbie", termCriteria.Values);
+            Assert.Contains("Kryten", termCriteria.Values);
+            Assert.Contains("IG-88", termCriteria.Values);
+            Assert.Contains("Marvin", termCriteria.Values);
+            Assert.Equal(TermsExecutionMode.@bool, termCriteria.ExecutionMode);
+        }
+
+        [Fact]
+        public static void ContainsAll_PropertyFirst_CreatesTermsQuery()
+        {
+            var matchNames = new[] { "Robbie", "Kryten", "IG-88", "Marvin" };
+            var where = Robots.Where(r => ElasticMethods.ContainsAll(r.Aliases, matchNames));
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+
+            var termCriteria = Assert.IsType<TermCriteria>(criteria);
+            Assert.Equal("terms", termCriteria.Name);
+            Assert.Equal("aliases", termCriteria.Field);
+            Assert.Contains("Robbie", termCriteria.Values);
+            Assert.Contains("Kryten", termCriteria.Values);
+            Assert.Contains("IG-88", termCriteria.Values);
+            Assert.Contains("Marvin", termCriteria.Values);
+            Assert.Equal(TermsExecutionMode.and, termCriteria.ExecutionMode);
+        }
+
+        [Fact]
+        public static void ContainsAll_ListFirst_CreatesTermsQuery()
+        {
+            var matchNames = new[] { "Robbie", "Kryten", "IG-88", "Marvin" };
+            var where = Robots.Where(r => ElasticMethods.ContainsAll(matchNames, r.Aliases));
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+
+            var termCriteria = Assert.IsType<TermCriteria>(criteria);
+            Assert.Equal("terms", termCriteria.Name);
+            Assert.Equal("aliases", termCriteria.Field);
+            Assert.Contains("Robbie", termCriteria.Values);
+            Assert.Contains("Kryten", termCriteria.Values);
+            Assert.Contains("IG-88", termCriteria.Values);
+            Assert.Contains("Marvin", termCriteria.Values);
+            Assert.Equal(TermsExecutionMode.and, termCriteria.ExecutionMode);
+        }
+
+        [Fact]
         public void RegexElasticMethodCreatesRegexWhereCriteria()
         {
             var where = Robots.Where(r => ElasticMethods.Regexp(r.Name, "r.*bot"));

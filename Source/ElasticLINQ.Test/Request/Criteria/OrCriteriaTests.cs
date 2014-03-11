@@ -3,6 +3,7 @@
 using ElasticLinq.Request.Criteria;
 using System.Linq;
 using Xunit;
+using Xunit.Extensions;
 
 namespace ElasticLinq.Test.Request.Criteria
 {
@@ -10,7 +11,6 @@ namespace ElasticLinq.Test.Request.Criteria
     {
         private readonly TermCriteria salutationMr = new TermCriteria("salutation", "Mr");
         private readonly TermCriteria salutationMrs = new TermCriteria("salutation", "Mrs");
-        private readonly TermCriteria salutationMs = new TermCriteria("salutation", "Miss", "Ms");
         private readonly TermCriteria area408 = new TermCriteria("area", "408");
 
         [Fact]
@@ -40,9 +40,14 @@ namespace ElasticLinq.Test.Request.Criteria
             Assert.Empty(((OrCriteria)criteria).Criteria);
         }
 
-        [Fact]
-        public void CombineWithAllTermFieldsSameCombinesIntoSingleTerm()
+        [Theory]
+        [InlineData(null)]
+        [InlineData(TermsExecutionMode.@bool)]
+        [InlineData(TermsExecutionMode.or)]
+        [InlineData(TermsExecutionMode.plain)]
+        public void CombineWithAllTermFieldsSame_OrCompatibleExecutionMode_CombinesIntoSingleTerm(TermsExecutionMode? executionMode)
         {
+            var salutationMs = new TermCriteria("salutation", "Miss", "Ms") { ExecutionMode = executionMode };
             var criteria = OrCriteria.Combine(salutationMr, salutationMrs, salutationMs);
 
             Assert.IsType<TermCriteria>(criteria);
@@ -54,6 +59,21 @@ namespace ElasticLinq.Test.Request.Criteria
                 Assert.Contains(value, termCriteria.Values);
 
             Assert.Equal(allValues.Length, termCriteria.Values.Count);
+        }
+
+        [Theory]
+        [InlineData(TermsExecutionMode.and)]
+        [InlineData(TermsExecutionMode.fielddata)]
+        public void CombineWithAllTermFieldsSame_OrIncompatibleExecutionMode_ReturnsOrCriteria(TermsExecutionMode executionMode)
+        {
+            var salutationMs = new TermCriteria("salutation", "Miss", "Ms") { ExecutionMode = executionMode };
+            var criteria = OrCriteria.Combine(salutationMr, salutationMrs, salutationMs);
+
+            var orCriteria = Assert.IsType<OrCriteria>(criteria);
+            Assert.Contains(salutationMr, orCriteria.Criteria);
+            Assert.Contains(salutationMrs, orCriteria.Criteria);
+            Assert.Contains(salutationMs, orCriteria.Criteria);
+            Assert.Equal(3, orCriteria.Criteria.Count);
         }
 
         [Fact]

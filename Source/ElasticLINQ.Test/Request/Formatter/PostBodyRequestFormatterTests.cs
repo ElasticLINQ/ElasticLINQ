@@ -51,7 +51,7 @@ namespace ElasticLinq.Test.Request.Formatter
         [Fact]
         public void BodyContainsFilterTerm()
         {
-            var termCriteria = new TermCriteria("term1", "singlecriteria");
+            var termCriteria = new TermCriteria("term1", "singlecriteria") { ExecutionMode = TermsExecutionMode.@bool };
 
             var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest { Type = "type1", Filter = termCriteria });
             var body = JObject.Parse(formatter.Body);
@@ -59,6 +59,7 @@ namespace ElasticLinq.Test.Request.Formatter
             var result = TraverseWithAssert(body, "filter", "term");
             Assert.Equal(1, result.Count());
             Assert.Equal(termCriteria.Values[0], result[termCriteria.Field].ToString());
+            Assert.Null(result["execution"]);  // Only applicable to "terms" filters
         }
 
         [Fact]
@@ -73,6 +74,23 @@ namespace ElasticLinq.Test.Request.Formatter
             var actualTerms = TraverseWithAssert(result, termCriteria.Field);
             foreach (var criteria in termCriteria.Values)
                 Assert.Contains(criteria, actualTerms.Select(t => t.ToString()).ToArray());
+            Assert.Null(result["execution"]);
+        }
+
+        [Fact]
+        public void BodyContainsFilterTermsWithExecutionMode()
+        {
+            var termCriteria = new TermCriteria("term1", "criteria1", "criteria2") { ExecutionMode = TermsExecutionMode.and };
+
+            var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest { Type = "type1", Filter = termCriteria });
+            var body = JObject.Parse(formatter.Body);
+
+            var result = TraverseWithAssert(body, "filter", "terms");
+            var actualTerms = TraverseWithAssert(result, termCriteria.Field);
+            foreach (var criteria in termCriteria.Values)
+                Assert.Contains(criteria, actualTerms.Select(t => t.ToString()).ToArray());
+            var execution = (JValue)TraverseWithAssert(result, "execution");
+            Assert.Equal("and", execution.Value);
         }
 
         [Fact]
