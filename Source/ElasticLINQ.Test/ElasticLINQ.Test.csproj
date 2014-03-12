@@ -57,6 +57,7 @@
     <Compile Include="ElasticQueryProviderTests.cs" />
     <Compile Include="ElasticQueryTests.cs" />
     <Compile Include="Integration\BasicConnectionTests.cs" />
+    <Compile Include="JsonNetTests.cs" />
     <Compile Include="Mapping\CouchbaseElasticMappingTests.cs" />
     <Compile Include="Mapping\ElasticFieldsMappingWrapperTests.cs" />
     <Compile Include="Mapping\MappingHelpersTests.cs" />

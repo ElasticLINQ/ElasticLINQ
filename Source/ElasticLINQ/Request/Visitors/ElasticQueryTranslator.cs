@@ -118,7 +118,7 @@ namespace ElasticLinq.Request.Visitors
             var cm = ConstantMemberPair.Create(left, right);
 
             if (cm != null)
-                return new CriteriaExpression(new PrefixCriteria(mapping.GetFieldName(cm.MemberExpression.Member), cm.ConstantExpression.Value));
+                return new CriteriaExpression(new PrefixCriteria(mapping.GetFieldName(cm.MemberExpression.Member), cm.ConstantExpression.Value.ToString()));
 
             throw new NotSupportedException("Prefix must be between a Member and a Constant");
         }
