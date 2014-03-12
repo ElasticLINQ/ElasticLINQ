@@ -1,11 +1,10 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using ElasticLinq.Utility;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using ElasticLinq.Utility;
 
 namespace ElasticLinq.Request.Formatters
 {
