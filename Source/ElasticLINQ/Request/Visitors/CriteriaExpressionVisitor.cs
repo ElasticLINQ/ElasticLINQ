@@ -191,14 +191,23 @@ namespace ElasticLinq.Request.Visitors
 
         private Expression VisitEnumerableContainsMethodCall(Expression source, Expression match)
         {
-            var property = Visit(match);
+            var matched = Visit(match);
 
-            if (source is ConstantExpression && property is MemberExpression)
+            // Where(x => constantsList.Contains(x.Property))
+            if (source is ConstantExpression && matched is MemberExpression)
             {
-                var field = Mapping.GetFieldName(((MemberExpression)property).Member);
+                var field = Mapping.GetFieldName(((MemberExpression)matched).Member);
                 var containsSource = ((IEnumerable)((ConstantExpression)source).Value).Cast<object>();
                 var values = new List<object>(containsSource);
                 return new CriteriaExpression(TermCriteria.FromIEnumerable(field, values.Distinct()));
+            }
+
+            // Where(x => x.SomeList.Contains(constantValue))
+            if (source is MemberExpression && matched is ConstantExpression)
+            {
+                var field = Mapping.GetFieldName(((MemberExpression)source).Member);
+                var value = ((ConstantExpression)matched).Value;
+                return new CriteriaExpression(TermCriteria.FromValue(field, value));
             }
 
             throw new NotSupportedException(string.Format("Unknown source '{0}' for Contains operation", source));
