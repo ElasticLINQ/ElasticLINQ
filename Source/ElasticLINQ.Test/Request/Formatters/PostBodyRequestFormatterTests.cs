@@ -298,7 +298,7 @@ namespace ElasticLinq.Test.Request.Formatters
         public static void BodyContainsTimeoutWhenSpecified()
         {
             const string expectedTimeout = "15s";
-            var connection = new ElasticConnection(new Uri("http://localhost/")) { Timeout = TimeSpan.FromSeconds(15) };
+            var connection = new ElasticConnection(new Uri("http://localhost/"), timeout: TimeSpan.FromSeconds(15));
 
             var formatter = new PostBodyRequestFormatter(connection, new ElasticSearchRequest());
             var body = JObject.Parse(formatter.Body);
@@ -310,7 +310,7 @@ namespace ElasticLinq.Test.Request.Formatters
         [Fact]
         public static void BodyDoesNotContainTimeoutWhenZero()
         {
-            var connection = new ElasticConnection(new Uri("http://localhost/")) { Timeout = TimeSpan.Zero };
+            var connection = new ElasticConnection(new Uri("http://localhost/"), timeout: TimeSpan.Zero);
 
             var formatter = new PostBodyRequestFormatter(connection, new ElasticSearchRequest());
             var body = JObject.Parse(formatter.Body);

@@ -29,19 +29,7 @@ namespace ElasticLinq.Test
         [Fact]
         public void GuardClauses_Timeout()
         {
-            var connection = new ElasticConnection(endpoint);
-
-            Assert.Throws<ArgumentOutOfRangeException>(() => connection.Timeout = TimeSpan.FromDays(-1));
-        }
-
-        [Fact]
-        public void TimeoutPropertyCanBeSet()
-        {
-            var expected = TimeSpan.FromSeconds(123);
-
-            var connection = new ElasticConnection(endpoint) { Timeout = expected };
-
-            Assert.Equal(expected, connection.Timeout);
+            Assert.Throws<ArgumentOutOfRangeException>(() => new ElasticConnection(endpoint, timeout: TimeSpan.FromDays(-1)));
         }
 
         [Fact]
@@ -60,6 +48,26 @@ namespace ElasticLinq.Test
             Assert.Equal(endpoint, connection.Endpoint);
             Assert.Equal(UserName, connection.UserName);
             Assert.Equal(Password, connection.Password);
+        }
+
+        [Fact]
+        public void ConstructorCreatesHttpClientWithDefaultTimeout()
+        {
+            var defaultTimeout = TimeSpan.FromSeconds(10);
+            var connection = new ElasticConnection(endpoint, UserName, Password);
+
+            Assert.NotNull(connection.HttpClient);
+            Assert.Equal(defaultTimeout, connection.Timeout);
+        }
+
+        [Fact]
+        public void ConstructorCreatesHttpClientWithSpecifiedTimeout()
+        {
+            var timeout = TimeSpan.FromSeconds(3);
+            var connection = new ElasticConnection(endpoint, UserName, Password, timeout);
+
+            Assert.NotNull(connection.HttpClient);
+            Assert.Equal(timeout, connection.Timeout);
         }
     }
 }

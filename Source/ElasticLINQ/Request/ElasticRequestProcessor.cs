@@ -22,14 +22,10 @@ namespace ElasticLinq.Request
     internal class ElasticRequestProcessor
     {
         private readonly ElasticConnection connection;
-        private readonly HttpMessageHandler innerMessageHandler;
         private readonly ILog log;
         private readonly IRetryPolicy retryPolicy;
 
         public ElasticRequestProcessor(ElasticConnection connection, ILog log, IRetryPolicy retryPolicy)
-            : this(connection, log, retryPolicy, new WebRequestHandler()) { }
-
-        internal ElasticRequestProcessor(ElasticConnection connection, ILog log, IRetryPolicy retryPolicy, HttpMessageHandler innerMessageHandler)
         {
             Argument.EnsureNotNull("connection", connection);
             Argument.EnsureNotNull("log", log);
@@ -38,30 +34,28 @@ namespace ElasticLinq.Request
             this.connection = connection;
             this.log = log;
             this.retryPolicy = retryPolicy;
-            this.innerMessageHandler = innerMessageHandler;
         }
 
-        public async Task<ElasticResponse> SearchAsync(ElasticSearchRequest searchRequest)
+        public Task<ElasticResponse> SearchAsync(ElasticSearchRequest searchRequest)
         {
             var formatter = new PostBodyRequestFormatter(connection, searchRequest);
             log.Debug(null, null, "Request: POST {0}", formatter.Uri);
             log.Debug(null, null, "Body:\n{0}", formatter.Body);
 
-            using (var httpClient = new HttpClient(new ForcedAuthHandler(connection.UserName, connection.Password, innerMessageHandler)) { Timeout = connection.Timeout })
-                return await retryPolicy.ExecuteAsync(
-                    async () =>
-                    {
-                        using (var requestMessage = new HttpRequestMessage(HttpMethod.Post, formatter.Uri) { Content = new StringContent(formatter.Body) })
-                        using (var response = await SendRequestAsync(httpClient, requestMessage))
-                        using (var responseStream = await response.Content.ReadAsStreamAsync())
-                            return ParseResponse(responseStream, log);
-                    },
-                    (response, exception) => exception is TaskCanceledException,
-                    (response, additionalInfo) =>
-                    {
-                        additionalInfo["index"] = connection.Index;
-                        additionalInfo["query"] = formatter.Body;
-                    });
+            return retryPolicy.ExecuteAsync(
+                async () =>
+                {
+                    using (var requestMessage = new HttpRequestMessage(HttpMethod.Post, formatter.Uri) { Content = new StringContent(formatter.Body) })
+                    using (var response = await SendRequestAsync(connection.HttpClient, requestMessage))
+                    using (var responseStream = await response.Content.ReadAsStreamAsync())
+                        return ParseResponse(responseStream, log);
+                },
+                (response, exception) => exception is TaskCanceledException,
+                (response, additionalInfo) =>
+                {
+                    additionalInfo["index"] = connection.Index;
+                    additionalInfo["query"] = formatter.Body;
+                });
         }
 
         private async Task<HttpResponseMessage> SendRequestAsync(HttpClient httpClient, HttpRequestMessage requestMessage)

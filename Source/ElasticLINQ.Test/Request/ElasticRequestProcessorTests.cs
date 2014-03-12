@@ -47,7 +47,8 @@ namespace ElasticLinq.Test.Request
         public static async Task NoAuthorizationWithEmptyUserName()
         {
             var messageHandler = new SpyMessageHandler();
-            var processor = new ElasticRequestProcessor(connection, log, retryPolicy, messageHandler);
+            var localConnection = new ElasticConnection(messageHandler, new Uri("http://localhost"));
+            var processor = new ElasticRequestProcessor(localConnection, log, retryPolicy);
             var request = new ElasticSearchRequest { Type = "docType" };
 
             await processor.SearchAsync(request);
@@ -58,9 +59,9 @@ namespace ElasticLinq.Test.Request
         [Fact]
         public static async Task ForcesBasicAuthorizationWhenProvidedWithUsernameAndPassword()
         {
-            var localConnection = new ElasticConnection(new Uri("http://localhost"), "myUser", "myPass");
             var messageHandler = new SpyMessageHandler();
-            var processor = new ElasticRequestProcessor(localConnection, log, retryPolicy, messageHandler);
+            var localConnection = new ElasticConnection(messageHandler, new Uri("http://localhost"), "myUser", "myPass");
+            var processor = new ElasticRequestProcessor(localConnection, log, retryPolicy);
             var request = new ElasticSearchRequest { Type = "docType" };
 
             await processor.SearchAsync(request);
@@ -76,7 +77,8 @@ namespace ElasticLinq.Test.Request
         {
             var messageHandler = new SpyMessageHandler();
             messageHandler.Response.StatusCode = HttpStatusCode.NotFound;
-            var processor = new ElasticRequestProcessor(connection, log, retryPolicy, messageHandler);
+            var localConnection = new ElasticConnection(messageHandler, new Uri("http://localhost"), "myUser", "myPass");
+            var processor = new ElasticRequestProcessor(localConnection, log, retryPolicy);
             var request = new ElasticSearchRequest { Type = "docType" };
 
             var ex = Record.Exception(() => processor.SearchAsync(request).GetAwaiter().GetResult());
@@ -125,7 +127,8 @@ namespace ElasticLinq.Test.Request
             var messageHandler = new SpyMessageHandler();
             var log = new SpyLog();
             messageHandler.Response.Content = new StringContent(responseString);
-            var processor = new ElasticRequestProcessor(connection, log, retryPolicy, messageHandler);
+            var localConnection = new ElasticConnection(messageHandler, new Uri("http://localhost"), "myUser", "myPass") { Index = "SearchIndex" };
+            var processor = new ElasticRequestProcessor(localConnection, log, retryPolicy);
             var request = new ElasticSearchRequest { Type = "abc123", Size = 2112 };
 
             await processor.SearchAsync(request);

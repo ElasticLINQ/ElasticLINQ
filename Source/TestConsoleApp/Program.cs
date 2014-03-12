@@ -13,11 +13,15 @@ namespace TestConsoleApp
 
         private static void Main()
         {
-            var context = new ElasticContext(new ElasticConnection(uri) { Index = "tier3" }, new CouchbaseElasticMapping(), new ConsoleLog());
+            using (var connection = new ElasticConnection(new Uri("http://192.168.2.14:9200")) { Index = "tier3" })
+            {
+                var log = new ConsoleLog();
+                var context = new ElasticContext(connection, new CouchbaseElasticMapping(), log);
 
-            AggregateQueries();
-            //DocumentQueries(context);
-            //BasicSampleQueries(context);
+                AggregateQueries();
+                DocumentQueries(context);
+                BasicSampleQueries(context);
+            }
 
             Console.Write("\n\nComplete.");
             Console.ReadKey();
