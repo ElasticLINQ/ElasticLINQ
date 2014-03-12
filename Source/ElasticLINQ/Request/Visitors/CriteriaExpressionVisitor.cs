@@ -63,6 +63,16 @@ namespace ElasticLinq.Request.Visitors
         {
             switch (m.Method.Name)
             {
+                case "ContainsAny":
+                    if (m.Arguments.Count == 2)
+                        return VisitContains("ContainsAny", m.Arguments[0], m.Arguments[1], TermsExecutionMode.@bool);
+                    break;
+
+                case "ContainsAll":
+                    if (m.Arguments.Count == 2)
+                        return VisitContains("ContainsAll", m.Arguments[0], m.Arguments[1], TermsExecutionMode.and);
+                    break;
+
                 case "Regexp":
                     if (m.Arguments.Count == 2)
                         return VisitRegexp(m.Arguments[0], m.Arguments[1]);
@@ -174,7 +184,7 @@ namespace ElasticLinq.Request.Visitors
             var cm = ConstantMemberPair.Create(left, right);
 
             if (cm != null)
-                return new CriteriaExpression(new PrefixCriteria(Mapping.GetFieldName(cm.MemberExpression.Member), cm.ConstantExpression.Value));
+                return new CriteriaExpression(new PrefixCriteria(Mapping.GetFieldName(cm.MemberExpression.Member), cm.ConstantExpression.Value.ToString()));
 
             throw new NotSupportedException("Prefix must be between a Member and a Constant");
         }
@@ -199,7 +209,7 @@ namespace ElasticLinq.Request.Visitors
                 var field = Mapping.GetFieldName(((MemberExpression)matched).Member);
                 var containsSource = ((IEnumerable)((ConstantExpression)source).Value).Cast<object>();
                 var values = new List<object>(containsSource);
-                return new CriteriaExpression(TermCriteria.FromIEnumerable(field, values.Distinct()));
+                return new CriteriaExpression(TermsCriteria.Build(field, values.Distinct()));
             }
 
             // Where(x => x.SomeList.Contains(constantValue))
@@ -207,7 +217,7 @@ namespace ElasticLinq.Request.Visitors
             {
                 var field = Mapping.GetFieldName(((MemberExpression)source).Member);
                 var value = ((ConstantExpression)matched).Value;
-                return new CriteriaExpression(TermCriteria.FromValue(field, value));
+                return new CriteriaExpression(TermsCriteria.Build(field, value));
             }
 
             throw new NotSupportedException(string.Format("Unknown source '{0}' for Contains operation", source));
@@ -258,6 +268,20 @@ namespace ElasticLinq.Request.Visitors
                 default:
                     throw new NotSupportedException(string.Format("The binary expression '{0}' is not supported", b.NodeType));
             }
+        }
+
+
+        private Expression VisitContains(string methodName, Expression left, Expression right, TermsExecutionMode executionMode)
+        {
+            var cm = ConstantMemberPair.Create(left, right);
+
+            if (cm != null)
+            {
+                var values = ((IEnumerable)cm.ConstantExpression.Value).Cast<object>().ToArray();
+                return new CriteriaExpression(TermsCriteria.Build(executionMode, Mapping.GetFieldName(cm.MemberExpression.Member), values));
+            }
+
+            throw new NotSupportedException(methodName + " must be between a Member and a Constant");
         }
 
         private Expression CreateExists(ConstantMemberPair cm, bool positiveTest)

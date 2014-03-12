@@ -45,12 +45,13 @@ namespace ElasticLinq.Request.Criteria
         {
             if (criteria.Count <= 1) return null;
 
-            var termCriteria = criteria.OfType<TermCriteria>().ToArray();
+            var termCriteria = criteria.OfType<ITermsCriteria>().ToArray();
             var areAllSameTerm = termCriteria.Length == criteria.Count
-                                 && termCriteria.Select(f => f.Field).Distinct().Count() == 1;
+                                 && termCriteria.Select(f => f.Field).Distinct().Count() == 1
+                                 && termCriteria.All(f => f.IsOrCriteria);
 
             return areAllSameTerm
-                ? TermCriteria.FromIEnumerable(termCriteria[0].Field, termCriteria.SelectMany(f => f.Values).Distinct())
+                ? TermsCriteria.Build(termCriteria[0].Field, termCriteria.SelectMany(f => f.Values).Distinct())
                 : null;
         }
     }

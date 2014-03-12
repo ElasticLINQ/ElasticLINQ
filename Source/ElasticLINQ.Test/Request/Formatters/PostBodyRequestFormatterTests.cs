@@ -51,7 +51,7 @@ namespace ElasticLinq.Test.Request.Formatters
         [Fact]
         public void BodyContainsFilterTerm()
         {
-            var termCriteria = new TermCriteria("term1", "singlecriteria");
+            var termCriteria = TermsCriteria.Build(TermsExecutionMode.@bool, "term1", "singlecriteria");
 
             var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest { Type = "type1", Filter = termCriteria });
             var body = JObject.Parse(formatter.Body);
@@ -59,12 +59,13 @@ namespace ElasticLinq.Test.Request.Formatters
             var result = TraverseWithAssert(body, "filter", "term");
             Assert.Equal(1, result.Count());
             Assert.Equal(termCriteria.Values[0], result[termCriteria.Field].ToString());
+            Assert.Null(result["execution"]);  // Only applicable to "terms" filters
         }
 
         [Fact]
         public void BodyContainsFilterTerms()
         {
-            var termCriteria = new TermCriteria("term1", "criteria1", "criteria2");
+            var termCriteria = TermsCriteria.Build("term1", "criteria1", "criteria2");
 
             var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest { Type = "type1", Filter = termCriteria });
             var body = JObject.Parse(formatter.Body);
@@ -73,6 +74,23 @@ namespace ElasticLinq.Test.Request.Formatters
             var actualTerms = TraverseWithAssert(result, termCriteria.Field);
             foreach (var criteria in termCriteria.Values)
                 Assert.Contains(criteria, actualTerms.Select(t => t.ToString()).ToArray());
+            Assert.Null(result["execution"]);
+        }
+
+        [Fact]
+        public void BodyContainsFilterTermsWithExecutionMode()
+        {
+            var termCriteria = TermsCriteria.Build(TermsExecutionMode.and, "term1", "criteria1", "criteria2");
+
+            var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest { Type = "type1", Filter = termCriteria });
+            var body = JObject.Parse(formatter.Body);
+
+            var result = TraverseWithAssert(body, "filter", "terms");
+            var actualTerms = TraverseWithAssert(result, termCriteria.Field);
+            foreach (var criteria in termCriteria.Values)
+                Assert.Contains(criteria, actualTerms.Select(t => t.ToString()).ToArray());
+            var execution = (JValue)TraverseWithAssert(result, "execution");
+            Assert.Equal("and", execution.Value);
         }
 
         [Fact]
@@ -104,7 +122,7 @@ namespace ElasticLinq.Test.Request.Formatters
         [Fact]
         public void BodyContainsFilterNot()
         {
-            var termCriteria = new TermCriteria("term1", "alpha", "bravo", "charlie", "delta", "echo");
+            var termCriteria = TermsCriteria.Build("term1", "alpha", "bravo", "charlie", "delta", "echo");
             var notCriteria = NotCriteria.Create(termCriteria);
 
             var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest { Type = "type1", Filter = notCriteria });

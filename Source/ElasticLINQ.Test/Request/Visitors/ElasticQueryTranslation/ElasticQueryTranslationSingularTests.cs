@@ -44,12 +44,9 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var request = ElasticQueryTranslator.Translate(Mapping, first).SearchRequest;
 
             Assert.Equal(1, request.Size);
-            Assert.IsType<TermCriteria>(request.Filter);
-            var termCriteria = (TermCriteria)request.Filter;
-            Assert.Equal("term", termCriteria.Name);
+            var termCriteria = Assert.IsType<TermCriteria>(request.Filter);
             Assert.Equal("name", termCriteria.Field);
-            Assert.Equal(1, termCriteria.Values.Count);
-            Assert.Equal(expectedTermValue, termCriteria.Values[0]);
+            Assert.Equal(expectedTermValue, termCriteria.Value);
         }
 
         [Fact]
@@ -62,12 +59,9 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var request = ElasticQueryTranslator.Translate(Mapping, first).SearchRequest;
 
             Assert.Equal(1, request.Size);
-            Assert.IsType<TermCriteria>(request.Filter);
-            var termCriteria = (TermCriteria)request.Filter;
-            Assert.Equal("term", termCriteria.Name);
+            var termCriteria = Assert.IsType<TermCriteria>(request.Filter);
             Assert.Equal("name", termCriteria.Field);
-            Assert.Equal(1, termCriteria.Values.Count);
-            Assert.Equal(expectedTermValue, termCriteria.Values[0]);
+            Assert.Equal(expectedTermValue, termCriteria.Value);
         }
 
         [Fact]
@@ -102,12 +96,9 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var request = ElasticQueryTranslator.Translate(Mapping, first).SearchRequest;
 
             Assert.Equal(2, request.Size);
-            Assert.IsType<TermCriteria>(request.Filter);
-            var termCriteria = (TermCriteria)request.Filter;
-            Assert.Equal("term", termCriteria.Name);
+            var termCriteria = Assert.IsType<TermCriteria>(request.Filter);
             Assert.Equal("name", termCriteria.Field);
-            Assert.Equal(1, termCriteria.Values.Count);
-            Assert.Equal(expectedTermValue, termCriteria.Values[0]);
+            Assert.Equal(expectedTermValue, termCriteria.Value);
         }
 
         [Fact]
@@ -120,12 +111,9 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var request = ElasticQueryTranslator.Translate(Mapping, first).SearchRequest;
 
             Assert.Equal(2, request.Size);
-            Assert.IsType<TermCriteria>(request.Filter);
-            var termCriteria = (TermCriteria)request.Filter;
-            Assert.Equal("term", termCriteria.Name);
+            var termCriteria = Assert.IsType<TermCriteria>(request.Filter);
             Assert.Equal("name", termCriteria.Field);
-            Assert.Equal(1, termCriteria.Values.Count);
-            Assert.Equal(expectedTermValue, termCriteria.Values[0]);
+            Assert.Equal(expectedTermValue, termCriteria.Value);
         }
 
         private static Expression MakeQueryableExpression<TSource>(string name, IQueryable<TSource> source, params Expression[] parameters)

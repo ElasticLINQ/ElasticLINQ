@@ -173,6 +173,9 @@ namespace ElasticLinq.Request.Formatters
             if (criteria is TermCriteria)
                 return Build((TermCriteria)criteria);
 
+            if (criteria is TermsCriteria)
+                return Build((TermsCriteria)criteria);
+
             if (criteria is NotCriteria)
                 return Build((NotCriteria)criteria);
 
@@ -218,12 +221,20 @@ namespace ElasticLinq.Request.Formatters
 
         private static JObject Build(TermCriteria criteria)
         {
-            // Terms filter with one item is a single term filter
-            var formattedValue = criteria.Values.Count == 1
-                ? FormatTerm(criteria.Values[0])
-                : new JArray(criteria.Values.Select(FormatTerm).ToArray());
+            return new JObject(
+                new JProperty(criteria.Name, new JObject(
+                    new JProperty(criteria.Field, FormatTerm(criteria.Value)))));
+        }
 
-            return new JObject(new JProperty(criteria.Name, new JObject(new JProperty(criteria.Field, formattedValue))));
+        private static JObject Build(TermsCriteria criteria)
+        {
+            var termsCriteria = new JObject(
+                new JProperty(criteria.Field, new JArray(criteria.Values.Select(FormatTerm).ToArray())));
+
+            if (criteria.ExecutionMode.HasValue)
+                termsCriteria.Add(new JProperty("execution", criteria.ExecutionMode.GetValueOrDefault().ToString()));
+
+            return new JObject(new JProperty(criteria.Name, termsCriteria));
         }
 
         private static JObject Build(SingleFieldCriteria criteria)

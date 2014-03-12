@@ -3,15 +3,15 @@
 using ElasticLinq.Request.Criteria;
 using System.Linq;
 using Xunit;
+using Xunit.Extensions;
 
 namespace ElasticLinq.Test.Request.Criteria
 {
     public class OrCriteriaTests
     {
-        private readonly TermCriteria salutationMr = new TermCriteria("salutation", "Mr");
-        private readonly TermCriteria salutationMrs = new TermCriteria("salutation", "Mrs");
-        private readonly TermCriteria salutationMs = new TermCriteria("salutation", "Miss", "Ms");
-        private readonly TermCriteria area408 = new TermCriteria("area", "408");
+        private readonly ITermsCriteria salutationMr = TermsCriteria.Build("salutation", "Mr");
+        private readonly ITermsCriteria salutationMrs = TermsCriteria.Build("salutation", "Mrs");
+        private readonly ITermsCriteria area408 = TermsCriteria.Build("area", "408");
 
         [Fact]
         public void NamePropertyIsOr()
@@ -40,20 +40,39 @@ namespace ElasticLinq.Test.Request.Criteria
             Assert.Empty(((OrCriteria)criteria).Criteria);
         }
 
-        [Fact]
-        public void CombineWithAllTermFieldsSameCombinesIntoSingleTerm()
+        [Theory]
+        [InlineData(null)]
+        [InlineData(TermsExecutionMode.@bool)]
+        [InlineData(TermsExecutionMode.or)]
+        [InlineData(TermsExecutionMode.plain)]
+        public void CombineWithAllTermFieldsSame_OrCompatibleExecutionMode_CombinesIntoSingleTerm(TermsExecutionMode? executionMode)
         {
+            var salutationMs = TermsCriteria.Build(executionMode, "salutation", "Miss", "Ms");
             var criteria = OrCriteria.Combine(salutationMr, salutationMrs, salutationMs);
 
-            Assert.IsType<TermCriteria>(criteria);
-            var termCriteria = (TermCriteria)criteria;
-            Assert.Equal(termCriteria.Field, salutationMr.Field);
+            var termsCriteria = Assert.IsType<TermsCriteria>(criteria);
+            Assert.Equal(termsCriteria.Field, salutationMr.Field);
 
             var allValues = salutationMr.Values.Concat(salutationMrs.Values).Concat(salutationMs.Values).Distinct().ToArray();
             foreach (var value in allValues)
-                Assert.Contains(value, termCriteria.Values);
+                Assert.Contains(value, termsCriteria.Values);
 
-            Assert.Equal(allValues.Length, termCriteria.Values.Count);
+            Assert.Equal(allValues.Length, termsCriteria.Values.Count);
+        }
+
+        [Theory]
+        [InlineData(TermsExecutionMode.and)]
+        [InlineData(TermsExecutionMode.fielddata)]
+        public void CombineWithAllTermFieldsSame_OrIncompatibleExecutionMode_ReturnsOrCriteria(TermsExecutionMode executionMode)
+        {
+            var salutationMs = TermsCriteria.Build(executionMode, "salutation", "Miss", "Ms");
+            var criteria = OrCriteria.Combine(salutationMr, salutationMrs, salutationMs);
+
+            var orCriteria = Assert.IsType<OrCriteria>(criteria);
+            Assert.Contains(salutationMr, orCriteria.Criteria);
+            Assert.Contains(salutationMrs, orCriteria.Criteria);
+            Assert.Contains(salutationMs, orCriteria.Criteria);
+            Assert.Equal(3, orCriteria.Criteria.Count);
         }
 
         [Fact]
@@ -73,7 +92,7 @@ namespace ElasticLinq.Test.Request.Criteria
         public void ToStringContainsSubfields()
         {
             var existsCriteria = new ExistsCriteria("thisIsAMissingField");
-            var termCriteria = new TermCriteria("termField", "some value");
+            var termCriteria = TermsCriteria.Build("termField", "some value");
 
             var orCriteria = OrCriteria.Combine(existsCriteria, termCriteria);
             var result = orCriteria.ToString();
