@@ -9,7 +9,7 @@ namespace ElasticLinq.Test.Request.Criteria
 {
     public class NotCriteriaTests
     {
-        private readonly ICriteria sampleTerm = new TermCriteria("field", "value");
+        private readonly ICriteria sampleTerm = TermsCriteria.Build("field", "value");
 
         [Fact]
         public void NamePropertyIsNot()
@@ -47,7 +47,7 @@ namespace ElasticLinq.Test.Request.Criteria
         [Fact]
         public void ToStringContainsSubfields()
         {
-            var termCriteria = new TermCriteria("termField", "some value");
+            var termCriteria = TermsCriteria.Build("termField", "some value");
 
             var notCriteria = NotCriteria.Create(termCriteria);
             var result = notCriteria.ToString();

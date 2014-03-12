@@ -107,7 +107,7 @@ namespace ElasticLinq.Request.Visitors
             if (cm != null)
             {
                 var values = ((IEnumerable)cm.ConstantExpression.Value).Cast<object>().ToArray();
-                return new CriteriaExpression(new TermCriteria(mapping.GetFieldName(cm.MemberExpression.Member), values) { ExecutionMode = executionMode });
+                return new CriteriaExpression(TermsCriteria.Build(executionMode, mapping.GetFieldName(cm.MemberExpression.Member), values));
             }
 
             throw new NotSupportedException(methodName + " must be between a Member and a Constant");
@@ -179,7 +179,7 @@ namespace ElasticLinq.Request.Visitors
                 var field = mapping.GetFieldName(((MemberExpression)matched).Member);
                 var containsSource = ((IEnumerable)((ConstantExpression)source).Value).Cast<object>();
                 var values = new List<object>(containsSource);
-                return new CriteriaExpression(TermCriteria.FromIEnumerable(field, values.Distinct()));
+                return new CriteriaExpression(TermsCriteria.Build(field, values.Distinct()));
             }
 
             // Where(x => x.SomeList.Contains(constantValue))
@@ -187,7 +187,7 @@ namespace ElasticLinq.Request.Visitors
             {
                 var field = mapping.GetFieldName(((MemberExpression)source).Member);
                 var value = ((ConstantExpression)matched).Value;
-                return new CriteriaExpression(TermCriteria.FromValue(field, value));
+                return new CriteriaExpression(TermsCriteria.Build(field, value));
             }
 
             throw new NotSupportedException(string.Format("Unknown source '{0}' for Contains operation", source));
@@ -482,7 +482,7 @@ namespace ElasticLinq.Request.Visitors
             if (cm != null)
                 return cm.IsNullTest
                     ? CreateExists(cm, true)
-                    : new CriteriaExpression(new TermCriteria(mapping.GetFieldName(cm.MemberExpression.Member), cm.ConstantExpression.Value));
+                    : new CriteriaExpression(TermsCriteria.Build(mapping.GetFieldName(cm.MemberExpression.Member), cm.ConstantExpression.Value));
 
             throw new NotSupportedException("Equality must be between a Member and a Constant");
         }
@@ -502,7 +502,7 @@ namespace ElasticLinq.Request.Visitors
             if (cm != null)
                 return cm.IsNullTest
                     ? CreateExists(cm, false)
-                    : new CriteriaExpression(NotCriteria.Create(new TermCriteria(mapping.GetFieldName(cm.MemberExpression.Member), cm.ConstantExpression.Value)));
+                    : new CriteriaExpression(NotCriteria.Create(TermsCriteria.Build(mapping.GetFieldName(cm.MemberExpression.Member), cm.ConstantExpression.Value)));
 
             throw new NotSupportedException("A not-equal expression must consist of a constant and a member");
         }

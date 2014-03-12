@@ -11,7 +11,7 @@ namespace ElasticLinq.Test.Request.Expressions
         [Fact]
         public void ConstructorSetsCriteria()
         {
-            var criteria = new TermCriteria("field", "value");
+            var criteria = TermsCriteria.Build("field", "value");
 
             var expression = new CriteriaExpression(criteria);
 
@@ -21,7 +21,7 @@ namespace ElasticLinq.Test.Request.Expressions
         [Fact]
         public void ExpressionsTypeIsBool()
         {
-            var criteria = new TermCriteria("field", "value");
+            var criteria = TermsCriteria.Build("field", "value");
 
             var expression = new CriteriaExpression(criteria);
 
@@ -31,7 +31,7 @@ namespace ElasticLinq.Test.Request.Expressions
         [Fact]
         public void CanReduceIsAlwaysFalse()
         {
-            var criteria = new TermCriteria("field", "value");
+            var criteria = TermsCriteria.Build("field", "value");
 
             var expression = new CriteriaExpression(criteria);
 
@@ -41,7 +41,7 @@ namespace ElasticLinq.Test.Request.Expressions
         [Fact]
         public void ToStringReturnsCriteriaToString()
         {
-            var criteria = new TermCriteria("field", "value");
+            var criteria = TermsCriteria.Build("field", "value");
 
             var expression = new CriteriaExpression(criteria);
 

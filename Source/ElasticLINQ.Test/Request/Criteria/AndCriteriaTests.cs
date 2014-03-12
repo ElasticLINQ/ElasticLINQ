@@ -10,8 +10,8 @@ namespace ElasticLinq.Test.Request.Criteria
 {
     public class AndCriteriaTests
     {
-        private readonly ICriteria sampleCriteria1 = new TermCriteria("first", "1st");
-        private readonly ICriteria sampleCriteria2 = new TermCriteria("second", "2nd");
+        private readonly ICriteria sampleCriteria1 = TermsCriteria.Build("first", "1st");
+        private readonly ICriteria sampleCriteria2 = TermsCriteria.Build("second", "2nd");
 
         [Fact]
         public void NamePropertyIsAnd()
@@ -107,7 +107,7 @@ namespace ElasticLinq.Test.Request.Criteria
         public void ToStringContainsSubfields()
         {
             var existsCriteria = new ExistsCriteria("thisIsAMissingField");
-            var termCriteria = new TermCriteria("termField", "some value");
+            var termCriteria = TermsCriteria.Build("termField", "some value");
 
             var andCriteria = AndCriteria.Combine(existsCriteria, termCriteria);
             var result = andCriteria.ToString();

@@ -51,7 +51,7 @@ namespace ElasticLinq.Test.Request.Formatter
         [Fact]
         public void BodyContainsFilterTerm()
         {
-            var termCriteria = new TermCriteria("term1", "singlecriteria") { ExecutionMode = TermsExecutionMode.@bool };
+            var termCriteria = TermsCriteria.Build(TermsExecutionMode.@bool, "term1", "singlecriteria");
 
             var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest { Type = "type1", Filter = termCriteria });
             var body = JObject.Parse(formatter.Body);
@@ -65,7 +65,7 @@ namespace ElasticLinq.Test.Request.Formatter
         [Fact]
         public void BodyContainsFilterTerms()
         {
-            var termCriteria = new TermCriteria("term1", "criteria1", "criteria2");
+            var termCriteria = TermsCriteria.Build("term1", "criteria1", "criteria2");
 
             var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest { Type = "type1", Filter = termCriteria });
             var body = JObject.Parse(formatter.Body);
@@ -80,7 +80,7 @@ namespace ElasticLinq.Test.Request.Formatter
         [Fact]
         public void BodyContainsFilterTermsWithExecutionMode()
         {
-            var termCriteria = new TermCriteria("term1", "criteria1", "criteria2") { ExecutionMode = TermsExecutionMode.and };
+            var termCriteria = TermsCriteria.Build(TermsExecutionMode.and, "term1", "criteria1", "criteria2");
 
             var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest { Type = "type1", Filter = termCriteria });
             var body = JObject.Parse(formatter.Body);
@@ -122,7 +122,7 @@ namespace ElasticLinq.Test.Request.Formatter
         [Fact]
         public void BodyContainsFilterNot()
         {
-            var termCriteria = new TermCriteria("term1", "alpha", "bravo", "charlie", "delta", "echo");
+            var termCriteria = TermsCriteria.Build("term1", "alpha", "bravo", "charlie", "delta", "echo");
             var notCriteria = NotCriteria.Create(termCriteria);
 
             var formatter = new PostBodyRequestFormatter(defaultConnection, new ElasticSearchRequest { Type = "type1", Filter = notCriteria });
