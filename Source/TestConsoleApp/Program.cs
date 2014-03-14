@@ -11,7 +11,7 @@ namespace TestConsoleApp
     {
         private static void Main()
         {
-            using (var connection = new ElasticConnection(new Uri("http://192.168.2.14:9200")) {Index = "tier3"})
+            using (var connection = new ElasticConnection(new Uri("http://192.168.2.14:9200"), index: "tier3"))
             {
                 var log = new ConsoleLog();
                 var context = new ElasticContext(connection, new CouchbaseElasticMapping(), log);

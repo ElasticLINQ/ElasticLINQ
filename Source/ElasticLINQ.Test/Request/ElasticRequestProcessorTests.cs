@@ -18,7 +18,7 @@ namespace ElasticLinq.Test.Request
 {
     public class ElasticRequestProcessorTests
     {
-        private static readonly ElasticConnection connection = new ElasticConnection(new Uri("http://localhost")) { Index = "SearchIndex" };
+        private static readonly ElasticConnection connection = new ElasticConnection(new Uri("http://localhost"), index: "SearchIndex");
         private static readonly ILog log = NullLog.Instance;
         private static readonly IRetryPolicy retryPolicy = NullRetryPolicy.Instance;
 
@@ -127,7 +127,7 @@ namespace ElasticLinq.Test.Request
             var messageHandler = new SpyMessageHandler();
             var log = new SpyLog();
             messageHandler.Response.Content = new StringContent(responseString);
-            var localConnection = new ElasticConnection(messageHandler, new Uri("http://localhost"), "myUser", "myPass") { Index = "SearchIndex" };
+            var localConnection = new ElasticConnection(messageHandler, new Uri("http://localhost"), "myUser", "myPass", index: "SearchIndex");
             var processor = new ElasticRequestProcessor(localConnection, log, retryPolicy);
             var request = new ElasticSearchRequest { Type = "abc123", Size = 2112 };
 
