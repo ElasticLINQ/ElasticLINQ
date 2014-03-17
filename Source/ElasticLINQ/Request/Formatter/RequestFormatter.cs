@@ -1,6 +1,5 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
-using Newtonsoft.Json.Linq;
 using System;
 using System.Globalization;
 
@@ -53,14 +52,6 @@ namespace ElasticLinq.Request.Formatter
                 return timeSpan.TotalSeconds.ToString(CultureInfo.InvariantCulture) + "s";
 
             return timeSpan.TotalMinutes.ToString(CultureInfo.InvariantCulture) + "m";
-        }
-
-        internal static JToken FormatTerm(object value)
-        {
-            if (value is string)
-                return new JValue(value.ToString().ToLower(CultureInfo.CurrentCulture));
-
-            return JToken.FromObject(value);
         }
     }
 }

@@ -51,7 +51,7 @@ namespace ElasticLinq.Request.Criteria
                                  && termCriteria.All(f => f.IsOrCriteria);
 
             return areAllSameTerm
-                ? TermsCriteria.Build(termCriteria[0].Field, termCriteria.SelectMany(f => f.Values).Distinct())
+                ? TermsCriteria.Build(termCriteria[0].Field, termCriteria[0].Member, termCriteria.SelectMany(f => f.Values).Distinct())
                 : null;
         }
     }

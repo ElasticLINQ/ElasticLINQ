@@ -41,8 +41,9 @@ namespace ElasticLinq.Test
 
         public string ToElasticSearchQuery()
         {
-            var request = ElasticQueryTranslator.Translate(Context.Mapping, Expression);
-            var formatter = new PostBodyRequestFormatter(Context.Connection, request.SearchRequest);
+            var prefix = Context.Mapping.GetDocumentMappingPrefix(typeof(T));
+            var request = ElasticQueryTranslator.Translate(Context.Mapping, prefix, Expression);
+            var formatter = new PostBodyRequestFormatter(Context.Connection, Context.Mapping, request.SearchRequest);
             return formatter.Body;
         }
     }

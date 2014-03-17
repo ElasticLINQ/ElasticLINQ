@@ -2,7 +2,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Reflection;
 
 namespace ElasticLinq.Request.Criteria
 {
@@ -13,12 +13,14 @@ namespace ElasticLinq.Request.Criteria
     internal class TermCriteria : ITermsCriteria
     {
         private readonly string field;
+        private readonly MemberInfo member;
         private readonly object value;
 
-        public TermCriteria(string field, object value)
+        public TermCriteria(string field, MemberInfo member, object value)
         {
             this.field = field;
             this.value = value;
+            this.member = member;
         }
 
         public string Field
@@ -30,6 +32,11 @@ namespace ElasticLinq.Request.Criteria
         bool ITermsCriteria.IsOrCriteria
         {
             get { return true; }
+        }
+
+        public MemberInfo Member
+        {
+            get { return member; }
         }
 
         public string Name

@@ -24,21 +24,11 @@ namespace ElasticLinq.Test.Request.Visitors
         private readonly IElasticMapping validMapping = new TrivialElasticMapping();
 
         [Fact]
-        public void RebindThrowsArgumentNullExceptionIfParameterIsNull()
+        public void Rebind_GuardClauses()
         {
-            Assert.Throws<ArgumentNullException>(() => ProjectionExpressionVisitor.Rebind(null, validMapping, Expression.Constant(1)));
-        }
-
-        [Fact]
-        public void RebindThrowsArgumentNullExceptionIfMappingIsNull()
-        {
-            Assert.Throws<ArgumentNullException>(() => ProjectionExpressionVisitor.Rebind(validParameter, null, Expression.Constant(1)));
-        }
-
-        [Fact]
-        public void RebindThrowsArgumentNullExceptionIfSelectorIsNull()
-        {
-            Assert.Throws<ArgumentNullException>(() => ProjectionExpressionVisitor.Rebind(validParameter, validMapping, null));
+            Assert.Throws<ArgumentNullException>(() => ProjectionExpressionVisitor.Rebind(null, "prefix", validMapping, Expression.Constant(1)));
+            Assert.Throws<ArgumentNullException>(() => ProjectionExpressionVisitor.Rebind(validParameter, "prefix", null, Expression.Constant(1)));
+            Assert.Throws<ArgumentNullException>(() => ProjectionExpressionVisitor.Rebind(validParameter, "prefix", validMapping, null));
         }
 
         [Fact]
@@ -46,34 +36,36 @@ namespace ElasticLinq.Test.Request.Visitors
         {
             var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(s => s.Name);
             var hitParameter = Expression.Parameter(typeof(Hit));
-            var rebound = ProjectionExpressionVisitor.Rebind(hitParameter, validMapping, source.Expression);
+            var rebound = ProjectionExpressionVisitor.Rebind(hitParameter, "prefix", validMapping, source.Expression);
 
-            Assert.Contains("name", rebound.FieldNames);
+            Assert.Contains("prefix.name", rebound.FieldNames);
             Assert.Equal(1, rebound.FieldNames.Count());
         }
 
         [Fact]
         public void RebindCollectsAnonymousProjectionPropertiesFieldNames()
         {
-            var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(s => new { s.Name, s.Id });
+            var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(s => new { s.Name, s.Id, score = ElasticFields.Score });
             var hitParameter = Expression.Parameter(typeof(Hit));
-            var rebound = ProjectionExpressionVisitor.Rebind(hitParameter, validMapping, source.Expression);
+            var rebound = ProjectionExpressionVisitor.Rebind(hitParameter, "prefix", validMapping, source.Expression);
 
-            Assert.Contains("name", rebound.FieldNames);
-            Assert.Contains("id", rebound.FieldNames);
-            Assert.Equal(2, rebound.FieldNames.Count());
+            Assert.Contains("prefix.name", rebound.FieldNames);
+            Assert.Contains("prefix.id", rebound.FieldNames);
+            Assert.Contains("_score", rebound.FieldNames);
+            Assert.Equal(3, rebound.FieldNames.Count());
         }
 
         [Fact]
         public void RebindCollectsTupleCreateProjectionPropertiesFieldNames()
         {
-            var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(s => Tuple.Create(s.Name, s.Id));
+            var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(s => Tuple.Create(s.Name, s.Id, ElasticFields.Score));
             var hitParameter = Expression.Parameter(typeof(Hit));
-            var rebound = ProjectionExpressionVisitor.Rebind(hitParameter, validMapping, source.Expression);
+            var rebound = ProjectionExpressionVisitor.Rebind(hitParameter, "prefix", validMapping, source.Expression);
 
-            Assert.Contains("name", rebound.FieldNames);
-            Assert.Contains("id", rebound.FieldNames);
-            Assert.Equal(2, rebound.FieldNames.Count());
+            Assert.Contains("prefix.name", rebound.FieldNames);
+            Assert.Contains("prefix.id", rebound.FieldNames);
+            Assert.Contains("_score", rebound.FieldNames);
+            Assert.Equal(3, rebound.FieldNames.Count());
         }
 
         [Fact]
@@ -83,7 +75,7 @@ namespace ElasticLinq.Test.Request.Visitors
             const string key = "Summer";
             var dictionary = new Dictionary<string, JToken> { { key, JToken.FromObject(expected) } };
 
-            var actual = (Sample) ProjectionExpressionVisitor.GetFieldValue(dictionary, key, typeof(Sample));
+            var actual = (Sample)ProjectionExpressionVisitor.GetFieldValue(dictionary, key, typeof(Sample));
 
             Assert.Equal(expected.Id, actual.Id);
             Assert.Equal(expected.Name, actual.Name);

@@ -24,7 +24,7 @@ namespace ElasticLinq.Request.Visitors
             Mapping = mapping;
         }
 
-        internal static Expression Rebind(ParameterExpression parameter, IElasticMapping mapping, Expression selector)
+        internal static Expression Rebind(ParameterExpression parameter, string prefix, IElasticMapping mapping, Expression selector)
         {
             var visitor = new ElasticFieldsProjectionExpressionVisitor(parameter, mapping);
             Argument.EnsureNotNull("selector", selector);
@@ -40,7 +40,7 @@ namespace ElasticLinq.Request.Visitors
 
         protected virtual Expression VisitElasticField(MemberExpression m)
         {
-            return Expression.Convert(Expression.PropertyOrField(Parameter, Mapping.GetFieldName(m.Member)), m.Type);
+            return Expression.Convert(Expression.PropertyOrField(Parameter, "_" + m.Member.Name.ToLowerInvariant()), m.Type);
         }
     }
 }

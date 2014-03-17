@@ -4,14 +4,16 @@ using ElasticLinq.Request.Criteria;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Reflection;
 using Xunit;
 
 namespace ElasticLinq.Test.Request.Criteria
 {
     public class AndCriteriaTests
     {
-        private readonly ICriteria sampleCriteria1 = TermsCriteria.Build("first", "1st");
-        private readonly ICriteria sampleCriteria2 = TermsCriteria.Build("second", "2nd");
+        private readonly static MemberInfo memberInfo = typeof(string).GetProperty("Length");
+        private readonly ICriteria sampleCriteria1 = TermsCriteria.Build("first", memberInfo, "1st");
+        private readonly ICriteria sampleCriteria2 = TermsCriteria.Build("second", memberInfo, "2nd");
 
         [Fact]
         public void NamePropertyIsAnd()
@@ -49,7 +51,7 @@ namespace ElasticLinq.Test.Request.Criteria
         [Fact]
         public void CombineWithSingleCriteriaReturnsThatCriteria()
         {
-            var rangeCriteria = new RangeCriteria("field", RangeComparison.LessThan, 1);
+            var rangeCriteria = new RangeCriteria("field", memberInfo, RangeComparison.LessThan, 1);
             var andCriteria = AndCriteria.Combine(rangeCriteria);
 
             Assert.Same(rangeCriteria, andCriteria);
@@ -70,14 +72,15 @@ namespace ElasticLinq.Test.Request.Criteria
         [Fact]
         public void CombineWithTwoSameFieldRangeCriteriaCombinesIntoSingleRangeCriteria()
         {
-            var lowerRangeCriteria = new RangeCriteria("first", RangeComparison.GreaterThan, "lower");
-            var upperRangeCriteria = new RangeCriteria("first", RangeComparison.LessThanOrEqual, "upper");
+            var lowerRangeCriteria = new RangeCriteria("first", memberInfo, RangeComparison.GreaterThan, "lower");
+            var upperRangeCriteria = new RangeCriteria("first", memberInfo, RangeComparison.LessThanOrEqual, "upper");
 
             var andCriteria = AndCriteria.Combine(lowerRangeCriteria, upperRangeCriteria);
 
             Assert.IsType<RangeCriteria>(andCriteria);
             var rangeCriteria = (RangeCriteria)andCriteria;
             Assert.Equal(rangeCriteria.Field, lowerRangeCriteria.Field);
+            Assert.Same(memberInfo, lowerRangeCriteria.Member);
             Assert.Single(rangeCriteria.Specifications, s => s.Comparison == lowerRangeCriteria.Specifications.First().Comparison);
             Assert.Single(rangeCriteria.Specifications, s => s.Comparison == upperRangeCriteria.Specifications.First().Comparison);
         }
@@ -85,9 +88,11 @@ namespace ElasticLinq.Test.Request.Criteria
         [Fact]
         public void CombineWithDifferentFieldRangeCriteriaCombinesRangesIntoAndCriteria()
         {
-            var lowerFirstRange = new RangeCriteria("first", RangeComparison.GreaterThan, "lower");
-            var upperFirstRange = new RangeCriteria("first", RangeComparison.LessThanOrEqual, "upper");
-            var secondRange = new RangeCriteria("second", RangeComparison.GreaterThanOrEqual, "lower2");
+            var firstMemberInfo = typeof(string).GetProperty("Length");
+            var secondMemberInfo = typeof(string).GetMethod("Clone");
+            var lowerFirstRange = new RangeCriteria("first", firstMemberInfo, RangeComparison.GreaterThan, "lower");
+            var upperFirstRange = new RangeCriteria("first", firstMemberInfo, RangeComparison.LessThanOrEqual, "upper");
+            var secondRange = new RangeCriteria("second", secondMemberInfo, RangeComparison.GreaterThanOrEqual, "lower2");
 
             var criteria = AndCriteria.Combine(lowerFirstRange, secondRange, upperFirstRange);
 
@@ -99,6 +104,7 @@ namespace ElasticLinq.Test.Request.Criteria
             var combinedRange = andCriteria.Criteria.OfType<RangeCriteria>().FirstOrDefault(r => r.Specifications.Count == 2);
             Assert.NotNull(combinedRange);
             Assert.Equal(lowerFirstRange.Field, combinedRange.Field);
+            Assert.Same(firstMemberInfo, combinedRange.Member);
             Assert.Single(combinedRange.Specifications, s => s.Comparison == lowerFirstRange.Specifications.First().Comparison);
             Assert.Single(combinedRange.Specifications, s => s.Comparison == upperFirstRange.Specifications.First().Comparison);
         }
@@ -107,7 +113,7 @@ namespace ElasticLinq.Test.Request.Criteria
         public void ToStringContainsSubfields()
         {
             var existsCriteria = new ExistsCriteria("thisIsAMissingField");
-            var termCriteria = TermsCriteria.Build("termField", "some value");
+            var termCriteria = TermsCriteria.Build("termField", memberInfo, "some value");
 
             var andCriteria = AndCriteria.Combine(existsCriteria, termCriteria);
             var result = andCriteria.ToString();

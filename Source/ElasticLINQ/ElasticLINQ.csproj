@@ -59,7 +59,9 @@
     <Compile Include="Logging\NullLog.cs" />
     <Compile Include="Mapping\CouchbaseElasticMapping.cs" />
     <Compile Include="Mapping\ElasticFieldsMappingWrapper.cs" />
+    <Compile Include="Mapping\ElasticMapping.cs" />
     <Compile Include="Mapping\MappingHelpers.cs" />
+    <Compile Include="NotAnalyzedAttribute.cs" />
     <Compile Include="Request\Criteria\AndCriteria.cs" />
     <Compile Include="Request\Criteria\CompoundCriteria.cs" />
     <Compile Include="Request\Criteria\ExistsCriteria.cs" />

@@ -19,7 +19,7 @@ namespace ElasticLinq
     /// </summary>
     public sealed class ElasticQueryProvider : IQueryProvider
     {
-        public ElasticQueryProvider(ElasticConnection connection, IElasticMapping mapping, ILog log, IRetryPolicy retryPolicy)
+        public ElasticQueryProvider(ElasticConnection connection, IElasticMapping mapping, ILog log, IRetryPolicy retryPolicy, string prefix)
         {
             Argument.EnsureNotNull("connection", connection);
             Argument.EnsureNotNull("mapping", mapping);
@@ -30,6 +30,7 @@ namespace ElasticLinq
             Mapping = mapping;
             Log = log;
             RetryPolicy = retryPolicy;
+            Prefix = prefix;
         }
 
         internal ElasticConnection Connection { get; private set; }
@@ -37,6 +38,8 @@ namespace ElasticLinq
         internal ILog Log { get; private set; }
 
         internal IElasticMapping Mapping { get; private set; }
+
+        internal string Prefix { get; private set; }
 
         internal IRetryPolicy RetryPolicy { get; private set; }
 
@@ -83,14 +86,14 @@ namespace ElasticLinq
 
         private object ExecuteInternal(Expression expression)
         {
-            var translation = ElasticQueryTranslator.Translate(Mapping, expression);
+            var translation = ElasticQueryTranslator.Translate(Mapping, Prefix, expression);
             var elementType = TypeHelper.GetSequenceElementType(expression.Type);
 
             Log.Debug(null, null, "Executing query against type {0}", elementType);
 
             try
             {
-                var response = AsyncHelper.RunSync(() => new ElasticRequestProcessor(Connection, Log, RetryPolicy).SearchAsync(translation.SearchRequest));
+                var response = AsyncHelper.RunSync(() => new ElasticRequestProcessor(Connection, Mapping, Log, RetryPolicy).SearchAsync(translation.SearchRequest));
                 if (response == null)
                     throw new InvalidOperationException("No HTTP response received.");
 

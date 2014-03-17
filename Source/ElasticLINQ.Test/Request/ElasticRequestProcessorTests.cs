@@ -1,6 +1,7 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using ElasticLinq.Logging;
+using ElasticLinq.Mapping;
 using ElasticLinq.Request;
 using ElasticLinq.Retry;
 using ElasticLinq.Test.Utility;
@@ -19,28 +20,18 @@ namespace ElasticLinq.Test.Request
     public class ElasticRequestProcessorTests
     {
         private static readonly ElasticConnection connection = new ElasticConnection(new Uri("http://localhost"), index: "SearchIndex");
+        private static readonly IElasticMapping mapping = new TrivialElasticMapping();
         private static readonly ILog log = NullLog.Instance;
         private static readonly IRetryPolicy retryPolicy = NullRetryPolicy.Instance;
 
         [Fact]
         [ExcludeFromCodeCoverage] // Expression isn't "executed"
-        public static void ConstructorThrowsArgumentNullExceptionWhenConnectionIsNull()
+        public static void Constructor_GuardClauses()
         {
-            Assert.Throws<ArgumentNullException>(() => new ElasticRequestProcessor(null, log, retryPolicy));
-        }
-
-        [Fact]
-        [ExcludeFromCodeCoverage] // Expression isn't "executed"
-        public static void ConstructorThrowsArgumentNullExceptionWhenLogIsNull()
-        {
-            Assert.Throws<ArgumentNullException>(() => new ElasticRequestProcessor(connection, null, retryPolicy));
-        }
-
-        [Fact]
-        [ExcludeFromCodeCoverage] // Expression isn't "executed"
-        public static void ConstructorThrowsArgumentNullExceptionWhenRetryPolicyIsNull()
-        {
-            Assert.Throws<ArgumentNullException>(() => new ElasticRequestProcessor(connection, log, null));
+            Assert.Throws<ArgumentNullException>(() => new ElasticRequestProcessor(null, mapping, log, retryPolicy));
+            Assert.Throws<ArgumentNullException>(() => new ElasticRequestProcessor(connection, null, log, retryPolicy));
+            Assert.Throws<ArgumentNullException>(() => new ElasticRequestProcessor(connection, mapping, null, retryPolicy));
+            Assert.Throws<ArgumentNullException>(() => new ElasticRequestProcessor(connection, mapping, log, null));
         }
 
         [Fact]
@@ -48,7 +39,7 @@ namespace ElasticLinq.Test.Request
         {
             var messageHandler = new SpyMessageHandler();
             var localConnection = new ElasticConnection(messageHandler, new Uri("http://localhost"));
-            var processor = new ElasticRequestProcessor(localConnection, log, retryPolicy);
+            var processor = new ElasticRequestProcessor(localConnection, mapping, log, retryPolicy);
             var request = new ElasticSearchRequest { Type = "docType" };
 
             await processor.SearchAsync(request);
@@ -61,7 +52,7 @@ namespace ElasticLinq.Test.Request
         {
             var messageHandler = new SpyMessageHandler();
             var localConnection = new ElasticConnection(messageHandler, new Uri("http://localhost"), "myUser", "myPass");
-            var processor = new ElasticRequestProcessor(localConnection, log, retryPolicy);
+            var processor = new ElasticRequestProcessor(localConnection, mapping, log, retryPolicy);
             var request = new ElasticSearchRequest { Type = "docType" };
 
             await processor.SearchAsync(request);
@@ -78,7 +69,7 @@ namespace ElasticLinq.Test.Request
             var messageHandler = new SpyMessageHandler();
             messageHandler.Response.StatusCode = HttpStatusCode.NotFound;
             var localConnection = new ElasticConnection(messageHandler, new Uri("http://localhost"), "myUser", "myPass");
-            var processor = new ElasticRequestProcessor(localConnection, log, retryPolicy);
+            var processor = new ElasticRequestProcessor(localConnection, mapping, log, retryPolicy);
             var request = new ElasticSearchRequest { Type = "docType" };
 
             var ex = Record.Exception(() => processor.SearchAsync(request).GetAwaiter().GetResult());
@@ -128,7 +119,7 @@ namespace ElasticLinq.Test.Request
             var log = new SpyLog();
             messageHandler.Response.Content = new StringContent(responseString);
             var localConnection = new ElasticConnection(messageHandler, new Uri("http://localhost"), "myUser", "myPass", index: "SearchIndex");
-            var processor = new ElasticRequestProcessor(localConnection, log, retryPolicy);
+            var processor = new ElasticRequestProcessor(localConnection, mapping, log, retryPolicy);
             var request = new ElasticSearchRequest { Type = "abc123", Size = 2112 };
 
             await processor.SearchAsync(request);

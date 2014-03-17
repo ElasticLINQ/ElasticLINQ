@@ -3,6 +3,7 @@
 using ElasticLinq.Mapping;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Reflection;
 using Xunit;
 
@@ -10,94 +11,96 @@ namespace ElasticLinq.Test.Mapping
 {
     public class MappingHelpersTests
     {
+        private readonly static CultureInfo USCulture = new CultureInfo(0x0409);
+
         [Fact]
-        public void ToCamelCaseWithAllCapsLowersFirstCapitalOnly()
+        public static void ToCamelCaseWithAllCapsLowersFirstCapitalOnly()
         {
-            var actual = "ALLCAPS".ToCamelCase();
+            var actual = "ALLCAPS".ToCamelCase(USCulture);
 
             Assert.Equal("aLLCAPS", actual);
         }
 
         [Fact]
-        public void ToCamelCaseWithAllLowerCaseReturnsAllLowerCase()
+        public static void ToCamelCaseWithAllLowerCaseReturnsAllLowerCase()
         {
-            var actual = "lowercase".ToCamelCase();
+            var actual = "lowercase".ToCamelCase(USCulture);
 
             Assert.Equal("lowercase", actual);
         }
 
         [Fact]
-        public void ToCamelCaseWithMixedCaseOnlyChangesFirstLetter()
+        public static void ToCamelCaseWithMixedCaseOnlyChangesFirstLetter()
         {
-            var actual = "MixedCaseExample".ToCamelCase();
+            var actual = "MixedCaseExample".ToCamelCase(USCulture);
 
             Assert.Equal("mixedCaseExample", actual);
         }
 
         [Fact]
-        public void ToCamelCaseWithCamelCaseReturnsCamelCase()
+        public static void ToCamelCaseWithCamelCaseReturnsCamelCase()
         {
-            var actual = "alreadyCamelCase".ToCamelCase();
+            var actual = "alreadyCamelCase".ToCamelCase(USCulture);
 
             Assert.Equal("alreadyCamelCase", actual);
         }
 
         [Fact]
-        public void ToCamelCaseWithSingleCharStringReturnsSingleCharLowered()
+        public static void ToCamelCaseWithSingleCharStringReturnsSingleCharLowered()
         {
-            var actual = "S".ToCamelCase();
+            var actual = "S".ToCamelCase(USCulture);
 
             Assert.Equal("s", actual);
         }
 
         [Fact]
-        public void ToCamelCaseWithEmptyStringReturnsEmptyString()
+        public static void ToCamelCaseWithEmptyStringReturnsEmptyString()
         {
-            var actual = "".ToCamelCase();
+            var actual = "".ToCamelCase(USCulture);
 
             Assert.Equal("", actual);
         }
 
         [Fact]
         [ExcludeFromCodeCoverage] // Expression isn't "executed"
-        public void ToCamelCaseWithNullThrowsArgumentNullException()
+        public static void ToCamelCaseWithNullThrowsArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => ((string)null).ToCamelCase());
+            Assert.Throws<ArgumentNullException>(() => ((string)null).ToCamelCase(USCulture));
         }
 
         [Fact]
-        public void ToPluralWithStringNotEndingInSAddsS()
+        public static void ToPluralWithStringNotEndingInSAddsS()
         {
-            var actual = "test".ToPlural();
+            var actual = "test".ToPlural(USCulture);
 
             Assert.Equal("tests", actual);
         }
 
         [Fact]
-        public void ToPluralWithStringEndingInSDoesNotAddS()
+        public static void ToPluralWithStringEndingInSDoesNotAddS()
         {
-            var actual = "tests".ToPlural();
+            var actual = "tests".ToPlural(USCulture);
 
             Assert.Equal("tests", actual);
         }
 
         [Fact]
-        public void ToPluralWithEmptyStringReturnsEmptyString()
+        public static void ToPluralWithEmptyStringReturnsEmptyString()
         {
-            var actual = "".ToPlural();
+            var actual = "".ToPlural(USCulture);
 
             Assert.Equal("", actual);
         }
 
         [Fact]
         [ExcludeFromCodeCoverage] // Expression isn't "executed"
-        public void ToPluralWithNullThrowsArgumentNullException()
+        public static void ToPluralWithNullThrowsArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => ((string)null).ToPlural());
+            Assert.Throws<ArgumentNullException>(() => ((string)null).ToPlural(USCulture));
         }
 
         [Fact]
-        public void GetSelectionPropertyReturnsReadWriteNonGenericValueProperty()
+        public static void GetSelectionPropertyReturnsReadWriteNonGenericValueProperty()
         {
             var selectionProperty = MappingHelpers.GetSelectionProperty(typeof(ClassWithOneValidSelectionProperty));
 
@@ -108,7 +111,7 @@ namespace ElasticLinq.Test.Mapping
         }
 
         [Fact]
-        public void GetSelectionPropertyWithNoSuitablePropertyThrows()
+        public static void GetSelectionPropertyWithNoSuitablePropertyThrows()
         {
             var ex = Record.Exception(() => MappingHelpers.GetSelectionProperty(typeof(ClassWithNoValidSelectionProperties)));
 

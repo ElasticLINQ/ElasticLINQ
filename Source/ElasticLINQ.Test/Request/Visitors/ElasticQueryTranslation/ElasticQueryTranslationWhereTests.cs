@@ -17,10 +17,10 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             const string expectedConstant = "Robbie";
             var where = Robots.Where(e => expectedConstant.Equals(e.Name));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             var termCriteria = Assert.IsType<TermCriteria>(criteria);
-            Assert.Equal("name", termCriteria.Field);
+            Assert.Equal("prefix.name", termCriteria.Field);
             Assert.Equal(expectedConstant, termCriteria.Value);
         }
 
@@ -29,10 +29,10 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             const string expectedConstant = "Robbie";
             var where = Robots.Where(e => expectedConstant.Equals(e.Name));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             var termCriteria = Assert.IsType<TermCriteria>(criteria);
-            Assert.Equal("name", termCriteria.Field);
+            Assert.Equal("prefix.name", termCriteria.Field);
             Assert.Equal(expectedConstant, termCriteria.Value);
         }
 
@@ -42,10 +42,10 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             const string expectedConstant = "Marvin";
             // ReSharper disable once RedundantNameQualifier
             var where = Robots.Where(e => Object.Equals(e.Name, expectedConstant));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             var termCriteria = Assert.IsType<TermCriteria>(criteria);
-            Assert.Equal("name", termCriteria.Field);
+            Assert.Equal("prefix.name", termCriteria.Field);
             Assert.Equal(expectedConstant, termCriteria.Value);
         }
 
@@ -54,10 +54,10 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             const string expectedConstant = "Marvin";
             var where = Robots.Where(e => e.Name == expectedConstant);
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             var termCriteria = Assert.IsType<TermCriteria>(criteria);
-            Assert.Equal("name", termCriteria.Field);
+            Assert.Equal("prefix.name", termCriteria.Field);
             Assert.Equal(expectedConstant, termCriteria.Value);
         }
 
@@ -66,10 +66,10 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             const string expectedConstant = "Marvin";
             var where = Robots.Where(e => e.Name.Equals(expectedConstant));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             var termCriteria = Assert.IsType<TermCriteria>(criteria);
-            Assert.Equal("name", termCriteria.Field);
+            Assert.Equal("prefix.name", termCriteria.Field);
             Assert.Equal(expectedConstant, termCriteria.Value);
         }
 
@@ -78,10 +78,10 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             const string expectedConstant = "Marvin";
             var where = Robots.Where(e => expectedConstant.Equals(e.Name));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             var termCriteria = Assert.IsType<TermCriteria>(criteria);
-            Assert.Equal("name", termCriteria.Field);
+            Assert.Equal("prefix.name", termCriteria.Field);
             Assert.Equal(expectedConstant, termCriteria.Value);
         }
 
@@ -90,10 +90,10 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             const string expectedConstant = "Kryten";
             var where = Robots.Where(e => expectedConstant == e.Name);
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             var termCriteria = Assert.IsType<TermCriteria>(criteria);
-            Assert.Equal("name", termCriteria.Field);
+            Assert.Equal("prefix.name", termCriteria.Field);
             Assert.Equal(expectedConstant, termCriteria.Value);
         }
 
@@ -102,10 +102,10 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             const string expectedConstant = "Kryten";
             var where = Robots.Where(e => String.Equals(e.Name, expectedConstant));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             var termCriteria = Assert.IsType<TermCriteria>(criteria);
-            Assert.Equal("name", termCriteria.Field);
+            Assert.Equal("prefix.name", termCriteria.Field);
             Assert.Equal(expectedConstant, termCriteria.Value);
         }
 
@@ -114,10 +114,10 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             const string expectedConstant = "IG-88";
             var where = Robots.Where(e => String.Equals(expectedConstant, e.Name));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             var termCriteria = Assert.IsType<TermCriteria>(criteria);
-            Assert.Equal("name", termCriteria.Field);
+            Assert.Equal("prefix.name", termCriteria.Field);
             Assert.Equal(expectedConstant, termCriteria.Value);
         }
 
@@ -126,10 +126,10 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             var expectedNames = new[] { "Robbie", "Kryten", "IG-88", "Marvin" };
             var where = Robots.Where(e => expectedNames.Contains(e.Name));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             var termsCriteria = Assert.IsType<TermsCriteria>(criteria);
-            Assert.Equal("name", termsCriteria.Field);
+            Assert.Equal("prefix.name", termsCriteria.Field);
             Assert.Equal(expectedNames.Length, termsCriteria.Values.Count);
             foreach (var term in expectedNames)
                 Assert.Contains(term, termsCriteria.Values);
@@ -140,10 +140,10 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             var expectedConstant = "Robbie";
             var where = Robots.Where(e => e.Aliases.Contains(expectedConstant));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             var termCriteria = Assert.IsType<TermCriteria>(criteria);
-            Assert.Equal("aliases", termCriteria.Field);
+            Assert.Equal("prefix.aliases", termCriteria.Field);
             Assert.Equal(expectedConstant, termCriteria.Value);
         }
 
@@ -152,10 +152,10 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             var expectedNames = new[] { "Robbie", "Kryten", "IG-88", "Marvin" };
             var where = Robots.Where(e => new[] { "Robbie", "Kryten", "IG-88", "Marvin" }.Contains(e.Name));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             var termsCriteria = Assert.IsType<TermsCriteria>(criteria);
-            Assert.Equal("name", termsCriteria.Field);
+            Assert.Equal("prefix.name", termsCriteria.Field);
             Assert.Equal(expectedNames.Length, termsCriteria.Values.Count);
             foreach (var term in expectedNames)
                 Assert.Contains(term, termsCriteria.Values);
@@ -166,10 +166,10 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             var expectedNames = new List<string> { "Robbie", "Kryten", "IG-88", "Marvin" };
             var where = Robots.Where(e => expectedNames.Contains(e.Name));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             var termsCriteria = Assert.IsType<TermsCriteria>(criteria);
-            Assert.Equal("name", termsCriteria.Field);
+            Assert.Equal("prefix.name", termsCriteria.Field);
             Assert.Equal(expectedNames.Count, termsCriteria.Values.Count);
             foreach (var term in expectedNames)
                 Assert.Contains(term, termsCriteria.Values);
@@ -180,10 +180,10 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             var expectedNames = new List<string> { "Robbie", "Kryten", "IG-88", "Marvin" };
             var where = Robots.Where(e => new List<string> { "Robbie", "Kryten", "IG-88", "Marvin" }.Contains(e.Name));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             var termsCriteria = Assert.IsType<TermsCriteria>(criteria);
-            Assert.Equal("name", termsCriteria.Field);
+            Assert.Equal("prefix.name", termsCriteria.Field);
             Assert.Equal(expectedNames.Count, termsCriteria.Values.Count);
             foreach (var term in expectedNames)
                 Assert.Contains(term, termsCriteria.Values);
@@ -194,10 +194,10 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             const decimal expectedConstant = 710.956m;
             var where = Robots.Where(e => e.Cost == expectedConstant);
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             var termCriteria = Assert.IsType<TermCriteria>(criteria);
-            Assert.Equal("cost", termCriteria.Field);
+            Assert.Equal("prefix.cost", termCriteria.Field);
             Assert.Equal(expectedConstant, termCriteria.Value);
         }
 
@@ -206,10 +206,10 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             const decimal expectedConstant = 710.956m;
             var where = Robots.Where(e => decimal.Equals(e.Cost, expectedConstant));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             var termCriteria = Assert.IsType<TermCriteria>(criteria);
-            Assert.Equal("cost", termCriteria.Field);
+            Assert.Equal("prefix.cost", termCriteria.Field);
             Assert.Equal(expectedConstant, termCriteria.Value);
         }
 
@@ -218,10 +218,10 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             var expectedHourlyWages = new[] { 1.1m, 3.2m, 4.9m, 7.6m, 8.9m, 12345.678m };
             var where = Robots.Where(e => expectedHourlyWages.Contains(e.Cost));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             var termsCriteria = Assert.IsType<TermsCriteria>(criteria);
-            Assert.Equal("cost", termsCriteria.Field);
+            Assert.Equal("prefix.cost", termsCriteria.Field);
             Assert.Equal(expectedHourlyWages.Length, termsCriteria.Values.Count);
             foreach (var term in expectedHourlyWages)
                 Assert.Contains(term, termsCriteria.Values);
@@ -233,12 +233,12 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             const decimal expectedConstant = 710.956m;
             var where = Robots.Where(e => e.Cost < expectedConstant);
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             Assert.IsType<RangeCriteria>(criteria);
             var rangeCriteria = (RangeCriteria)criteria;
             Assert.Equal("range", rangeCriteria.Name);
-            Assert.Equal("cost", rangeCriteria.Field);
+            Assert.Equal("prefix.cost", rangeCriteria.Field);
             Assert.Single(rangeCriteria.Specifications, s => s.Comparison == RangeComparison.LessThan && Equals(s.Value, expectedConstant));
             Assert.Equal(1, rangeCriteria.Specifications.Count);
         }
@@ -249,12 +249,12 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             const decimal expectedConstant = 710.956m;
             var where = Robots.Where(e => e.Cost <= expectedConstant);
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             Assert.IsType<RangeCriteria>(criteria);
             var rangeCriteria = (RangeCriteria)criteria;
             Assert.Equal("range", rangeCriteria.Name);
-            Assert.Equal("cost", rangeCriteria.Field);
+            Assert.Equal("prefix.cost", rangeCriteria.Field);
             Assert.Single(rangeCriteria.Specifications, s => s.Comparison == RangeComparison.LessThanOrEqual && Equals(s.Value, expectedConstant));
             Assert.Equal(1, rangeCriteria.Specifications.Count);
         }
@@ -265,12 +265,12 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             const decimal expectedConstant = 710.956m;
             var where = Robots.Where(e => e.Cost > expectedConstant);
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             Assert.IsType<RangeCriteria>(criteria);
             var rangeCriteria = (RangeCriteria)criteria;
             Assert.Equal("range", rangeCriteria.Name);
-            Assert.Equal("cost", rangeCriteria.Field);
+            Assert.Equal("prefix.cost", rangeCriteria.Field);
             Assert.Single(rangeCriteria.Specifications, s => s.Comparison == RangeComparison.GreaterThan && Equals(s.Value, expectedConstant));
             Assert.Equal(1, rangeCriteria.Specifications.Count);
         }
@@ -281,12 +281,12 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             const decimal expectedConstant = 710.956m;
             var where = Robots.Where(e => e.Cost >= expectedConstant);
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             Assert.IsType<RangeCriteria>(criteria);
             var rangeCriteria = (RangeCriteria)criteria;
             Assert.Equal("range", rangeCriteria.Name);
-            Assert.Equal("cost", rangeCriteria.Field);
+            Assert.Equal("prefix.cost", rangeCriteria.Field);
             Assert.Single(rangeCriteria.Specifications, s => s.Comparison == RangeComparison.GreaterThanOrEqual && Equals(s.Value, expectedConstant));
             Assert.Equal(1, rangeCriteria.Specifications.Count);
         }
@@ -297,12 +297,12 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             const decimal expectedLower = 710.956m;
             const decimal expectedUpper = 3428.9m;
             var where = Robots.Where(e => e.Cost > expectedLower && e.Cost < expectedUpper);
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             Assert.IsType<RangeCriteria>(criteria);
             var rangeCriteria = (RangeCriteria)criteria;
             Assert.Equal("range", rangeCriteria.Name);
-            Assert.Equal("cost", rangeCriteria.Field);
+            Assert.Equal("prefix.cost", rangeCriteria.Field);
             Assert.Single(rangeCriteria.Specifications, s => s.Comparison == RangeComparison.GreaterThan && Equals(s.Value, expectedLower));
             Assert.Single(rangeCriteria.Specifications, s => s.Comparison == RangeComparison.LessThan && Equals(s.Value, expectedUpper));
             Assert.Equal(2, rangeCriteria.Specifications.Count);
@@ -314,12 +314,12 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             const decimal expectedLower = 710.956m;
             const decimal expectedUpper = 3428.9m;
             var where = Robots.Where(e => e.Cost >= expectedLower && e.Cost <= expectedUpper);
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             Assert.IsType<RangeCriteria>(criteria);
             var rangeCriteria = (RangeCriteria)criteria;
             Assert.Equal("range", rangeCriteria.Name);
-            Assert.Equal("cost", rangeCriteria.Field);
+            Assert.Equal("prefix.cost", rangeCriteria.Field);
             Assert.Single(rangeCriteria.Specifications, s => s.Comparison == RangeComparison.GreaterThanOrEqual && Equals(s.Value, expectedLower));
             Assert.Single(rangeCriteria.Specifications, s => s.Comparison == RangeComparison.LessThanOrEqual && Equals(s.Value, expectedUpper));
             Assert.Equal(2, rangeCriteria.Specifications.Count);
@@ -331,10 +331,10 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             const double expectedConstant = 710.956;
             // ReSharper disable once CompareOfFloatsByEqualityOperator
             var where = Robots.Where(e => e.EnergyUse == expectedConstant);
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             var termCriteria = Assert.IsType<TermCriteria>(criteria);
-            Assert.Equal("energyUse", termCriteria.Field);
+            Assert.Equal("prefix.energyUse", termCriteria.Field);
             Assert.Equal(expectedConstant, termCriteria.Value);
         }
 
@@ -343,10 +343,10 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             const double expectedConstant = 710.956;
             var where = Robots.Where(e => double.Equals(e.EnergyUse, expectedConstant));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             var termCriteria = Assert.IsType<TermCriteria>(criteria);
-            Assert.Equal("energyUse", termCriteria.Field);
+            Assert.Equal("prefix.energyUse", termCriteria.Field);
             Assert.Equal(expectedConstant, termCriteria.Value);
         }
 
@@ -355,10 +355,10 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             var expectedValues = new[] { 1.1, 3.2, 4.9, 7.6, 8.9, 12345.678 };
             var where = Robots.Where(e => expectedValues.Contains(e.EnergyUse));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             var termsCriteria = Assert.IsType<TermsCriteria>(criteria);
-            Assert.Equal("energyUse", termsCriteria.Field);
+            Assert.Equal("prefix.energyUse", termsCriteria.Field);
             Assert.Equal(expectedValues.Length, termsCriteria.Values.Count);
             foreach (var term in expectedValues)
                 Assert.Contains(term, termsCriteria.Values);
@@ -369,10 +369,10 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             const Int32 expectedConstant = 808;
             var where = Robots.Where(e => e.Id == expectedConstant);
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             var termCriteria = Assert.IsType<TermCriteria>(criteria);
-            Assert.Equal("id", termCriteria.Field);
+            Assert.Equal("prefix.id", termCriteria.Field);
             Assert.Equal(expectedConstant, termCriteria.Value);
         }
 
@@ -381,10 +381,10 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             const Int32 expectedConstant = 98004;
             var where = Robots.Where(e => int.Equals(e.Id, expectedConstant));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             var termCriteria = Assert.IsType<TermCriteria>(criteria);
-            Assert.Equal("id", termCriteria.Field);
+            Assert.Equal("prefix.id", termCriteria.Field);
             Assert.Equal(expectedConstant, termCriteria.Value);
         }
 
@@ -393,10 +393,10 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             var expectedIds = new[] { 1, 3, 2, 9, 7, 6, 123, 45678 };
             var where = Robots.Where(e => expectedIds.Contains(e.Id));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             var termsCriteria = Assert.IsType<TermsCriteria>(criteria);
-            Assert.Equal("id", termsCriteria.Field);
+            Assert.Equal("prefix.id", termsCriteria.Field);
             Assert.Equal(expectedIds.Length, termsCriteria.Values.Count);
             foreach (var term in expectedIds)
                 Assert.Contains(term, termsCriteria.Values);
@@ -407,10 +407,10 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             var expectedConstant = DateTime.Now;
             var where = Robots.Where(e => e.Started == expectedConstant);
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             var termCriteria = Assert.IsType<TermCriteria>(criteria);
-            Assert.Equal("started", termCriteria.Field);
+            Assert.Equal("prefix.started", termCriteria.Field);
             Assert.Equal(expectedConstant, termCriteria.Value);
         }
 
@@ -419,10 +419,10 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             var expectedConstant = DateTime.Now;
             var where = Robots.Where(e => DateTime.Equals(e.Started, expectedConstant));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             var termCriteria = Assert.IsType<TermCriteria>(criteria);
-            Assert.Equal("started", termCriteria.Field);
+            Assert.Equal("prefix.started", termCriteria.Field);
             Assert.Equal(expectedConstant, termCriteria.Value);
         }
 
@@ -431,11 +431,11 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             var expectedIds = new[] { 1, 3, 2, 9, 7, 6, 123, 4568 }.Select(d => DateTime.Now.AddDays(d)).ToArray();
             var where = Robots.Where(e => expectedIds.Contains(e.Started));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             var termsCriteria = Assert.IsType<TermsCriteria>(criteria);
             Assert.Equal("terms", termsCriteria.Name);
-            Assert.Equal("started", termsCriteria.Field);
+            Assert.Equal("prefix.started", termsCriteria.Field);
             Assert.Equal(expectedIds.Length, termsCriteria.Values.Count);
             foreach (var term in expectedIds)
                 Assert.Contains(term, termsCriteria.Values);
@@ -445,12 +445,12 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         public void StringEqualsNullGeneratesMissingCriteria()
         {
             var where = Robots.Where(e => e.Name == null);
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             Assert.IsType<MissingCriteria>(criteria);
             var missingCriteria = (MissingCriteria)criteria;
             Assert.Equal("missing", missingCriteria.Name);
-            Assert.Equal("name", missingCriteria.Field);
+            Assert.Equal("prefix.name", missingCriteria.Field);
         }
 
         [Fact]
@@ -458,36 +458,36 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             // ReSharper disable once NegativeEqualityExpression
             var where = Robots.Where(e => !(e.Name == null));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             Assert.IsType<ExistsCriteria>(criteria);
             var missingCriteria = (ExistsCriteria)criteria;
             Assert.Equal("exists", missingCriteria.Name);
-            Assert.Equal("name", missingCriteria.Field);
+            Assert.Equal("prefix.name", missingCriteria.Field);
         }
 
         [Fact]
         public void StringStaticEqualsNullMethodGeneratesMissingCriteria()
         {
             var where = Robots.Where(e => String.Equals(e.Name, null));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             Assert.IsType<MissingCriteria>(criteria);
             var missingCriteria = (MissingCriteria)criteria;
             Assert.Equal("missing", missingCriteria.Name);
-            Assert.Equal("name", missingCriteria.Field);
+            Assert.Equal("prefix.name", missingCriteria.Field);
         }
 
         [Fact]
         public void StringNotEqualsNullGeneratesExistsCriteria()
         {
             var where = Robots.Where(e => e.Name != null);
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             Assert.IsType<ExistsCriteria>(criteria);
             var existsCriteria = (ExistsCriteria)criteria;
             Assert.Equal("exists", existsCriteria.Name);
-            Assert.Equal("name", existsCriteria.Field);
+            Assert.Equal("prefix.name", existsCriteria.Field);
         }
 
         [Fact]
@@ -495,36 +495,36 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             // ReSharper disable once NegativeEqualityExpression
             var where = Robots.Where(e => !(e.Name != null));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             Assert.IsType<MissingCriteria>(criteria);
             var missingCriteria = (MissingCriteria)criteria;
             Assert.Equal("missing", missingCriteria.Name);
-            Assert.Equal("name", missingCriteria.Field);
+            Assert.Equal("prefix.name", missingCriteria.Field);
         }
 
         [Fact]
         public void StringStaticNotEqualsNullMethodGeneratesMissingCriteria()
         {
             var where = Robots.Where(e => !String.Equals(e.Name, null));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             Assert.IsType<ExistsCriteria>(criteria);
             var existsCriteria = (ExistsCriteria)criteria;
             Assert.Equal("exists", existsCriteria.Name);
-            Assert.Equal("name", existsCriteria.Field);
+            Assert.Equal("prefix.name", existsCriteria.Field);
         }
 
         [Fact]
         public void NullableIntEqualsNullGeneratesMissingCriteria()
         {
             var where = Robots.Where(e => e.Zone == null);
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             Assert.IsType<MissingCriteria>(criteria);
             var missingCriteria = (MissingCriteria)criteria;
             Assert.Equal("missing", missingCriteria.Name);
-            Assert.Equal("zone", missingCriteria.Field);
+            Assert.Equal("prefix.zone", missingCriteria.Field);
         }
 
         [Fact]
@@ -533,24 +533,24 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             // ReSharper disable once AccessToStaticMemberViaDerivedType
             // ReSharper disable once RedundantNameQualifier
             var where = Robots.Where(e => Nullable<int>.Equals(e.Zone, null));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             Assert.IsType<MissingCriteria>(criteria);
             var missingCriteria = (MissingCriteria)criteria;
             Assert.Equal("missing", missingCriteria.Name);
-            Assert.Equal("zone", missingCriteria.Field);
+            Assert.Equal("prefix.zone", missingCriteria.Field);
         }
 
         [Fact]
         public void NullableIntNotEqualsNullGeneratesExistsCriteria()
         {
             var where = Robots.Where(e => e.Zone != null);
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             Assert.IsType<ExistsCriteria>(criteria);
             var existsCriteria = (ExistsCriteria)criteria;
             Assert.Equal("exists", existsCriteria.Name);
-            Assert.Equal("zone", existsCriteria.Field);
+            Assert.Equal("prefix.zone", existsCriteria.Field);
         }
 
         [Fact]
@@ -559,43 +559,43 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             // ReSharper disable once AccessToStaticMemberViaDerivedType
             // ReSharper disable once RedundantNameQualifier
             var where = Robots.Where(e => !Nullable<int>.Equals(e.Zone, null));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             Assert.IsType<ExistsCriteria>(criteria);
             var existsCriteria = (ExistsCriteria)criteria;
             Assert.Equal("exists", existsCriteria.Name);
-            Assert.Equal("zone", existsCriteria.Field);
+            Assert.Equal("prefix.zone", existsCriteria.Field);
         }
 
         [Fact]
         public void NullableIntNotValuePropertyGeneratesExistsCriteria()
         {
             var where = Robots.Where(e => e.Zone.HasValue);
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             Assert.IsType<ExistsCriteria>(criteria);
             var existsCriteria = (ExistsCriteria)criteria;
             Assert.Equal("exists", existsCriteria.Name);
-            Assert.Equal("zone", existsCriteria.Field);
+            Assert.Equal("prefix.zone", existsCriteria.Field);
         }
 
         [Fact]
         public void NullableIntNotHasValuePropertyGeneratesMissingCriteria()
         {
             var where = Robots.Where(e => !e.Zone.HasValue);
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             Assert.IsType<MissingCriteria>(criteria);
             var missingCriteria = (MissingCriteria)criteria;
             Assert.Equal("missing", missingCriteria.Name);
-            Assert.Equal("zone", missingCriteria.Field);
+            Assert.Equal("prefix.zone", missingCriteria.Field);
         }
 
         [Fact]
         public void OrOperatorGeneratesOrCriteria()
         {
             var where = Robots.Where(e => e.Name == "IG-88" || e.Cost > 1);
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             Assert.IsType<OrCriteria>(criteria);
             var orCriteria = (OrCriteria)criteria;
@@ -610,7 +610,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             var possibleIds = new[] { 1, 2, 3, 4 };
             var where = Robots.Where(e => e.Name == "IG-88" || e.Cost > 1 || e.Zone.HasValue || possibleIds.Contains(e.Id));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             Assert.IsType<OrCriteria>(criteria);
             var orCriteria = (OrCriteria)criteria;
@@ -626,7 +626,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         public void AndOperatorGeneratesAndCriteria()
         {
             var where = Robots.Where(r => r.Name == "IG-88" && r.Cost > 1);
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             Assert.IsType<AndCriteria>(criteria);
             var orCriteria = (AndCriteria)criteria;
@@ -640,7 +640,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         public void AndOperatorChainsAndsTogetherIntoSingleAndCriteria()
         {
             var where = Robots.Where(r => r.Name == "IG-88" && r.Cost > 1 && r.Zone.HasValue);
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             Assert.IsType<AndCriteria>(criteria);
             var andCriteria = (AndCriteria)criteria;
@@ -656,10 +656,10 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             var matchNames = new[] { "Robbie", "Kryten", "IG-88", "Marvin" };
             var where = Robots.Where(r => ElasticMethods.ContainsAny(r.Aliases, matchNames));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             var termsCriteria = Assert.IsType<TermsCriteria>(criteria);
-            Assert.Equal("aliases", termsCriteria.Field);
+            Assert.Equal("prefix.aliases", termsCriteria.Field);
             Assert.Contains("Robbie", termsCriteria.Values);
             Assert.Contains("Kryten", termsCriteria.Values);
             Assert.Contains("IG-88", termsCriteria.Values);
@@ -672,10 +672,10 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             var matchNames = new[] { "Robbie", "Kryten", "IG-88", "Marvin" };
             var where = Robots.Where(r => ElasticMethods.ContainsAny(matchNames, r.Aliases));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             var termsCriteria = Assert.IsType<TermsCriteria>(criteria);
-            Assert.Equal("aliases", termsCriteria.Field);
+            Assert.Equal("prefix.aliases", termsCriteria.Field);
             Assert.Contains("Robbie", termsCriteria.Values);
             Assert.Contains("Kryten", termsCriteria.Values);
             Assert.Contains("IG-88", termsCriteria.Values);
@@ -688,10 +688,10 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             var matchNames = new[] { "Robbie", "Kryten", "IG-88", "Marvin" };
             var where = Robots.Where(r => ElasticMethods.ContainsAll(r.Aliases, matchNames));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             var termsCriteria = Assert.IsType<TermsCriteria>(criteria);
-            Assert.Equal("aliases", termsCriteria.Field);
+            Assert.Equal("prefix.aliases", termsCriteria.Field);
             Assert.Contains("Robbie", termsCriteria.Values);
             Assert.Contains("Kryten", termsCriteria.Values);
             Assert.Contains("IG-88", termsCriteria.Values);
@@ -704,10 +704,10 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             var matchNames = new[] { "Robbie", "Kryten", "IG-88", "Marvin" };
             var where = Robots.Where(r => ElasticMethods.ContainsAll(matchNames, r.Aliases));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             var termsCriteria = Assert.IsType<TermsCriteria>(criteria);
-            Assert.Equal("aliases", termsCriteria.Field);
+            Assert.Equal("prefix.aliases", termsCriteria.Field);
             Assert.Contains("Robbie", termsCriteria.Values);
             Assert.Contains("Kryten", termsCriteria.Values);
             Assert.Contains("IG-88", termsCriteria.Values);
@@ -719,12 +719,12 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         public void RegexElasticMethodCreatesRegexWhereCriteria()
         {
             var where = Robots.Where(r => ElasticMethods.Regexp(r.Name, "r.*bot"));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             Assert.IsType<RegexpCriteria>(criteria);
             var regexpCriteria = (RegexpCriteria)criteria;
             Assert.Equal("regexp", regexpCriteria.Name);
-            Assert.Equal("name", regexpCriteria.Field);
+            Assert.Equal("prefix.name", regexpCriteria.Field);
             Assert.Equal("r.*bot", regexpCriteria.Regexp);
         }
 
@@ -732,12 +732,12 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         public void PrefixElasticMethodCreatesPrefixWhereCriteria()
         {
             var where = Robots.Where(r => ElasticMethods.Prefix(r.Name, "robot"));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 
             Assert.IsType<PrefixCriteria>(criteria);
             var regexpCriteria = (PrefixCriteria)criteria;
             Assert.Equal("prefix", regexpCriteria.Name);
-            Assert.Equal("name", regexpCriteria.Field);
+            Assert.Equal("prefix.name", regexpCriteria.Field);
             Assert.Equal("robot", regexpCriteria.Prefix);
         }
 
@@ -748,7 +748,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
                 .Query(r => ElasticMethods.Regexp(r.Name, "r.*bot"))
                 .Where(r => r.Zone.HasValue);
 
-            var searchRequest = ElasticQueryTranslator.Translate(Mapping, query.Expression).SearchRequest;
+            var searchRequest = ElasticQueryTranslator.Translate(Mapping, "prefix", query.Expression).SearchRequest;
 
             Assert.IsType<RegexpCriteria>(searchRequest.Query);
             Assert.IsType<ExistsCriteria>(searchRequest.Filter);
@@ -758,7 +758,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         public void QueryGeneratesQueryCriteria()
         {
             var where = Robots.Query(r => r.Name == "IG-88" && r.Cost > 1);
-            var request = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest;
+            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest;
 
             Assert.IsType<AndCriteria>(request.Query);
             Assert.Null(request.Filter);
@@ -774,7 +774,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             const string expectedQueryStringValue = "Data";
             var where = Robots.QueryString(expectedQueryStringValue);
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest;
 
             Assert.Null(criteria.Filter);
             Assert.NotNull(criteria.Query);
@@ -788,7 +788,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             const string expectedQueryStringValue = "Data";
             var where = Robots.QueryString(expectedQueryStringValue).Query(q => q.Cost > 0);
-            var request = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest;
+            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest;
 
             Assert.Null(request.Filter);
             Assert.NotNull(request.Query);

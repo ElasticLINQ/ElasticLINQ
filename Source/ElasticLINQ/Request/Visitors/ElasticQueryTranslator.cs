@@ -29,15 +29,17 @@ namespace ElasticLinq.Request.Visitors
         private Type finalItemType;
         private Func<Hit, Object> itemProjector;
         private IElasticMaterializer materializer;
+        private string prefix;
 
-        private ElasticQueryTranslator(IElasticMapping mapping)
+        private ElasticQueryTranslator(IElasticMapping mapping, string prefix)
         {
             this.mapping = new ElasticFieldsMappingWrapper(mapping);
+            this.prefix = prefix;
         }
 
-        internal static ElasticTranslateResult Translate(IElasticMapping mapping, Expression e)
+        internal static ElasticTranslateResult Translate(IElasticMapping mapping, string prefix, Expression e)
         {
-            return new ElasticQueryTranslator(mapping).Translate(e);
+            return new ElasticQueryTranslator(mapping, prefix).Translate(e);
         }
 
         private ElasticTranslateResult Translate(Expression e)
@@ -45,9 +47,9 @@ namespace ElasticLinq.Request.Visitors
             var evaluated = PartialEvaluator.Evaluate(e);
             Visit(evaluated);
 
-            searchRequest.Type = mapping.GetTypeName(type);
+            searchRequest.Type = mapping.GetDocumentType(type);
             if (searchRequest.Filter == null && searchRequest.Query == null)
-                searchRequest.Filter = mapping.GetTypeSelectionCriteria(type);
+                searchRequest.Filter = mapping.GetTypeExistsCriteria(type);
 
             if (materializer == null)
                 materializer = new ElasticManyHitsMaterializer(itemProjector ?? DefaultItemProjector, finalItemType ?? type);
@@ -107,7 +109,7 @@ namespace ElasticLinq.Request.Visitors
             if (cm != null)
             {
                 var values = ((IEnumerable)cm.ConstantExpression.Value).Cast<object>().ToArray();
-                return new CriteriaExpression(TermsCriteria.Build(executionMode, mapping.GetFieldName(cm.MemberExpression.Member), values));
+                return new CriteriaExpression(TermsCriteria.Build(executionMode, mapping.GetFieldName(prefix, cm.MemberExpression.Member), cm.MemberExpression.Member, values));
             }
 
             throw new NotSupportedException(methodName + " must be between a Member and a Constant");
@@ -118,7 +120,7 @@ namespace ElasticLinq.Request.Visitors
             var cm = ConstantMemberPair.Create(left, right);
 
             if (cm != null)
-                return new CriteriaExpression(new PrefixCriteria(mapping.GetFieldName(cm.MemberExpression.Member), cm.ConstantExpression.Value.ToString()));
+                return new CriteriaExpression(new PrefixCriteria(mapping.GetFieldName(prefix, cm.MemberExpression.Member), cm.ConstantExpression.Value.ToString()));
 
             throw new NotSupportedException("Prefix must be between a Member and a Constant");
         }
@@ -128,7 +130,7 @@ namespace ElasticLinq.Request.Visitors
             var cm = ConstantMemberPair.Create(left, right);
 
             if (cm != null)
-                return new CriteriaExpression(new RegexpCriteria(mapping.GetFieldName(cm.MemberExpression.Member), cm.ConstantExpression.Value.ToString()));
+                return new CriteriaExpression(new RegexpCriteria(mapping.GetFieldName(prefix, cm.MemberExpression.Member), cm.ConstantExpression.Value.ToString()));
 
             throw new NotSupportedException("Regexp must be between a Member and a Constant");
         }
@@ -176,18 +178,20 @@ namespace ElasticLinq.Request.Visitors
             // Where(x => constantsList.Contains(x.Property))
             if (source is ConstantExpression && matched is MemberExpression)
             {
-                var field = mapping.GetFieldName(((MemberExpression)matched).Member);
+                var member = ((MemberExpression)matched).Member;
+                var field = mapping.GetFieldName(prefix, member);
                 var containsSource = ((IEnumerable)((ConstantExpression)source).Value).Cast<object>();
                 var values = new List<object>(containsSource);
-                return new CriteriaExpression(TermsCriteria.Build(field, values.Distinct()));
+                return new CriteriaExpression(TermsCriteria.Build(field, member, values.Distinct()));
             }
 
             // Where(x => x.SomeList.Contains(constantValue))
             if (source is MemberExpression && matched is ConstantExpression)
             {
-                var field = mapping.GetFieldName(((MemberExpression)source).Member);
+                var member = ((MemberExpression)source).Member;
+                var field = mapping.GetFieldName(prefix, member);
                 var value = ((ConstantExpression)matched).Value;
-                return new CriteriaExpression(TermsCriteria.Build(field, value));
+                return new CriteriaExpression(TermsCriteria.Build(field, member, value));
             }
 
             throw new NotSupportedException(string.Format("Unknown source '{0}' for Contains operation", source));
@@ -462,8 +466,7 @@ namespace ElasticLinq.Request.Visitors
 
         private Expression CreateExists(ConstantMemberPair cm, bool positiveTest)
         {
-            var fieldName = mapping.GetFieldName(UnwrapNullableMethodExpression(cm.MemberExpression));
-
+            var fieldName = mapping.GetFieldName(prefix, UnwrapNullableMethodExpression(cm.MemberExpression));
             var value = cm.ConstantExpression.Value ?? false;
 
             if (value.Equals(positiveTest))
@@ -478,13 +481,15 @@ namespace ElasticLinq.Request.Visitors
         private Expression VisitEquals(Expression left, Expression right)
         {
             var cm = ConstantMemberPair.Create(left, right);
+            if (cm == null)
+                throw new NotSupportedException("Equality must be between a Member and a Constant");
 
-            if (cm != null)
-                return cm.IsNullTest
-                    ? CreateExists(cm, true)
-                    : new CriteriaExpression(TermsCriteria.Build(mapping.GetFieldName(cm.MemberExpression.Member), cm.ConstantExpression.Value));
+            if (cm.IsNullTest)
+                return CreateExists(cm, true);
 
-            throw new NotSupportedException("Equality must be between a Member and a Constant");
+            var member = cm.MemberExpression.Member;
+            var fieldName = mapping.GetFieldName(prefix, member);
+            return new CriteriaExpression(TermsCriteria.Build(fieldName, member, cm.ConstantExpression.Value));
         }
 
         private static MemberInfo UnwrapNullableMethodExpression(MemberExpression m)
@@ -498,26 +503,27 @@ namespace ElasticLinq.Request.Visitors
         private Expression VisitNotEqual(Expression left, Expression right)
         {
             var cm = ConstantMemberPair.Create(left, right);
+            if (cm == null)
+                throw new NotSupportedException("A not-equal expression must consist of a constant and a member");
 
-            if (cm != null)
-                return cm.IsNullTest
-                    ? CreateExists(cm, false)
-                    : new CriteriaExpression(NotCriteria.Create(TermsCriteria.Build(mapping.GetFieldName(cm.MemberExpression.Member), cm.ConstantExpression.Value)));
+            if (cm.IsNullTest)
+                return CreateExists(cm, false);
 
-            throw new NotSupportedException("A not-equal expression must consist of a constant and a member");
+            var member = cm.MemberExpression.Member;
+            var fieldName = mapping.GetFieldName(prefix, member);
+            return new CriteriaExpression(NotCriteria.Create(TermsCriteria.Build(fieldName, member, cm.ConstantExpression.Value)));
+
         }
 
         private Expression VisitRange(ExpressionType t, Expression left, Expression right)
         {
             var cm = ConstantMemberPair.Create(left, right);
+            if (cm == null)
+                throw new NotSupportedException("A range must consist of a constant and a member");
 
-            if (cm != null)
-            {
-                var field = mapping.GetFieldName(cm.MemberExpression.Member);
-                return new CriteriaExpression(new RangeCriteria(field, ExpressionTypeToRangeType(t), cm.ConstantExpression.Value));
-            }
-
-            throw new NotSupportedException("A range must consist of a constant and a member");
+            var member = cm.MemberExpression.Member;
+            var fieldName = mapping.GetFieldName(prefix, member);
+            return new CriteriaExpression(new RangeCriteria(fieldName, member, ExpressionTypeToRangeType(t), cm.ConstantExpression.Value));
         }
 
         private static RangeComparison ExpressionTypeToRangeType(ExpressionType expressionType)
@@ -543,7 +549,7 @@ namespace ElasticLinq.Request.Visitors
             var final = Visit(lambda.Body) as MemberExpression;
             if (final != null)
             {
-                var fieldName = mapping.GetFieldName(final.Member);
+                var fieldName = mapping.GetFieldName(prefix, final.Member);
                 var ignoreUnmapped = TypeHelper.IsNullable(final.Type); // Consider a config switch?
                 searchRequest.SortOptions.Insert(0, new SortOption(fieldName, ascending, ignoreUnmapped));
             }
@@ -603,14 +609,14 @@ namespace ElasticLinq.Request.Visitors
         }
 
         /// <summary>
-        /// We are using the whole entity in a new select projection. Rebind any ElasticField references to JObject
+        /// We are using the whole entity in a new select projection. Re-bind any ElasticField references to JObject
         /// and ensure the entity parameter is a freshly materialized entity object from our default materializer.
         /// </summary>
-        /// <param name="selectExpression">Select expression to rebind.</param>
+        /// <param name="selectExpression">Select expression to re-bind.</param>
         /// <param name="entityParameter">Parameter that references the whole entity.</param>
         private void RebindElasticFieldsAndChainProjector(Expression selectExpression, ParameterExpression entityParameter)
         {
-            var projection = ElasticFieldsProjectionExpressionVisitor.Rebind(projectionParameter, mapping, selectExpression);
+            var projection = ElasticFieldsProjectionExpressionVisitor.Rebind(projectionParameter, prefix, mapping, selectExpression);
             var compiled = Expression.Lambda(projection, entityParameter, projectionParameter).Compile();
             itemProjector = h => compiled.DynamicInvoke(DefaultItemProjector(h), h);
             finalItemType = selectExpression.Type;
@@ -620,10 +626,10 @@ namespace ElasticLinq.Request.Visitors
         /// We are using just some properties of the entity. Rewrite the properties as JObject field lookups and
         /// record all the field names used to ensure we only select those.
         /// </summary>
-        /// <param name="selectExpression">Select expression to rebind.</param>
+        /// <param name="selectExpression">Select expression to re-bind.</param>
         private void RebindPropertiesAndElasticFields(Expression selectExpression)
         {
-            var projection = ProjectionExpressionVisitor.Rebind(projectionParameter, mapping, selectExpression);
+            var projection = ProjectionExpressionVisitor.Rebind(projectionParameter, prefix, mapping, selectExpression);
             var compiled = Expression.Lambda(projection.Materialization, projectionParameter).Compile();
             itemProjector = h => compiled.DynamicInvoke(h);
             searchRequest.Fields.AddRange(projection.FieldNames);
@@ -655,7 +661,7 @@ namespace ElasticLinq.Request.Visitors
 
         private Func<Hit, Object> DefaultItemProjector
         {
-            get { return hit => mapping.GetObjectSource(type, hit).ToObject(type); }
+            get { return hit => hit._source.SelectToken(mapping.GetDocumentMappingPrefix(type) ?? "").ToObject(type); }
         }
     }
 }

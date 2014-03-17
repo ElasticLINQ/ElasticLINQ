@@ -35,23 +35,5 @@ namespace ElasticLinq.Test.Request.Formatter
 
             Assert.Equal(timespan.TotalMinutes.ToString(CultureInfo.InvariantCulture) + "m", actual);
         }
-
-        [Fact]
-        public void FormatValueWithStringLowercasesString()
-        {
-            const string term = "lowerCaseME";
-            var actual = RequestFormatter.FormatTerm(term);
-
-            Assert.Equal(term.ToLower(CultureInfo.CurrentCulture), actual);
-        }
-
-        [Fact]
-        public void FormatValueWithNonStringObjectReturnsObject()
-        {
-            var expected = DateTime.Now;
-            var actual = RequestFormatter.FormatTerm(expected);
-
-            Assert.Equal(expected, actual);
-        }
     }
 }

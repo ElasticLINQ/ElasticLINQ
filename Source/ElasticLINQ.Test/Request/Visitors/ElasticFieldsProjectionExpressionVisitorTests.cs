@@ -24,31 +24,21 @@ namespace ElasticLinq.Test.Request.Visitors
         private readonly IElasticMapping validMapping = new ElasticFieldsMappingWrapper(new TrivialElasticMapping());
 
         [Fact]
-        public void RebindThrowsArgumentNullExceptionIfParameterIsNull()
+        public void Rebind_GuardClauses()
         {
             Assert.Throws<ArgumentNullException>(() =>
-                ElasticFieldsProjectionExpressionVisitor.Rebind(null, validMapping, Expression.Constant(1)));
-        }
-
-        [Fact]
-        public void RebindThrowsArgumentNullExceptionIfMappingIsNull()
-        {
+                ElasticFieldsProjectionExpressionVisitor.Rebind(null, "prefix", validMapping, Expression.Constant(1)));
             Assert.Throws<ArgumentNullException>(() =>
-                ElasticFieldsProjectionExpressionVisitor.Rebind(hitParameter, null, Expression.Constant(1)));
-        }
-
-        [Fact]
-        public void RebindThrowsArgumentNullExceptionIfSelectorIsNull()
-        {
+                ElasticFieldsProjectionExpressionVisitor.Rebind(hitParameter, "prefix", null, Expression.Constant(1)));
             Assert.Throws<ArgumentNullException>(() =>
-                ElasticFieldsProjectionExpressionVisitor.Rebind(hitParameter, validMapping, null));
+                ElasticFieldsProjectionExpressionVisitor.Rebind(hitParameter, "prefix", validMapping, null));
         }
 
         [Fact]
         public void RebindEntityToEntityIsUnchanged()
         {
             var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(f => f);
-            var rebound = ElasticFieldsProjectionExpressionVisitor.Rebind(hitParameter, validMapping, source.Expression);
+            var rebound = ElasticFieldsProjectionExpressionVisitor.Rebind(hitParameter, "prefix", validMapping, source.Expression);
             Assert.Same(source.Expression, rebound);
         }
 
@@ -56,7 +46,7 @@ namespace ElasticLinq.Test.Request.Visitors
         public void RebindElasticFieldsToHitProperties()
         {
             var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(f => ElasticFields.Score);
-            var rebound = ElasticFieldsProjectionExpressionVisitor.Rebind(hitParameter, validMapping, source.Expression);
+            var rebound = ElasticFieldsProjectionExpressionVisitor.Rebind(hitParameter, "prefix", validMapping, source.Expression);
 
             var flattened = FlatteningExpressionVisitor.Flatten(rebound);
             Assert.Single(flattened.OfType<MemberExpression>(), e => e.Expression == hitParameter && e.Member.Name == "_score");
@@ -66,7 +56,7 @@ namespace ElasticLinq.Test.Request.Visitors
         public void RebindAnonymousProjectionElasticFieldsToHitProperties()
         {
             var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(f => new { ElasticFields.Score });
-            var rebound = ElasticFieldsProjectionExpressionVisitor.Rebind(hitParameter, validMapping, source.Expression);
+            var rebound = ElasticFieldsProjectionExpressionVisitor.Rebind(hitParameter, "prefix", validMapping, source.Expression);
 
             var flattened = FlatteningExpressionVisitor.Flatten(rebound);
             Assert.Single(flattened.OfType<MemberExpression>(), e => e.Expression == hitParameter && e.Member.Name == "_score");
@@ -77,7 +67,7 @@ namespace ElasticLinq.Test.Request.Visitors
         public void RebindTupleCreateMethodElasticFieldsToHitProperties()
         {
             var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(f => Tuple.Create(ElasticFields.Score));
-            var rebound = ElasticFieldsProjectionExpressionVisitor.Rebind(hitParameter, validMapping, source.Expression);
+            var rebound = ElasticFieldsProjectionExpressionVisitor.Rebind(hitParameter, "prefix", validMapping, source.Expression);
 
             var flattened = FlatteningExpressionVisitor.Flatten(rebound);
             Assert.Single(flattened.OfType<MemberExpression>(), e => e.Expression == hitParameter && e.Member.Name == "_score");
@@ -88,7 +78,7 @@ namespace ElasticLinq.Test.Request.Visitors
         public void RebindAnonymousProjectionEntityAndElasticFieldsToMaterializationAndHitProperty()
         {
             var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(f => new { f, ElasticFields.Score });
-            var rebound = ElasticFieldsProjectionExpressionVisitor.Rebind(hitParameter, validMapping, source.Expression);
+            var rebound = ElasticFieldsProjectionExpressionVisitor.Rebind(hitParameter, "prefix", validMapping, source.Expression);
 
             var flattened = FlatteningExpressionVisitor.Flatten(rebound);
             Assert.Single(flattened.OfType<MemberExpression>(), m => m.Expression == hitParameter && m.Member.Name == "_score");
@@ -103,7 +93,7 @@ namespace ElasticLinq.Test.Request.Visitors
         public void RebindTupleCreateMethodEntityAndElasticFieldsToMaterializationAndHitProperty()
         {
             var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(f => Tuple.Create(ElasticFields.Id, f));
-            var rebound = ElasticFieldsProjectionExpressionVisitor.Rebind(hitParameter, validMapping, source.Expression);
+            var rebound = ElasticFieldsProjectionExpressionVisitor.Rebind(hitParameter, "prefix", validMapping, source.Expression);
 
             var flattened = FlatteningExpressionVisitor.Flatten(rebound);
             Assert.Single(flattened.OfType<MemberExpression>(), e => e.Expression == hitParameter && e.Member.Name == "_id");
@@ -118,7 +108,7 @@ namespace ElasticLinq.Test.Request.Visitors
         public void RebindWithNonElasticMemberIsUnchanged()
         {
             var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(f => f.Name);
-            var rebound = ElasticFieldsProjectionExpressionVisitor.Rebind(hitParameter, validMapping, source.Expression);
+            var rebound = ElasticFieldsProjectionExpressionVisitor.Rebind(hitParameter, "prefix", validMapping, source.Expression);
 
             var memberExpression = FlatteningExpressionVisitor.Flatten(rebound).OfType<MemberExpression>().FirstOrDefault();
             Assert.NotNull(memberExpression);

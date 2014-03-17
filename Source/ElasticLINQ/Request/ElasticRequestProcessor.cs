@@ -1,6 +1,7 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using ElasticLinq.Logging;
+using ElasticLinq.Mapping;
 using ElasticLinq.Request.Formatter;
 using ElasticLinq.Response.Model;
 using ElasticLinq.Retry;
@@ -20,22 +21,25 @@ namespace ElasticLinq.Request
     {
         private readonly ElasticConnection connection;
         private readonly ILog log;
+        private readonly IElasticMapping mapping;
         private readonly IRetryPolicy retryPolicy;
 
-        public ElasticRequestProcessor(ElasticConnection connection, ILog log, IRetryPolicy retryPolicy)
+        public ElasticRequestProcessor(ElasticConnection connection, IElasticMapping mapping, ILog log, IRetryPolicy retryPolicy)
         {
             Argument.EnsureNotNull("connection", connection);
+            Argument.EnsureNotNull("mapping", mapping);
             Argument.EnsureNotNull("log", log);
             Argument.EnsureNotNull("retryPolicy", retryPolicy);
 
             this.connection = connection;
+            this.mapping = mapping;
             this.log = log;
             this.retryPolicy = retryPolicy;
         }
 
         public Task<ElasticResponse> SearchAsync(ElasticSearchRequest searchRequest)
         {
-            var formatter = new PostBodyRequestFormatter(connection, searchRequest);
+            var formatter = new PostBodyRequestFormatter(connection, mapping, searchRequest);
             log.Debug(null, null, "Request: POST {0}", formatter.Uri);
             log.Debug(null, null, "Body: {0}", formatter.Body);
 

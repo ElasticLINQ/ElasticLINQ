@@ -31,7 +31,7 @@ namespace ElasticLinq.Request.Criteria
                 return criteria[0];
 
             // Unwrap and combine ANDs
-            var combinedCriteria = criteria.SelectMany(c => c is AndCriteria ? ((AndCriteria) c).Criteria : new[] {c}).ToList();
+            var combinedCriteria = criteria.SelectMany(c => c is AndCriteria ? ((AndCriteria)c).Criteria : new[] { c }).ToList();
             CombineRanges(combinedCriteria);
 
             return combinedCriteria.Count == 1
@@ -46,7 +46,8 @@ namespace ElasticLinq.Request.Criteria
             {
                 foreach (var rangeCriteria in range)
                     criteria.Remove(rangeCriteria);
-                criteria.Add(new RangeCriteria(range.Key, range.SelectMany(r => r.Specifications)));
+
+                criteria.Add(new RangeCriteria(range.Key, range.First().Member, range.SelectMany(r => r.Specifications)));
             }
         }
     }

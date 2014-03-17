@@ -3,65 +3,89 @@
 using ElasticLinq.Mapping;
 using ElasticLinq.Response.Model;
 using ElasticLinq.Test.TestSupport;
+using NSubstitute;
 using System;
 using System.Reflection;
 using Xunit;
+using Xunit.Extensions;
 
 namespace ElasticLinq.Test.Mapping
 {
     public class ElasticFieldsMappingWrapperTests
     {
         [Fact]
-        public void GetTypeNamePassesThroughToUnderlingMapping()
+        public static void FormatValue_PassesThrough()
         {
-            var fakeMapping = new FakeElasticMapping();
-            var mapping = new ElasticFieldsMappingWrapper(fakeMapping);
+            var innerMapping = Substitute.For<IElasticMapping>();
+            var mapping = new ElasticFieldsMappingWrapper(innerMapping);
+            var memberInfo = typeof(string).GetProperty("Length");
+
+            mapping.FormatValue(memberInfo, "abc");
+
+            innerMapping.Received(1).FormatValue(memberInfo, "abc");
+        }
+
+        [Fact]
+        public static void GetDocumentMappingPrefix_PassesThrough()
+        {
+            var innerMapping = Substitute.For<IElasticMapping>();
+            var mapping = new ElasticFieldsMappingWrapper(innerMapping);
             var type = typeof(ElasticFieldsMappingWrapperTests);
 
-            mapping.GetTypeName(type);
+            mapping.GetDocumentMappingPrefix(type);
 
-            Assert.Single(fakeMapping.GetTypeNames, type);
-            Assert.Equal(1, fakeMapping.GetTypeNames.Count);
+            innerMapping.Received(1).GetDocumentMappingPrefix(type);
         }
 
         [Fact]
-        public void GetObjectSourcesPassesThroughToUnderlingMapping()
+        public static void GetDocumentType_PassesThrough()
         {
-            var fakeMapping = new FakeElasticMapping();
-            var mapping = new ElasticFieldsMappingWrapper(fakeMapping);
+            var innerMapping = Substitute.For<IElasticMapping>();
+            var mapping = new ElasticFieldsMappingWrapper(innerMapping);
             var type = typeof(ElasticFieldsMappingWrapperTests);
-            var hit = new Hit { _id = "testing" };
 
-            mapping.GetObjectSource(type, hit);
+            mapping.GetDocumentType(type);
 
-            Assert.Single(fakeMapping.GetObjectSources, Tuple.Create(type, hit));
-            Assert.Equal(1, fakeMapping.GetObjectSources.Count);
+            innerMapping.Received(1).GetDocumentType(type);
+        }
+
+        [Theory]
+        [InlineData("Id", "_id")]
+        [InlineData("Score", "_score")]
+        public static void GetFieldName_WithElasticFieldsMember_ReturnsRootedName(string propertyName, string expectedValue)
+        {
+            var innerMapping = Substitute.For<IElasticMapping>();
+            var mapping = new ElasticFieldsMappingWrapper(innerMapping);
+            var member = typeof(ElasticFields).GetProperty(propertyName);
+
+            var result = mapping.GetFieldName("a.b.c", member);
+
+            Assert.Equal(expectedValue, result);
+            innerMapping.Received(0).GetFieldName("a.b.c", member);
         }
 
         [Fact]
-        public void GetFieldNamePassesThroughToUnderlingMappingWhenNotElasticField()
+        public static void GetFieldName_WithNonElasticFieldsMember_PassesThrough()
         {
-            var fakeMapping = new FakeElasticMapping();
-            var mapping = new ElasticFieldsMappingWrapper(fakeMapping);
-            var memberInfo = MethodBase.GetCurrentMethod();
+            var innerMapping = Substitute.For<IElasticMapping>();
+            var mapping = new ElasticFieldsMappingWrapper(innerMapping);
+            var member = typeof(string).GetProperty("Length");
 
-            mapping.GetFieldName(memberInfo);
+            mapping.GetFieldName("a.b.c", member);
 
-            Assert.Single(fakeMapping.GetFieldNames, memberInfo);
-            Assert.Equal(1, fakeMapping.GetFieldNames.Count);
+            innerMapping.Received(1).GetFieldName("a.b.c", member);
         }
 
         [Fact]
-        public void GetFieldNameReturnsScoreForElasticFieldScore()
+        public static void GetTypeExistsCriteria_PassesThrough()
         {
-            var fakeMapping = new FakeElasticMapping();
-            var mapping = new ElasticFieldsMappingWrapper(fakeMapping);
-            var memberInfo = typeof(ElasticFields).GetMember("Score")[0];
+            var innerMapping = Substitute.For<IElasticMapping>();
+            var mapping = new ElasticFieldsMappingWrapper(innerMapping);
+            var type = typeof(ElasticFieldsMappingWrapperTests);
 
-            var fieldName = mapping.GetFieldName(memberInfo);
+            mapping.GetTypeExistsCriteria(type);
 
-            Assert.Equal("_score", fieldName);
-            Assert.Empty(fakeMapping.GetFieldNames);
+            innerMapping.Received(1).GetTypeExistsCriteria(type);
         }
     }
 }

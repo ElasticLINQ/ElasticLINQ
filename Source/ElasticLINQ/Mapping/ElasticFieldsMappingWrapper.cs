@@ -1,7 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using ElasticLinq.Request.Criteria;
-using ElasticLinq.Response.Model;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Reflection;
@@ -16,36 +15,43 @@ namespace ElasticLinq.Mapping
     {
         private readonly IElasticMapping wrapped;
 
+        /// <inheritdoc/>
         public ElasticFieldsMappingWrapper(IElasticMapping wrapped)
         {
             this.wrapped = wrapped;
         }
 
-        public string GetFieldName(MemberInfo memberInfo)
+        /// <inheritdoc/>
+        public JToken FormatValue(MemberInfo member, object value)
         {
-            return memberInfo.DeclaringType == typeof(ElasticFields)
-                ? ElasticFieldName(memberInfo) 
-                : wrapped.GetFieldName(memberInfo);
+            return wrapped.FormatValue(member, value);
         }
 
-        private static string ElasticFieldName(MemberInfo memberInfo)
+        /// <inheritdoc/>
+        public string GetDocumentMappingPrefix(Type type)
         {
-            return "_" + memberInfo.Name.ToLowerInvariant();
+            return wrapped.GetDocumentMappingPrefix(type);
         }
 
-        public string GetTypeName(Type type)
+        /// <inheritdoc/>
+        public string GetDocumentType(Type type)
         {
-            return wrapped.GetTypeName(type);
+            return wrapped.GetDocumentType(type);
         }
 
-        public JToken GetObjectSource(Type docType, Hit hit)
+        /// <inheritdoc/>
+        public string GetFieldName(string prefix, MemberInfo memberInfo)
         {
-            return wrapped.GetObjectSource(docType, hit);
+            return
+                memberInfo.DeclaringType == typeof(ElasticFields)
+                    ? "_" + memberInfo.Name.ToLowerInvariant()
+                    : wrapped.GetFieldName(prefix, memberInfo);
         }
 
-        public ICriteria GetTypeSelectionCriteria(Type docType)
+        /// <inheritdoc/>
+        public ICriteria GetTypeExistsCriteria(Type docType)
         {
-            return wrapped.GetTypeSelectionCriteria(docType);
+            return wrapped.GetTypeExistsCriteria(docType);
         }
     }
 }

@@ -18,15 +18,17 @@ namespace ElasticLinq.Request.Visitors
     internal class ProjectionExpressionVisitor : ElasticFieldsProjectionExpressionVisitor
     {
         private readonly HashSet<string> fieldNames = new HashSet<string>();
+        private readonly string prefix;
 
-        private ProjectionExpressionVisitor(ParameterExpression parameter, IElasticMapping mapping)
+        private ProjectionExpressionVisitor(ParameterExpression parameter, string prefix, IElasticMapping mapping)
             : base(parameter, mapping)
         {
+            this.prefix = prefix;
         }
 
-        internal static new Projection Rebind(ParameterExpression parameter, IElasticMapping mapping, Expression selector)
+        internal static new Projection Rebind(ParameterExpression parameter, string prefix, IElasticMapping mapping, Expression selector)
         {
-            var visitor = new ProjectionExpressionVisitor(parameter, mapping);
+            var visitor = new ProjectionExpressionVisitor(parameter, prefix, mapping);
             Argument.EnsureNotNull("selector", selector);
             var materialization = visitor.Visit(selector);
             return new Projection(visitor.fieldNames, materialization);
@@ -44,7 +46,7 @@ namespace ElasticLinq.Request.Visitors
 
         private Expression VisitFieldSelection(MemberExpression m)
         {
-            var fieldName = Mapping.GetFieldName(m.Member);
+            var fieldName = Mapping.GetFieldName(prefix, m.Member);
             fieldNames.Add(fieldName);
             var getFieldExpression = Expression.Call(null, getFieldMethod, Expression.PropertyOrField(Parameter, "fields"), Expression.Constant(fieldName), Expression.Constant(m.Type));
             return Expression.Convert(getFieldExpression, m.Type);
@@ -63,7 +65,7 @@ namespace ElasticLinq.Request.Visitors
 
         protected override Expression VisitElasticField(MemberExpression m)
         {
-            fieldNames.Add(Mapping.GetFieldName(m.Member));
+            fieldNames.Add("_" + m.Member.Name.ToLowerInvariant());
             return base.VisitElasticField(m);
         }
     }
