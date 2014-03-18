@@ -21,6 +21,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>SecurityRules.ruleset</CodeAnalysisRuleSet>
+    <DocumentationFile>bin\Debug\ElasticLinq.xml</DocumentationFile>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -29,10 +31,12 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\ElasticLinq.xml</DocumentationFile>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.6.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -55,7 +59,9 @@
     <Compile Include="Logging\NullLog.cs" />
     <Compile Include="Mapping\CouchbaseElasticMapping.cs" />
     <Compile Include="Mapping\ElasticFieldsMappingWrapper.cs" />
+    <Compile Include="Mapping\ElasticMapping.cs" />
     <Compile Include="Mapping\MappingHelpers.cs" />
+    <Compile Include="NotAnalyzedAttribute.cs" />
     <Compile Include="Request\Criteria\AndCriteria.cs" />
     <Compile Include="Request\Criteria\CompoundCriteria.cs" />
     <Compile Include="Request\Criteria\ExistsCriteria.cs" />

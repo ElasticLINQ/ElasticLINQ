@@ -27,20 +27,20 @@ namespace ElasticLinq.Request.Visitors
         private Func<Hit, Object> itemProjector;
         private IElasticMaterializer materializer;
 
-        private ElasticQueryTranslator(IElasticMapping mapping)
-            : base(mapping)
+        private ElasticQueryTranslator(IElasticMapping mapping, string prefix)
+            : base(mapping, prefix)
         {
         }
 
-        internal static ElasticTranslateResult Translate(IElasticMapping mapping, Expression e)
+        internal static ElasticTranslateResult Translate(IElasticMapping mapping, string prefix, Expression e)
         {
-            return new ElasticQueryTranslator(mapping).Translate(e);
+            return new ElasticQueryTranslator(mapping, prefix).Translate(e);
         }
 
         private ElasticTranslateResult Translate(Expression e)
         {
             var evaluated = PartialEvaluator.Evaluate(e);
-            var aggregated = FacetExpressionVisitor.Rebind(Mapping, evaluated);
+            var aggregated = FacetExpressionVisitor.Rebind(Mapping, Prefix, evaluated);
 
             if (aggregated.Collected.Count > 0)
                 CompleteFacetTranslation(aggregated);
@@ -53,10 +53,10 @@ namespace ElasticLinq.Request.Visitors
         private void CompleteHitTranslation(Expression evaluated)
         {
             Visit(evaluated);
-            searchRequest.Type = Mapping.GetTypeName(sourceType);
+            searchRequest.Type = Mapping.GetDocumentType(sourceType);
 
             if (searchRequest.Filter == null && searchRequest.Query == null)
-                searchRequest.Filter = Mapping.GetTypeSelectionCriteria(sourceType);
+                searchRequest.Filter = Mapping.GetTypeExistsCriteria(sourceType);
 
             if (materializer == null)
                 materializer = new ElasticManyHitsMaterializer(itemProjector ?? DefaultItemProjector, finalItemType ?? sourceType);
@@ -65,7 +65,7 @@ namespace ElasticLinq.Request.Visitors
         private void CompleteFacetTranslation(RebindCollectionResult<IFacet> aggregated)
         {
             Visit(aggregated.Expression);
-            searchRequest.Type = Mapping.GetTypeName(sourceType);
+            searchRequest.Type = Mapping.GetDocumentType(sourceType);
 
             searchRequest.Facets = aggregated.Collected.ToList();
             searchRequest.SearchType = "count"; // We only want facets, not hits
@@ -270,8 +270,8 @@ namespace ElasticLinq.Request.Visitors
             var final = Visit(lambda.Body) as MemberExpression;
             if (final != null)
             {
-                var fieldName = Mapping.GetFieldName(final.Member);
-                var ignoreUnmapped = final.Type.IsNullable();
+                var fieldName = Mapping.GetFieldName(Prefix, final.Member);
+                var ignoreUnmapped = final.Type.IsNullable(); // Consider a config switch?
                 searchRequest.SortOptions.Insert(0, new SortOption(fieldName, ascending, ignoreUnmapped));
             }
 
@@ -313,14 +313,14 @@ namespace ElasticLinq.Request.Visitors
         }
 
         /// <summary>
-        /// We are using the whole entity in a new select projection. Rebind any ElasticField references to JObject
+        /// We are using the whole entity in a new select projection. Re-bind any ElasticField references to JObject
         /// and ensure the entity parameter is a freshly materialized entity object from our default materializer.
         /// </summary>
-        /// <param name="selectExpression">Select expression to rebind.</param>
+        /// <param name="selectExpression">Select expression to re-bind.</param>
         /// <param name="entityParameter">Parameter that references the whole entity.</param>
         private void RebindElasticFieldsAndChainProjector(Expression selectExpression, ParameterExpression entityParameter)
         {
-            var projection = ElasticFieldsExpressionVisitor.Rebind(Mapping, selectExpression);
+            var projection = ElasticFieldsExpressionVisitor.Rebind(Prefix, Mapping, selectExpression);
             var compiled = Expression.Lambda(projection.Item1, entityParameter, projection.Item2).Compile();
             itemProjector = h => compiled.DynamicInvoke(DefaultItemProjector(h), h);
         }
@@ -329,10 +329,10 @@ namespace ElasticLinq.Request.Visitors
         /// We are using just some properties of the entity. Rewrite the properties as JObject field lookups and
         /// record all the field names used to ensure we only select those.
         /// </summary>
-        /// <param name="selectExpression">Select expression to rebind.</param>
+        /// <param name="selectExpression">Select expression to re-bind.</param>
         private void RebindPropertiesAndElasticFields(Expression selectExpression)
         {
-            var projection = MemberProjectionExpressionVisitor.Rebind(Mapping, selectExpression);
+            var projection = MemberProjectionExpressionVisitor.Rebind(Prefix, Mapping, selectExpression);
             var compiled = Expression.Lambda(projection.Expression, projection.Parameter).Compile();
             itemProjector = h => compiled.DynamicInvoke(h);
             searchRequest.Fields.AddRange(projection.Collected);
@@ -363,7 +363,12 @@ namespace ElasticLinq.Request.Visitors
 
         private Func<Hit, Object> DefaultItemProjector
         {
-            get { return hit => Mapping.GetObjectSource(sourceType, hit).ToObject(sourceType); }
+            get
+            {
+                return hit => hit._source
+                                .SelectToken(Mapping.GetDocumentMappingPrefix(sourceType) ?? "")
+                                .ToObject(sourceType);
+            }
         }
     }
 }

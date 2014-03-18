@@ -4,6 +4,7 @@ using ElasticLinq.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace ElasticLinq.Request.Criteria
 {
@@ -11,12 +12,14 @@ namespace ElasticLinq.Request.Criteria
     {
         private readonly TermsExecutionMode? executionMode;
         private readonly string field;
+        private readonly MemberInfo member;
         private readonly HashSet<object> values;
 
-        private TermsCriteria(TermsExecutionMode? executionMode, string field, HashSet<object> values)
+        private TermsCriteria(TermsExecutionMode? executionMode, string field, MemberInfo member, HashSet<object> values)
         {
             this.executionMode = executionMode;
             this.field = field;
+            this.member = member;
             this.values = values;
         }
 
@@ -43,6 +46,11 @@ namespace ElasticLinq.Request.Criteria
             }
         }
 
+        public MemberInfo Member
+        {
+            get { return member; }
+        }
+
         public string Name
         {
             get { return "terms"; }
@@ -67,11 +75,12 @@ namespace ElasticLinq.Request.Criteria
         /// present in the <paramref name="values"/> collection.
         /// </summary>
         /// <param name="field">The field that's being searched.</param>
+        /// <param name="member">The member information for the field.</param>
         /// <param name="values">The values to be matched.</param>
         /// <returns>Either a <see cref="TermCriteria"/> object or a <see cref="TermsCriteria"/> object.</returns>
-        internal static ITermsCriteria Build(string field, params object[] values)
+        internal static ITermsCriteria Build(string field, MemberInfo member, params object[] values)
         {
-            return Build(null, field, values.AsEnumerable());
+            return Build(null, field, member, values.AsEnumerable());
         }
 
         /// <summary>
@@ -79,24 +88,12 @@ namespace ElasticLinq.Request.Criteria
         /// present in the <paramref name="values"/> collection.
         /// </summary>
         /// <param name="field">The field that's being searched.</param>
+        /// <param name="member">The member information for the field.</param>
         /// <param name="values">The values to be matched.</param>
         /// <returns>Either a <see cref="TermCriteria"/> object or a <see cref="TermsCriteria"/> object.</returns>
-        internal static ITermsCriteria Build(string field, IEnumerable<object> values)
+        internal static ITermsCriteria Build(string field, MemberInfo member, IEnumerable<object> values)
         {
-            return Build(null, field, values);
-        }
-
-        /// <summary>
-        /// Builds a <see cref="TermCriteria"/> or <see cref="TermsCriteria"/>, depending on how many values are
-        /// present in the <paramref name="values"/> collection.
-        /// </summary>
-        /// <param name="executionMode">The terms execution mode (optional). Only used when a <see cref="TermsCriteria"/> is returned.</param>
-        /// <param name="field">The field that's being searched.</param>
-        /// <param name="values">The values to be matched.</param>
-        /// <returns>Either a <see cref="TermCriteria"/> object or a <see cref="TermsCriteria"/> object.</returns>
-        internal static ITermsCriteria Build(TermsExecutionMode? executionMode, string field, params object[] values)
-        {
-            return Build(executionMode, field, values.AsEnumerable());
+            return Build(null, field, member, values);
         }
 
         /// <summary>
@@ -105,17 +102,32 @@ namespace ElasticLinq.Request.Criteria
         /// </summary>
         /// <param name="executionMode">The terms execution mode (optional). Only used when a <see cref="TermsCriteria"/> is returned.</param>
         /// <param name="field">The field that's being searched.</param>
+        /// <param name="member">The member information for the field.</param>
         /// <param name="values">The values to be matched.</param>
         /// <returns>Either a <see cref="TermCriteria"/> object or a <see cref="TermsCriteria"/> object.</returns>
-        internal static ITermsCriteria Build(TermsExecutionMode? executionMode, string field, IEnumerable<object> values)
+        internal static ITermsCriteria Build(TermsExecutionMode? executionMode, string field, MemberInfo member, params object[] values)
+        {
+            return Build(executionMode, field, member, values.AsEnumerable());
+        }
+
+        /// <summary>
+        /// Builds a <see cref="TermCriteria"/> or <see cref="TermsCriteria"/>, depending on how many values are
+        /// present in the <paramref name="values"/> collection.
+        /// </summary>
+        /// <param name="executionMode">The terms execution mode (optional). Only used when a <see cref="TermsCriteria"/> is returned.</param>
+        /// <param name="field">The field that's being searched.</param>
+        /// <param name="member">The member information for the field.</param>
+        /// <param name="values">The values to be matched.</param>
+        /// <returns>Either a <see cref="TermCriteria"/> object or a <see cref="TermsCriteria"/> object.</returns>
+        internal static ITermsCriteria Build(TermsExecutionMode? executionMode, string field, MemberInfo member, IEnumerable<object> values)
         {
             Argument.EnsureNotNull("values", values);
 
             var hashValues = new HashSet<object>(values);
             if (hashValues.Count == 1)
-                return new TermCriteria(field, hashValues.First());
+                return new TermCriteria(field, member, hashValues.First());
 
-            return new TermsCriteria(executionMode, field, hashValues);
+            return new TermsCriteria(executionMode, field, member, hashValues);
         }
     }
 }

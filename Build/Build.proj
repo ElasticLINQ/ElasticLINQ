@@ -23,7 +23,8 @@
   </ItemGroup>
 
   <Target Name="Default" DependsOnTargets="Test"/>
-  <Target Name="TeamCity" DependsOnTargets="Clean;PackageRestore;SetVersionNumber;Test;Packages"/>
+  <Target Name="TeamCity-CI" DependsOnTargets="Clean;PackageRestore;SetVersionNumberCI;Test;Packages"/>
+  <Target Name="TeamCity-Release" DependsOnTargets="Clean;PackageRestore;SetVersionNumber;Test;Packages"/>
 
   <Target Name="Build" DependsOnTargets="PackageRestore">
     <MSBuild
@@ -68,6 +69,9 @@
         Pattern='AssemblyVersion\("(\d+\.\d+\.\d+)\.\d+"\)'
         Replacement='AssemblyVersion("$1.$(BuildNumber)")'
         Files="$(SolutionDir)GlobalAssemblyInfo.cs"/>
+  </Target>
+
+  <Target Name="SetVersionNumberCI" DependsOnTargets="SetVersionNumber">
     <RegexReplace
         Pattern='&lt;version&gt;(\d+\.\d+\.\d+(-[A-Za-z0-9-]+)?)&lt;'
         Replacement='&lt;version&gt;$1-build$(BuildNumber)&lt;'

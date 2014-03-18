@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace ElasticLinq.Request.Criteria
 {
@@ -20,6 +21,11 @@ namespace ElasticLinq.Request.Criteria
         /// Gets a value that indicates whether this criteria is an "or" style criteria.
         /// </summary>
         bool IsOrCriteria { get; }
+
+        /// <summary>
+        /// Gets the member that this criteria is searching.
+        /// </summary>
+        MemberInfo Member { get; }
 
         /// <summary>
         /// Gets the list of values to be searched for.

@@ -30,12 +30,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NSubstitute">
-      <HintPath>..\packages\NSubstitute.1.6.1.0\lib\NET40\NSubstitute.dll</HintPath>
+      <HintPath>..\packages\NSubstitute.1.7.2.0\lib\NET45\NSubstitute.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -66,7 +65,7 @@
     <Compile Include="Request\Criteria\RegExpCriteriaTests.cs" />
     <Compile Include="Request\ElasticRequestProcessorTests.cs" />
     <Compile Include="ElasticConnectionTests.cs" />
-    <Compile Include="Mapping\TrivialElasticMappingTests.cs" />
+    <Compile Include="Mapping\ElasticMappingTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Request\ElasticSearchRequestTests.cs" />
     <Compile Include="Request\Expressions\FacetExpressionTests.cs" />
@@ -104,9 +103,9 @@
     <Compile Include="Retry\RetryPolicyTests.cs" />
     <Compile Include="TestSupport\FlatteningExpressionVisitor.cs" />
     <Compile Include="TestSupport\HttpStub.cs" />
-    <Compile Include="TestSupport\FakeElasticMapping.cs" />
     <Compile Include="TestSupport\FakeQuery.cs" />
     <Compile Include="TestSupport\FakeQueryProvider.cs" />
+    <Compile Include="TestSupport\Identifier.cs" />
     <Compile Include="TestSupport\NSubstituteExtensions.cs" />
     <Compile Include="TestSupport\NullRetryPolicy.cs" />
     <Compile Include="TestSupport\SpyLog.cs" />

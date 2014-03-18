@@ -22,15 +22,15 @@ namespace ElasticLinq.Request.Visitors
 
         private readonly HashSet<string> fieldNames = new HashSet<string>();
 
-        private MemberProjectionExpressionVisitor(ParameterExpression bindingParameter, IElasticMapping mapping)
-            : base(bindingParameter, mapping)
+        private MemberProjectionExpressionVisitor(string prefix, ParameterExpression bindingParameter, IElasticMapping mapping)
+            : base(prefix, bindingParameter, mapping)
         {
         }
 
-        internal static new RebindCollectionResult<string> Rebind(IElasticMapping mapping, Expression selector)
+        internal static new RebindCollectionResult<string> Rebind(string prefix, IElasticMapping mapping, Expression selector)
         {
             var parameter = Expression.Parameter(typeof(Hit), "h");
-            var visitor = new MemberProjectionExpressionVisitor(parameter, mapping);
+            var visitor = new MemberProjectionExpressionVisitor(prefix, parameter, mapping);
             Argument.EnsureNotNull("selector", selector);
             var materializer = visitor.Visit(selector);
             return new RebindCollectionResult<string>(materializer, visitor.fieldNames, parameter, null);
@@ -46,13 +46,13 @@ namespace ElasticLinq.Request.Visitors
 
         protected override Expression VisitElasticField(MemberExpression m)
         {
-            fieldNames.Add(Mapping.GetFieldName(m.Member));
+            fieldNames.Add(Mapping.GetFieldName(Prefix, m.Member));
             return base.VisitElasticField(m);
         }
 
         private Expression VisitFieldSelection(MemberExpression m)
         {
-            var fieldName = Mapping.GetFieldName(m.Member);
+            var fieldName = Mapping.GetFieldName(Prefix, m.Member);
             fieldNames.Add(fieldName);
             var getFieldExpression = Expression.Call(null, GetDictionaryValueMethod, Expression.PropertyOrField(BindingParameter, "fields"), Expression.Constant(fieldName), Expression.Constant(m.Type));
             return Expression.Convert(getFieldExpression, m.Type);

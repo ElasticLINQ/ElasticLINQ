@@ -70,8 +70,8 @@ namespace ElasticLinq
         /// </summary>
         public string ToElasticSearchQuery()
         {
-            var request = ElasticQueryTranslator.Translate(provider.Mapping, Expression);
-            var formatter = new PostBodyRequestFormatter(provider.Connection, request.SearchRequest);
+            var request = ElasticQueryTranslator.Translate(provider.Mapping, provider.Prefix, Expression);
+            var formatter = new PostBodyRequestFormatter(provider.Connection, provider.Mapping, request.SearchRequest);
             return formatter.Body;
         }
     }

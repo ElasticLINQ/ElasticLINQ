@@ -2,32 +2,33 @@
 
 using ElasticLinq.Utility;
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
 namespace ElasticLinq.Mapping
 {
     /// <summary>
-    /// Common techniques for remapping names used between the various mappings.
+    /// Common techniques for re-mapping names used between the various mappings.
     /// </summary>
     public static class MappingHelpers
     {
-        public static string ToCamelCase(this string value)
+        public static string ToCamelCase(this string value, CultureInfo culture)
         {
             Argument.EnsureNotNull("value", value);
 
             return value.Length < 2
-                ? value.ToLower()
-                : char.ToLower(value[0]) + value.Substring(1);
+                ? value.ToLower(culture)
+                : char.ToLower(value[0], culture) + value.Substring(1);
         }
 
-        public static string ToPlural(this string value)
+        public static string ToPlural(this string value, CultureInfo culture)
         {
             Argument.EnsureNotNull("value", value);
 
             return value.Length < 1
                 ? value
-                : value + (value.EndsWith("s") ? "" : "s");
+                : value + (value.EndsWith("s", false, culture) ? "" : "s");
         }
 
         public static PropertyInfo GetSelectionProperty(Type type)

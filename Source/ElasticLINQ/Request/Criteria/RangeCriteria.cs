@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 
 namespace ElasticLinq.Request.Criteria
 {
@@ -16,20 +17,26 @@ namespace ElasticLinq.Request.Criteria
     internal class RangeCriteria : ICriteria
     {
         private readonly string field;
+        private readonly MemberInfo member;
         private readonly List<RangeSpecificationCriteria> specifications;
 
-        public RangeCriteria(string field, IEnumerable<RangeSpecificationCriteria> specifications)
+        public RangeCriteria(string field, MemberInfo member, IEnumerable<RangeSpecificationCriteria> specifications)
         {
             Argument.EnsureNotBlank("field", field);
+            Argument.EnsureNotNull("member", member);
             Argument.EnsureNotNull("specifications", specifications);
 
             this.field = field;
+            this.member = member;
             this.specifications = new List<RangeSpecificationCriteria>(specifications);
         }
 
-        public RangeCriteria(string field, RangeComparison comparison, object value)
-            : this(field, new[] { new RangeSpecificationCriteria(comparison, value) })
+        public RangeCriteria(string field, MemberInfo member, RangeComparison comparison, object value)
+            : this(field, member, new[] { new RangeSpecificationCriteria(comparison, value) }) { }
+
+        public MemberInfo Member
         {
+            get { return member; }
         }
 
         public string Name
@@ -49,7 +56,7 @@ namespace ElasticLinq.Request.Criteria
 
         public override string ToString()
         {
-            return "range: " + field + "(" + String.Join(",", specifications.Select(s => s.ToString())) + ")";
+            return String.Format("range: {0}({1})", field, String.Join(",", specifications.Select(s => s.ToString())));
         }
     }
 
@@ -101,7 +108,7 @@ namespace ElasticLinq.Request.Criteria
 
         public override string ToString()
         {
-            return comparison + " " + value;
+            return String.Format("{0} {1}", comparison, value);
         }
     }
 }

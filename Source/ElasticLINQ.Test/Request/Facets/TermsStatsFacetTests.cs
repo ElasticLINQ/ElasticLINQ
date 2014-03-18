@@ -12,7 +12,7 @@ namespace ElasticLinq.Test.Request.Facets
         private const string ExpectedName = "name";
         private const string ExpectedKey = "key";
         private const string ExpectedValue = "value";
-        private readonly ICriteria expectedFilter = new TermCriteria("field", "value1");
+        private readonly ICriteria expectedFilter = new TermCriteria("field", null, "value1");
         private readonly int? expectedSize = 123;
 
         [Fact]

@@ -15,15 +15,7 @@ namespace ElasticLinq.Test
         public static void GuardClauses_Constructor()
         {
             Assert.Throws<ArgumentNullException>(() => new ElasticConnection(null));
-        }
-
-        [Fact]
-        public void GuardClauses_Index()
-        {
-            var connection = new ElasticConnection(endpoint);
-
-            Assert.Throws<ArgumentNullException>(() => connection.Index = null);
-            Assert.Throws<ArgumentException>(() => connection.Index = "");
+            Assert.Throws<ArgumentException>(() => new ElasticConnection(new Uri("http://localhost/"), index: ""));
         }
 
         [Fact]

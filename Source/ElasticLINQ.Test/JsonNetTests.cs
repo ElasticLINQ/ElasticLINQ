@@ -1,7 +1,9 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
-using Newtonsoft.Json;
+using ElasticLinq.Mapping;
+using ElasticLinq.Test.TestSupport;
 using System;
+using System.Globalization;
 using System.Linq;
 using Xunit;
 
@@ -9,66 +11,39 @@ namespace ElasticLinq.Test
 {
     public class JsonNetTests
     {
+        class MyCustomMapping : ElasticMapping
+        {
+            public override string GetDocumentMappingPrefix(Type type)
+            {
+                return String.Format("docWrapper.{0}", type.Name.ToCamelCase(CultureInfo.CurrentCulture));
+            }
+        }
+
         [Fact]
         public static void CustomTypes_Term()
         {
-            var context = new TestableElasticContext();
-            var helloIdentifier = new Identifier("hello");
+            var context = new TestableElasticContext(new MyCustomMapping());
+            var helloIdentifier = new Identifier("Hello");
 
-            var query = context.Query<ClassWithIdentifer>().Where(x => x.id == helloIdentifier).ToElasticSearchQuery();
+            var query = context.Query<ClassWithIdentifier>().Where(x => x.id == helloIdentifier).ToElasticSearchQuery();
 
-            Assert.Equal(@"{""filter"":{""term"":{""id"":""hello!!""}}}", query);
+            // Also verifies that any value which gets JSON converted into a string gets lower-cased
+            Assert.Equal(@"{""filter"":{""term"":{""docWrapper.classWithIdentifier.id"":""hello!!""}}}", query);
         }
 
         [Fact]
         public static void CustomTypes_Terms()
         {
             var context = new TestableElasticContext();
-            var identifiers = new[] { new Identifier("value1"), new Identifier("value2") };
+            var identifiers = new[] { new Identifier("vALue1"), new Identifier("ValuE2") };
 
-            var query = context.Query<ClassWithIdentifer>().Where(x => identifiers.Contains(x.id)).ToElasticSearchQuery();
+            var query = context.Query<ClassWithIdentifier>().Where(x => identifiers.Contains(x.id)).ToElasticSearchQuery();
 
+            // Also verifies that any value which gets JSON converted into a string gets lower-cased
             Assert.Equal(@"{""filter"":{""terms"":{""id"":[""value1!!"",""value2!!""]}}}", query);
         }
 
-        [JsonConverter(typeof(IdentifierJsonConverter))]
-        class Identifier
-        {
-            private readonly string value;
-
-            public Identifier(string value)
-            {
-                this.value = value;
-            }
-
-            public override string ToString()
-            {
-                return value;
-            }
-
-            class IdentifierJsonConverter : JsonConverter
-            {
-                public override bool CanConvert(Type objectType)
-                {
-                    return objectType == typeof(Identifier);
-                }
-
-                public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-                {
-                    if (reader.Value == null)
-                        return null;
-
-                    return new Identifier(reader.Value.ToString());
-                }
-
-                public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-                {
-                    writer.WriteValue(value + "!!");
-                }
-            }
-        }
-
-        class ClassWithIdentifer
+        class ClassWithIdentifier
         {
             public Identifier id { get; set; }
         }

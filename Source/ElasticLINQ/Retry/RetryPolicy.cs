@@ -17,7 +17,7 @@ namespace ElasticLinq.Retry
         /// <summary>
         /// Retries an operation if the operation is retryable.
         /// </summary>
-        /// <param name="elasticContext">The ElasticLINQ context object.</param>
+        /// <param name="log">Used for logging debug and warning information.</param>
         /// <param name="initialRetryMilliseconds">The initial wait time for a retry. Subsequent retries grow exponentially. Defaults to 100ms.</param>
         /// <param name="maxAttempts">The maximum number of attempts to perform. Defaults to 10 attempts.</param>
         /// <param name="delay">The object which implements an async delay. Replaceable for testing purposes.</param>

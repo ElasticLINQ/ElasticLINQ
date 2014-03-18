@@ -1,5 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using ElasticLinq.Mapping;
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Facets;
 using ElasticLinq.Utility;
@@ -18,11 +19,13 @@ namespace ElasticLinq.Request.Formatters
     /// </summary>
     internal class PostBodyRequestFormatter : RequestFormatter
     {
-        readonly Lazy<string> body;
+        private readonly Lazy<string> body;
+        private readonly IElasticMapping mapping;
 
-        public PostBodyRequestFormatter(ElasticConnection connection, ElasticSearchRequest searchRequest)
+        public PostBodyRequestFormatter(ElasticConnection connection, IElasticMapping mapping, ElasticSearchRequest searchRequest)
             : base(connection, searchRequest)
         {
+            this.mapping = mapping;
             body = new Lazy<string>(() => CreateJsonPayload().ToString(Formatting.None));
         }
 
@@ -73,12 +76,12 @@ namespace ElasticLinq.Request.Formatters
             return root;
         }
 
-        private static JToken Build(IEnumerable<IFacet> facets, ICriteria primaryFilter)
+        private JToken Build(IEnumerable<IFacet> facets, ICriteria primaryFilter)
         {
             return new JObject(facets.Select(facet => Build(facet, primaryFilter)));
         }
 
-        private static JProperty Build(IFacet facet, ICriteria primaryFilter)
+        private JProperty Build(IFacet facet, ICriteria primaryFilter)
         {
             Argument.EnsureNotNull("facet", facet);
 
@@ -159,7 +162,7 @@ namespace ElasticLinq.Request.Formatters
             return new JObject(new JProperty(sortOption.Name, new JObject(properties)));
         }
 
-        private static JObject Build(ICriteria criteria)
+        private JObject Build(ICriteria criteria)
         {
             if (criteria is RangeCriteria)
                 return Build((RangeCriteria)criteria);
@@ -199,14 +202,14 @@ namespace ElasticLinq.Request.Formatters
             return new JObject(new JProperty(criteria.Name, new JObject(new JProperty("query", unformattedValue))));
         }
 
-        private static JObject Build(RangeCriteria criteria)
+        private JObject Build(RangeCriteria criteria)
         {
             // Range filters can be combined by field
             return new JObject(
                 new JProperty(criteria.Name,
                     new JObject(new JProperty(criteria.Field,
                         new JObject(criteria.Specifications.Select(s =>
-                            new JProperty(s.Name, FormatTerm(s.Value))).ToList())))));
+                            new JProperty(s.Name, mapping.FormatValue(criteria.Member, s.Value))).ToList())))));
         }
 
         private static JObject Build(RegexpCriteria criteria)
@@ -219,17 +222,17 @@ namespace ElasticLinq.Request.Formatters
             return new JObject(new JProperty(criteria.Name, new JObject(new JProperty(criteria.Field, criteria.Prefix))));
         }
 
-        private static JObject Build(TermCriteria criteria)
+        private JObject Build(TermCriteria criteria)
         {
             return new JObject(
                 new JProperty(criteria.Name, new JObject(
-                    new JProperty(criteria.Field, FormatTerm(criteria.Value)))));
+                    new JProperty(criteria.Field, mapping.FormatValue(criteria.Member, criteria.Value)))));
         }
 
-        private static JObject Build(TermsCriteria criteria)
+        private JObject Build(TermsCriteria criteria)
         {
             var termsCriteria = new JObject(
-                new JProperty(criteria.Field, new JArray(criteria.Values.Select(FormatTerm).ToArray())));
+                new JProperty(criteria.Field, new JArray(criteria.Values.Select(x => mapping.FormatValue(criteria.Member, x)).ToArray())));
 
             if (criteria.ExecutionMode.HasValue)
                 termsCriteria.Add(new JProperty("execution", criteria.ExecutionMode.GetValueOrDefault().ToString()));
@@ -242,12 +245,12 @@ namespace ElasticLinq.Request.Formatters
             return new JObject(new JProperty(criteria.Name, new JObject(new JProperty("field", criteria.Field))));
         }
 
-        private static JObject Build(NotCriteria criteria)
+        private JObject Build(NotCriteria criteria)
         {
             return new JObject(new JProperty(criteria.Name, Build(criteria.Criteria)));
         }
 
-        private static JObject Build(CompoundCriteria criteria)
+        private JObject Build(CompoundCriteria criteria)
         {
             // A compound filter with one item can be collapsed
             return criteria.Criteria.Count == 1

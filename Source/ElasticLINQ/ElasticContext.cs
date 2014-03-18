@@ -13,8 +13,6 @@ namespace ElasticLinq
     /// </summary>
     public class ElasticContext : IElasticContext
     {
-        private readonly ElasticQueryProvider provider;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ElasticContext"/> class.
         /// </summary>
@@ -30,8 +28,6 @@ namespace ElasticLinq
             Mapping = mapping ?? new TrivialElasticMapping();
             Log = log ?? NullLog.Instance;
             RetryPolicy = retryPolicy ?? new RetryPolicy(Log);
-
-            provider = new ElasticQueryProvider(Connection, Mapping, Log, RetryPolicy);
         }
 
         public ElasticConnection Connection { get; private set; }
@@ -45,6 +41,8 @@ namespace ElasticLinq
         /// <inheritdoc/>
         public virtual IQueryable<T> Query<T>()
         {
+            var prefix = Mapping.GetDocumentMappingPrefix(typeof(T));
+            var provider = new ElasticQueryProvider(Connection, Mapping, Log, RetryPolicy, prefix);
             return new ElasticQuery<T>(provider);
         }
     }

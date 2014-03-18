@@ -45,17 +45,17 @@ namespace ElasticLinq.Request.Visitors
         private int? size;
         private LambdaExpression selectProjection;
 
-        private FacetExpressionVisitor(IElasticMapping mapping)
-            : base(mapping)
+        private FacetExpressionVisitor(IElasticMapping mapping, string prefix)
+            : base(mapping, prefix)
         {
         }
 
-        internal static RebindCollectionResult<IFacet> Rebind(IElasticMapping mapping, Expression expression)
+        internal static RebindCollectionResult<IFacet> Rebind(IElasticMapping mapping, string prefix, Expression expression)
         {
             Argument.EnsureNotNull("mapping", mapping);
             Argument.EnsureNotNull("expression", expression);
 
-            var visitor = new FacetExpressionVisitor(mapping);
+            var visitor = new FacetExpressionVisitor(mapping, prefix);
             var visitedExpression = visitor.Visit(expression);
             var facets = new HashSet<IFacet>(visitor.GetFacets());
 
@@ -71,8 +71,8 @@ namespace ElasticLinq.Request.Visitors
             {
                 case ExpressionType.MemberAccess:
                     {
-                        var groupByField = Mapping.GetFieldName(((MemberExpression)groupBy).Member);
-                        foreach (var valueField in aggregateMembers.Select(member => Mapping.GetFieldName(member)))
+                        var groupByField = Mapping.GetFieldName(Prefix, ((MemberExpression)groupBy).Member);
+                        foreach (var valueField in aggregateMembers.Select(member => Mapping.GetFieldName(Prefix, member)))
                             yield return new TermsStatsFacet(valueField, groupByField, valueField, size);
 
                         foreach (var criteria in aggregateCriteria)
@@ -82,7 +82,7 @@ namespace ElasticLinq.Request.Visitors
                     }
                 case ExpressionType.Constant:
                     {
-                        foreach (var valueField in aggregateMembers.Select(member => Mapping.GetFieldName(member)))
+                        foreach (var valueField in aggregateMembers.Select(member => Mapping.GetFieldName(Prefix, member)))
                             yield return new StatisticalFacet(valueField, valueField);
 
                         foreach (var criteria in aggregateCriteria)
@@ -183,7 +183,7 @@ namespace ElasticLinq.Request.Visitors
         {
             var member = GetMemberInfoFromLambda(property);
             aggregateMembers.Add(member);
-            return RebindValue(Mapping.GetFieldName(member), operation, returnType);
+            return RebindValue(Mapping.GetFieldName(Prefix, member), operation, returnType);
         }
 
         private Expression RebindValue(string valueField, string operation, Type returnType)

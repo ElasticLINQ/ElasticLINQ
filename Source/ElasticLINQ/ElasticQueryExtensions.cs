@@ -101,13 +101,13 @@ namespace ElasticLinq
         }
 
         /// <summary>
-        /// Converts an <see cref="IElasticQuery`1"/> into the JSON that would be submitted
+        /// Converts an <see cref="IElasticQuery{T}"/> into the JSON that would be submitted
         /// to ElasticSearch.
         /// </summary>
-        /// <param name="source">An <see cref="T:System.Linq.IQueryable`1"/> to query.</param>
+        /// <param name="source">An <see cref="T:System.Linq.IQueryable{T}"/> to query.</param>
         /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
         /// <returns>The ElasticSearch JSON representing this query.</returns>
-        /// <exception cref="ArgumentException"><paramref name="source"/> is not of type <see cref="IElasticQuery`1"/>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="source"/> is not of type <see cref="IElasticQuery{T}"/>.</exception>
         public static string ToElasticSearchQuery<TSource>(this IQueryable<TSource> source)
         {
             var elasticQuery = source as IElasticQuery<TSource>;

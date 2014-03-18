@@ -17,9 +17,9 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         [Fact]
         public void SearchRequestTypeIsSetFromType()
         {
-            var actual = Mapping.GetTypeName(typeof(Robot));
+            var actual = Mapping.GetDocumentType(typeof(Robot));
 
-            var translation = ElasticQueryTranslator.Translate(Mapping, Robots.Expression);
+            var translation = ElasticQueryTranslator.Translate(Mapping, "prefix", Robots.Expression);
 
             Assert.Equal(actual, translation.SearchRequest.Type);
         }
@@ -29,7 +29,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             var mapping = new CouchbaseElasticMapping();
 
-            var translation = ElasticQueryTranslator.Translate(mapping, Robots.Expression);
+            var translation = ElasticQueryTranslator.Translate(Mapping, "prefix", Robots.Expression);
 
             Assert.IsType<ExistsCriteria>(translation.SearchRequest.Filter);
         }
@@ -40,7 +40,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             const int actual = 325;
 
             var skipped = Robots.Skip(actual);
-            var translation = ElasticQueryTranslator.Translate(Mapping, skipped.Expression);
+            var translation = ElasticQueryTranslator.Translate(Mapping, "prefix", skipped.Expression);
 
             Assert.Equal(actual, translation.SearchRequest.From);
         }
@@ -51,21 +51,9 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             const int actual = 73;
 
             var taken = Robots.Take(actual);
-            var translation = ElasticQueryTranslator.Translate(Mapping, taken.Expression);
+            var translation = ElasticQueryTranslator.Translate(Mapping, "prefix", taken.Expression);
 
             Assert.Equal(actual, translation.SearchRequest.Size);
-        }
-
-        [Fact]
-        public void SimpleSelectProducesValidMaterializer()
-        {
-            var translation = ElasticQueryTranslator.Translate(Mapping, Robots.Expression);
-            var response = new ElasticResponse { hits = new Hits { hits = new List<Hit>() } };
-
-            Assert.NotNull(translation.Materializer);
-            var materialized = translation.Materializer.Materialize(response);
-            Assert.IsAssignableFrom<IEnumerable<Robot>>(materialized);
-            Assert.Empty((IEnumerable<Robot>)materialized);
         }
 
         [Theory]
@@ -76,9 +64,21 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var expectedSize = Math.Min(size1, size2);
 
             var taken = Robots.Take(size1).Take(size2);
-            var translation = ElasticQueryTranslator.Translate(Mapping, taken.Expression);
+            var translation = ElasticQueryTranslator.Translate(Mapping, "prefix", taken.Expression);
 
             Assert.Equal(expectedSize, translation.SearchRequest.Size);
+        }
+
+        [Fact]
+        public void SimpleSelectProducesValidMaterializer()
+        {
+            var translation = ElasticQueryTranslator.Translate(Mapping, "prefix", Robots.Expression);
+            var response = new ElasticResponse { hits = new Hits { hits = new List<Hit>() } };
+
+            Assert.NotNull(translation.Materializer);
+            var materialized = translation.Materializer.Materialize(response);
+            Assert.IsAssignableFrom<IEnumerable<Robot>>(materialized);
+            Assert.Empty((IEnumerable<Robot>)materialized);
         }
    }
 }

@@ -1,9 +1,9 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
-using System.Net.Http;
 using ElasticLinq.Utility;
 using System;
 using System.Diagnostics;
+using System.Net.Http;
 
 namespace ElasticLinq
 {
@@ -14,26 +14,29 @@ namespace ElasticLinq
     public class ElasticConnection : IDisposable
     {
         private static readonly TimeSpan defaultTimeout = TimeSpan.FromSeconds(10);
-        
+
         private readonly Uri endpoint;
-        private string index;
+        private readonly string index;
         private readonly string password;
         private readonly TimeSpan timeout = defaultTimeout;
         private readonly string userName;
         private readonly HttpClient httpClient;
 
-        public ElasticConnection(Uri endpoint, string userName = null, string password = null, TimeSpan? timeout = null)
-            : this(new WebRequestHandler(), endpoint, userName, password, timeout) {}
+        public ElasticConnection(Uri endpoint, string userName = null, string password = null, TimeSpan? timeout = null, string index = null)
+            : this(new WebRequestHandler(), endpoint, userName, password, index, timeout) { }
 
-        internal ElasticConnection(HttpMessageHandler innerMessageHandler, Uri endpoint, string userName = null, string password = null, TimeSpan? timeout = null)
+        internal ElasticConnection(HttpMessageHandler innerMessageHandler, Uri endpoint, string userName = null, string password = null, string index = null, TimeSpan? timeout = null)
         {
             Argument.EnsureNotNull("endpoint", endpoint);
             if (timeout.HasValue)
                 Argument.EnsurePositive("value", timeout.Value);
+            if (index != null)
+                Argument.EnsureNotBlank("index", index);
 
             this.endpoint = endpoint;
             this.userName = userName;
             this.password = password;
+            this.index = index;
             this.timeout = timeout ?? defaultTimeout;
 
             httpClient = new HttpClient(new ForcedAuthHandler(this.userName, this.password, innerMessageHandler));
@@ -49,15 +52,9 @@ namespace ElasticLinq
             get { return endpoint; }
         }
 
-        // TODO: Move to ctor and make immutable
         public string Index
         {
             get { return index; }
-            set
-            {
-                Argument.EnsureNotBlank("value", value);
-                index = value;
-            }
         }
 
         public string Password

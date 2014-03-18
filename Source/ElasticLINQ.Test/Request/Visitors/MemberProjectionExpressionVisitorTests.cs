@@ -22,51 +22,49 @@ namespace ElasticLinq.Test.Request.Visitors
         private readonly IElasticMapping validMapping = new TrivialElasticMapping();
 
         [Fact]
-        public void RebindThrowsArgumentNullExceptionIfMappingIsNull()
+        public void Rebind_GuardClauses()
         {
-            Assert.Throws<ArgumentNullException>(() => MemberProjectionExpressionVisitor.Rebind(null, Expression.Constant(1)));
-        }
-
-        [Fact]
-        public void RebindThrowsArgumentNullExceptionIfSelectorIsNull()
-        {
-            Assert.Throws<ArgumentNullException>(() => MemberProjectionExpressionVisitor.Rebind(validMapping, null));
+            Assert.Throws<ArgumentNullException>(() => MemberProjectionExpressionVisitor.Rebind(null, validMapping, Expression.Constant(1)));
+            Assert.Throws<ArgumentNullException>(() => MemberProjectionExpressionVisitor.Rebind("prefix", null, Expression.Constant(1)));
+            Assert.Throws<ArgumentNullException>(() => MemberProjectionExpressionVisitor.Rebind("prefix", validMapping, null));
         }
 
         [Fact]
         public void RebindCollectsSinglePropertyFieldName()
         {
             var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(s => s.Name);
-            var rebound = MemberProjectionExpressionVisitor.Rebind(validMapping, source.Expression);
+            var rebound = MemberProjectionExpressionVisitor.Rebind("prefix", validMapping, source.Expression);
 
-            Assert.Contains("name", rebound.Collected);
+            Assert.Contains("prefix.name", rebound.Collected);
             Assert.Equal(1, rebound.Collected.Count());
         }
 
         [Fact]
         public void RebindCollectsAnonymousProjectionPropertiesFieldNames()
         {
-            var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(s => new { s.Name, s.Id });
-            var rebound = MemberProjectionExpressionVisitor.Rebind(validMapping, source.Expression);
+            var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(s => new { s.Name, s.Id, score = ElasticFields.Score });
+            var rebound = MemberProjectionExpressionVisitor.Rebind("prefix", validMapping, source.Expression);
 
-            Assert.Contains("name", rebound.Collected);
-            Assert.Contains("id", rebound.Collected);
-            Assert.Equal(2, rebound.Collected.Count());
+            Assert.Contains("prefix.name", rebound.Collected);
+            Assert.Contains("prefix.id", rebound.Collected);
+            Assert.Contains("_score", rebound.Collected);
+            Assert.Equal(3, rebound.Collected.Count());
         }
 
         [Fact]
         public void RebindCollectsTupleCreateProjectionPropertiesFieldNames()
         {
-            var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(s => Tuple.Create(s.Name, s.Id));
-            var rebound = MemberProjectionExpressionVisitor.Rebind(validMapping, source.Expression);
+            var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(s => Tuple.Create(s.Name, s.Id, ElasticFields.Score));
+            var rebound = MemberProjectionExpressionVisitor.Rebind("prefix", validMapping, source.Expression);
 
-            Assert.Contains("name", rebound.Collected);
-            Assert.Contains("id", rebound.Collected);
-            Assert.Equal(2, rebound.Collected.Count());
+            Assert.Contains("prefix.name", rebound.Collected);
+            Assert.Contains("prefix.id", rebound.Collected);
+            Assert.Contains("_score", rebound.Collected);
+            Assert.Equal(3, rebound.Collected.Count());
         }
 
         [Fact]
-        public void GetFieldValueReturnsTokenFromDictionaryIfKeyFound()
+        public void GetDictionaryValueOrDefaultReturnsTokenFromDictionaryIfKeyFound()
         {
             var expected = new Sample { Id = "T-900", Name = "Cameron" };
             const string key = "Summer";
@@ -79,7 +77,7 @@ namespace ElasticLinq.Test.Request.Visitors
         }
 
         [Fact]
-        public void GetFieldValueReturnsDefaultObjectIfKeyNotFoundForValueType()
+        public void GetDictionaryValueOrDefaultReturnsDefaultObjectIfKeyNotFoundForValueType()
         {
             var dictionary = new Dictionary<string, JToken>();
 
@@ -89,7 +87,7 @@ namespace ElasticLinq.Test.Request.Visitors
         }
 
         [Fact]
-        public void GetFieldValueReturnsNullIfKeyNotFoundForReferenceType()
+        public void GetDictionaryValueOrDefaultReturnsNullIfKeyNotFoundForReferenceType()
         {
             var dictionary = new Dictionary<string, JToken>();
 

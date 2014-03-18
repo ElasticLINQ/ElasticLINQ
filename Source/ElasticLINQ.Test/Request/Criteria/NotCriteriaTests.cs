@@ -3,13 +3,15 @@
 using ElasticLinq.Request.Criteria;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using Xunit;
 
 namespace ElasticLinq.Test.Request.Criteria
 {
     public class NotCriteriaTests
     {
-        private readonly ICriteria sampleTerm = TermsCriteria.Build("field", "value");
+        private readonly static MemberInfo memberInfo = typeof(string).GetProperty("Length");
+        private readonly ICriteria sampleTerm = TermsCriteria.Build("field", memberInfo, "value");
 
         [Fact]
         public void NamePropertyIsNot()
@@ -47,12 +49,12 @@ namespace ElasticLinq.Test.Request.Criteria
         [Fact]
         public void ToStringContainsSubfields()
         {
-            var termCriteria = TermsCriteria.Build("termField", "some value");
+            var termCriteria = TermsCriteria.Build("termField", memberInfo, "some value");
 
             var notCriteria = NotCriteria.Create(termCriteria);
             var result = notCriteria.ToString();
 
             Assert.Contains(termCriteria.ToString(), result);
         }
-   }
+    }
 }

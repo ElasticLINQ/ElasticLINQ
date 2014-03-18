@@ -13,25 +13,25 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
     public class ElasticQueryTranslationSingularTests : ElasticQueryTranslationTestsBase
     {
         [Fact]
-        public void FirstTranslatesToSizeOfOneWithNoFilter()
+        public void FirstTranslatesToSizeOfOneWithExistsFilter()
         {
             var first = MakeQueryableExpression("First", Robots);
 
-            var request = ElasticQueryTranslator.Translate(Mapping, first).SearchRequest;
+            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", first).SearchRequest;
 
             Assert.Equal(1, request.Size);
-            Assert.Null(request.Filter);
+            Assert.Equal("exists [id]", request.Filter.ToString());
         }
 
         [Fact]
-        public void FirstOrDefaultTranslatesToSizeOfOneWithNoFilter()
+        public void FirstOrDefaultTranslatesToSizeOfOneWithExistsFilter()
         {
             var first = MakeQueryableExpression("FirstOrDefault", Robots);
 
-            var request = ElasticQueryTranslator.Translate(Mapping, first).SearchRequest;
+            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", first).SearchRequest;
 
             Assert.Equal(1, request.Size);
-            Assert.Null(request.Filter);
+            Assert.Equal("exists [id]", request.Filter.ToString());
         }
 
         [Fact]
@@ -41,11 +41,11 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             Expression<Func<Robot, bool>> lambda = r => r.Name == expectedTermValue;
             var first = MakeQueryableExpression("First", Robots, lambda);
 
-            var request = ElasticQueryTranslator.Translate(Mapping, first).SearchRequest;
+            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", first).SearchRequest;
 
             Assert.Equal(1, request.Size);
             var termCriteria = Assert.IsType<TermCriteria>(request.Filter);
-            Assert.Equal("name", termCriteria.Field);
+            Assert.Equal("prefix.name", termCriteria.Field);
             Assert.Equal(expectedTermValue, termCriteria.Value);
         }
 
@@ -56,11 +56,11 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             Expression<Func<Robot, bool>> lambda = r => r.Name == expectedTermValue;
             var first = MakeQueryableExpression("FirstOrDefault", Robots, lambda);
 
-            var request = ElasticQueryTranslator.Translate(Mapping, first).SearchRequest;
+            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", first).SearchRequest;
 
             Assert.Equal(1, request.Size);
             var termCriteria = Assert.IsType<TermCriteria>(request.Filter);
-            Assert.Equal("name", termCriteria.Field);
+            Assert.Equal("prefix.name", termCriteria.Field);
             Assert.Equal(expectedTermValue, termCriteria.Value);
         }
 
@@ -69,10 +69,10 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             var first = MakeQueryableExpression("Single", Robots);
 
-            var request = ElasticQueryTranslator.Translate(Mapping, first).SearchRequest;
+            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", first).SearchRequest;
 
             Assert.Equal(2, request.Size);
-            Assert.Null(request.Filter);
+            Assert.Equal("exists [id]", request.Filter.ToString());
         }
 
         [Fact]
@@ -80,10 +80,10 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             var first = MakeQueryableExpression("SingleOrDefault", Robots);
 
-            var request = ElasticQueryTranslator.Translate(Mapping, first).SearchRequest;
+            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", first).SearchRequest;
 
             Assert.Equal(2, request.Size);
-            Assert.Null(request.Filter);
+            Assert.Equal("exists [id]", request.Filter.ToString());
         }
 
         [Fact]
@@ -93,11 +93,11 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             Expression<Func<Robot, bool>> lambda = r => r.Name == expectedTermValue;
             var first = MakeQueryableExpression("Single", Robots, lambda);
 
-            var request = ElasticQueryTranslator.Translate(Mapping, first).SearchRequest;
+            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", first).SearchRequest;
 
             Assert.Equal(2, request.Size);
             var termCriteria = Assert.IsType<TermCriteria>(request.Filter);
-            Assert.Equal("name", termCriteria.Field);
+            Assert.Equal("prefix.name", termCriteria.Field);
             Assert.Equal(expectedTermValue, termCriteria.Value);
         }
 
@@ -108,11 +108,11 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             Expression<Func<Robot, bool>> lambda = r => r.Name == expectedTermValue;
             var first = MakeQueryableExpression("SingleOrDefault", Robots, lambda);
 
-            var request = ElasticQueryTranslator.Translate(Mapping, first).SearchRequest;
+            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", first).SearchRequest;
 
             Assert.Equal(2, request.Size);
             var termCriteria = Assert.IsType<TermCriteria>(request.Filter);
-            Assert.Equal("name", termCriteria.Field);
+            Assert.Equal("prefix.name", termCriteria.Field);
             Assert.Equal(expectedTermValue, termCriteria.Value);
         }
 

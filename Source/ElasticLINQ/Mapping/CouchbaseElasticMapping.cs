@@ -1,67 +1,37 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
-using ElasticLinq.Request.Criteria;
-using ElasticLinq.Response.Model;
-using ElasticLinq.Utility;
-using Newtonsoft.Json.Linq;
 using System;
-using System.Reflection;
+using System.Globalization;
 
 namespace ElasticLinq.Mapping
 {
     /// <summary>
-    /// Default mapping for a common import of Couchbase documents.
+    /// Mapping appropriate for use with the Couchbase/ElasticSearch adapter.
     /// </summary>
-    public class CouchbaseElasticMapping : IElasticMapping
+    public class CouchbaseElasticMapping : ElasticMapping
     {
-        private readonly string typeName;
-        private readonly string fieldPrefix;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CouchbaseElasticMapping"/> class.
+        /// </summary>
+        /// <param name="camelCaseFieldNames">Pass <c>true</c> to automatically camel-case field names (for <see cref="ElasticMapping.GetFieldName"/>).</param>
+        /// <param name="lowerCaseAnalyzedFieldValues">Pass <c>true</c> to automatically convert field values to lower case (for <see cref="ElasticMapping.FormatValue"/>).</param>
+        /// <param name="conversionCulture">The culture to use for the lower-casing, camel-casing, and pluralization operations. If <c>null</c>,
+        /// uses <see cref="CultureInfo.CurrentCulture"/>.</param>
+        public CouchbaseElasticMapping(bool camelCaseFieldNames = true,
+                                       bool lowerCaseAnalyzedFieldValues = true,
+                                       CultureInfo conversionCulture = null)
+            : base(camelCaseFieldNames, false, false, lowerCaseAnalyzedFieldValues, conversionCulture) { }
 
-        public CouchbaseElasticMapping()
-            : this("couchbaseDocument", false)
+        /// <inheritdoc/>
+        public override string GetDocumentMappingPrefix(Type type)
         {
+            return "doc";
         }
 
-        public CouchbaseElasticMapping(string typeName, bool qualifyFieldNames)
+        /// <inheritdoc/>
+        public override string GetDocumentType(Type type)
         {
-            Argument.EnsureNotBlank("typeName", typeName);
-
-            this.typeName = typeName;
-            fieldPrefix = qualifyFieldNames ? typeName + ".doc" : "doc";
-        }        
-
-        public string GetFieldName(MemberInfo memberInfo)
-        {
-            Argument.EnsureNotNull("memberInfo", memberInfo);
-
-            return string.Join(".",
-                fieldPrefix,
-                GetDocTypeName(memberInfo.ReflectedType),
-                memberInfo.Name.ToCamelCase());
-        }
-
-        public string GetTypeName(Type type)
-        {
-            return typeName;
-        }
-
-        public ICriteria GetTypeSelectionCriteria(Type docType)
-        {
-            var fieldName = GetFieldName(MappingHelpers.GetSelectionProperty(docType));
-            return new ExistsCriteria(fieldName);
-        }
-
-        public JToken GetObjectSource(Type docType, Hit hit)
-        {
-            Argument.EnsureNotNull("type", docType);
-            Argument.EnsureNotNull("hit", hit);
-
-            return hit._source["doc"][GetDocTypeName(docType)];
-        }
-
-        private static string GetDocTypeName(Type type)
-        {
-            return type.Name.ToCamelCase();
+            return "couchbaseDocument";
         }
     }
 }
