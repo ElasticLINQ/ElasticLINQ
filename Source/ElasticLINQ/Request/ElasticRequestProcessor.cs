@@ -2,11 +2,13 @@
 
 using ElasticLinq.Logging;
 using ElasticLinq.Mapping;
-using ElasticLinq.Request.Formatter;
+using ElasticLinq.Request.Formatters;
 using ElasticLinq.Response.Model;
 using ElasticLinq.Retry;
 using ElasticLinq.Utility;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
@@ -41,7 +43,7 @@ namespace ElasticLinq.Request
         {
             var formatter = new PostBodyRequestFormatter(connection, mapping, searchRequest);
             log.Debug(null, null, "Request: POST {0}", formatter.Uri);
-            log.Debug(null, null, "Body: {0}", formatter.Body);
+            log.Debug(null, null, "Body:\n{0}", formatter.Body);
 
             return retryPolicy.ExecuteAsync(
                 async () =>
@@ -79,12 +81,28 @@ namespace ElasticLinq.Request
             using (var textReader = new JsonTextReader(streamReader))
             {
                 var results = new JsonSerializer().Deserialize<ElasticResponse>(textReader);
-                var resultCount = results == null ? 0 : results.hits.hits.Count;
                 stopwatch.Stop();
 
-                log.Debug(null, null, "De-serialized {0} bytes into {1} hits in {2}ms", responseStream.Length, resultCount, stopwatch.ElapsedMilliseconds);
+                var resultSummary = String.Join(", ", GetResultSummary(results));
+                log.Debug(null, null, "Deserialized {0} bytes into {1} in {2}ms", responseStream.Length, resultSummary, stopwatch.ElapsedMilliseconds);
 
                 return results;
+            }
+        }
+
+        private static IEnumerable<string> GetResultSummary(ElasticResponse results)
+        {
+            if (results == null)
+            {
+                yield return "nothing";
+            }
+            else
+            {
+                if (results.hits != null && results.hits.hits != null && results.hits.hits.Count > 0)
+                    yield return results.hits.hits.Count + " hits";
+
+                if (results.facets != null && results.facets.Count > 0)
+                    yield return results.facets.Count + " facets";
             }
         }
     }

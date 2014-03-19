@@ -3,7 +3,7 @@
 using ElasticLinq.Mapping;
 using ElasticLinq.Request;
 using ElasticLinq.Request.Criteria;
-using ElasticLinq.Request.Formatter;
+using ElasticLinq.Request.Formatters;
 using Newtonsoft.Json.Linq;
 using NSubstitute;
 using System;
@@ -12,7 +12,7 @@ using System.Linq;
 using System.Reflection;
 using Xunit;
 
-namespace ElasticLinq.Test.Request.Formatter
+namespace ElasticLinq.Test.Request.Formatters
 {
     public class PostBodyRequestFormatterTests
     {

@@ -1,6 +1,7 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using ElasticLinq.Utility;
+using System;
 using System.Diagnostics;
 using System.Linq.Expressions;
 
@@ -46,12 +47,12 @@ namespace ElasticLinq.Request.Visitors
                 // someProperty.HasValue
                 if (memberExpression.Member.Name == "HasValue"
                        && constantExpression.Type == typeof(bool)
-                       && TypeHelper.IsOfNullableT(memberExpression.Member.DeclaringType))
+                       && memberExpression.Member.DeclaringType.IsGenericOf(typeof(Nullable<>)))
                     return true;
 
                 // something == null (for reference types or Nullable<T>
                 if (constantExpression.Value == null)
-                    return !memberExpression.Type.IsValueType || TypeHelper.IsNullable(memberExpression.Type);
+                    return memberExpression.Type.IsNullable();
 
                 return false;
             }

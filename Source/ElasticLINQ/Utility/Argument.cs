@@ -41,5 +41,11 @@ namespace ElasticLinq.Utility
             if (!Enum.IsDefined(typeof(T), value))
                 throw new ArgumentOutOfRangeException(parameterName, string.Format("Must be a defined {0} enum value.", typeof(T)));
         }
+
+        public static void EnsureNotEmpty<T>(string parameterName, T[] values)
+        {
+            if (values == null || values.Length < 1)
+                throw new ArgumentOutOfRangeException(parameterName, "Must contain one or more values");
+        }
     }
 }

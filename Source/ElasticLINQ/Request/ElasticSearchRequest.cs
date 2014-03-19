@@ -1,6 +1,7 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using ElasticLinq.Request.Criteria;
+using ElasticLinq.Request.Facets;
 using System.Collections.Generic;
 
 namespace ElasticLinq.Request
@@ -14,6 +15,7 @@ namespace ElasticLinq.Request
         {
             Fields = new List<string>();
             SortOptions = new List<SortOption>();
+            Facets = new List<IFacet>();
         }
 
         public long @From { get; set; }
@@ -23,5 +25,7 @@ namespace ElasticLinq.Request
         public List<SortOption> SortOptions { get; set; }
         public ICriteria Filter { get; set; }
         public ICriteria Query { get; set; }
+        public List<IFacet> Facets { get; set; }
+        public string SearchType { get; set; }
     }
 }

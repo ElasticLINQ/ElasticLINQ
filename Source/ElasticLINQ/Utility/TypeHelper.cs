@@ -48,14 +48,20 @@ namespace ElasticLinq.Utility
             }
         }
 
-        public static bool IsNullable(Type type)
+        public static bool IsGenericOf(this Type type, Type genericType)
         {
-            return !type.IsValueType || IsOfNullableT(type);
+            return type != null && genericType != null
+                && type.IsGenericType && type.GetGenericTypeDefinition() == genericType;
         }
 
-        public static bool IsOfNullableT(Type type)
+        public static bool IsNullable(this Type type)
         {
-            return type != null && type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
+            return !type.IsValueType || type.IsGenericOf(typeof(Nullable<>));
+        }
+
+        public static object CreateDefault(Type type)
+        {
+            return type.IsValueType ? Activator.CreateInstance(type) : null;
         }
     }
 }

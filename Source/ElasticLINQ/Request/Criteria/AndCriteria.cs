@@ -25,6 +25,9 @@ namespace ElasticLinq.Request.Criteria
         public static ICriteria Combine(params ICriteria[] criteria)
         {
             Argument.EnsureNotNull("criteria", criteria);
+
+            // Strip out null args and handle cases where no combination required
+            criteria = criteria.Where(c => c != null).ToArray();
             if (criteria.Length == 0)
                 return null;
             if (criteria.Length == 1)

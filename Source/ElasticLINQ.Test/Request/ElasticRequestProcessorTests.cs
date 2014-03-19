@@ -126,9 +126,9 @@ namespace ElasticLinq.Test.Request
 
             Assert.Equal(4, log.Messages.Count);
             Assert.Equal(@"[VERBOSE] Request: POST http://localhost/SearchIndex/abc123/_search", log.Messages[0]);
-            Assert.Equal(@"[VERBOSE] Body: {""size"":2112,""timeout"":""10s""}", log.Messages[1]);
+            Assert.Equal(@"[VERBOSE] Body:" +'\n' + @"{""size"":2112,""timeout"":""10s""}", log.Messages[1]);
             Assert.True(new Regex(@"\[VERBOSE\] Response: 200 OK \(in \d+ms\)").Match(log.Messages[2]).Success);
-            Assert.True(new Regex(@"\[VERBOSE\] De-serialized \d+ bytes into 1 hits in \d+ms").Match(log.Messages[3]).Success);
+            Assert.True(new Regex(@"\[VERBOSE\] Deserialized \d+ bytes into 1 hits in \d+ms").Match(log.Messages[3]).Success);
         }
 
         private static string BuildResponseString(int took, int shards, int hits, double score, string index, string type, string id)

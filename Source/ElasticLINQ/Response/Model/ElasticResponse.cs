@@ -19,5 +19,6 @@ namespace ElasticLinq.Response.Model
 
         public JValue error;
         public HttpStatusCode status;
+        public JObject facets;
     }
 }

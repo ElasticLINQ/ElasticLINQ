@@ -2,13 +2,16 @@
 
 using ElasticLinq.Mapping;
 using ElasticLinq.Request.Criteria;
+using ElasticLinq.Request.Facets;
+using ElasticLinq.Utility;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
-namespace ElasticLinq.Request.Formatter
+namespace ElasticLinq.Request.Formatters
 {
     /// <summary>
     /// Formats an ElasticSearchRequest into a JSON POST body to be sent
@@ -28,6 +31,12 @@ namespace ElasticLinq.Request.Formatter
 
         protected override void CompleteSearchUri(UriBuilder builder)
         {
+            var parameters = builder.GetQueryParameters();
+
+            if (!String.IsNullOrEmpty(SearchRequest.SearchType))
+                parameters["search_type"] = SearchRequest.SearchType;
+
+            builder.SetQueryParameters(parameters);
         }
 
         public string Body
@@ -43,10 +52,11 @@ namespace ElasticLinq.Request.Formatter
                 root.Add("fields", new JArray(SearchRequest.Fields));
 
             if (SearchRequest.Query != null)
-                root.Add("query", BuildCriteria(SearchRequest.Query));
+                root.Add("query", Build(SearchRequest.Query));
 
-            if (SearchRequest.Filter != null)
-                root.Add("filter", BuildCriteria(SearchRequest.Filter));
+            // Filters are pushed down to the facets for aggregate queries
+            if (SearchRequest.Filter != null && !SearchRequest.Facets.Any())
+                root.Add("filter", Build(SearchRequest.Filter));
 
             if (SearchRequest.SortOptions.Any())
                 root.Add("sort", Build(SearchRequest.SortOptions));
@@ -57,15 +67,85 @@ namespace ElasticLinq.Request.Formatter
             if (SearchRequest.Size.HasValue)
                 root.Add("size", SearchRequest.Size.Value);
 
+            if (SearchRequest.Facets.Any())
+                root.Add("facets", Build(SearchRequest.Facets, SearchRequest.Filter));
+
             if (Connection.Timeout != TimeSpan.Zero)
                 root.Add("timeout", Format(Connection.Timeout));
 
             return root;
         }
 
+        private JToken Build(IEnumerable<IFacet> facets, ICriteria primaryFilter)
+        {
+            return new JObject(facets.Select(facet => Build(facet, primaryFilter)));
+        }
+
+        private JProperty Build(IFacet facet, ICriteria primaryFilter)
+        {
+            Argument.EnsureNotNull("facet", facet);
+
+            var specificBody = Build(facet);
+            var orderableFacet = facet as IOrderableFacet;
+            if (orderableFacet != null && orderableFacet.Size.HasValue)
+                specificBody["size"] = orderableFacet.Size.Value.ToString(CultureInfo.InvariantCulture);
+            
+            var namedBody = new JObject(new JProperty(facet.Type, specificBody));
+
+            var combinedFilter = AndCriteria.Combine(primaryFilter, facet.Filter);
+            if (combinedFilter != null)
+                namedBody[facet is FilterFacet ? "filter" : "facet_filter"] = Build(combinedFilter);
+
+            return new JProperty(facet.Name, namedBody);
+        }
+
+        private static JToken Build(IFacet facet)
+        {
+            if (facet is StatisticalFacet)
+                return Build((StatisticalFacet)facet);
+
+            if (facet is TermsStatsFacet)
+                return Build((TermsStatsFacet)facet);
+
+            if (facet is TermsFacet)
+                return Build((TermsFacet)facet);
+
+            if (facet is FilterFacet)
+                return new JObject();
+
+            throw new InvalidOperationException(string.Format("Unknown implementation of IFacet {0} can not be formatted", facet.GetType().Name));
+        }
+
+        private static JToken Build(StatisticalFacet statisticalFacet)
+        {
+            return new JObject(
+                BuildFieldProperty(statisticalFacet.Fields.ToArray())
+            );
+        }
+
+        private static JToken Build(TermsStatsFacet termStatsFacet)
+        {
+            return new JObject(
+                new JProperty("key_field", termStatsFacet.Key),
+                new JProperty("value_field", termStatsFacet.Value)
+            );
+        }
+
+        private static JToken Build(TermsFacet termsFacet)
+        {
+            return new JObject(BuildFieldProperty(termsFacet.Fields.ToArray()));
+        }
+
+        private static JToken BuildFieldProperty(IReadOnlyCollection<string> fields)
+        {
+            return fields.Count == 1
+                ? new JProperty("field", fields.First())
+                : new JProperty("fields", new JArray(fields));
+        }
+
         private static JArray Build(IEnumerable<SortOption> sortOptions)
         {
-            return new JArray(sortOptions.Select(Build).ToArray());
+            return new JArray(sortOptions.Select(Build));
         }
 
         private static object Build(SortOption sortOption)
@@ -82,7 +162,7 @@ namespace ElasticLinq.Request.Formatter
             return new JObject(new JProperty(sortOption.Name, new JObject(properties)));
         }
 
-        private JObject BuildCriteria(ICriteria criteria)
+        private JObject Build(ICriteria criteria)
         {
             if (criteria is RangeCriteria)
                 return Build((RangeCriteria)criteria);
@@ -167,15 +247,15 @@ namespace ElasticLinq.Request.Formatter
 
         private JObject Build(NotCriteria criteria)
         {
-            return new JObject(new JProperty(criteria.Name, BuildCriteria(criteria.Criteria)));
+            return new JObject(new JProperty(criteria.Name, Build(criteria.Criteria)));
         }
 
         private JObject Build(CompoundCriteria criteria)
         {
             // A compound filter with one item can be collapsed
             return criteria.Criteria.Count == 1
-                ? BuildCriteria(criteria.Criteria.First())
-                : new JObject(new JProperty(criteria.Name, new JArray(criteria.Criteria.Select(BuildCriteria).ToList())));
+                ? Build(criteria.Criteria.First())
+                : new JObject(new JProperty(criteria.Name, new JArray(criteria.Criteria.Select(Build).ToList())));
         }
     }
 }

@@ -4,6 +4,7 @@ using ElasticLinq.Response.Model;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace ElasticLinq.Test.Response.Materializers
@@ -12,13 +13,13 @@ namespace ElasticLinq.Test.Response.Materializers
     {
         public static List<Hit> CreateSampleHits(int count)
         {
-            return Enumerable.Range(0, count).Select(i => i.ToString()).Select(CreateHit).ToList();
+            return Enumerable.Range(0, count).Select(i => i.ToString(CultureInfo.InvariantCulture)).Select(CreateHit).ToList();
         }
 
         public static readonly Func<Hit, SampleClass> ItemCreator =
             h => new SampleClass { SampleField = (string)h.fields["someField"] };
 
-        public static ElasticResponse CreateSampleResponse(int count)
+        internal static ElasticResponse CreateSampleResponse(int count)
         {
             return new ElasticResponse { hits = new Hits { hits = CreateSampleHits(count) } };
         }

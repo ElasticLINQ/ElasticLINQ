@@ -1,9 +1,11 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using ElasticLinq.Utility;
 using System;
 using System.Globalization;
+using System.Linq;
 
-namespace ElasticLinq.Request.Formatter
+namespace ElasticLinq.Request.Formatters
 {
     /// <summary>
     /// Formats various parts of a <see cref="ElasticSearchRequest"/>.
@@ -19,7 +21,7 @@ namespace ElasticLinq.Request.Formatter
             SearchRequest = searchRequest;
         }
 
-        protected abstract void CompleteSearchUri(UriBuilder builder);
+        protected abstract void CompleteSearchUri(UriBuilder uriBuilder);
 
         public Uri Uri
         {
@@ -30,13 +32,16 @@ namespace ElasticLinq.Request.Formatter
         {
             var builder = new UriBuilder(Connection.Endpoint);
 
-            if (!String.IsNullOrEmpty(Connection.Index))
-                builder.Path += Connection.Index + "/";
+            builder.Path += String.Join("/",
+                new[] { Connection.Index, SearchRequest.Type, "_search" }
+               .Where(s => !String.IsNullOrEmpty(s)));
 
-            if (!String.IsNullOrEmpty(SearchRequest.Type))
-                builder.Path += SearchRequest.Type + "/";
-
-            builder.Path += "_search";
+            if (!String.IsNullOrEmpty(SearchRequest.SearchType))
+            {
+                var parameters = builder.GetQueryParameters();
+                parameters["search_type"] = SearchRequest.SearchType;
+                builder.SetQueryParameters(parameters);
+            }
 
             CompleteSearchUri(builder);
 

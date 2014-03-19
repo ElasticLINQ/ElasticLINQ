@@ -16,12 +16,12 @@ namespace ElasticLinq.Response.Materializers
     {
         private static readonly MethodInfo manyMethodInfo = typeof(ElasticManyHitsMaterializer).GetMethod("Many", BindingFlags.NonPublic | BindingFlags.Static);
 
-        private readonly Func<Hit, object> itemCreator;
+        private readonly Func<Hit, object> projector;
         private readonly Type elementType;
 
-        public ElasticManyHitsMaterializer(Func<Hit, object> itemCreator, Type elementType)
+        public ElasticManyHitsMaterializer(Func<Hit, object> projector, Type elementType)
         {
-            this.itemCreator = itemCreator;
+            this.projector = projector;
             this.elementType = elementType;
         }
 
@@ -29,7 +29,7 @@ namespace ElasticLinq.Response.Materializers
         {
             return manyMethodInfo
                 .MakeGenericMethod(elementType)
-                .Invoke(null, new object[] { elasticResponse.hits.hits, itemCreator });
+                .Invoke(null, new object[] { elasticResponse.hits.hits, projector });
         }
 
         internal static List<T> Many<T>(IEnumerable<Hit> hits, Func<Hit, object> projector)

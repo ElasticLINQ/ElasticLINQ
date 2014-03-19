@@ -1,7 +1,9 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using ElasticLinq.Mapping;
+using ElasticLinq.Response.Model;
 using ElasticLinq.Utility;
+using System;
 using System.Linq.Expressions;
 
 namespace ElasticLinq.Request.Visitors
@@ -10,25 +12,28 @@ namespace ElasticLinq.Request.Visitors
     /// Expression visitor that substitutes references to <see cref="ElasticFields"/>
     /// with the desired underlying special reserved name.
     /// </summary>
-    internal class ElasticFieldsProjectionExpressionVisitor : ExpressionVisitor
+    internal class ElasticFieldsExpressionVisitor : ExpressionVisitor
     {
-        protected readonly ParameterExpression Parameter;
+        protected readonly ParameterExpression BindingParameter;
         protected readonly IElasticMapping Mapping;
+        protected readonly string Prefix;
 
-        protected ElasticFieldsProjectionExpressionVisitor(ParameterExpression parameter, IElasticMapping mapping)
+        public ElasticFieldsExpressionVisitor(string prefix, ParameterExpression bindingParameter, IElasticMapping mapping)
         {
-            Argument.EnsureNotNull("parameter", parameter);
+            Argument.EnsureNotNull("bindingParameter", bindingParameter);
             Argument.EnsureNotNull("mapping", mapping);
 
-            Parameter = parameter;
+            Prefix = prefix;
+            BindingParameter = bindingParameter;
             Mapping = mapping;
         }
 
-        internal static Expression Rebind(ParameterExpression parameter, string prefix, IElasticMapping mapping, Expression selector)
+        internal static Tuple<Expression, ParameterExpression> Rebind(string prefix, IElasticMapping mapping, Expression selector)
         {
-            var visitor = new ElasticFieldsProjectionExpressionVisitor(parameter, mapping);
+            var parameter = Expression.Parameter(typeof(Hit), "h");
+            var visitor = new ElasticFieldsExpressionVisitor(prefix, parameter, mapping);
             Argument.EnsureNotNull("selector", selector);
-            return visitor.Visit(selector);
+            return Tuple.Create(visitor.Visit(selector), parameter);
         }
 
         protected override Expression VisitMember(MemberExpression m)
@@ -40,7 +45,7 @@ namespace ElasticLinq.Request.Visitors
 
         protected virtual Expression VisitElasticField(MemberExpression m)
         {
-            return Expression.Convert(Expression.PropertyOrField(Parameter, "_" + m.Member.Name.ToLowerInvariant()), m.Type);
+            return Expression.Convert(Expression.PropertyOrField(BindingParameter, "_" + m.Member.Name.ToLowerInvariant()), m.Type);
         }
     }
 }
