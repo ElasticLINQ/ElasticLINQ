@@ -24,8 +24,6 @@ namespace ElasticLinq.Test.Request.Visitors
         public void Rebind_GuardClauses()
         {
             Assert.Throws<ArgumentNullException>(() =>
-                ElasticFieldsExpressionVisitor.Rebind(null, validMapping, Expression.Constant(1)));
-            Assert.Throws<ArgumentNullException>(() =>
                 ElasticFieldsExpressionVisitor.Rebind("prefix", null, Expression.Constant(1)));
             Assert.Throws<ArgumentNullException>(() =>
                 ElasticFieldsExpressionVisitor.Rebind("prefix", validMapping, null));

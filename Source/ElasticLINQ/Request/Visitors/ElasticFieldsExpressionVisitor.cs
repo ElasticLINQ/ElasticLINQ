@@ -20,7 +20,6 @@ namespace ElasticLinq.Request.Visitors
 
         public ElasticFieldsExpressionVisitor(string prefix, ParameterExpression bindingParameter, IElasticMapping mapping)
         {
-            Argument.EnsureNotNull("prefix", prefix);
             Argument.EnsureNotNull("bindingParameter", bindingParameter);
             Argument.EnsureNotNull("mapping", mapping);
 
