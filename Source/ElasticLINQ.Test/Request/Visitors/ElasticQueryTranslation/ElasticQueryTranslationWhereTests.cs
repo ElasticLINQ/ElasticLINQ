@@ -136,9 +136,30 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         }
 
         [Fact]
+        public void StringArrayExistingContainsWithNullGeneratesOrWithTermsAndMissingCriteria()
+        {
+            const string expectedField = "prefix.name";
+            var names = new[] { "Robbie", null, "IG-88", "Marvin" };
+            var where = Robots.Where(e => names.Contains(e.Name));
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
+
+            var orCriteria = Assert.IsType<OrCriteria>(criteria);
+            Assert.Equal(2, orCriteria.Criteria.Count);
+
+            var missingCriteria = orCriteria.Criteria.OfType<MissingCriteria>().Single();
+            Assert.Equal(expectedField, missingCriteria.Field);
+
+            var termsCriteria = orCriteria.Criteria.OfType<TermsCriteria>().Single();
+            Assert.Equal(expectedField, termsCriteria.Field);
+            Assert.Equal(names.Length - 1, termsCriteria.Values.Count);
+            foreach (var term in names.Where(n => n != null))
+                Assert.Contains(term, termsCriteria.Values);
+        }
+
+        [Fact]
         public void StringArrayExistingContainsGeneratesTermCriteria()
         {
-            var expectedConstant = "Robbie";
+            const string expectedConstant = "Robbie";
             var where = Robots.Where(e => e.Aliases.Contains(expectedConstant));
             var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
 

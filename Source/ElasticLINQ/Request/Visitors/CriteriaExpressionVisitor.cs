@@ -209,10 +209,19 @@ namespace ElasticLinq.Request.Visitors
             if (source is ConstantExpression && matched is MemberExpression)
             {
                 var member = ((MemberExpression)matched).Member;
-                var field = Mapping.GetFieldName(Prefix, ((MemberExpression)matched).Member);
-                var containsSource = ((IEnumerable)((ConstantExpression)source).Value).Cast<object>();
-                var values = new List<object>(containsSource);
-                return new CriteriaExpression(TermsCriteria.Build(field, member, values.Distinct()));
+                var field = Mapping.GetFieldName(Prefix, member);
+                var containsSource = ((IEnumerable)((ConstantExpression)source).Value);
+
+                // If criteria contains a null create an Or criteria with Terms on one
+                // side and Missing on the other.
+                var values = containsSource.Cast<object>().Distinct().ToList();
+                var nonNullValues = values.Where(v => v != null).ToList();
+
+                ICriteria criteria = TermsCriteria.Build(field, member, nonNullValues);
+                if (values.Count != nonNullValues.Count)
+                    criteria = OrCriteria.Combine(criteria, new MissingCriteria(field));
+
+                return new CriteriaExpression(criteria);
             }
 
             // Where(x => x.SomeList.Contains(constantValue))
