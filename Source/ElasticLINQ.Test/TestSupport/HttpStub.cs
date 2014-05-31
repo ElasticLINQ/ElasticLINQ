@@ -15,10 +15,10 @@ namespace ElasticLinq.Test.TestSupport
         private const int MaximumBindAttempts = 5;
         private static readonly Random random = new Random();
 
-        private readonly HttpListener listener = new HttpListener();
         private readonly List<HttpListenerRequest> requests = new List<HttpListenerRequest>();
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-        private readonly Action<HttpListenerContext> responder;
+        private readonly Action<HttpListenerContext> responder;        
+        private readonly HttpListener listener;
 
         private bool disposed;
 
@@ -32,6 +32,7 @@ namespace ElasticLinq.Test.TestSupport
             do
             {
                 var randomPort = random.Next(49152, 65535);
+                listener = new HttpListener();
                 listener.Prefixes.Clear();
                 listener.Prefixes.Add(String.Format("http://localhost:{0}/", randomPort));
                 try
