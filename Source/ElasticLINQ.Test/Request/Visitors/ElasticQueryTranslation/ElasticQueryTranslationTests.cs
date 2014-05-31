@@ -27,8 +27,6 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         [Fact]
         public void TypeSelectionCriteriaIsAddedWhenNoOtherCriteria()
         {
-            var mapping = new CouchbaseElasticMapping();
-
             var translation = ElasticQueryTranslator.Translate(Mapping, "prefix", Robots.Expression);
 
             Assert.IsType<ExistsCriteria>(translation.SearchRequest.Filter);

@@ -29,8 +29,7 @@ namespace ElasticLinq.Test.Response.Materializers
             var materializer = new ElasticManyHitsMaterializer(MaterializerTestHelper.ItemCreator, typeof(SampleClass));
             var actual = materializer.Materialize(response);
 
-            Assert.IsType<List<SampleClass>>(actual);
-            var actualList = (List<SampleClass>)actual;
+            var actualList = Assert.IsType<List<SampleClass>>(actual);
 
             Assert.Equal(expected.Count, actualList.Count);
             var index = 0;

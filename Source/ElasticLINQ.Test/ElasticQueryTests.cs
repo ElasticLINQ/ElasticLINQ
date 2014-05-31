@@ -56,8 +56,8 @@ namespace ElasticLinq.Test
         {
             var query = new ElasticQuery<Sample>(provider);
 
-            Assert.IsType<ConstantExpression>(query.Expression);
-            Assert.Same(query, (((ConstantExpression)query.Expression)).Value);
+            var constantExpression = Assert.IsType<ConstantExpression>(query.Expression);
+            Assert.Same(query, constantExpression.Value);
         }
 
         [Fact]

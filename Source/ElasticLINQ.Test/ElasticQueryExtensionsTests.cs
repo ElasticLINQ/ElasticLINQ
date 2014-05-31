@@ -47,8 +47,8 @@ namespace ElasticLinq.Test
             var callExpression = (MethodCallExpression)applied.Expression;
 
             Assert.Equal(2, callExpression.Arguments.Count);
-            Assert.IsType<ConstantExpression>(callExpression.Arguments[1]);
-            Assert.Equal(((ConstantExpression)callExpression.Arguments[1]).Value, expectedQueryString);
+            var constantExpression = Assert.IsType<ConstantExpression>(callExpression.Arguments[1]);
+            Assert.Equal(constantExpression.Value, expectedQueryString);
         }
 
         [Fact]
@@ -135,8 +135,7 @@ namespace ElasticLinq.Test
             Assert.NotSame(source, afterMethod);
             Assert.NotNull(final);
 
-            Assert.IsType<FakeQueryProvider>(source.Provider);
-            var finalExpression = ((FakeQueryProvider)source.Provider).FinalExpression;
+            var finalExpression = Assert.IsType<FakeQueryProvider>(source.Provider).FinalExpression;
             Assert.Equal(ExpressionType.Call, finalExpression.NodeType);
             Assert.Equal(methodName, ((MethodCallExpression)finalExpression).Method.Name);
         }
