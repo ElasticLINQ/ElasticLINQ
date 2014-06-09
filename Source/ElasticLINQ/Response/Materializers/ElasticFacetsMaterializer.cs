@@ -73,5 +73,10 @@ namespace ElasticLinq.Response.Materializers
                     g.SelectMany(v => v.Cast<JProperty>().Select(z =>
                         new AggregateField(((JProperty)v.Parent.Parent.Parent.Parent).Name, z.Name, z.Value)))));
         }
+
+        /// <summary>
+        /// Type of element being materialized.
+        /// </summary>
+        internal Type ElementType { get { return elementType; } }
     }
 }
