@@ -87,6 +87,7 @@
     <Compile Include="Request\Visitors\BranchSelectExpressionVisitorTests.cs" />
     <Compile Include="Request\Visitors\ConstantMemberPairTests.cs" />
     <Compile Include="Request\Visitors\ElasticFieldsExpressionVisitorTests.cs" />
+    <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationGroupByFieldTests.cs" />
     <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationSingularTests.cs" />
     <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationSelectTests.cs" />
     <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationTestsBase.cs" />
@@ -95,7 +96,7 @@
     <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationWhereTests.cs" />
     <Compile Include="Request\Visitors\ElasticTranslateResultTests.cs" />
     <Compile Include="Request\Visitors\EvaluatingExpressionVisitorTests.cs" />
-    <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationGroupByTests.cs" />
+    <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationGroupByConstantTests.cs" />
     <Compile Include="Request\Visitors\PartialEvaluatorTests.cs" />
     <Compile Include="Request\Visitors\MemberProjectionExpressionVisitorTests.cs" />
     <Compile Include="Response\Materializers\MaterializerTestHelper.cs" />

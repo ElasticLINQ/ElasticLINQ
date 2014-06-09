@@ -1,5 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using System.Diagnostics;
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Utility;
 
@@ -13,6 +14,7 @@ namespace ElasticLinq.Request.Facets
     /// <remarks>
     /// Mapped to .GroupBy(a => a.Term).Select(a => a.Sum(b => b.Field))
     /// </remarks>
+    [DebuggerDisplay("TermsStatsFacet \"{key,nq}.{value,nq}\"")]
     internal class TermsStatsFacet : IOrderableFacet
     {
         private readonly string name;
