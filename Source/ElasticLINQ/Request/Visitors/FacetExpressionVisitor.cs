@@ -19,7 +19,7 @@ namespace ElasticLinq.Request.Visitors
     /// </summary>
     internal class FacetExpressionVisitor : CriteriaExpressionVisitor
     {
-        private const string GroupKeyFacetFormat = "GroupKey.{0}";
+        private const string GroupKeyFacet = "GroupKey";
         private static readonly MethodInfo getValue = typeof(AggregateRow).GetMethod("GetValue", BindingFlags.Static | BindingFlags.NonPublic);
         private static readonly MethodInfo getKey = typeof(AggregateRow).GetMethod("GetKey", BindingFlags.Static | BindingFlags.NonPublic);
 
@@ -37,6 +37,7 @@ namespace ElasticLinq.Request.Visitors
             { "LongCount", "count" }
         };
 
+        private bool aggregateOnGroupKey;
         private readonly HashSet<MemberInfo> aggregateMembers = new HashSet<MemberInfo>();
         private readonly Dictionary<string, ICriteria> aggregateCriteria = new Dictionary<string, ICriteria>();
         private readonly ParameterExpression bindingParameter = Expression.Parameter(typeof(AggregateRow), "r");
@@ -72,6 +73,9 @@ namespace ElasticLinq.Request.Visitors
                 case ExpressionType.MemberAccess:
                     {
                         var groupByField = Mapping.GetFieldName(Prefix, ((MemberExpression)groupBy).Member);
+                        if (aggregateOnGroupKey)
+                            yield return new TermsFacet(GroupKeyFacet, null, size, groupByField);
+
                         foreach (var valueField in aggregateMembers.Select(member => Mapping.GetFieldName(Prefix, member)))
                             yield return new TermsStatsFacet(valueField, groupByField, valueField, size);
 
@@ -131,7 +135,7 @@ namespace ElasticLinq.Request.Visitors
                     switch (m.Arguments.Count)
                     {
                         case 1:
-                            return VisitAggregateGroupOperation(operation, m.Method.ReturnType);
+                            return VisitAggregateGroupKeyOperation(operation, m.Method.ReturnType);
                         case 2:
                             return VisitAggregateGroupPredicateOperation(m.Arguments[1], operation, m.Method.ReturnType);
                     }
@@ -163,7 +167,7 @@ namespace ElasticLinq.Request.Visitors
             if (criteriaExpression == null)
                 throw new NotSupportedException(string.Format("Unknown Aggregate predicate '{0}'", body));
 
-            var facetName = String.Format(GroupKeyFacetFormat, aggregateCriteria.Count + 1);
+            var facetName = String.Format(GroupKeyFacet + "." + aggregateCriteria.Count + 1);
             aggregateCriteria.Add(facetName, criteriaExpression.Criteria);
             return RebindValue(facetName, operation, returnType);
         }
@@ -174,9 +178,10 @@ namespace ElasticLinq.Request.Visitors
             return Expression.Convert(getKeyExpression, returnType);
         }
 
-        private Expression VisitAggregateGroupOperation(string operation, Type returnType)
+        private Expression VisitAggregateGroupKeyOperation(string operation, Type returnType)
         {
-            return RebindValue(GroupKeyFacetFormat, operation, returnType);
+            aggregateOnGroupKey = true;
+            return RebindValue(GroupKeyFacet, operation, returnType);
         }
 
         private Expression VisitAggregateMemberOperation(Expression property, string operation, Type returnType)

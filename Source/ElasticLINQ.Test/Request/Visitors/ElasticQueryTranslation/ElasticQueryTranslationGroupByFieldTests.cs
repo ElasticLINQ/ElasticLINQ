@@ -27,7 +27,39 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         }
 
         [Fact]
-        public void SelectCoundPredicateCreatesTermsFacetWithFilter()
+        public void SelectCountPredicateCreatesTermsFacet()
+        {
+            var query = Robots.GroupBy(r => r.Zone).Select(g => g.Count());
+
+            var translation = ElasticQueryTranslator.Translate(Mapping, "", query.Expression);
+
+            Assert.Equal(typeof(int), Assert.IsType<ElasticFacetsMaterializer>(translation.Materializer).ElementType);
+            Assert.Equal(1, translation.SearchRequest.Facets.Count);
+
+            var facet = Assert.IsType<TermsFacet>(translation.SearchRequest.Facets[0]);
+            Assert.Equal(1, facet.Fields.Count);
+            Assert.Equal("zone", facet.Fields[0]);
+            Assert.Null(facet.Filter);
+        }
+
+        [Fact]
+        public void SelectLongCountPredicateCreatesTermsFacet()
+        {
+            var query = Robots.GroupBy(r => r.Zone).Select(g => g.LongCount());
+
+            var translation = ElasticQueryTranslator.Translate(Mapping, "", query.Expression);
+
+            Assert.Equal(typeof(long), Assert.IsType<ElasticFacetsMaterializer>(translation.Materializer).ElementType);
+            Assert.Equal(1, translation.SearchRequest.Facets.Count);
+
+            var facet = Assert.IsType<TermsFacet>(translation.SearchRequest.Facets[0]);
+            Assert.Equal(1, facet.Fields.Count);
+            Assert.Equal("zone", facet.Fields[0]);
+            Assert.Null(facet.Filter);
+        }
+
+        [Fact]
+        public void SelectCountPredicateCreatesTermsFacetWithFilter()
         {
             var query = Robots.GroupBy(r => r.Zone).Select(g => g.Count(r => r.Cost > 5m));
 
@@ -94,6 +126,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var query = Robots.GroupBy(r => r.Zone)
                 .Select(g => new
                 {
+                    Count = g.Count(),
                     SumCost = g.Sum(a => a.Cost),
                     AverageEnergyUse = g.Average(a => a.EnergyUse),
                     MinStarted = g.Min(a => a.Started),
@@ -102,13 +135,17 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var translation = ElasticQueryTranslator.Translate(Mapping, "", query.Expression);
 
             Assert.Contains("AnonymousType", Assert.IsType<ElasticFacetsMaterializer>(translation.Materializer).ElementType.FullName);
-            Assert.Equal(expectedFields.Length, translation.SearchRequest.Facets.Count);
+            Assert.Equal(expectedFields.Length + 1, translation.SearchRequest.Facets.Count);
             foreach (var expectedField in expectedFields)
             {
                 var facet = translation.SearchRequest.Facets.OfType<TermsStatsFacet>().Single(s => s.Value == expectedField);
                 Assert.Equal("zone", facet.Key);
                 Assert.Null(facet.Filter);
             }
+
+            var countTerms = translation.SearchRequest.Facets.OfType<TermsFacet>().Single();
+            Assert.Contains("zone", countTerms.Fields);
+            Assert.Null(countTerms.Filter);
         }
 
         [Fact]
