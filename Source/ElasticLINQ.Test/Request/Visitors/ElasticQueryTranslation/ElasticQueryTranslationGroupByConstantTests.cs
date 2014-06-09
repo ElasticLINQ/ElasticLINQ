@@ -30,7 +30,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         [Fact]
         public void SelectCountPredicateCreatesFilterFacet()
         {
-            var query = Robots.GroupBy(r => 1).Select(g => g.Count(r => r.EnergyUse > 5));
+            var query = Robots.GroupBy(r => 1).Select(g => g.Count(r => r.EnergyUse > 5.0));
 
             var translation = ElasticQueryTranslator.Translate(Mapping, "e", query.Expression);
 
@@ -42,7 +42,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             Assert.Equal("e.energyUse", rangeCriteria.Field);
             Assert.Equal(1, rangeCriteria.Specifications.Count);
             Assert.Equal(RangeComparison.GreaterThan, rangeCriteria.Specifications[0].Comparison);
-            Assert.Equal(5, rangeCriteria.Specifications[0].Value);
+            Assert.Equal(5.0, rangeCriteria.Specifications[0].Value);
         }
 
         [Fact]
