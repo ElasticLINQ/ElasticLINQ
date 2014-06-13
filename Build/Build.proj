@@ -19,12 +19,12 @@
   <ItemGroup>
     <SolutionFile Include="$(SolutionDir)ElasticLINQ.sln"/>
     <NuspecFiles Include="$(SolutionDir)**\*.nuspec"/>
-    <NuGetCsprojTargets Include="$(SolutionDir)ElasticLINQ\ElasticLINQ.csproj"/>
+    <NuGetTargets Include="$(SolutionDir)ElasticLINQ\ElasticLINQ.csproj"/>
   </ItemGroup>
 
   <Target Name="Default" DependsOnTargets="Test"/>
-  <Target Name="TeamCity-CI" DependsOnTargets="Clean;PackageRestore;SetVersionNumberCI;Test;Packages"/>
-  <Target Name="TeamCity-Release" DependsOnTargets="Clean;PackageRestore;SetVersionNumber;Test;Packages"/>
+  <Target Name="TeamCity-CI" DependsOnTargets="Clean;PackageRestore;SetVersionNumber;Test;Packages"/>
+  <Target Name="TeamCity-Release" DependsOnTargets="Clean;PackageRestore;Test;Packages"/>
 
   <Target Name="Build" DependsOnTargets="PackageRestore">
     <MSBuild
@@ -49,7 +49,7 @@
   </Target>
 
   <Target Name="Packages">
-    <Exec Command="$(NugetExe) pack %(NuGetCsProjTargets.Identity) -NoPackageAnalysis -NonInteractive -Verbosity quiet -Symbols -Properties Configuration=$(Configuration)" WorkingDirectory="$(RootDir)"/>
+    <Exec Command="$(NugetExe) pack %(NuGetTargets.Identity) -NoPackageAnalysis -NonInteractive -Verbosity quiet -Symbols -Properties Configuration=$(Configuration)" WorkingDirectory="$(RootDir)"/>
   </Target>
 
   <Target Name="Test" DependsOnTargets="Build">
@@ -64,24 +64,15 @@
     <BuildNumber>0</BuildNumber>
   </PropertyGroup>
 
-  <Target Name="SetVersionNumber">
+  <Target Name="SetVersionNumber" Condition=" '$(BuildNumber)' != '0' ">
     <RegexReplace
         Pattern='AssemblyVersion\("(\d+\.\d+\.\d+)\.\d+"\)'
         Replacement='AssemblyVersion("$1.$(BuildNumber)")'
         Files="$(SolutionDir)GlobalAssemblyInfo.cs"/>
-  </Target>
-
-  <Target Name="SetVersionNumberCI" DependsOnTargets="SetVersionNumber">
     <RegexReplace
         Pattern='&lt;version&gt;(\d+\.\d+\.\d+(-[A-Za-z0-9-]+)?)&lt;'
         Replacement='&lt;version&gt;$1-build$(BuildNumber)&lt;'
-        Files="@(NuspecFiles)"
-        Condition=" '$(BuildNumber)' != '0' "/>
-    <RegexReplace
-        Pattern='&lt;version&gt;(\d+\.\d+\.\d+(-[A-Za-z0-9-]+)?)-build\d+&lt;'
-        Replacement='&lt;version&gt;$1&lt;'
-        Files="@(NuspecFiles)"
-        Condition=" '$(BuildNumber)' == '0' "/>
+        Files="@(NuspecFiles)"/>
   </Target>
 
   <Target Name="_DownloadNuGet">
