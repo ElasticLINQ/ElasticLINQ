@@ -66,10 +66,6 @@
 
   <Target Name="SetVersionNumber" Condition=" '$(BuildNumber)' != '0' ">
     <RegexReplace
-        Pattern='AssemblyVersion\("(\d+\.\d+\.\d+)\.\d+"\)'
-        Replacement='AssemblyVersion("$1.$(BuildNumber)")'
-        Files="$(SolutionDir)GlobalAssemblyInfo.cs"/>
-    <RegexReplace
         Pattern='&lt;version&gt;(\d+\.\d+\.\d+(-[A-Za-z0-9-]+)?)&lt;'
         Replacement='&lt;version&gt;$1-build$(BuildNumber)&lt;'
         Files="@(NuspecFiles)"/>
