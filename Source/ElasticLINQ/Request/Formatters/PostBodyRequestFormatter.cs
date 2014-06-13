@@ -17,26 +17,22 @@ namespace ElasticLinq.Request.Formatters
     /// Formats an ElasticSearchRequest into a JSON POST body to be sent
     /// to ElasticSearch for querying.
     /// </summary>
-    internal class PostBodyRequestFormatter : RequestFormatter
+    internal class PostBodyRequestFormatter
     {
         private readonly Lazy<string> body;
+        private readonly ElasticConnection connection;
         private readonly IElasticMapping mapping;
+        private readonly ElasticSearchRequest searchRequest;
+        private readonly Uri uri;
 
         public PostBodyRequestFormatter(ElasticConnection connection, IElasticMapping mapping, ElasticSearchRequest searchRequest)
-            : base(connection, searchRequest)
         {
+            this.connection = connection;
             this.mapping = mapping;
+            this.searchRequest = searchRequest;
+
             body = new Lazy<string>(() => CreateJsonPayload().ToString(Formatting.None));
-        }
-
-        protected override void CompleteSearchUri(UriBuilder builder)
-        {
-            var parameters = builder.GetQueryParameters();
-
-            if (!String.IsNullOrEmpty(SearchRequest.SearchType))
-                parameters["search_type"] = SearchRequest.SearchType;
-
-            builder.SetQueryParameters(parameters);
+            uri = BuildSearchUri();
         }
 
         public string Body
@@ -44,34 +40,51 @@ namespace ElasticLinq.Request.Formatters
             get { return body.Value; }
         }
 
+        public Uri Uri
+        {
+            get { return uri; }
+        }
+
+        private Uri BuildSearchUri()
+        {
+            var builder = new UriBuilder(connection.Endpoint);
+            builder.Path += (connection.Index ?? "_all") + "/";
+
+            if (!String.IsNullOrEmpty(searchRequest.DocumentType))
+                builder.Path += searchRequest.DocumentType + "/";
+
+            builder.Path += "_search";
+            return builder.Uri;
+        }
+
         private JObject CreateJsonPayload()
         {
             var root = new JObject();
 
-            if (SearchRequest.Fields.Any())
-                root.Add("fields", new JArray(SearchRequest.Fields));
+            if (searchRequest.Fields.Any())
+                root.Add("fields", new JArray(searchRequest.Fields));
 
-            if (SearchRequest.Query != null)
-                root.Add("query", Build(SearchRequest.Query));
+            if (searchRequest.Query != null)
+                root.Add("query", Build(searchRequest.Query));
 
             // Filters are pushed down to the facets for aggregate queries
-            if (SearchRequest.Filter != null && !SearchRequest.Facets.Any())
-                root.Add("filter", Build(SearchRequest.Filter));
+            if (searchRequest.Filter != null && !searchRequest.Facets.Any())
+                root.Add("filter", Build(searchRequest.Filter));
 
-            if (SearchRequest.SortOptions.Any())
-                root.Add("sort", Build(SearchRequest.SortOptions));
+            if (searchRequest.SortOptions.Any())
+                root.Add("sort", Build(searchRequest.SortOptions));
 
-            if (SearchRequest.From > 0)
-                root.Add("from", SearchRequest.From);
+            if (searchRequest.From > 0)
+                root.Add("from", searchRequest.From);
 
-            if (SearchRequest.Size.HasValue)
-                root.Add("size", SearchRequest.Size.Value);
+            if (searchRequest.Size.HasValue)
+                root.Add("size", searchRequest.Size.Value);
 
-            if (SearchRequest.Facets.Any())
-                root.Add("facets", Build(SearchRequest.Facets, SearchRequest.Filter));
+            if (searchRequest.Facets.Any())
+                root.Add("facets", Build(searchRequest.Facets, searchRequest.Filter));
 
-            if (Connection.Timeout != TimeSpan.Zero)
-                root.Add("timeout", Format(Connection.Timeout));
+            if (connection.Timeout != TimeSpan.Zero)
+                root.Add("timeout", Format(connection.Timeout));
 
             return root;
         }
@@ -256,6 +269,17 @@ namespace ElasticLinq.Request.Formatters
             return criteria.Criteria.Count == 1
                 ? Build(criteria.Criteria.First())
                 : new JObject(new JProperty(criteria.Name, new JArray(criteria.Criteria.Select(Build).ToList())));
+        }
+
+        internal static string Format(TimeSpan timeSpan)
+        {
+            if (timeSpan.Milliseconds != 0)
+                return timeSpan.TotalMilliseconds.ToString(CultureInfo.InvariantCulture);
+
+            if (timeSpan.Seconds != 0)
+                return timeSpan.TotalSeconds.ToString(CultureInfo.InvariantCulture) + "s";
+
+            return timeSpan.TotalMinutes.ToString(CultureInfo.InvariantCulture) + "m";
         }
     }
 }

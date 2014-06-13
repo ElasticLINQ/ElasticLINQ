@@ -21,7 +21,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
             var translation = ElasticQueryTranslator.Translate(Mapping, "prefix", Robots.Expression);
 
-            Assert.Equal(actual, translation.SearchRequest.Type);
+            Assert.Equal(actual, translation.SearchRequest.DocumentType);
         }
 
         [Fact]

@@ -20,7 +20,7 @@ namespace ElasticLinq.Request
 
         public long @From { get; set; }
         public long? Size { get; set; }
-        public string Type { get; set; }
+        public string DocumentType { get; set; }
         public List<string> Fields { get; set; }
         public List<SortOption> SortOptions { get; set; }
         public ICriteria Filter { get; set; }

@@ -53,7 +53,7 @@ namespace ElasticLinq.Request.Visitors
         private void CompleteHitTranslation(Expression evaluated)
         {
             Visit(evaluated);
-            searchRequest.Type = Mapping.GetDocumentType(sourceType);
+            searchRequest.DocumentType = Mapping.GetDocumentType(sourceType);
 
             if (searchRequest.Filter == null && searchRequest.Query == null)
                 searchRequest.Filter = Mapping.GetTypeExistsCriteria(sourceType);
@@ -65,7 +65,7 @@ namespace ElasticLinq.Request.Visitors
         private void CompleteFacetTranslation(RebindCollectionResult<IFacet> aggregated)
         {
             Visit(aggregated.Expression);
-            searchRequest.Type = Mapping.GetDocumentType(sourceType);
+            searchRequest.DocumentType = Mapping.GetDocumentType(sourceType);
 
             searchRequest.Facets = aggregated.Collected.ToList();
             searchRequest.SearchType = "count"; // We only want facets, not hits
@@ -84,7 +84,7 @@ namespace ElasticLinq.Request.Visitors
                 return VisitElasticMethodsMethodCall(m);
 
             if (m.Method.Name == "Create")
-                return m;
+                    return m;
 
             return base.VisitMethodCall(m);
         }

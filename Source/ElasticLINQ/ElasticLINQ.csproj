@@ -84,7 +84,6 @@
     <Compile Include="Request\Facets\TermsFacet.cs" />
     <Compile Include="Request\Facets\TermsStatsFacet.cs" />
     <Compile Include="Request\Formatters\PostBodyRequestFormatter.cs" />
-    <Compile Include="Request\Formatters\RequestFormatter.cs" />
     <Compile Include="Request\Visitors\FacetExpressionVisitor.cs" />
     <Compile Include="Request\Visitors\CriteriaExpressionVisitor.cs" />
     <Compile Include="Response\Materializers\Aggregates.cs" />

@@ -8,9 +8,11 @@ using Newtonsoft.Json.Linq;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using Xunit;
+using Xunit.Extensions;
 
 namespace ElasticLinq.Test.Request.Formatters
 {
@@ -26,35 +28,30 @@ namespace ElasticLinq.Test.Request.Formatters
                    .ReturnsForAnyArgs(callInfo => new JValue(String.Format("!!! {0} !!!", callInfo.Arg<object>(1))));
         }
 
-        [Fact]
-        public void UrlPathContainsTypeSpecifier()
+        [Theory]
+        [InlineData(null, null, "http://a.b.com:9000/_all/_search")]
+        [InlineData("index1,index2", null, "http://a.b.com:9000/index1,index2/_search")]
+        [InlineData(null, "docType1,docType2", "http://a.b.com:9000/_all/docType1,docType2/_search")]
+        [InlineData("index1,index2", "docType1,docType2", "http://a.b.com:9000/index1,index2/docType1,docType2/_search")]
+        public void UriFormatting(string index, string documentType, string expectedUri)
         {
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { Type = "type1" });
+            var connection = new ElasticConnection(new Uri("http://a.b.com:9000/"), index: index);
+            var formatter = new PostBodyRequestFormatter(connection, mapping, new ElasticSearchRequest { DocumentType = documentType });
 
-            Assert.Contains("type1", formatter.Uri.AbsolutePath);
-        }
-
-        [Fact]
-        public void UrlPathContainsIndexSpecifier()
-        {
-            const string expectedIndex = "myIndex";
-            var indexConnection = new ElasticConnection(defaultConnection.Endpoint, index: expectedIndex);
-            var formatter = new PostBodyRequestFormatter(indexConnection, mapping, new ElasticSearchRequest { Type = "type1" });
-
-            Assert.Contains(expectedIndex, formatter.Uri.AbsolutePath);
+            Assert.Equal(expectedUri, formatter.Uri.ToString());
         }
 
         [Fact]
         public void ParseThrowsInvalidOperationForUnknownCriteriaTypes()
         {
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { Type = "type1", Query = new FakeCriteria() });
+            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Query = new FakeCriteria() });
             Assert.Throws<InvalidOperationException>(() => JObject.Parse(formatter.Body));
         }
 
         [Fact]
         public void BodyIsValidJsonFormattedResponse()
         {
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { Type = "type1" });
+            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1" });
 
             Assert.DoesNotThrow(() => JObject.Parse(formatter.Body));
         }
@@ -64,7 +61,7 @@ namespace ElasticLinq.Test.Request.Formatters
         {
             var termCriteria = TermsCriteria.Build(TermsExecutionMode.@bool, "term1", memberInfo, "singlecriteria");
 
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { Type = "type1", Filter = termCriteria });
+            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Filter = termCriteria });
             var body = JObject.Parse(formatter.Body);
 
             var result = TraverseWithAssert(body, "filter", "term");
@@ -78,7 +75,7 @@ namespace ElasticLinq.Test.Request.Formatters
         {
             var termCriteria = TermsCriteria.Build("term1", memberInfo, "criteria1", "criteria2");
 
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { Type = "type1", Filter = termCriteria });
+            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Filter = termCriteria });
             var body = JObject.Parse(formatter.Body);
 
             var result = TraverseWithAssert(body, "filter", "terms");
@@ -93,7 +90,7 @@ namespace ElasticLinq.Test.Request.Formatters
         {
             var termCriteria = TermsCriteria.Build(TermsExecutionMode.and, "term1", memberInfo, "criteria1", "criteria2");
 
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { Type = "type1", Filter = termCriteria });
+            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Filter = termCriteria });
             var body = JObject.Parse(formatter.Body);
 
             var result = TraverseWithAssert(body, "filter", "terms");
@@ -110,7 +107,7 @@ namespace ElasticLinq.Test.Request.Formatters
             const string expectedFieldName = "fieldShouldExist";
             var existsCriteria = new ExistsCriteria(expectedFieldName);
 
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { Type = "type1", Filter = existsCriteria });
+            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Filter = existsCriteria });
             var body = JObject.Parse(formatter.Body);
 
             var field = TraverseWithAssert(body, "filter", "exists", "field");
@@ -123,7 +120,7 @@ namespace ElasticLinq.Test.Request.Formatters
             const string expectedFieldName = "fieldShouldBeMissing";
             var termCriteria = new MissingCriteria(expectedFieldName);
 
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { Type = "type1", Filter = termCriteria });
+            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Filter = termCriteria });
             var body = JObject.Parse(formatter.Body);
 
             var field = TraverseWithAssert(body, "filter", "missing", "field");
@@ -136,7 +133,7 @@ namespace ElasticLinq.Test.Request.Formatters
             var termCriteria = TermsCriteria.Build("term1", memberInfo, "alpha", "bravo", "charlie", "delta", "echo");
             var notCriteria = NotCriteria.Create(termCriteria);
 
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { Type = "type1", Filter = notCriteria });
+            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Filter = notCriteria });
             var body = JObject.Parse(formatter.Body);
 
             var result = TraverseWithAssert(body, "filter", "not", "terms");
@@ -152,7 +149,7 @@ namespace ElasticLinq.Test.Request.Formatters
             var maxCriteria = new RangeCriteria("maxField", memberInfo, RangeComparison.LessThan, 32768);
             var orCriteria = OrCriteria.Combine(minCriteria, maxCriteria);
 
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { Type = "type1", Filter = orCriteria });
+            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Filter = orCriteria });
             var body = JObject.Parse(formatter.Body);
 
             var result = TraverseWithAssert(body, "filter", "or");
@@ -168,7 +165,7 @@ namespace ElasticLinq.Test.Request.Formatters
             const decimal expectedRange = 2.0m;
             var rangeCriteria = new RangeCriteria(expectedField, memberInfo, RangeComparison.GreaterThanOrEqual, expectedRange);
 
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { Type = "type1", Filter = rangeCriteria });
+            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Filter = rangeCriteria });
             var body = JObject.Parse(formatter.Body);
 
             var result = TraverseWithAssert(body, "filter", "range", expectedField, "gte");
@@ -182,7 +179,7 @@ namespace ElasticLinq.Test.Request.Formatters
             const string expectedRegexp = "SR20DET";
             var regexpCriteria = new RegexpCriteria(expectedField, expectedRegexp);
 
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { Type = "type1", Filter = regexpCriteria });
+            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Filter = regexpCriteria });
             var body = JObject.Parse(formatter.Body);
 
             var actualRegexp = TraverseWithAssert(body, "filter", "regexp", expectedField);
@@ -196,7 +193,7 @@ namespace ElasticLinq.Test.Request.Formatters
             const string expectedPrefix = "SR20";
             var prefixCriteria = new PrefixCriteria(expectedField, expectedPrefix);
 
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { Type = "type1", Filter = prefixCriteria });
+            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Filter = prefixCriteria });
             var body = JObject.Parse(formatter.Body);
 
             var actualRegexp = TraverseWithAssert(body, "filter", "prefix", expectedField);
@@ -210,7 +207,7 @@ namespace ElasticLinq.Test.Request.Formatters
             var existsCriteria = new ExistsCriteria(expectedFieldName);
             var orCriteria = OrCriteria.Combine(existsCriteria);
 
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { Type = "type1", Filter = orCriteria });
+            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Filter = orCriteria });
             var body = JObject.Parse(formatter.Body);
 
             var field = TraverseWithAssert(body, "filter", "exists", "field");
@@ -223,7 +220,7 @@ namespace ElasticLinq.Test.Request.Formatters
             const string expectedQuery = "this is my query string";
             var queryString = new QueryStringCriteria(expectedQuery);
 
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { Type = "type1", Query = queryString });
+            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Query = queryString });
             var body = JObject.Parse(formatter.Body);
 
             var result = TraverseWithAssert(body, "query", "query_string", "query");
@@ -240,7 +237,7 @@ namespace ElasticLinq.Test.Request.Formatters
                     new RangeSpecificationCriteria(RangeComparison.GreaterThan, 200)
                 });
 
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { Type = "type1", Query = rangeCriteria });
+            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Query = rangeCriteria });
             var body = JObject.Parse(formatter.Body);
 
             var result = TraverseWithAssert(body, "query", "range");
@@ -254,7 +251,7 @@ namespace ElasticLinq.Test.Request.Formatters
         {
             var expectedSortOptions = new List<SortOption> { new SortOption("first", true), new SortOption("second", false), new SortOption("third", false, true) };
 
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { Type = "type1", SortOptions = expectedSortOptions });
+            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", SortOptions = expectedSortOptions });
             var body = JObject.Parse(formatter.Body);
 
             var result = TraverseWithAssert(body, "sort");
@@ -291,7 +288,7 @@ namespace ElasticLinq.Test.Request.Formatters
         {
             var expectedFields = new List<string> { "first", "second", "third" };
 
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { Type = "type1", Fields = expectedFields });
+            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Fields = expectedFields });
             var body = JObject.Parse(formatter.Body);
 
             var result = TraverseWithAssert(body, "fields");
@@ -304,7 +301,7 @@ namespace ElasticLinq.Test.Request.Formatters
         {
             const int expectedFrom = 1024;
 
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { Type = "type1", From = expectedFrom });
+            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", From = expectedFrom });
             var body = JObject.Parse(formatter.Body);
 
             var result = TraverseWithAssert(body, "from");
@@ -316,7 +313,7 @@ namespace ElasticLinq.Test.Request.Formatters
         {
             const int expectedSize = 4096;
 
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { Type = "type1", Size = expectedSize });
+            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Size = expectedSize });
             var body = JObject.Parse(formatter.Body);
 
             var result = TraverseWithAssert(body, "size");
@@ -346,6 +343,33 @@ namespace ElasticLinq.Test.Request.Formatters
 
             var result = body["timeout"];
             Assert.Null(result);
+        }
+
+        [Fact]
+        public void FormatTimeSpanWithMillisecondPrecisionIsUnquantifiedFormat()
+        {
+            var timespan = TimeSpan.FromMilliseconds(1500);
+            var actual = PostBodyRequestFormatter.Format(timespan);
+
+            Assert.Equal(timespan.TotalMilliseconds.ToString(CultureInfo.InvariantCulture), actual);
+        }
+
+        [Fact]
+        public void FormatTimeSpanWithSecondPrecisionIsSecondFormat()
+        {
+            var timespan = TimeSpan.FromSeconds(3);
+            var actual = PostBodyRequestFormatter.Format(timespan);
+
+            Assert.Equal(timespan.TotalSeconds.ToString(CultureInfo.InvariantCulture) + "s", actual);
+        }
+
+        [Fact]
+        public void FormatTimeSpanWithMinutePrecisionIsMinuteFormat()
+        {
+            var timespan = TimeSpan.FromMinutes(4);
+            var actual = PostBodyRequestFormatter.Format(timespan);
+
+            Assert.Equal(timespan.TotalMinutes.ToString(CultureInfo.InvariantCulture) + "m", actual);
         }
 
         private static JToken TraverseWithAssert(JToken token, params string[] paths)
