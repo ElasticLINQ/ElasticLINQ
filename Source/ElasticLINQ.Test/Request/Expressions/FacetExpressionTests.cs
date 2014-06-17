@@ -49,17 +49,5 @@ namespace ElasticLinq.Test.Request.Expressions
 
             Assert.Equal(facet.ToString(), expression.ToString());
         }
-
-        [Fact]
-        public void NodeTypeDoesNotConflictWithSystemNodeTypes()
-        {
-            var expressionTypes = typeof(LambdaExpression).Assembly
-                .GetTypes()
-                .Where(typeof(Expression).IsAssignableFrom)
-                .ToList();
-
-            foreach(var expressionType in expressionTypes)
-
-        }
     }
 }
