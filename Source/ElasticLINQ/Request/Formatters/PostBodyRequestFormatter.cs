@@ -198,6 +198,9 @@ namespace ElasticLinq.Request.Formatters
             if (criteria is QueryStringCriteria)
                 return Build((QueryStringCriteria)criteria);
 
+            if (criteria is MatchAllCriteria)
+                return Build((MatchAllCriteria)criteria);
+
             // Base class formatters using name property
 
             if (criteria is SingleFieldCriteria)
@@ -261,6 +264,11 @@ namespace ElasticLinq.Request.Formatters
         private JObject Build(NotCriteria criteria)
         {
             return new JObject(new JProperty(criteria.Name, Build(criteria.Criteria)));
+        }
+
+        private static JObject Build(MatchAllCriteria criteria)
+        {
+            return new JObject(new JProperty(criteria.Name));
         }
 
         private JObject Build(CompoundCriteria criteria)

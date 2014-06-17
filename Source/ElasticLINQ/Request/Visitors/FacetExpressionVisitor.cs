@@ -37,7 +37,7 @@ namespace ElasticLinq.Request.Visitors
             { "LongCount", "count" }
         };
 
-        private bool aggregateOnGroupKey;
+        private bool aggregateWithoutMember;
         private readonly HashSet<MemberInfo> aggregateMembers = new HashSet<MemberInfo>();
         private readonly Dictionary<string, ICriteria> aggregateCriteria = new Dictionary<string, ICriteria>();
         private readonly ParameterExpression bindingParameter = Expression.Parameter(typeof(AggregateRow), "r");
@@ -73,7 +73,7 @@ namespace ElasticLinq.Request.Visitors
                 case ExpressionType.MemberAccess:
                     {
                         var groupByField = Mapping.GetFieldName(Prefix, ((MemberExpression)groupBy).Member);
-                        if (aggregateOnGroupKey)
+                        if (aggregateWithoutMember)
                             yield return new TermsFacet(GroupKeyFacet, null, size, groupByField);
 
                         foreach (var valueField in aggregateMembers.Select(member => Mapping.GetFieldName(Prefix, member)))
@@ -86,6 +86,9 @@ namespace ElasticLinq.Request.Visitors
                     }
                 case ExpressionType.Constant:
                     {
+                        if (aggregateWithoutMember)
+                            yield return new FilterFacet(GroupKeyFacet, new MatchAllCriteria());
+
                         foreach (var valueField in aggregateMembers.Select(member => Mapping.GetFieldName(Prefix, member)))
                             yield return new StatisticalFacet(valueField, valueField);
 
@@ -180,7 +183,7 @@ namespace ElasticLinq.Request.Visitors
 
         private Expression VisitAggregateGroupKeyOperation(string operation, Type returnType)
         {
-            aggregateOnGroupKey = true;
+            aggregateWithoutMember = true;
             return RebindValue(GroupKeyFacet, operation, returnType);
         }
 

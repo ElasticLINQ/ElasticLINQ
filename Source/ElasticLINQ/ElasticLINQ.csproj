@@ -68,6 +68,7 @@
     <Compile Include="Request\Criteria\ICriteria.cs" />
     <Compile Include="Request\Criteria\INegatableCriteria.cs" />
     <Compile Include="Request\Criteria\ITermsCriteria.cs" />
+    <Compile Include="Request\Criteria\MatchAllCriteria.cs" />
     <Compile Include="Request\Criteria\MissingCriteria.cs" />
     <Compile Include="Request\Criteria\NotCriteria.cs" />
     <Compile Include="Request\Criteria\OrCriteria.cs" />
