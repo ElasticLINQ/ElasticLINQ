@@ -3,6 +3,7 @@
 using ElasticLinq.Mapping;
 using ElasticLinq.Request;
 using ElasticLinq.Request.Criteria;
+using ElasticLinq.Request.Facets;
 using ElasticLinq.Request.Formatters;
 using Newtonsoft.Json.Linq;
 using NSubstitute;
@@ -212,6 +213,101 @@ namespace ElasticLinq.Test.Request.Formatters
 
             var field = TraverseWithAssert(body, "filter", "exists", "field");
             Assert.Equal(expectedFieldName, field);
+        }
+
+        [Fact]
+        public void BodyContainsStatisticalFacet()
+        {
+            var expectedFacet = new StatisticalFacet("TotalSales", "OrderTotal");
+            var searchRequest = new ElasticSearchRequest { Facets = new List<IFacet>(new [] { expectedFacet }) };
+
+            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, searchRequest);
+            var body = JObject.Parse(formatter.Body);
+
+            var result = TraverseWithAssert(body, "facets", expectedFacet.Name, expectedFacet.Type, "field");
+            Assert.Equal(expectedFacet.Fields[0], result.ToString());
+        }
+
+        [Fact]
+        public void BodyContainsFilterFacet()
+        {
+            var expectedFilter = new ExistsCriteria("IsLocal");
+            var expectedFacet = new FilterFacet("LocalSales", expectedFilter);
+            var searchRequest = new ElasticSearchRequest { Facets = new List<IFacet>(new[] { expectedFacet }) };
+
+            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, searchRequest);
+            var body = JObject.Parse(formatter.Body);
+
+            var result = TraverseWithAssert(body, "facets", expectedFacet.Name, expectedFacet.Type, expectedFilter.Name, "field");
+            Assert.Equal(expectedFilter.Field, result.ToString());
+        }
+
+        [Fact]
+        public void BodyContainsTermsFacet()
+        {
+            var expectedFacet = new TermsFacet("Totals", "OrderTotal", "OrderCost");
+            var searchRequest = new ElasticSearchRequest { Facets = new List<IFacet>(new[] { expectedFacet }) };
+
+            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, searchRequest);
+            var body = JObject.Parse(formatter.Body);
+
+            var actualFields = TraverseWithAssert(body, "facets", expectedFacet.Name, expectedFacet.Type, "fields").ToArray();
+
+            foreach(var expectedField in expectedFacet.Fields)
+                Assert.Contains(expectedField, actualFields);
+        }
+
+        [Fact]
+        public void BodyContainsTermsStatsFacet()
+        {
+            const int expectedSize = 101;
+            var expectedFacet = new TermsStatsFacet("Name", "Key", "Value", expectedSize);
+            var searchRequest = new ElasticSearchRequest { Facets = new List<IFacet>(new[] { expectedFacet }) };
+
+            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, searchRequest);
+            var body = JObject.Parse(formatter.Body);
+
+            var result = TraverseWithAssert(body, "facets", expectedFacet.Name, expectedFacet.Type);
+            Assert.Equal(expectedFacet.Key, TraverseWithAssert(result, "key_field").ToString());
+            Assert.Equal(expectedFacet.Value, TraverseWithAssert(result, "value_field").ToString());
+            Assert.Equal(expectedSize.ToString(CultureInfo.InvariantCulture), TraverseWithAssert(result, "size").ToString());
+        }
+
+        [Fact]
+        public void BodyContainsMultipleFacets()
+        {
+            var expectedFacets = new List<IFacet>
+            {
+                new FilterFacet("LocalSales", new ExistsCriteria("IsLocal")),
+                new StatisticalFacet("TotalSales", "OrderTotal")
+            };
+
+            var searchRequest = new ElasticSearchRequest { Facets = expectedFacets };
+
+            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, searchRequest);
+            var body = JObject.Parse(formatter.Body);
+
+            var facetResults = TraverseWithAssert(body, "facets");
+            foreach (var expectedFacet in expectedFacets)
+                TraverseWithAssert(facetResults, expectedFacet.Name, expectedFacet.Type);
+        }
+
+        [Fact]
+        public void BodyContainsFilterFacetAndedWithRequestFilter()
+        {
+            var expectedFacet = new FilterFacet("LocalSales", new ExistsCriteria("IsLocal"));
+            var searchRequest = new ElasticSearchRequest
+            {
+                Filter = new MissingCriteria("Country"),
+                Query = new PrefixCriteria("Field", "Prefix"),
+                Facets = new List<IFacet>(new[] { expectedFacet })
+            };
+
+            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, searchRequest);
+            var body = JObject.Parse(formatter.Body);
+
+            var andFilter = TraverseWithAssert(body, "facets", expectedFacet.Name, expectedFacet.Type, "and");
+            Assert.Equal(2, andFilter.Count());
         }
 
         [Fact]

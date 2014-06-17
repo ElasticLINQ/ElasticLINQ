@@ -1,5 +1,7 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using System.Linq;
+using System.Linq.Expressions;
 using ElasticLinq.Request.Expressions;
 using ElasticLinq.Request.Facets;
 using Xunit;
@@ -46,6 +48,18 @@ namespace ElasticLinq.Test.Request.Expressions
             var expression = new FacetExpression(facet);
 
             Assert.Equal(facet.ToString(), expression.ToString());
+        }
+
+        [Fact]
+        public void NodeTypeDoesNotConflictWithSystemNodeTypes()
+        {
+            var expressionTypes = typeof(LambdaExpression).Assembly
+                .GetTypes()
+                .Where(typeof(Expression).IsAssignableFrom)
+                .ToList();
+
+            foreach(var expressionType in expressionTypes)
+
         }
     }
 }

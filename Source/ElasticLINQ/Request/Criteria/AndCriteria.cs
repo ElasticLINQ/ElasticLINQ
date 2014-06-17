@@ -33,6 +33,12 @@ namespace ElasticLinq.Request.Criteria
             if (criteria.Length == 1)
                 return criteria[0];
 
+            // MatchAll in an And is redundant when other more restrictive criteria present
+            var strippedCriteria = criteria.Where(c => !(c is MatchAllCriteria)).ToArray();
+            if (strippedCriteria.Length == 0)
+                return criteria[0];
+            criteria = strippedCriteria;
+
             // Unwrap and combine ANDs
             var combinedCriteria = criteria.SelectMany(c => c is AndCriteria ? ((AndCriteria)c).Criteria : new[] { c }).ToList();
             CombineRanges(combinedCriteria);

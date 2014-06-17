@@ -248,7 +248,8 @@ namespace ElasticLinq.Request.Formatters
         private JObject Build(TermsCriteria criteria)
         {
             var termsCriteria = new JObject(
-                new JProperty(criteria.Field, new JArray(criteria.Values.Select(x => mapping.FormatValue(criteria.Member, x)).ToArray())));
+                new JProperty(criteria.Field,
+                    new JArray(criteria.Values.Select(x => mapping.FormatValue(criteria.Member, x)).Cast<Object>().ToArray())));
 
             if (criteria.ExecutionMode.HasValue)
                 termsCriteria.Add(new JProperty("execution", criteria.ExecutionMode.GetValueOrDefault().ToString()));
