@@ -22,7 +22,7 @@ namespace ElasticLinq.Request.Expressions
 
         public override ExpressionType NodeType
         {
-            get { return (ExpressionType)10000; }
+            get { return ElasticExpressionType.Criteria; }
         }
 
         public override Type Type

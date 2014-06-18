@@ -3,8 +3,8 @@
 using ElasticLinq.Mapping;
 using ElasticLinq.Request;
 using ElasticLinq.Request.Criteria;
-using ElasticLinq.Request.Facets;
 using ElasticLinq.Request.Formatters;
+using ElasticLinq.Test.TestSupport;
 using Newtonsoft.Json.Linq;
 using NSubstitute;
 using System;
@@ -43,271 +43,11 @@ namespace ElasticLinq.Test.Request.Formatters
         }
 
         [Fact]
-        public void ParseThrowsInvalidOperationForUnknownCriteriaTypes()
-        {
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Query = new FakeCriteria() });
-            Assert.Throws<InvalidOperationException>(() => JObject.Parse(formatter.Body));
-        }
-
-        [Fact]
         public void BodyIsValidJsonFormattedResponse()
         {
             var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1" });
 
             Assert.DoesNotThrow(() => JObject.Parse(formatter.Body));
-        }
-
-        [Fact]
-        public void BodyContainsFilterTerm()
-        {
-            var termCriteria = TermsCriteria.Build(TermsExecutionMode.@bool, "term1", memberInfo, "singlecriteria");
-
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Filter = termCriteria });
-            var body = JObject.Parse(formatter.Body);
-
-            var result = TraverseWithAssert(body, "filter", "term");
-            Assert.Equal(1, result.Count());
-            Assert.Equal("!!! singlecriteria !!!", result[termCriteria.Field].ToString());
-            Assert.Null(result["execution"]);  // Only applicable to "terms" filters
-        }
-
-        [Fact]
-        public void BodyContainsFilterTerms()
-        {
-            var termCriteria = TermsCriteria.Build("term1", memberInfo, "criteria1", "criteria2");
-
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Filter = termCriteria });
-            var body = JObject.Parse(formatter.Body);
-
-            var result = TraverseWithAssert(body, "filter", "terms");
-            var actualTerms = TraverseWithAssert(result, termCriteria.Field);
-            foreach (var criteria in termCriteria.Values)
-                Assert.Contains("!!! " + criteria + " !!!", actualTerms.Select(t => t.ToString()).ToArray());
-            Assert.Null(result["execution"]);
-        }
-
-        [Fact]
-        public void BodyContainsFilterTermsWithExecutionMode()
-        {
-            var termCriteria = TermsCriteria.Build(TermsExecutionMode.and, "term1", memberInfo, "criteria1", "criteria2");
-
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Filter = termCriteria });
-            var body = JObject.Parse(formatter.Body);
-
-            var result = TraverseWithAssert(body, "filter", "terms");
-            var actualTerms = TraverseWithAssert(result, termCriteria.Field);
-            foreach (var criteria in termCriteria.Values)
-                Assert.Contains("!!! " + criteria + " !!!", actualTerms.Select(t => t.ToString()).ToArray());
-            var execution = (JValue)TraverseWithAssert(result, "execution");
-            Assert.Equal("and", execution.Value);
-        }
-
-        [Fact]
-        public void BodyContainsFilterExists()
-        {
-            const string expectedFieldName = "fieldShouldExist";
-            var existsCriteria = new ExistsCriteria(expectedFieldName);
-
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Filter = existsCriteria });
-            var body = JObject.Parse(formatter.Body);
-
-            var field = TraverseWithAssert(body, "filter", "exists", "field");
-            Assert.Equal(expectedFieldName, field);
-        }
-
-        [Fact]
-        public void BodyContainsFilterMissing()
-        {
-            const string expectedFieldName = "fieldShouldBeMissing";
-            var termCriteria = new MissingCriteria(expectedFieldName);
-
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Filter = termCriteria });
-            var body = JObject.Parse(formatter.Body);
-
-            var field = TraverseWithAssert(body, "filter", "missing", "field");
-            Assert.Equal(expectedFieldName, field);
-        }
-
-        [Fact]
-        public void BodyContainsFilterNot()
-        {
-            var termCriteria = TermsCriteria.Build("term1", memberInfo, "alpha", "bravo", "charlie", "delta", "echo");
-            var notCriteria = NotCriteria.Create(termCriteria);
-
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Filter = notCriteria });
-            var body = JObject.Parse(formatter.Body);
-
-            var result = TraverseWithAssert(body, "filter", "not", "terms");
-            var actualTerms = TraverseWithAssert(result, termCriteria.Field);
-            foreach (var criteria in termCriteria.Values)
-                Assert.Contains("!!! " + criteria + " !!!", actualTerms.Select(t => t.ToString()).ToArray());
-        }
-
-        [Fact]
-        public void BodyContainsFilterOr()
-        {
-            var minCriteria = new RangeCriteria("minField", memberInfo, RangeComparison.GreaterThanOrEqual, 100);
-            var maxCriteria = new RangeCriteria("maxField", memberInfo, RangeComparison.LessThan, 32768);
-            var orCriteria = OrCriteria.Combine(minCriteria, maxCriteria);
-
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Filter = orCriteria });
-            var body = JObject.Parse(formatter.Body);
-
-            var result = TraverseWithAssert(body, "filter", "or");
-            Assert.Equal(2, result.Children().Count());
-            foreach (var child in result)
-                Assert.True(((JProperty)(child.First)).Name == "range");
-        }
-
-        [Fact]
-        public void BodyContainsRangeFilter()
-        {
-            const string expectedField = "capacity";
-            const decimal expectedRange = 2.0m;
-            var rangeCriteria = new RangeCriteria(expectedField, memberInfo, RangeComparison.GreaterThanOrEqual, expectedRange);
-
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Filter = rangeCriteria });
-            var body = JObject.Parse(formatter.Body);
-
-            var result = TraverseWithAssert(body, "filter", "range", expectedField, "gte");
-            Assert.Equal("!!! 2.0 !!!", result);
-        }
-
-        [Fact]
-        public void BodyContainsRegexFilter()
-        {
-            const string expectedField = "motor";
-            const string expectedRegexp = "SR20DET";
-            var regexpCriteria = new RegexpCriteria(expectedField, expectedRegexp);
-
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Filter = regexpCriteria });
-            var body = JObject.Parse(formatter.Body);
-
-            var actualRegexp = TraverseWithAssert(body, "filter", "regexp", expectedField);
-            Assert.Equal(expectedRegexp, actualRegexp);
-        }
-
-        [Fact]
-        public void BodyContainsPrefixFilter()
-        {
-            const string expectedField = "motor";
-            const string expectedPrefix = "SR20";
-            var prefixCriteria = new PrefixCriteria(expectedField, expectedPrefix);
-
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Filter = prefixCriteria });
-            var body = JObject.Parse(formatter.Body);
-
-            var actualRegexp = TraverseWithAssert(body, "filter", "prefix", expectedField);
-            Assert.Equal(expectedPrefix, actualRegexp);
-        }
-
-        [Fact]
-        public void BodyContainsFilterSingleCollapsedOr()
-        {
-            const string expectedFieldName = "fieldShouldExist";
-            var existsCriteria = new ExistsCriteria(expectedFieldName);
-            var orCriteria = OrCriteria.Combine(existsCriteria);
-
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Filter = orCriteria });
-            var body = JObject.Parse(formatter.Body);
-
-            var field = TraverseWithAssert(body, "filter", "exists", "field");
-            Assert.Equal(expectedFieldName, field);
-        }
-
-        [Fact]
-        public void BodyContainsStatisticalFacet()
-        {
-            var expectedFacet = new StatisticalFacet("TotalSales", "OrderTotal");
-            var searchRequest = new ElasticSearchRequest { Facets = new List<IFacet>(new [] { expectedFacet }) };
-
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, searchRequest);
-            var body = JObject.Parse(formatter.Body);
-
-            var result = TraverseWithAssert(body, "facets", expectedFacet.Name, expectedFacet.Type, "field");
-            Assert.Equal(expectedFacet.Fields[0], result.ToString());
-        }
-
-        [Fact]
-        public void BodyContainsFilterFacet()
-        {
-            var expectedFilter = new ExistsCriteria("IsLocal");
-            var expectedFacet = new FilterFacet("LocalSales", expectedFilter);
-            var searchRequest = new ElasticSearchRequest { Facets = new List<IFacet>(new[] { expectedFacet }) };
-
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, searchRequest);
-            var body = JObject.Parse(formatter.Body);
-
-            var result = TraverseWithAssert(body, "facets", expectedFacet.Name, expectedFacet.Type, expectedFilter.Name, "field");
-            Assert.Equal(expectedFilter.Field, result.ToString());
-        }
-
-        [Fact]
-        public void BodyContainsTermsFacet()
-        {
-            var expectedFacet = new TermsFacet("Totals", "OrderTotal", "OrderCost");
-            var searchRequest = new ElasticSearchRequest { Facets = new List<IFacet>(new[] { expectedFacet }) };
-
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, searchRequest);
-            var body = JObject.Parse(formatter.Body);
-
-            var actualFields = TraverseWithAssert(body, "facets", expectedFacet.Name, expectedFacet.Type, "fields").ToArray();
-
-            foreach(var expectedField in expectedFacet.Fields)
-                Assert.Contains(expectedField, actualFields);
-        }
-
-        [Fact]
-        public void BodyContainsTermsStatsFacet()
-        {
-            const int expectedSize = 101;
-            var expectedFacet = new TermsStatsFacet("Name", "Key", "Value", expectedSize);
-            var searchRequest = new ElasticSearchRequest { Facets = new List<IFacet>(new[] { expectedFacet }) };
-
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, searchRequest);
-            var body = JObject.Parse(formatter.Body);
-
-            var result = TraverseWithAssert(body, "facets", expectedFacet.Name, expectedFacet.Type);
-            Assert.Equal(expectedFacet.Key, TraverseWithAssert(result, "key_field").ToString());
-            Assert.Equal(expectedFacet.Value, TraverseWithAssert(result, "value_field").ToString());
-            Assert.Equal(expectedSize.ToString(CultureInfo.InvariantCulture), TraverseWithAssert(result, "size").ToString());
-        }
-
-        [Fact]
-        public void BodyContainsMultipleFacets()
-        {
-            var expectedFacets = new List<IFacet>
-            {
-                new FilterFacet("LocalSales", new ExistsCriteria("IsLocal")),
-                new StatisticalFacet("TotalSales", "OrderTotal")
-            };
-
-            var searchRequest = new ElasticSearchRequest { Facets = expectedFacets };
-
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, searchRequest);
-            var body = JObject.Parse(formatter.Body);
-
-            var facetResults = TraverseWithAssert(body, "facets");
-            foreach (var expectedFacet in expectedFacets)
-                TraverseWithAssert(facetResults, expectedFacet.Name, expectedFacet.Type);
-        }
-
-        [Fact]
-        public void BodyContainsFilterFacetAndedWithRequestFilter()
-        {
-            var expectedFacet = new FilterFacet("LocalSales", new ExistsCriteria("IsLocal"));
-            var searchRequest = new ElasticSearchRequest
-            {
-                Filter = new MissingCriteria("Country"),
-                Query = new PrefixCriteria("Field", "Prefix"),
-                Facets = new List<IFacet>(new[] { expectedFacet })
-            };
-
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, searchRequest);
-            var body = JObject.Parse(formatter.Body);
-
-            var andFilter = TraverseWithAssert(body, "facets", expectedFacet.Name, expectedFacet.Type, "and");
-            Assert.Equal(2, andFilter.Count());
         }
 
         [Fact]
@@ -319,7 +59,7 @@ namespace ElasticLinq.Test.Request.Formatters
             var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Query = queryString });
             var body = JObject.Parse(formatter.Body);
 
-            var result = TraverseWithAssert(body, "query", "query_string", "query");
+            var result = body.TraverseWithAssert("query", "query_string", "query");
             Assert.Equal(expectedQuery, result.ToString());
         }
 
@@ -336,8 +76,8 @@ namespace ElasticLinq.Test.Request.Formatters
             var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Query = rangeCriteria });
             var body = JObject.Parse(formatter.Body);
 
-            var result = TraverseWithAssert(body, "query", "range");
-            var actualRange = TraverseWithAssert(result, rangeCriteria.Field);
+            var result = body.TraverseWithAssert("query", "range");
+            var actualRange = result.TraverseWithAssert(rangeCriteria.Field);
             Assert.Equal("!!! 100 !!!", actualRange["lt"]);
             Assert.Equal("!!! 200 !!!", actualRange["gt"]);
         }
@@ -350,7 +90,7 @@ namespace ElasticLinq.Test.Request.Formatters
             var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", SortOptions = expectedSortOptions });
             var body = JObject.Parse(formatter.Body);
 
-            var result = TraverseWithAssert(body, "sort");
+            var result = body.TraverseWithAssert("sort");
             for (var i = 0; i < expectedSortOptions.Count; i++)
             {
                 var actualSort = result[i];
@@ -387,7 +127,7 @@ namespace ElasticLinq.Test.Request.Formatters
             var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Fields = expectedFields });
             var body = JObject.Parse(formatter.Body);
 
-            var result = TraverseWithAssert(body, "fields");
+            var result = body.TraverseWithAssert("fields");
             foreach (var field in expectedFields)
                 Assert.Contains(field, result);
         }
@@ -400,7 +140,7 @@ namespace ElasticLinq.Test.Request.Formatters
             var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", From = expectedFrom });
             var body = JObject.Parse(formatter.Body);
 
-            var result = TraverseWithAssert(body, "from");
+            var result = body.TraverseWithAssert("from");
             Assert.Equal(expectedFrom, result);
         }
 
@@ -412,7 +152,7 @@ namespace ElasticLinq.Test.Request.Formatters
             var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Size = expectedSize });
             var body = JObject.Parse(formatter.Body);
 
-            var result = TraverseWithAssert(body, "size");
+            var result = body.TraverseWithAssert("size");
             Assert.Equal(expectedSize, result);
         }
 
@@ -425,7 +165,7 @@ namespace ElasticLinq.Test.Request.Formatters
             var formatter = new PostBodyRequestFormatter(connection, mapping, new ElasticSearchRequest());
             var body = JObject.Parse(formatter.Body);
 
-            var result = TraverseWithAssert(body, "timeout");
+            var result = body.TraverseWithAssert("timeout");
             Assert.Equal(expectedTimeout, result);
         }
 
@@ -466,23 +206,6 @@ namespace ElasticLinq.Test.Request.Formatters
             var actual = PostBodyRequestFormatter.Format(timespan);
 
             Assert.Equal(timespan.TotalMinutes.ToString(CultureInfo.InvariantCulture) + "m", actual);
-        }
-
-        private static JToken TraverseWithAssert(JToken token, params string[] paths)
-        {
-            foreach (var path in paths)
-            {
-                Assert.NotNull(token);
-                token = token[path];
-            }
-
-            Assert.NotNull(token);
-            return token;
-        }
-
-        class FakeCriteria : ICriteria
-        {
-            public string Name { get; private set; }
         }
     }
 }

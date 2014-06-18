@@ -76,6 +76,13 @@ namespace ElasticLinq.Test.Utility
             Assert.DoesNotThrow(() => Argument.EnsureIsAssignableFrom<IEnumerable<object>>("a", typeof(List<object>)));
         }
 
+        [Fact]
+        [ExcludeFromCodeCoverage] // Expression isn't "executed"
+        public void EnsureNotEmptyThrowsArgumentExceptionWhenValuesIsNull()
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => Argument.EnsureNotEmpty<string>("a", null));
+        }
+
         private enum TestEnum
         {
             Two = 2,

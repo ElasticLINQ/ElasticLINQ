@@ -1,6 +1,7 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Xunit;
 
 namespace ElasticLinq.Test
@@ -12,6 +13,7 @@ namespace ElasticLinq.Test
         private const string UserName = "theUser";
 
         [Fact]
+        [ExcludeFromCodeCoverage]
         public static void GuardClauses_Constructor()
         {
             Assert.Throws<ArgumentNullException>(() => new ElasticConnection(null));
@@ -19,6 +21,7 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
+        [ExcludeFromCodeCoverage]
         public void GuardClauses_Timeout()
         {
             Assert.Throws<ArgumentOutOfRangeException>(() => new ElasticConnection(endpoint, timeout: TimeSpan.FromDays(-1)));
@@ -60,6 +63,17 @@ namespace ElasticLinq.Test
 
             Assert.NotNull(connection.HttpClient);
             Assert.Equal(timeout, connection.Timeout);
+        }
+
+        [Fact]
+        [ExcludeFromCodeCoverage]
+        public void DisposeKillsHttpClient()
+        {
+            var connection = new ElasticConnection(endpoint, UserName, Password);
+            
+            connection.Dispose();
+
+            Assert.Throws<ObjectDisposedException>(() => connection.HttpClient.GetAsync(new Uri("http://something.com")));
         }
     }
 }

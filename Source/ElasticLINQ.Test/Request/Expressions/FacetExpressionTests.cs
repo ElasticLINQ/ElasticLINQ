@@ -1,5 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using System;
 using System.Linq;
 using System.Linq.Expressions;
 using ElasticLinq.Request.Expressions;
@@ -10,22 +11,20 @@ namespace ElasticLinq.Test.Request.Expressions
 {
     public class FacetExpressionTests
     {
+        private readonly TermsFacet termsFacet = new TermsFacet("field", "value");
+
         [Fact]
         public void ConstructorSetsFacet()
         {
-            var facet = new TermsFacet("field", "value");
+            var expression = new FacetExpression(termsFacet);
 
-            var expression = new FacetExpression(facet);
-
-            Assert.Same(facet, expression.Facet);
+            Assert.Same(termsFacet, expression.Facet);
         }
 
         [Fact]
         public void ExpressionsTypeIsBool()
         {
-            var facet = new TermsFacet("field", "value");
-
-            var expression = new FacetExpression(facet);
+            var expression = new FacetExpression(termsFacet);
 
             Assert.Equal(typeof(bool), expression.Type);
         }
@@ -33,9 +32,7 @@ namespace ElasticLinq.Test.Request.Expressions
         [Fact]
         public void CanReduceIsAlwaysFalse()
         {
-            var facet = new TermsFacet("field", "value");
-
-            var expression = new FacetExpression(facet);
+            var expression = new FacetExpression(termsFacet);
 
             Assert.False(expression.CanReduce);
         }
@@ -43,11 +40,19 @@ namespace ElasticLinq.Test.Request.Expressions
         [Fact]
         public void ToStringReturnsFacetToString()
         {
-            var facet = new TermsFacet("field", "value");
+            var expression = new FacetExpression(termsFacet);
 
-            var expression = new FacetExpression(facet);
+            Assert.Equal(termsFacet.ToString(), expression.ToString());
+        }
 
-            Assert.Equal(facet.ToString(), expression.ToString());
+        [Fact]
+        public void NodeTypeDoesNotConflictWithSystemNodeTypes()
+        {
+            var systemNodeTypes = Enum.GetValues(typeof(ExpressionType)).OfType<ExpressionType>();
+
+            var expression = new FacetExpression(termsFacet);
+
+            Assert.DoesNotContain(expression.NodeType, systemNodeTypes);
         }
     }
 }

@@ -22,7 +22,7 @@ namespace ElasticLinq.Request.Expressions
 
         public override ExpressionType NodeType
         {
-            get { return (ExpressionType)10001; }
+            get { return ElasticExpressionType.Facet; }
         }
 
         public override Type Type

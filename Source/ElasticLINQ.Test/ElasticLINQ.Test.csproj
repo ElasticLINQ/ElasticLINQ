@@ -57,6 +57,7 @@
     <Compile Include="ElasticQueryTests.cs" />
     <Compile Include="Integration\BasicConnectionTests.cs" />
     <Compile Include="JsonNetTests.cs" />
+    <Compile Include="Logging\LogExtensionTests.cs" />
     <Compile Include="Mapping\CouchbaseElasticMappingTests.cs" />
     <Compile Include="Mapping\ElasticFieldsMappingWrapperTests.cs" />
     <Compile Include="Mapping\MappingHelpersTests.cs" />
@@ -82,7 +83,9 @@
     <Compile Include="Request\Facets\TermsStatsFacetTests.cs" />
     <Compile Include="Request\Facets\TermsFacetTests.cs" />
     <Compile Include="Request\Facets\FilterFacetTests.cs" />
+    <Compile Include="Request\Formatters\PostBodyRequestFormatterFilterTests.cs" />
     <Compile Include="Request\Formatters\PostBodyRequestFormatterTests.cs" />
+    <Compile Include="Request\Formatters\PostBodyRequestFormatterFacetTests.cs" />
     <Compile Include="Request\SortOptionTests.cs" />
     <Compile Include="Request\Visitors\BranchSelectExpressionVisitorTests.cs" />
     <Compile Include="Request\Visitors\ConstantMemberPairTests.cs" />
@@ -103,6 +106,7 @@
     <Compile Include="Response\Materializers\ElasticOneHitMaterializerTests.cs" />
     <Compile Include="Response\Materializers\ElasticManyHitsMaterializerTests.cs" />
     <Compile Include="Retry\RetryPolicyTests.cs" />
+    <Compile Include="TestSupport\Assertions.cs" />
     <Compile Include="TestSupport\FlatteningExpressionVisitor.cs" />
     <Compile Include="TestSupport\HttpStub.cs" />
     <Compile Include="TestSupport\FakeQuery.cs" />
@@ -111,6 +115,8 @@
     <Compile Include="TestSupport\NSubstituteExtensions.cs" />
     <Compile Include="TestSupport\NullRetryPolicy.cs" />
     <Compile Include="TestSupport\SpyLog.cs" />
+    <Compile Include="Test\TestableElasticQueryTests.cs" />
+    <Compile Include="Test\TestableElasticContextTests.cs" />
     <Compile Include="Utility\ArgumentTests.cs" />
     <Compile Include="Utility\SpyMessageHandler.cs" />
     <Compile Include="Utility\TypeHelperTests.cs" />
