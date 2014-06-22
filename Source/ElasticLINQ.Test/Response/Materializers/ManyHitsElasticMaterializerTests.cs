@@ -6,7 +6,7 @@ using Xunit;
 
 namespace ElasticLinq.Test.Response.Materializers
 {
-    public class ElasticManyHitsMaterializerTests
+    public class ManyHitsElasticMaterializerTests
     {
         [Fact]
         public void ManyOfTMaterializesObjects()

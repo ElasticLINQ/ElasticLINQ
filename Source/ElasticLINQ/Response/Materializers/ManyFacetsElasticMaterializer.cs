@@ -12,18 +12,18 @@ namespace ElasticLinq.Response.Materializers
     /// <summary>
     /// Materializes multiple facet requests from the ElasticResponse.
     /// </summary>
-    internal class ElasticFacetsMaterializer : IElasticMaterializer
+    internal class ManyFacetsElasticMaterializer : IElasticMaterializer
     {
         private static readonly string[] termsFacetTypes = { "terms_stats", "terms" };
         private static readonly string[] termlessFacetTypes = { "statistical", "filter" };
 
         private static readonly MethodInfo manyMethodInfo =
-            typeof(ElasticFacetsMaterializer).GetMethod("Many", BindingFlags.NonPublic | BindingFlags.Static);
+            typeof(ManyFacetsElasticMaterializer).GetMethod("Many", BindingFlags.NonPublic | BindingFlags.Static);
 
         private readonly Func<AggregateRow, object> projector;
         private readonly Type elementType;
 
-        public ElasticFacetsMaterializer(Func<AggregateRow, object> projector, Type elementType)
+        public ManyFacetsElasticMaterializer(Func<AggregateRow, object> projector, Type elementType)
         {
             this.projector = projector;
             this.elementType = elementType;

@@ -69,7 +69,7 @@ namespace ElasticLinq.Request.Visitors
 
             searchRequest.Facets = aggregated.Collected.ToList();
             searchRequest.SearchType = "count"; // We only want facets, not hits
-            materializer = new ElasticFacetsMaterializer(r => aggregated.Projection.Compile().DynamicInvoke(r), aggregated.Projection.ReturnType);
+            materializer = new ManyFacetsElasticMaterializer(r => aggregated.Projection.Compile().DynamicInvoke(r), aggregated.Projection.ReturnType);
         }
 
         protected override Expression VisitMethodCall(MethodCallExpression m)
@@ -182,7 +182,7 @@ namespace ElasticLinq.Request.Visitors
 
             searchRequest.Size = single ? 2 : 1;
             finalItemType = source.Type;
-            materializer = new ElasticOneHitMaterializer(itemProjector ?? DefaultItemProjector, finalItemType, single, orDefault);
+            materializer = new OneHitElasticMaterializer(itemProjector ?? DefaultItemProjector, finalItemType, single, orDefault);
 
             return predicate != null
                 ? VisitWhere(source, predicate)

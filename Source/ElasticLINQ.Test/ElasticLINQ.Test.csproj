@@ -102,9 +102,10 @@
     <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationGroupByConstantTests.cs" />
     <Compile Include="Request\Visitors\PartialEvaluatorTests.cs" />
     <Compile Include="Request\Visitors\MemberProjectionExpressionVisitorTests.cs" />
+    <Compile Include="Response\Materializers\AggregatesTests.cs" />
     <Compile Include="Response\Materializers\MaterializerTestHelper.cs" />
-    <Compile Include="Response\Materializers\ElasticOneHitMaterializerTests.cs" />
-    <Compile Include="Response\Materializers\ElasticManyHitsMaterializerTests.cs" />
+    <Compile Include="Response\Materializers\OneHitElasticMaterializerTests.cs" />
+    <Compile Include="Response\Materializers\ManyHitsElasticMaterializerTests.cs" />
     <Compile Include="Retry\RetryPolicyTests.cs" />
     <Compile Include="TestSupport\Assertions.cs" />
     <Compile Include="TestSupport\FlatteningExpressionVisitor.cs" />
