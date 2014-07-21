@@ -242,6 +242,8 @@ namespace ElasticLinq.Request.Visitors
         private Expression VisitQuery(Expression source, Expression predicate)
         {
             var lambda = predicate.GetLambda();
+            var wasWithin = Within;
+            Within = CriteriaWithin.Query;;
             var body = BooleanMemberAccessBecomesEquals(lambda.Body);
 
             var criteriaExpression = body as CriteriaExpression;
@@ -249,6 +251,7 @@ namespace ElasticLinq.Request.Visitors
                 throw new NotSupportedException(string.Format("Unknown Query predicate '{0}'", body));
 
             searchRequest.Query = ApplyCriteria(searchRequest.Query, criteriaExpression.Criteria);
+            Within = wasWithin;
 
             return Visit(source);
         }

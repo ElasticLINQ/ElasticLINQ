@@ -97,11 +97,19 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         }
 
         [Fact]
-        public void StringContainsGeneratesQueryStringCriteria()
+        public void StringContainsWithinWhereThrows()
         {
             const string expectedConstant = "Kryten";
             var where = Robots.Where(e => e.Name.Contains(expectedConstant));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
+            Assert.Throws<NotSupportedException>(() => ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression));
+        }
+
+        [Fact]
+        public void StringContainsWithinQueryGeneratesQueryStringCriteria()
+        {
+            const string expectedConstant = "Kryten";
+            var where = Robots.Query(e => e.Name.Contains(expectedConstant));
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Query;
 
             var queryStringCriteria = Assert.IsType<QueryStringCriteria>(criteria);
             Assert.Equal("prefix.name", queryStringCriteria.Fields.Single());
@@ -109,15 +117,43 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         }
 
         [Fact]
-        public void StringStartsWithGeneratesQueryStringCriteria()
+        public void StringStartsWithWithinWhereThrows()
         {
             const string expectedConstant = "Kryten";
             var where = Robots.Where(e => e.Name.StartsWith(expectedConstant));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
+            Assert.Throws<NotSupportedException>(() => ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression));
+        }
+
+        [Fact]
+        public void StringStartsWithGeneratesQueryStringCriteria()
+        {
+            const string expectedConstant = "Kryten";
+            var where = Robots.Query(e => e.Name.StartsWith(expectedConstant));
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Query;
 
             var queryStringCriteria = Assert.IsType<QueryStringCriteria>(criteria);
             Assert.Equal("prefix.name", queryStringCriteria.Fields.Single());
             Assert.Equal(String.Format("{0}*", expectedConstant), queryStringCriteria.Value);
+        }
+
+        [Fact]
+        public void StringEndsWithWithinWhereThrows()
+        {
+            const string expectedConstant = "Kryten";
+            var where = Robots.Where(e => e.Name.EndsWith(expectedConstant));
+            Assert.Throws<NotSupportedException>(() => ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression));
+        }
+
+        [Fact]
+        public void StringEndsWithGeneratesQueryStringCriteria()
+        {
+            const string expectedConstant = "Kryten";
+            var where = Robots.Query(e => e.Name.EndsWith(expectedConstant));
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Query;
+
+            var queryStringCriteria = Assert.IsType<QueryStringCriteria>(criteria);
+            Assert.Equal("prefix.name", queryStringCriteria.Fields.Single());
+            Assert.Equal(String.Format("*{0}", expectedConstant), queryStringCriteria.Value);
         }
 
         [Fact]
