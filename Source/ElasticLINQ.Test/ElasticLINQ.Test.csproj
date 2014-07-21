@@ -103,6 +103,7 @@
     <Compile Include="Request\Visitors\PartialEvaluatorTests.cs" />
     <Compile Include="Request\Visitors\MemberProjectionExpressionVisitorTests.cs" />
     <Compile Include="Response\Materializers\AggregatesTests.cs" />
+    <Compile Include="Response\Materializers\ManyFacetsElasticMaterializerTests.cs" />
     <Compile Include="Response\Materializers\MaterializerTestHelper.cs" />
     <Compile Include="Response\Materializers\OneHitElasticMaterializerTests.cs" />
     <Compile Include="Response\Materializers\ManyHitsElasticMaterializerTests.cs" />

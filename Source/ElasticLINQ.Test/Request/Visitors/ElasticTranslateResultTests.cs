@@ -13,7 +13,7 @@ namespace ElasticLinq.Test.Request.Visitors
         public void ConstructorSetsProperties()
         {
             var expectedSearch = new ElasticSearchRequest { DocumentType = "someType" };
-            var expectedMaterializer = new ElasticManyHitsMaterializer(o => o, typeof(ElasticConnectionTests));
+            var expectedMaterializer = new ManyHitsElasticMaterializer(o => o, typeof(ElasticConnectionTests));
 
             var result = new ElasticTranslateResult(expectedSearch, expectedMaterializer);
 

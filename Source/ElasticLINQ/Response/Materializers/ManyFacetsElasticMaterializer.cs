@@ -1,6 +1,7 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using ElasticLinq.Response.Model;
+using ElasticLinq.Utility;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -31,6 +32,12 @@ namespace ElasticLinq.Response.Materializers
 
         public object Materialize(ElasticResponse elasticResponse)
         {
+            Argument.EnsureNotNull("elasticResponse", elasticResponse);
+
+            var facets = elasticResponse.facets;
+            if (facets == null || facets.Count == 0)
+                return Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType));
+
             return manyMethodInfo
                 .MakeGenericMethod(elementType)
                 .Invoke(null, new object[] { elasticResponse.facets, projector });
@@ -38,20 +45,19 @@ namespace ElasticLinq.Response.Materializers
 
         internal static List<T> Many<T>(JObject facets, Func<AggregateRow, object> projector)
         {
-            if (facets != null && facets.Count != 0)
-            {
-                var termsStats = facets.Values().Where(x => termsFacetTypes.Contains(x["_type"].ToString())).ToList();
-                if (termsStats.Any())
-                    return FlattenTermsStatsToAggregateRows(termsStats).Select(projector).Cast<T>().ToList();
+            var facetValues = facets.Values().ToList();
 
-                var termlessStats = facets.Values().Where(x => termlessFacetTypes.Contains(x["_type"].ToString())).ToList();
-                if (termlessStats.Any())
-                    return Enumerable.Range(1, 1)
-                        .Select(r => new AggregateStatisticalRow(facets))
-                        .Select(projector)
-                        .Cast<T>()
-                        .ToList();
-            }
+            var facetsWithTerms = facetValues.Where(x => termsFacetTypes.Contains(x["_type"].ToString())).ToList();
+            if (facetsWithTerms.Any())
+                return FlattenTermsStatsToAggregateRows(facetsWithTerms).Select(projector).Cast<T>().ToList();
+
+            var facetsWithoutTerms = facetValues.Where(x => termlessFacetTypes.Contains(x["_type"].ToString())).ToList();
+            if (facetsWithoutTerms.Any())
+                return Enumerable.Range(1, 1)
+                    .Select(r => new AggregateStatisticalRow(facets))
+                    .Select(projector)
+                    .Cast<T>()
+                    .ToList();
 
             return new List<T>();
         }

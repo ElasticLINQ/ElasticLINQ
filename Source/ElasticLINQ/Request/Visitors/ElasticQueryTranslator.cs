@@ -59,7 +59,7 @@ namespace ElasticLinq.Request.Visitors
                 searchRequest.Filter = Mapping.GetTypeExistsCriteria(sourceType);
 
             if (materializer == null)
-                materializer = new ElasticManyHitsMaterializer(itemProjector ?? DefaultItemProjector, finalItemType ?? sourceType);
+                materializer = new ManyHitsElasticMaterializer(itemProjector ?? DefaultItemProjector, finalItemType ?? sourceType);
         }
 
         private void CompleteFacetTranslation(RebindCollectionResult<IFacet> aggregated)
