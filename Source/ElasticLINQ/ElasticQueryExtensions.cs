@@ -49,6 +49,24 @@ namespace ElasticLinq
         }
 
         /// <summary>
+        /// Queries an ElasticSearch index based on a query string for specific field partterns.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="T:System.Linq.IQueryable`1"/> that contains elements from the input sequence that satisfy the condition specified by <paramref name="query"/>.
+        /// </returns>
+        /// <param name="source">An <see cref="T:System.Linq.IQueryable`1"/> to query.</param>
+        /// <param name="query">A query string to test each element for.</param>
+        /// <param name="fields">A list of field name patterns to search.</param>
+        /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
+        /// <exception cref="T:System.ArgumentNullException"><paramref name="source"/>, <paramref name="query"/> or <paramref name="fields"/> is null.</exception>
+        public static IQueryable<TSource> QueryString<TSource>(this IQueryable<TSource> source, string query, string[] fields)
+        {
+            Argument.EnsureNotNull("query", query);
+            Argument.EnsureNotNull("fields", fields);
+            return CreateQueryMethodCall(source, (MethodInfo)MethodBase.GetCurrentMethod(), Expression.Constant(query), Expression.Constant(fields));
+        }
+
+        /// <summary>
         /// Sorts the elements of a sequence in ascending order by their ElasticSearch score.
         /// </summary>
         /// <returns>

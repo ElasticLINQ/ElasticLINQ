@@ -64,6 +64,21 @@ namespace ElasticLinq.Test.Request.Formatters
         }
 
         [Fact]
+        public void BodyContainsQueryStringWithFields()
+        {
+            const string expectedQuery = "this is my query string";
+            var expectedFields = new[] { "green", "brown", "yellow" };
+            var queryString = new QueryStringCriteria(expectedQuery, expectedFields);
+
+            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Query = queryString });
+            var body = JObject.Parse(formatter.Body);
+
+            var result = body.TraverseWithAssert("query", "query_string");
+            Assert.Equal(expectedQuery, result.TraverseWithAssert("query").ToString());
+            Assert.Equal(expectedFields, result.TraverseWithAssert("fields").Select(f => f.ToString()).ToArray());
+        }
+
+        [Fact]
         public void BodyContainsQueryRange()
         {
             var rangeCriteria = new RangeCriteria("someField", memberInfo,

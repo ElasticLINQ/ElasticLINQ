@@ -101,6 +101,8 @@ namespace ElasticLinq.Request.Visitors
                 case "QueryString":
                     if (m.Arguments.Count == 2)
                         return VisitQueryString(m.Arguments[0], m.Arguments[1]);
+                    if (m.Arguments.Count == 3)
+                        return VisitQueryString(m.Arguments[0], m.Arguments[1], m.Arguments[2]);
                     break;
 
                 case "OrderByScore":
@@ -115,10 +117,12 @@ namespace ElasticLinq.Request.Visitors
             throw new NotSupportedException(string.Format("The ElasticQuery method '{0}' is not supported", m.Method.Name));
         }
 
-        private Expression VisitQueryString(Expression source, Expression queryExpression)
+        private Expression VisitQueryString(Expression source, Expression queryExpression, Expression fieldsExpression = null)
         {
             var constantQueryExpression = (ConstantExpression)queryExpression;
-            var criteriaExpression = new CriteriaExpression(new QueryStringCriteria(constantQueryExpression.Value.ToString()));
+            var constantFieldExpression = fieldsExpression as ConstantExpression;
+            var constantFields = constantFieldExpression == null ? null : (IEnumerable<string>)constantFieldExpression.Value;
+            var criteriaExpression = new CriteriaExpression(new QueryStringCriteria(constantQueryExpression.Value.ToString(), constantFields));
             searchRequest.Query = ApplyCriteria(searchRequest.Query, criteriaExpression.Criteria);
 
             return Visit(source);
