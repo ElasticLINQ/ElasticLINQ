@@ -146,8 +146,8 @@ namespace ElasticLinq.Request.Visitors
                 if (aggregateMemberOperations.TryGetValue(m.Method.Name, out operation) && m.Arguments.Count == 2)
                     return VisitAggregateMemberOperation(m.Arguments[1], operation, m.Method.ReturnType);
             }
-
-            return base.VisitMethodCall(m);
+            
+            return m; // Do not base.VisitMethodCall as we don't want to examine the whole tree
         }
 
         private Expression VisitTake(Expression source, Expression takeExpression)
