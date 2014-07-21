@@ -25,12 +25,12 @@ namespace ElasticLinq.Test.Request.Criteria
         public void ConstructorWithAllParametersSetsPropertiesFromArguments()
         {
             const string expectedValue = "c3po";
-            var expectedField = new List<string>(new[] { "jawas", "homestead" });
+            var expectedFields = new[] { "jawas", "homestead" };
 
-            var criteria = new QueryStringCriteria(expectedValue, expectedField);
+            var criteria = new QueryStringCriteria(expectedValue, expectedFields);
 
             Assert.Equal(expectedValue, criteria.Value);
-            Assert.Equal(expectedField, criteria.Fields);
+            Assert.Equal(expectedFields, criteria.Fields);
         }
 
         [Fact]

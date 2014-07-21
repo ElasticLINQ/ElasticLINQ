@@ -12,21 +12,17 @@ namespace ElasticLinq.Request.Criteria
     public class QueryStringCriteria : ICriteria
     {
         private readonly string value;
-        private readonly IEnumerable<string> fields = Enumerable.Empty<string>();
+        private readonly IReadOnlyList<string> fields;
 
-        public QueryStringCriteria(string value)
+        public QueryStringCriteria(string value, params string[] fields)
         {
             Argument.EnsureNotBlank("value", value);
+
             this.value = value;
+            this.fields = fields ?? new string[0];
         }
 
-        public QueryStringCriteria(string value, IEnumerable<string> fields)
-            : this(value)
-        {
-            this.fields = fields;
-        }
-
-        public IEnumerable<string> Fields
+        public IReadOnlyList<string> Fields
         {
             get { return fields; }
         }

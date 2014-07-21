@@ -30,12 +30,20 @@ namespace ElasticLinq.Request.Visitors
 
         protected override Expression VisitMethodCall(MethodCallExpression m)
         {
+            if (m.Method.DeclaringType == typeof(string))
+                return VisitStringMethodCall(m);
+
             if (m.Method.DeclaringType == typeof(Enumerable))
                 return VisitEnumerableMethodCall(m);
 
             if (m.Method.DeclaringType == typeof(ElasticMethods))
                 return VisitElasticMethodsMethodCall(m);
 
+            return VisitDefaultMethodCall(m);
+        }
+
+        private Expression VisitDefaultMethodCall(MethodCallExpression m)
+        {
             switch (m.Method.Name)
             {
                 case "Equals":
@@ -100,6 +108,24 @@ namespace ElasticLinq.Request.Visitors
             }
 
             throw new NotSupportedException(string.Format("The Enumerable method '{0}' is not supported", m.Method.Name));
+        }
+
+        protected Expression VisitStringMethodCall(MethodCallExpression m)
+        {
+            switch (m.Method.Name)
+            {
+                case "Contains":
+                    if (m.Arguments.Count == 1)
+                        return VisitStringContainsMethodCall(m.Object, m.Arguments[0]);
+                    break;
+
+                case "StartsWith":
+                    if (m.Arguments.Count == 1)
+                        return VisitStringStartsWithMethodCall(m.Object, m.Arguments[0]);
+                    break;
+            }
+
+            return VisitDefaultMethodCall(m);
         }
 
         protected override Expression VisitUnary(UnaryExpression node)
@@ -231,6 +257,38 @@ namespace ElasticLinq.Request.Visitors
                 var field = Mapping.GetFieldName(Prefix, member);
                 var value = ((ConstantExpression)matched).Value;
                 return new CriteriaExpression(TermsCriteria.Build(field, member, value));
+            }
+
+            throw new NotSupportedException(string.Format("Unknown source '{0}' for Contains operation", source));
+        }
+
+        private Expression VisitStringContainsMethodCall(Expression source, Expression match)
+        {
+            var matched = Visit(match);
+
+            // Where(x => x.StringProperty.Contains(value))
+            if (source is MemberExpression && matched is ConstantExpression)
+            {
+                var member = ((MemberExpression)source).Member;
+                var field = Mapping.GetFieldName(Prefix, member);
+                var value = ((ConstantExpression)matched).Value;
+                return new CriteriaExpression(new QueryStringCriteria(String.Format("*{0}*", value), field));
+            }
+
+            throw new NotSupportedException(string.Format("Unknown source '{0}' for Contains operation", source));
+        }
+
+        private Expression VisitStringStartsWithMethodCall(Expression source, Expression match)
+        {
+            var matched = Visit(match);
+
+            // Where(x => x.StringProperty.Contains(value))
+            if (source is MemberExpression && matched is ConstantExpression)
+            {
+                var member = ((MemberExpression)source).Member;
+                var field = Mapping.GetFieldName(Prefix, member);
+                var value = ((ConstantExpression)matched).Value;
+                return new CriteriaExpression(new QueryStringCriteria(String.Format("{0}*", value), field));
             }
 
             throw new NotSupportedException(string.Format("Unknown source '{0}' for Contains operation", source));
