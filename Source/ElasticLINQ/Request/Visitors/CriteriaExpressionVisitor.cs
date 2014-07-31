@@ -365,6 +365,14 @@ namespace ElasticLinq.Request.Visitors
             throw new NotSupportedException("A null test Expression must have a member being compared to a bool or null");
         }
 
+        private string GetFieldName(MemberExpression memberExpression)
+        {
+            if (memberExpression.Expression.NodeType == ExpressionType.MemberAccess)
+                return Mapping.GetFieldName(GetFieldName((MemberExpression)memberExpression.Expression), memberExpression.Member);
+
+            return Mapping.GetFieldName(Prefix, memberExpression.Member);
+        }
+
         private Expression VisitEquals(Expression left, Expression right)
         {
             var cm = ConstantMemberPair.Create(left, right);
@@ -372,7 +380,7 @@ namespace ElasticLinq.Request.Visitors
             if (cm != null)
                 return cm.IsNullTest
                     ? CreateExists(cm, true)
-                    : new CriteriaExpression(new TermCriteria(Mapping.GetFieldName(Prefix, cm.MemberExpression.Member), cm.MemberExpression.Member, cm.ConstantExpression.Value));
+                    : new CriteriaExpression(new TermCriteria(GetFieldName(cm.MemberExpression), cm.MemberExpression.Member, cm.ConstantExpression.Value));
 
             throw new NotSupportedException("Equality must be between a Member and a Constant");
         }

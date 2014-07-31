@@ -769,6 +769,18 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         }
 
         [Fact]
+        public static void SupportsDeepQueries()
+        {
+            const Int32 expectedConstant = 2;
+            var where = Robots.Where(e => e.Stats.Limbs.HandCount == expectedConstant);
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
+
+            var termCriteria = Assert.IsType<TermCriteria>(criteria);
+            Assert.Equal("prefix.stats.limbs.handCount", termCriteria.Field);
+            Assert.Equal(expectedConstant, termCriteria.Value);
+        }
+
+        [Fact]
         public void RegexElasticMethodCreatesRegexWhereCriteria()
         {
             var where = Robots.Where(r => ElasticMethods.Regexp(r.Name, "r.*bot"));
