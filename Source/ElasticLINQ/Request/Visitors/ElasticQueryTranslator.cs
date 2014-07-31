@@ -84,7 +84,7 @@ namespace ElasticLinq.Request.Visitors
                 return VisitElasticMethodsMethodCall(m);
 
             if (m.Method.Name == "Create")
-                    return m;
+                return m;
 
             return base.VisitMethodCall(m);
         }
@@ -228,22 +228,19 @@ namespace ElasticLinq.Request.Visitors
             switch (m.Expression.NodeType)
             {
                 case ExpressionType.Parameter:
+                case ExpressionType.MemberAccess:
                     return m;
 
-                case ExpressionType.MemberAccess:
-                    if (m.Member.Name == "HasValue" && m.Member.DeclaringType.IsGenericOf(typeof(Nullable<>)))
-                        return m;
-                    break;
+                default:
+                    throw new NotSupportedException(string.Format("The MemberInfo '{0}' is not supported", m.Member.Name));
             }
-
-            throw new NotSupportedException(string.Format("The MemberInfo '{0}' is not supported", m.Member.Name));
         }
 
         private Expression VisitQuery(Expression source, Expression predicate)
         {
             var lambda = predicate.GetLambda();
             var wasWithin = Within;
-            Within = CriteriaWithin.Query;;
+            Within = CriteriaWithin.Query;
             var body = BooleanMemberAccessBecomesEquals(lambda.Body);
 
             var criteriaExpression = body as CriteriaExpression;
@@ -277,7 +274,7 @@ namespace ElasticLinq.Request.Visitors
             var final = Visit(lambda.Body) as MemberExpression;
             if (final != null)
             {
-                var fieldName = Mapping.GetFieldName(Prefix, final.Member);
+                var fieldName = Mapping.GetFieldName(Prefix, final);
                 var ignoreUnmapped = final.Type.IsNullable(); // Consider a config switch?
                 searchRequest.SortOptions.Insert(0, new SortOption(fieldName, ascending, ignoreUnmapped));
             }

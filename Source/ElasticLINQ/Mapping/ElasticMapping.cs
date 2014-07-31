@@ -5,6 +5,7 @@ using ElasticLinq.Utility;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Globalization;
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace ElasticLinq.Mapping
@@ -25,7 +26,7 @@ namespace ElasticLinq.Mapping
         /// <summary>
         /// Initializes a new instance of the <see cref="ElasticMapping"/> class.
         /// </summary>
-        /// <param name="camelCaseFieldNames">Pass <c>true</c> to automatically camel-case field names (for <see cref="GetFieldName"/>).</param>
+        /// <param name="camelCaseFieldNames">Pass <c>true</c> to automatically camel-case field names (for <see cref="GetFieldName(string, MemberInfo)"/>).</param>
         /// <param name="camelCaseTypeNames">Pass <c>true</c> to automatically camel-case type names (for <see cref="GetDocumentType"/>).</param>
         /// <param name="pluralizeTypeNames">Pass <c>true</c> to automatically pluralize type names (for <see cref="GetDocumentType"/>).</param>
         /// <param name="lowerCaseAnalyzedFieldValues">Pass <c>true</c> to automatically convert field values to lower case (for <see cref="FormatValue"/>).</param>
@@ -60,6 +61,30 @@ namespace ElasticLinq.Mapping
         }
 
         /// <inheritdoc/>
+        public virtual string GetFieldName(string prefix, MemberExpression memberExpression)
+        {
+            Argument.EnsureNotNull("memberExpression", memberExpression);
+
+            switch (memberExpression.Expression.NodeType)
+            {
+                case ExpressionType.MemberAccess:
+                    return GetFieldName(GetFieldName(prefix, (MemberExpression)memberExpression.Expression), memberExpression.Member);
+
+                case ExpressionType.Parameter:
+                    return GetFieldName(prefix, memberExpression.Member);
+
+                default:
+                    throw new NotSupportedException(String.Format("Unknown expression type {0} for left hand side of expression {1}", memberExpression.Expression.NodeType, memberExpression));
+            }
+        }
+
+        /// <summary>
+        /// The default implementation of GetFieldName delegates to this, after resolving deep property
+        /// accessors appropriately (i.e., x => x.foo.bar.baz).
+        /// </summary>
+        /// <param name="prefix">The prefix</param>
+        /// <param name="memberInfo"></param>
+        /// <returns></returns>
         public virtual string GetFieldName(string prefix, MemberInfo memberInfo)
         {
             Argument.EnsureNotNull("memberInfo", memberInfo);
