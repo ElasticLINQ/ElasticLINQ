@@ -165,15 +165,12 @@ namespace ElasticLinq.Request.Visitors
             switch (m.Expression.NodeType)
             {
                 case ExpressionType.Parameter:
+                case ExpressionType.MemberAccess:
                     return m;
 
-                case ExpressionType.MemberAccess:
-                    if (m.Member.Name == "HasValue" && m.Member.DeclaringType.IsGenericOf(typeof(Nullable<>)))
-                        return m;
-                    break;
+                default:
+                    throw new NotSupportedException(string.Format("The MemberInfo '{0}' is not supported", m.Member.Name));
             }
-
-            throw new NotSupportedException(string.Format("The MemberInfo '{0}' is not supported", m.Member.Name));
         }
 
         protected override Expression VisitBinary(BinaryExpression b)
@@ -222,7 +219,7 @@ namespace ElasticLinq.Request.Visitors
             var cm = ConstantMemberPair.Create(left, right);
 
             if (cm != null)
-                return new CriteriaExpression(new PrefixCriteria(Mapping.GetFieldName(Prefix, cm.MemberExpression.Member), cm.ConstantExpression.Value.ToString()));
+                return new CriteriaExpression(new PrefixCriteria(Mapping.GetFieldName(Prefix, cm.MemberExpression), cm.ConstantExpression.Value.ToString()));
 
             throw new NotSupportedException("Prefix must be between a Member and a Constant");
         }
@@ -232,7 +229,7 @@ namespace ElasticLinq.Request.Visitors
             var cm = ConstantMemberPair.Create(left, right);
 
             if (cm != null)
-                return new CriteriaExpression(new RegexpCriteria(Mapping.GetFieldName(Prefix, cm.MemberExpression.Member), cm.ConstantExpression.Value.ToString()));
+                return new CriteriaExpression(new RegexpCriteria(Mapping.GetFieldName(Prefix, cm.MemberExpression), cm.ConstantExpression.Value.ToString()));
 
             throw new NotSupportedException("Regexp must be between a Member and a Constant");
         }
@@ -244,8 +241,8 @@ namespace ElasticLinq.Request.Visitors
             // Where(x => constantsList.Contains(x.Property))
             if (source is ConstantExpression && matched is MemberExpression)
             {
-                var member = ((MemberExpression)matched).Member;
-                var field = Mapping.GetFieldName(Prefix, member);
+                var memberExpression = (MemberExpression)matched;
+                var field = Mapping.GetFieldName(Prefix, memberExpression);
                 var containsSource = ((IEnumerable)((ConstantExpression)source).Value);
 
                 // If criteria contains a null create an Or criteria with Terms on one
@@ -253,7 +250,7 @@ namespace ElasticLinq.Request.Visitors
                 var values = containsSource.Cast<object>().Distinct().ToList();
                 var nonNullValues = values.Where(v => v != null).ToList();
 
-                ICriteria criteria = TermsCriteria.Build(field, member, nonNullValues);
+                ICriteria criteria = TermsCriteria.Build(field, memberExpression.Member, nonNullValues);
                 if (values.Count != nonNullValues.Count)
                     criteria = OrCriteria.Combine(criteria, new MissingCriteria(field));
 
@@ -263,10 +260,10 @@ namespace ElasticLinq.Request.Visitors
             // Where(x => x.SomeList.Contains(constantValue))
             if (source is MemberExpression && matched is ConstantExpression)
             {
-                var member = ((MemberExpression)source).Member;
-                var field = Mapping.GetFieldName(Prefix, member);
+                var memberExpression = (MemberExpression)source;
+                var field = Mapping.GetFieldName(Prefix, memberExpression);
                 var value = ((ConstantExpression)matched).Value;
-                return new CriteriaExpression(TermsCriteria.Build(field, member, value));
+                return new CriteriaExpression(TermsCriteria.Build(field, memberExpression.Member, value));
             }
 
             throw new NotSupportedException(string.Format("Unknown source '{0}' for Contains operation", source));
@@ -281,8 +278,7 @@ namespace ElasticLinq.Request.Visitors
 
             if (source is MemberExpression && matched is ConstantExpression)
             {
-                var member = ((MemberExpression)source).Member;
-                var field = Mapping.GetFieldName(Prefix, member);
+                var field = Mapping.GetFieldName(Prefix, (MemberExpression)source);
                 var value = ((ConstantExpression)matched).Value;
                 return new CriteriaExpression(new QueryStringCriteria(String.Format(pattern, value), field));
             }
@@ -344,7 +340,7 @@ namespace ElasticLinq.Request.Visitors
             if (cm != null)
             {
                 var values = ((IEnumerable)cm.ConstantExpression.Value).Cast<object>().ToArray();
-                return new CriteriaExpression(TermsCriteria.Build(executionMode, Mapping.GetFieldName(Prefix, cm.MemberExpression.Member), cm.MemberExpression.Member, values));
+                return new CriteriaExpression(TermsCriteria.Build(executionMode, Mapping.GetFieldName(Prefix, cm.MemberExpression), cm.MemberExpression.Member, values));
             }
 
             throw new NotSupportedException(methodName + " must be between a Member and a Constant");
@@ -372,17 +368,18 @@ namespace ElasticLinq.Request.Visitors
             if (cm != null)
                 return cm.IsNullTest
                     ? CreateExists(cm, true)
-                    : new CriteriaExpression(new TermCriteria(Mapping.GetFieldName(Prefix, cm.MemberExpression.Member), cm.MemberExpression.Member, cm.ConstantExpression.Value));
+                    : new CriteriaExpression(new TermCriteria(Mapping.GetFieldName(Prefix, cm.MemberExpression), cm.MemberExpression.Member, cm.ConstantExpression.Value));
 
             throw new NotSupportedException("Equality must be between a Member and a Constant");
         }
 
-        private static MemberInfo UnwrapNullableMethodExpression(MemberExpression m)
+        private static MemberExpression UnwrapNullableMethodExpression(MemberExpression m)
         {
-            if (m.Expression is MemberExpression)
-                return ((MemberExpression)(m.Expression)).Member;
+            var lhsMemberExpression = m.Expression as MemberExpression;
+            if (lhsMemberExpression != null && m.Member.Name == "HasValue" && m.Member.DeclaringType.IsGenericOf(typeof(Nullable<>)))
+                return lhsMemberExpression;
 
-            return m.Member;
+            return m;
         }
 
         private Expression VisitNotEqual(Expression left, Expression right)
@@ -392,7 +389,7 @@ namespace ElasticLinq.Request.Visitors
             if (cm != null)
                 return cm.IsNullTest
                     ? CreateExists(cm, false)
-                    : new CriteriaExpression(NotCriteria.Create(new TermCriteria(Mapping.GetFieldName(Prefix, cm.MemberExpression.Member), cm.MemberExpression.Member, cm.ConstantExpression.Value)));
+                    : new CriteriaExpression(NotCriteria.Create(new TermCriteria(Mapping.GetFieldName(Prefix, cm.MemberExpression), cm.MemberExpression.Member, cm.ConstantExpression.Value)));
 
             throw new NotSupportedException("A not-equal expression must consist of a constant and a member");
         }
@@ -403,7 +400,7 @@ namespace ElasticLinq.Request.Visitors
 
             if (cm != null)
             {
-                var field = Mapping.GetFieldName(Prefix, cm.MemberExpression.Member);
+                var field = Mapping.GetFieldName(Prefix, cm.MemberExpression);
                 return new CriteriaExpression(new RangeCriteria(field, cm.MemberExpression.Member, ExpressionTypeToRangeType(t), cm.ConstantExpression.Value));
             }
 

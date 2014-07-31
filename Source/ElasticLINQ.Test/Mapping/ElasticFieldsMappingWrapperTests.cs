@@ -1,11 +1,10 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using ElasticLinq.Mapping;
-using ElasticLinq.Response.Model;
-using ElasticLinq.Test.TestSupport;
 using NSubstitute;
 using System;
-using System.Reflection;
+using System.Linq;
+using System.Linq.Expressions;
 using Xunit;
 using Xunit.Extensions;
 
@@ -57,11 +56,12 @@ namespace ElasticLinq.Test.Mapping
             var innerMapping = Substitute.For<IElasticMapping>();
             var mapping = new ElasticFieldsMappingWrapper(innerMapping);
             var member = typeof(ElasticFields).GetProperty(propertyName);
+            var memberExpression = Expression.MakeMemberAccess(null, member);
 
-            var result = mapping.GetFieldName("a.b.c", member);
+            var result = mapping.GetFieldName("a.b.c", memberExpression);
 
             Assert.Equal(expectedValue, result);
-            innerMapping.Received(0).GetFieldName("a.b.c", member);
+            innerMapping.Received(0).GetFieldName("a.b.c", memberExpression);
         }
 
         [Fact]
@@ -70,10 +70,12 @@ namespace ElasticLinq.Test.Mapping
             var innerMapping = Substitute.For<IElasticMapping>();
             var mapping = new ElasticFieldsMappingWrapper(innerMapping);
             var member = typeof(string).GetProperty("Length");
+            var constantExpression = Expression.Constant("string value");
+            var memberExpression = Expression.MakeMemberAccess(constantExpression, member);
 
-            mapping.GetFieldName("a.b.c", member);
+            mapping.GetFieldName("a.b.c", memberExpression);
 
-            innerMapping.Received(1).GetFieldName("a.b.c", member);
+            innerMapping.Received(1).GetFieldName("a.b.c", memberExpression);
         }
 
         [Fact]
