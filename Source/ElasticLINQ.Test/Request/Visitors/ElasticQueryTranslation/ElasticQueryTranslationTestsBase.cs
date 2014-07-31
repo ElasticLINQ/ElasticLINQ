@@ -31,6 +31,17 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             public double EnergyUse { get; set; }
             public int? Zone { get; set; }
             public List<string> Aliases { get; set; }
+            public RobotStats Stats { get; set; }
+        }
+
+        protected class RobotStats
+        {
+            public RobotLimbs Limbs { get; set; }
+        }
+
+        public class RobotLimbs
+        {
+            public Int32 HandCount { get; set; }
         }
     }
 }
