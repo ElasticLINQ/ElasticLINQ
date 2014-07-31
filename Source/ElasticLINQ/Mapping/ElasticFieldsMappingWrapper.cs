@@ -3,6 +3,7 @@
 using ElasticLinq.Request.Criteria;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace ElasticLinq.Mapping
@@ -40,12 +41,12 @@ namespace ElasticLinq.Mapping
         }
 
         /// <inheritdoc/>
-        public string GetFieldName(string prefix, MemberInfo memberInfo)
+        public string GetFieldName(string prefix, MemberExpression memberExpression)
         {
             return
-                memberInfo.DeclaringType == typeof(ElasticFields)
-                    ? "_" + memberInfo.Name.ToLowerInvariant()
-                    : wrapped.GetFieldName(prefix, memberInfo);
+                memberExpression.Member.DeclaringType == typeof(ElasticFields)
+                    ? "_" + memberExpression.Member.Name.ToLowerInvariant()
+                    : wrapped.GetFieldName(prefix, memberExpression);
         }
 
         /// <inheritdoc/>

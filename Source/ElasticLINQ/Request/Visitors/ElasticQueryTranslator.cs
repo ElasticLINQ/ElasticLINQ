@@ -273,7 +273,7 @@ namespace ElasticLinq.Request.Visitors
             var final = Visit(lambda.Body) as MemberExpression;
             if (final != null)
             {
-                var fieldName = Mapping.GetFieldName(Prefix, final.Member);
+                var fieldName = Mapping.GetFieldName(Prefix, final);
                 var ignoreUnmapped = final.Type.IsNullable(); // Consider a config switch?
                 searchRequest.SortOptions.Insert(0, new SortOption(fieldName, ascending, ignoreUnmapped));
             }
