@@ -132,5 +132,17 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
                 .Single(a => a.GetParameters().Length == parameterCount)
                 .MakeGenericMethod(typeof(TSource));
         }
+
+
+        [Fact]
+        public void CountTranslatesToFilter()
+        {
+            var first = MakeQueryableExpression("Count", Robots);
+
+            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", first).SearchRequest;
+
+            Assert.Equal(0, request.Size);
+            Assert.IsType<ExistsCriteria>(request.Filter);
+        }
     }
 }

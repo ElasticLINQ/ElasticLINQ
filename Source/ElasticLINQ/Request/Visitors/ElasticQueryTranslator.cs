@@ -185,7 +185,7 @@ namespace ElasticLinq.Request.Visitors
         private Expression VisitCount(Expression expression)
         {
             materializer = new CountElasticMaterializer();
-            return Visit(expression);
+            return VisitTake(expression, Expression.Constant(0));
         }
 
 
