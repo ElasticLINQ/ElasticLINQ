@@ -174,10 +174,20 @@ namespace ElasticLinq.Request.Visitors
                     if (m.Arguments.Count == 2)
                         return VisitOrderBy(m.Arguments[0], m.Arguments[1], m.Method.Name == "ThenBy");
                     break;
+
+                case "Count":
+                    return VisitCount(m.Arguments[0]);
             }
 
             throw new NotSupportedException(string.Format("The Queryable method '{0}' is not supported", m.Method.Name));
         }
+
+        private Expression VisitCount(Expression expression)
+        {
+            materializer = new CountElasticMaterializer();
+            return Visit(expression);
+        }
+
 
         private Expression VisitFirstOrSingle(Expression source, Expression predicate, string methodName)
         {
