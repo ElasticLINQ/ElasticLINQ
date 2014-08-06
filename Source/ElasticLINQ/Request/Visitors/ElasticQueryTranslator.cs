@@ -176,16 +176,19 @@ namespace ElasticLinq.Request.Visitors
                     break;
 
                 case "Count":
-                    return VisitCount(m.Arguments[0]);
+                    return VisitCount(m.Arguments[0], m.Arguments.Count == 2 ? m.Arguments[1] : null);
             }
 
             throw new NotSupportedException(string.Format("The Queryable method '{0}' is not supported", m.Method.Name));
         }
 
-        private Expression VisitCount(Expression expression)
+        private Expression VisitCount(Expression source, Expression predicate)
         {
             materializer = new CountElasticMaterializer();
-            return VisitTake(expression, Expression.Constant(0));
+            searchRequest.Size = 0;
+            return predicate != null 
+                ? VisitWhere(source, predicate) 
+                : Visit(source);
         }
 
 
