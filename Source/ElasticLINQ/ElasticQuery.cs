@@ -1,5 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using ElasticLinq.Request;
 using ElasticLinq.Request.Formatters;
 using ElasticLinq.Request.Visitors;
 using ElasticLinq.Utility;
@@ -66,11 +67,12 @@ namespace ElasticLinq
         }
 
         /// <inheritdoc/>
-        public string ToElasticSearchQuery()
+        public QueryInfo ToQueryInfo()
         {
             var request = ElasticQueryTranslator.Translate(provider.Mapping, provider.Prefix, Expression);
             var formatter = new PostBodyRequestFormatter(provider.Connection, provider.Mapping, request.SearchRequest);
-            return formatter.Body;
+
+            return new QueryInfo(formatter.Body, formatter.Uri);
         }
     }
 }

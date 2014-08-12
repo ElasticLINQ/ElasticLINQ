@@ -25,10 +25,10 @@ namespace ElasticLinq.Test
             var context = new TestableElasticContext(new MyCustomMapping());
             var helloIdentifier = new Identifier("Hello");
 
-            var query = context.Query<ClassWithIdentifier>().Where(x => x.id == helloIdentifier).ToElasticSearchQuery();
+            var queryInfo = context.Query<ClassWithIdentifier>().Where(x => x.id == helloIdentifier).ToQueryInfo();
 
             // Also verifies that any value which gets JSON converted into a string gets lower-cased
-            Assert.Equal(@"{""filter"":{""term"":{""docWrapper.classWithIdentifier.id"":""hello!!""}}}", query);
+            Assert.Equal(@"{""filter"":{""term"":{""docWrapper.classWithIdentifier.id"":""hello!!""}}}", queryInfo.Query);
         }
 
         [Fact]
@@ -37,10 +37,10 @@ namespace ElasticLinq.Test
             var context = new TestableElasticContext();
             var identifiers = new[] { new Identifier("vALue1"), new Identifier("ValuE2") };
 
-            var query = context.Query<ClassWithIdentifier>().Where(x => identifiers.Contains(x.id)).ToElasticSearchQuery();
+            var queryInfo = context.Query<ClassWithIdentifier>().Where(x => identifiers.Contains(x.id)).ToQueryInfo();
 
             // Also verifies that any value which gets JSON converted into a string gets lower-cased
-            Assert.Equal(@"{""filter"":{""terms"":{""id"":[""value1!!"",""value2!!""]}}}", query);
+            Assert.Equal(@"{""filter"":{""terms"":{""id"":[""value1!!"",""value2!!""]}}}", queryInfo.Query);
         }
 
         class ClassWithIdentifier

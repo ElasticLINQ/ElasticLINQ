@@ -1,5 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using ElasticLinq.Request;
 using System.Linq;
 
 namespace ElasticLinq
@@ -11,8 +12,8 @@ namespace ElasticLinq
     public interface IElasticQuery<out T> : IOrderedQueryable<T>
     {
         /// <summary>
-        /// Returns the JSON query that would be sent to Elasticsearch.
+        /// Returns the query information including the JSON payload and Uri.
         /// </summary>
-        string ToElasticSearchQuery();
+        QueryInfo ToQueryInfo();
     }
 }

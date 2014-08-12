@@ -1,5 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using ElasticLinq.Request;
 using ElasticLinq.Request.Formatters;
 using ElasticLinq.Request.Visitors;
 using System;
@@ -29,7 +30,7 @@ namespace ElasticLinq.Test
 
         public IEnumerator<T> GetEnumerator()
         {
-            Context.Requests.Add(ToElasticSearchQuery());
+            Context.Requests.Add(ToQueryInfo());
 
             return ((IEnumerable<T>)Provider.Execute(Expression)).GetEnumerator();
         }
@@ -39,12 +40,12 @@ namespace ElasticLinq.Test
             return GetEnumerator();
         }
 
-        public string ToElasticSearchQuery()
+        public QueryInfo ToQueryInfo()
         {
             var prefix = Context.Mapping.GetDocumentMappingPrefix(typeof(T));
             var request = ElasticQueryTranslator.Translate(Context.Mapping, prefix, Expression);
             var formatter = new PostBodyRequestFormatter(Context.Connection, Context.Mapping, request.SearchRequest);
-            return formatter.Body;
+            return new QueryInfo(formatter.Body, formatter.Uri);
         }
     }
 }

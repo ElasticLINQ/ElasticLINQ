@@ -111,9 +111,9 @@ namespace ElasticLinq.Test
         {
             var query = new TestableElasticContext().Query<Sample>();
 
-            var result = query.Where(x => x.Property == "2112").ToElasticSearchQuery();
+            var queryInfo = query.Where(x => x.Property == "2112").ToQueryInfo();
 
-            Assert.Equal(@"{""filter"":{""term"":{""property"":""2112""}}}", result);
+            Assert.Equal(@"{""filter"":{""term"":{""property"":""2112""}}}", queryInfo.Query);
         }
 
         [Fact]
@@ -121,8 +121,8 @@ namespace ElasticLinq.Test
         {
             var query = new[] { 42, 2112 }.AsQueryable();
 
-            var ex = Assert.Throws<ArgumentException>(() => query.ToElasticSearchQuery());
-            Assert.True(ex.Message.StartsWith("Query must be of type IElasticQuery<> to call ToElasticSearchQuery()"));
+            var ex = Assert.Throws<ArgumentException>(() => query.ToQueryInfo());
+            Assert.True(ex.Message.StartsWith("Query must be of type IElasticQuery<> to call ToQueryInfo()"));
             Assert.Equal("source", ex.ParamName);
         }
 

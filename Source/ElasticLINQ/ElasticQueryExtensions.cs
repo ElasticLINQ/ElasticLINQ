@@ -1,5 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using ElasticLinq.Request;
 using ElasticLinq.Utility;
 using System;
 using System.Linq;
@@ -119,19 +120,19 @@ namespace ElasticLinq
         }
 
         /// <summary>
-        /// Converts an <see cref="IElasticQuery{T}"/> into the JSON that would be submitted to Elasticsearch.
+        /// Return information about a <see cref="IElasticQuery{T}"/> including the JSON that would be submitted to Elasticsearch.
         /// </summary>
         /// <param name="source">An <see cref="T:System.Linq.IQueryable{T}"/> to query.</param>
         /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
-        /// <returns>The Elasticsearch JSON representing this query.</returns>
+        /// <returns>QueryInfo including the Uri and Elasticsearch DSL JSON representing this query.</returns>
         /// <exception cref="ArgumentException"><paramref name="source"/> is not of type <see cref="IElasticQuery{T}"/>.</exception>
-        public static string ToElasticSearchQuery<TSource>(this IQueryable<TSource> source)
+        public static QueryInfo ToQueryInfo<TSource>(this IQueryable<TSource> source)
         {
             var elasticQuery = source as IElasticQuery<TSource>;
             if (elasticQuery == null)
-                throw new ArgumentException("Query must be of type IElasticQuery<> to call ToElasticSearchQuery()", "source");
+                throw new ArgumentException("Query must be of type IElasticQuery<> to call ToQueryInfo()", "source");
 
-            return elasticQuery.ToElasticSearchQuery();
+            return elasticQuery.ToQueryInfo();
         }
 
         private static IQueryable<TSource> CreateQueryMethodCall<TSource>(IQueryable<TSource> source, MethodInfo method, params Expression[] arguments)

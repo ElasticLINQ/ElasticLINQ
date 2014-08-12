@@ -2,6 +2,7 @@
 
 using ElasticLinq.Logging;
 using ElasticLinq.Mapping;
+using ElasticLinq.Request;
 using ElasticLinq.Retry;
 using System;
 using System.Collections.Generic;
@@ -21,7 +22,7 @@ namespace ElasticLinq.Test
             Connection = new ElasticConnection(new Uri("http://localhost/"), timeout: timeout);
             Mapping = mapping ?? new TrivialElasticMapping();
             Provider = new TestableElasticQueryProvider(this);
-            Requests = new List<string>();
+            Requests = new List<QueryInfo>();
             Log = log ?? NullLog.Instance;
             RetryPolicy = new RetryPolicy(Log, 0, maxAttempts, NullDelay.Instance);
         }
@@ -34,7 +35,7 @@ namespace ElasticLinq.Test
 
         public TestableElasticQueryProvider Provider { get; private set; }
 
-        public List<string> Requests { get; private set; }
+        public List<QueryInfo> Requests { get; private set; }
 
         public IRetryPolicy RetryPolicy { get; private set; }
 
