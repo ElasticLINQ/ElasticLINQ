@@ -3,6 +3,7 @@
 using ElasticLinq.Utility;
 using System;
 using System.Diagnostics;
+using System.Net;
 using System.Net.Http;
 
 namespace ElasticLinq
@@ -23,7 +24,7 @@ namespace ElasticLinq
         private readonly HttpClient httpClient;
 
         public ElasticConnection(Uri endpoint, string userName = null, string password = null, TimeSpan? timeout = null, string index = null)
-            : this(new WebRequestHandler(), endpoint, userName, password, index, timeout) { }
+            : this(new HttpClientHandler(), endpoint, userName, password, index, timeout) { }
 
         internal ElasticConnection(HttpMessageHandler innerMessageHandler, Uri endpoint, string userName = null, string password = null, string index = null, TimeSpan? timeout = null)
         {
@@ -39,7 +40,11 @@ namespace ElasticLinq
             this.index = index;
             this.timeout = timeout ?? defaultTimeout;
 
-            httpClient = new HttpClient(new ForcedAuthHandler(this.userName, this.password, innerMessageHandler));
+            var httpClientHandler = innerMessageHandler as HttpClientHandler;
+            if (httpClientHandler != null && httpClientHandler.SupportsAutomaticDecompression)
+                httpClientHandler.AutomaticDecompression = DecompressionMethods.GZip;
+
+            httpClient = new HttpClient(new ForcedAuthHandler(this.userName, this.password, innerMessageHandler), true);
         }
 
         public HttpClient HttpClient

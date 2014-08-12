@@ -28,6 +28,21 @@ namespace ElasticLinq.Test.Integration
         }
 
         [Fact]
+        public void AcceptEncodingIsGzip()
+        {
+            using(var httpStub = new HttpStub(ZeroHits))
+            {
+                var context = MakeElasticContext(httpStub.Uri);
+
+                var dummy = context.Query<Robot>().FirstOrDefault();
+
+                var request = httpStub.Requests.Single();
+                Assert.Contains("Accept-Encoding", request.Headers.AllKeys);
+                Assert.Equal("gzip", request.Headers["Accept-Encoding"]);
+            }            
+        }
+
+        [Fact]
         public void QueryEvaluationCausesPostToConnectionEndpoint()
         {
             using (var httpStub = new HttpStub(ZeroHits))

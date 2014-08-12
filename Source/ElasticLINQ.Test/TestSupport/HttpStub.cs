@@ -16,6 +16,7 @@ namespace ElasticLinq.Test.TestSupport
         private static readonly Random random = new Random();
 
         private readonly List<HttpListenerRequest> requests = new List<HttpListenerRequest>();
+        private readonly List<HttpListenerResponse> responses = new List<HttpListenerResponse>();
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         private readonly Action<HttpListenerContext> responder;        
         private readonly HttpListener listener;
@@ -55,6 +56,11 @@ namespace ElasticLinq.Test.TestSupport
             get { return requests.AsReadOnly(); }
         }
 
+        public IReadOnlyList<HttpListenerResponse> Responses
+        {
+            get { return responses.AsReadOnly(); }
+        }
+
         public void Dispose()
         {
             Dispose(true);           
@@ -68,7 +74,9 @@ namespace ElasticLinq.Test.TestSupport
             if (disposing)
             {
                 cancellationTokenSource.Cancel();
-                listener.Stop();
+                listener.Close();
+                foreach(var response in responses)
+                    response.Close();
                 cancellationTokenSource.Dispose();
             }
 
@@ -98,7 +106,9 @@ namespace ElasticLinq.Test.TestSupport
                     context.Response.StatusCode = 200;
                     responder(context);
                     requests.Add(context.Request);
-                    context.Response.Close();
+                    responses.Add(context.Response);
+                    // Closing response would dispose the request objects we need
+                    context.Response.OutputStream.Close();
                 }
             }
         }

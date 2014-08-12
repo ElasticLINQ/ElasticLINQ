@@ -19,7 +19,7 @@ namespace ElasticLinq.Utility
         private readonly string password;
 
         public ForcedAuthHandler(string userName, string password, HttpMessageHandler innerHandler = null)
-            : base(innerHandler ?? new WebRequestHandler())
+            : base(innerHandler ?? new HttpClientHandler())
         {
             this.userName = userName;
             this.password = password;
