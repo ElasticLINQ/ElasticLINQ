@@ -19,6 +19,8 @@ namespace ElasticLinq
     /// </summary>
     public sealed class ElasticQueryProvider : IQueryProvider
     {
+        private readonly ElasticRequestProcessor requestProcessor;
+
         public ElasticQueryProvider(ElasticConnection connection, IElasticMapping mapping, ILog log, IRetryPolicy retryPolicy, string prefix)
         {
             Argument.EnsureNotNull("connection", connection);
@@ -31,6 +33,8 @@ namespace ElasticLinq
             Log = log;
             RetryPolicy = retryPolicy;
             Prefix = prefix;
+
+            requestProcessor = new ElasticRequestProcessor(connection, mapping, log, retryPolicy);
         }
 
         internal ElasticConnection Connection { get; private set; }
@@ -93,7 +97,7 @@ namespace ElasticLinq
 
             try
             {
-                var response = AsyncHelper.RunSync(() => new ElasticRequestProcessor(Connection, Mapping, Log, RetryPolicy).SearchAsync(translation.SearchRequest));
+                var response = AsyncHelper.RunSync(() => requestProcessor.SearchAsync(translation.SearchRequest));
                 if (response == null)
                     throw new InvalidOperationException("No HTTP response received.");
 
