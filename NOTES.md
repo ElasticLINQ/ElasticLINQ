@@ -1,11 +1,9 @@
 # ElasticLINQ release notes
 
-Welcome to the first drop of ElasticLINQ. As this is a work in progress there are a number of things to point out and get feedback on so please review this document carefully.
-
 ## Getting started
 To get started you need to create an ElasticConnection with the URL and timeout values (and optionally index name), e.g.
 
-	var connection = new ElasticConnection(new Uri("http://192.168.2.12:9200") { Index = "myIndex" });
+	var connection = new ElasticConnection(new Uri("http://192.168.2.12:9200"), Index: "myIndex");
 
 Then create an ElasticContext with the connection passed in the constructor and the mapping provider to use:
 
