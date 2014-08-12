@@ -9,12 +9,12 @@ namespace ElasticLinq.Request
     /// <summary>
     /// Represents a search request to be sent to Elasticsearch.
     /// </summary>
-    internal class ElasticSearchRequest
+    internal class SearchRequest
     {
         /// <summary>
-        /// Create a new ElasticSearchRequest.
+        /// Create a new SearchRequest.
         /// </summary>
-        public ElasticSearchRequest()
+        public SearchRequest()
         {
             Fields = new List<string>();
             SortOptions = new List<SortOption>();

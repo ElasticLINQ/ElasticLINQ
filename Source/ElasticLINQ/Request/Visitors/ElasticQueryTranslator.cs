@@ -20,7 +20,7 @@ namespace ElasticLinq.Request.Visitors
     /// </summary>
     internal class ElasticQueryTranslator : CriteriaExpressionVisitor
     {
-        private readonly ElasticSearchRequest searchRequest = new ElasticSearchRequest();
+        private readonly SearchRequest searchRequest = new SearchRequest();
 
         private Type sourceType;
         private Type finalItemType;

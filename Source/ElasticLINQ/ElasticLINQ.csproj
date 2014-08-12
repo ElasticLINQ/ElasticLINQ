@@ -124,7 +124,7 @@
     <Compile Include="Mapping\TrivialElasticMapping.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Request\ElasticRequestProcessor.cs" />
-    <Compile Include="Request\ElasticSearchRequest.cs" />
+    <Compile Include="Request\SearchRequest.cs" />
     <Compile Include="Response\Model\ElasticResponse.cs" />
     <Compile Include="Response\Model\Hit.cs" />
     <Compile Include="Response\Model\Hits.cs" />

@@ -40,7 +40,7 @@ namespace ElasticLinq.Test.Request
             var messageHandler = new SpyMessageHandler();
             var localConnection = new ElasticConnection(messageHandler, new Uri("http://localhost"));
             var processor = new ElasticRequestProcessor(localConnection, mapping, log, retryPolicy);
-            var request = new ElasticSearchRequest { DocumentType = "docType" };
+            var request = new SearchRequest { DocumentType = "docType" };
 
             await processor.SearchAsync(request);
 
@@ -53,7 +53,7 @@ namespace ElasticLinq.Test.Request
             var messageHandler = new SpyMessageHandler();
             var localConnection = new ElasticConnection(messageHandler, new Uri("http://localhost"), "myUser", "myPass");
             var processor = new ElasticRequestProcessor(localConnection, mapping, log, retryPolicy);
-            var request = new ElasticSearchRequest { DocumentType = "docType" };
+            var request = new SearchRequest { DocumentType = "docType" };
 
             await processor.SearchAsync(request);
 
@@ -70,7 +70,7 @@ namespace ElasticLinq.Test.Request
             messageHandler.Response.StatusCode = HttpStatusCode.NotFound;
             var localConnection = new ElasticConnection(messageHandler, new Uri("http://localhost"), "myUser", "myPass");
             var processor = new ElasticRequestProcessor(localConnection, mapping, log, retryPolicy);
-            var request = new ElasticSearchRequest { DocumentType = "docType" };
+            var request = new SearchRequest { DocumentType = "docType" };
 
             var ex = Record.Exception(() => processor.SearchAsync(request).GetAwaiter().GetResult());
 
@@ -120,7 +120,7 @@ namespace ElasticLinq.Test.Request
             messageHandler.Response.Content = new StringContent(responseString);
             var localConnection = new ElasticConnection(messageHandler, new Uri("http://localhost"), "myUser", "myPass", index: "SearchIndex");
             var processor = new ElasticRequestProcessor(localConnection, mapping, log, retryPolicy);
-            var request = new ElasticSearchRequest { DocumentType = "abc123", Size = 2112 };
+            var request = new SearchRequest { DocumentType = "abc123", Size = 2112 };
 
             await processor.SearchAsync(request);
 

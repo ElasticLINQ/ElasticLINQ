@@ -37,7 +37,7 @@ namespace ElasticLinq.Test.Request.Formatters
         public void UriFormatting(string index, string documentType, string expectedUri)
         {
             var connection = new ElasticConnection(new Uri("http://a.b.com:9000/"), index: index);
-            var formatter = new PostBodyRequestFormatter(connection, mapping, new ElasticSearchRequest { DocumentType = documentType });
+            var formatter = new PostBodyRequestFormatter(connection, mapping, new SearchRequest { DocumentType = documentType });
 
             Assert.Equal(expectedUri, formatter.Uri.ToString());
         }
@@ -45,7 +45,7 @@ namespace ElasticLinq.Test.Request.Formatters
         [Fact]
         public void BodyIsValidJsonFormattedResponse()
         {
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1" });
+            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1" });
 
             Assert.DoesNotThrow(() => JObject.Parse(formatter.Body));
         }
@@ -56,7 +56,7 @@ namespace ElasticLinq.Test.Request.Formatters
             const string expectedQuery = "this is my query string";
             var queryString = new QueryStringCriteria(expectedQuery);
 
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Query = queryString });
+            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Query = queryString });
             var body = JObject.Parse(formatter.Body);
 
             var result = body.TraverseWithAssert("query", "query_string", "query");
@@ -70,7 +70,7 @@ namespace ElasticLinq.Test.Request.Formatters
             var expectedFields = new[] { "green", "brown", "yellow" };
             var queryString = new QueryStringCriteria(expectedQuery, expectedFields);
 
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Query = queryString });
+            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Query = queryString });
             var body = JObject.Parse(formatter.Body);
 
             var result = body.TraverseWithAssert("query", "query_string");
@@ -88,7 +88,7 @@ namespace ElasticLinq.Test.Request.Formatters
                     new RangeSpecificationCriteria(RangeComparison.GreaterThan, 200)
                 });
 
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Query = rangeCriteria });
+            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Query = rangeCriteria });
             var body = JObject.Parse(formatter.Body);
 
             var result = body.TraverseWithAssert("query", "range");
@@ -102,7 +102,7 @@ namespace ElasticLinq.Test.Request.Formatters
         {
             var expectedSortOptions = new List<SortOption> { new SortOption("first", true), new SortOption("second", false), new SortOption("third", false, true) };
 
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", SortOptions = expectedSortOptions });
+            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", SortOptions = expectedSortOptions });
             var body = JObject.Parse(formatter.Body);
 
             var result = body.TraverseWithAssert("sort");
@@ -139,7 +139,7 @@ namespace ElasticLinq.Test.Request.Formatters
         {
             var expectedFields = new List<string> { "first", "second", "third" };
 
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Fields = expectedFields });
+            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Fields = expectedFields });
             var body = JObject.Parse(formatter.Body);
 
             var result = body.TraverseWithAssert("fields");
@@ -152,7 +152,7 @@ namespace ElasticLinq.Test.Request.Formatters
         {
             const int expectedFrom = 1024;
 
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", From = expectedFrom });
+            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", From = expectedFrom });
             var body = JObject.Parse(formatter.Body);
 
             var result = body.TraverseWithAssert("from");
@@ -164,7 +164,7 @@ namespace ElasticLinq.Test.Request.Formatters
         {
             const int expectedSize = 4096;
 
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new ElasticSearchRequest { DocumentType = "type1", Size = expectedSize });
+            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Size = expectedSize });
             var body = JObject.Parse(formatter.Body);
 
             var result = body.TraverseWithAssert("size");
@@ -177,7 +177,7 @@ namespace ElasticLinq.Test.Request.Formatters
             const string expectedTimeout = "15s";
             var connection = new ElasticConnection(new Uri("http://localhost/"), timeout: TimeSpan.FromSeconds(15));
 
-            var formatter = new PostBodyRequestFormatter(connection, mapping, new ElasticSearchRequest());
+            var formatter = new PostBodyRequestFormatter(connection, mapping, new SearchRequest());
             var body = JObject.Parse(formatter.Body);
 
             var result = body.TraverseWithAssert("timeout");
@@ -189,7 +189,7 @@ namespace ElasticLinq.Test.Request.Formatters
         {
             var connection = new ElasticConnection(new Uri("http://localhost/"), timeout: TimeSpan.Zero);
 
-            var formatter = new PostBodyRequestFormatter(connection, mapping, new ElasticSearchRequest());
+            var formatter = new PostBodyRequestFormatter(connection, mapping, new SearchRequest());
             var body = JObject.Parse(formatter.Body);
 
             var result = body["timeout"];

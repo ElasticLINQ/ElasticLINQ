@@ -14,7 +14,7 @@ using System.Linq;
 namespace ElasticLinq.Request.Formatters
 {
     /// <summary>
-    /// Formats an ElasticSearchRequest into a JSON POST body to be sent
+    /// Formats an SearchRequest into a JSON POST body to be sent
     /// to Elasticsearch for processing.
     /// </summary>
     internal class PostBodyRequestFormatter
@@ -22,10 +22,10 @@ namespace ElasticLinq.Request.Formatters
         private readonly Lazy<string> body;
         private readonly ElasticConnection connection;
         private readonly IElasticMapping mapping;
-        private readonly ElasticSearchRequest searchRequest;
+        private readonly SearchRequest searchRequest;
         private readonly Uri uri;
 
-        public PostBodyRequestFormatter(ElasticConnection connection, IElasticMapping mapping, ElasticSearchRequest searchRequest)
+        public PostBodyRequestFormatter(ElasticConnection connection, IElasticMapping mapping, SearchRequest searchRequest)
         {
             this.connection = connection;
             this.mapping = mapping;

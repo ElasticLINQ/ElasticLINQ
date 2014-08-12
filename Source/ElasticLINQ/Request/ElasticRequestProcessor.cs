@@ -39,7 +39,7 @@ namespace ElasticLinq.Request
             this.retryPolicy = retryPolicy;
         }
 
-        public Task<ElasticResponse> SearchAsync(ElasticSearchRequest searchRequest)
+        public Task<ElasticResponse> SearchAsync(SearchRequest searchRequest)
         {
             var formatter = new PostBodyRequestFormatter(connection, mapping, searchRequest);
             log.Debug(null, null, "Request: POST {0}", formatter.Uri);

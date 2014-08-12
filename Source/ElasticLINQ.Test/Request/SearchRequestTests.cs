@@ -5,12 +5,12 @@ using Xunit;
 
 namespace ElasticLinq.Test.Request
 {
-    public class ElasticSearchRequestTests
+    public class SearchRequestTests
     {
         [Fact]
         public void ConstructorHasSensibleDefaultValues()
         {
-            var request = new ElasticSearchRequest();
+            var request = new SearchRequest();
 
             Assert.Equal(0, request.From);
             Assert.Null(request.Size);

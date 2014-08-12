@@ -6,22 +6,22 @@ namespace ElasticLinq.Request.Visitors
 {
     /// <summary>
     /// Represents the result of a translated query including the
-    /// remote <see cref="ElasticSearchRequest"/> to select the data
+    /// remote <see cref="Request.SearchRequest"/> to select the data
     /// and the local <see cref="IElasticMaterializer"/> necessary to
     /// instantiate objects.
     /// </summary>
     internal class ElasticTranslateResult
     {
-        private readonly ElasticSearchRequest searchRequest;
+        private readonly SearchRequest searchRequest;
         private readonly IElasticMaterializer materializer;
 
-        public ElasticTranslateResult(ElasticSearchRequest searchRequest, IElasticMaterializer materializer)
+        public ElasticTranslateResult(SearchRequest searchRequest, IElasticMaterializer materializer)
         {
             this.searchRequest = searchRequest;
             this.materializer = materializer;
         }
 
-        public ElasticSearchRequest SearchRequest
+        public SearchRequest SearchRequest
         {
             get { return searchRequest; }
         }
