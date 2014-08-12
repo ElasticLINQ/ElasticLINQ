@@ -41,8 +41,6 @@ namespace ElasticLinq.Test
             var connection = new ElasticConnection(endpoint, UserName, Password);
 
             Assert.Equal(endpoint, connection.Endpoint);
-            Assert.Equal(UserName, connection.UserName);
-            Assert.Equal(Password, connection.Password);
         }
 
         [Fact]

@@ -18,9 +18,7 @@ namespace ElasticLinq
 
         private readonly Uri endpoint;
         private readonly string index;
-        private readonly string password;
         private readonly TimeSpan timeout = defaultTimeout;
-        private readonly string userName;
         private readonly HttpClient httpClient;
 
         /// <summary>
@@ -43,8 +41,6 @@ namespace ElasticLinq
                 Argument.EnsureNotBlank("index", index);
 
             this.endpoint = endpoint;
-            this.userName = userName;
-            this.password = password;
             this.index = index;
             this.timeout = timeout ?? defaultTimeout;
 
@@ -52,7 +48,7 @@ namespace ElasticLinq
             if (httpClientHandler != null && httpClientHandler.SupportsAutomaticDecompression)
                 httpClientHandler.AutomaticDecompression = DecompressionMethods.GZip;
 
-            httpClient = new HttpClient(new ForcedAuthHandler(this.userName, this.password, innerMessageHandler), true);
+            httpClient = new HttpClient(new ForcedAuthHandler(userName, password, innerMessageHandler), true);
         }
 
         internal HttpClient HttpClient
@@ -70,19 +66,9 @@ namespace ElasticLinq
             get { return index; }
         }
 
-        public string Password
-        {
-            get { return password; }
-        }
-
         public TimeSpan Timeout
         {
             get { return timeout; }
-        }
-
-        public string UserName
-        {
-            get { return userName; }
         }
 
         public void Dispose()
