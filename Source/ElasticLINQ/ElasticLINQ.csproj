@@ -132,7 +132,6 @@
     <Compile Include="..\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Utility\UriBuilderExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
