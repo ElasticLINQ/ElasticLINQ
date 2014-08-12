@@ -9,7 +9,7 @@ using System.Net.Http;
 namespace ElasticLinq
 {
     /// <summary>
-    /// Specifies connection parameters for ElasticSearch.
+    /// Specifies connection parameters for Elasticsearch.
     /// </summary>
     [DebuggerDisplay("{Endpoint.ToString(),nq}{Index,nq}")]
     public class ElasticConnection : IDisposable
@@ -23,6 +23,14 @@ namespace ElasticLinq
         private readonly string userName;
         private readonly HttpClient httpClient;
 
+        /// <summary>
+        /// Create a new ElasticConnection with the given parameters defining its properties.
+        /// </summary>
+        /// <param name="endpoint">The URL endpoint of the Elasticsearch server.</param>
+        /// <param name="userName">UserName to use to connect to the server (optional).</param>
+        /// <param name="password">Password to use to connect to the server (optional).</param>
+        /// <param name="timeout">TimeSpan to wait for network responses before failing (optional, defaults to 10 seconds).</param>
+        /// <param name="index">Name of the index to use on the server (optional).</param>
         public ElasticConnection(Uri endpoint, string userName = null, string password = null, TimeSpan? timeout = null, string index = null)
             : this(new HttpClientHandler(), endpoint, userName, password, index, timeout) { }
 
@@ -47,7 +55,7 @@ namespace ElasticLinq
             httpClient = new HttpClient(new ForcedAuthHandler(this.userName, this.password, innerMessageHandler), true);
         }
 
-        public HttpClient HttpClient
+        internal HttpClient HttpClient
         {
             get { return httpClient; }
         }

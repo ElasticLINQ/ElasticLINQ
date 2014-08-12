@@ -10,7 +10,7 @@ using System.Reflection;
 namespace ElasticLinq.Mapping
 {
     /// <summary>
-    /// A base class for mapping ElasticSearch values that can lower-case all field values
+    /// A base class for mapping Elasticsearch values that can lower-case all field values
     /// (and respects <see cref="NotAnalyzedAttribute"/> to opt-out of the lower-casing), 
     /// camel-case field names, and camel-case and pluralize type names.
     /// </summary>

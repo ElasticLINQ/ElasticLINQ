@@ -7,13 +7,11 @@ using ElasticLinq.Utility;
 namespace ElasticLinq.Request.Facets
 {
     /// <summary>
-    /// Represents a terms_stats facet in ElasticSearch.
+    /// Represents a terms_stats facet.
     /// Terms_stats facets return all statistical information for
     /// a given field broken down by a term. 
     /// </summary>
-    /// <remarks>
-    /// Mapped to .GroupBy(a => a.Term).Select(a => a.Sum(b => b.Field))
-    /// </remarks>
+    /// <remarks>Mapped to .GroupBy(a => a.Term).Select(a => a.Sum(b => b.Field))</remarks>
     [DebuggerDisplay("TermsStatsFacet \"{key,nq}.{value,nq}\"")]
     internal class TermsStatsFacet : IOrderableFacet
     {

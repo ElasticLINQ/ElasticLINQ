@@ -10,8 +10,7 @@ using System.Reflection;
 namespace ElasticLinq.Response.Materializers
 {
     /// <summary>
-    /// Materializes multiple ElasticSearch hits into the required
-    /// C# list of objects.
+    /// Materializes multiple JSON hits into CLR objects.
     /// </summary>
     internal class ManyHitsElasticMaterializer : IElasticMaterializer
     {

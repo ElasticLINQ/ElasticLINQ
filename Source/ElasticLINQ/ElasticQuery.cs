@@ -12,7 +12,7 @@ using System.Linq.Expressions;
 namespace ElasticLinq
 {
     /// <summary>
-    /// ElasticSearch query object used to facilitate LINQ query syntax.
+    /// Represents a LINQ query object that will communicate with Elasticsearch.
     /// </summary>
     /// <typeparam name="T">Element type being queried.</typeparam>
     public class ElasticQuery<T> : IElasticQuery<T>
@@ -65,9 +65,7 @@ namespace ElasticLinq
             get { return provider; }
         }
 
-        /// <summary>
-        /// Shows the query that would be issued to ElasticSearch
-        /// </summary>
+        /// <inheritdoc/>
         public string ToElasticSearchQuery()
         {
             var request = ElasticQueryTranslator.Translate(provider.Mapping, provider.Prefix, Expression);

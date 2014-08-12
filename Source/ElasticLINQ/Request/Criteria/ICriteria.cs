@@ -4,10 +4,13 @@ namespace ElasticLinq.Request.Criteria
 {
     /// <summary>
     /// Interface that all Criteria must implement to be part of
-    /// the query filter tree for ElasticSearch.
+    /// the query filter tree.
     /// </summary>
     public interface ICriteria
     {
+        /// <summary>
+        /// Name of this criteria as specified in the Elasticsearch DSL.
+        /// </summary>
         string Name { get; }
     }
 }

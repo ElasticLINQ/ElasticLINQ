@@ -7,7 +7,7 @@ using System;
 namespace ElasticLinq.Response.Materializers
 {
     /// <summary>
-    /// Materializes one ElasticSearch hit throwing necessary exceptions as required to ensure First/Single semantics.
+    /// Materializes one JSON hit into a CLR object throwing necessary exceptions as required to ensure First/Single semantics.
     /// </summary>
     internal class OneHitElasticMaterializer : IElasticMaterializer
     {

@@ -62,7 +62,7 @@ Where creates **filter** operations and supports the following patterns:
 * ``Equals`` for static and instance maps to **term**
 * ``Contains`` on IEnumerable/arrays maps to **terms**
 
-To create similar expression as **queries** use the .Query extension operator. It maps very similar operations but **exists** and **missing** are not available within queries on ElasticSearch.
+To create similar expression as **queries** use the .Query extension operator. It maps very similar operations but **exists** and **missing** are not available within queries on Elasticsearch.
 
 #### OrderBy/ThenBy
 Ordering is achieved by the usual LINQ methods however if you wish to sort by score you have two options:
@@ -73,7 +73,7 @@ Ordering is achieved by the usual LINQ methods however if you wish to sort by sc
 The latter is more easily discovered but the former should be kept around as it is the same pattern used in Select projections. Recommend the former for the less common orderings and latter for common.
 
 ### New operations
-Where ElasticSearch exceeds the basic LINQ patterns some additional extensions are provided to expose that functionality.
+Where Elasticsearch exceeds the basic LINQ patterns some additional extensions are provided to expose that functionality.
 
 ####Extensions
 A number of extensions on IQueryable are available via ``ElasticQueryExtensions`` to provide some of this functionality, this includes:
@@ -83,10 +83,10 @@ A number of extensions on IQueryable are available via ``ElasticQueryExtensions`
 * ``QueryString(query)`` to pass through a query_string for search.
 
 ####ElasticFields
-There is a static class called ElasticFields. This currently provides just Score and Id properties but you can use these to stand-in for the _score and _id values in ElasticSearch, e.g:
+There is a static class called ElasticFields. This currently provides just Score and Id properties but you can use these to stand-in for the _score and _id values in Elasticsearch, e.g:
 
-``Select(c => new { c, ElasticSearch.Score })`` wraps the entity with its score.
-``OrderBy(c => ElasticSearch.Score)`` orders results by score.
+``Select(c => new { c, ElasticFields.Score })`` wraps the entity with its score.
+``OrderBy(c => ElasticFields.Score)`` orders results by score.
 
 ### Mapping
 There is a mapping interface called IElasticMapping. A default CouchbaseElasticMapping is provided that maps against the current structure shown by Tier 3.
@@ -94,7 +94,7 @@ There is a mapping interface called IElasticMapping. A default CouchbaseElasticM
 ## Implementation notes
 
 ### Dependencies
-JSON.Net is required for serializing the ElasticSearch queries to JSON and parsing the results coming back.
+JSON.Net is required for converting the Elasticsearch queries to JSON and parsing the results coming back.
 
 XUnit.Net is required for the unit tests.
 
@@ -127,10 +127,10 @@ This includes currently:
 3. Facets
 4. Async<T>
 5. Caching
-6. Any other desired ElasticSearch operations
+6. Any other desired Elasticsearch operations
 
 ### Not supported; not recommended
 
-**Nested queries running multiple ElasticSearch requests**
+**Nested queries running multiple Elasticsearch requests**
 
 Very complex to do and breaks the explicit boundaries recommended in LINQ providers.

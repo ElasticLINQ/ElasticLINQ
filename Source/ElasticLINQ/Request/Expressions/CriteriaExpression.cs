@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 namespace ElasticLinq.Request.Expressions
 {
     /// <summary>
-    /// An expression tree node that represents ElasticSearch criteria.
+    /// An expression tree node that represents Elasticsearch criteria.
     /// </summary>
     internal class CriteriaExpression : Expression
     {

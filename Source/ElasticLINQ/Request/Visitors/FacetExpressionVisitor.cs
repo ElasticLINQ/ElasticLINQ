@@ -15,7 +15,7 @@ using System.Reflection;
 namespace ElasticLinq.Request.Visitors
 {
     /// <summary>
-    /// Gathers and rebinds aggregate operations into ElasticSearch facets.
+    /// Gathers and rebinds aggregate operations into facets.
     /// </summary>
     internal class FacetExpressionVisitor : CriteriaExpressionVisitor
     {

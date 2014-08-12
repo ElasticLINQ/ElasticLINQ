@@ -9,7 +9,7 @@ using System.Reflection;
 namespace ElasticLinq
 {
     /// <summary>
-    /// Extension methods that extend LINQ functionality for ElasticSearch queries.
+    /// Extension methods that extend LINQ functionality for Elasticsearch queries.
     /// </summary>
     /// <remarks>
     /// Using these methods against any provider except <see cref="ElasticQueryProvider"/> will fail.
@@ -17,7 +17,7 @@ namespace ElasticLinq
     public static class ElasticQueryExtensions
     {
         /// <summary>
-        /// Queries an ElasticSearch index based on a predicate.
+        /// Queries an Elasticsearch index based on a predicate.
         /// </summary>
         /// <returns>
         /// An <see cref="T:System.Linq.IQueryable`1"/> that contains elements from the input sequence that satisfy the condition specified by <paramref name="predicate"/>.
@@ -33,7 +33,7 @@ namespace ElasticLinq
         }
 
         /// <summary>
-        /// Queries an ElasticSearch index based on a query string.
+        /// Queries an Elasticsearch index based on a query string.
         /// </summary>
         /// <returns>
         /// An <see cref="T:System.Linq.IQueryable`1"/> that contains elements from the input sequence that satisfy the condition specified by <paramref name="query"/>.
@@ -49,7 +49,7 @@ namespace ElasticLinq
         }
 
         /// <summary>
-        /// Queries an ElasticSearch index based on a query string for specific field partterns.
+        /// Queries an Elasticsearch index based on a query string for specific field partterns.
         /// </summary>
         /// <returns>
         /// An <see cref="T:System.Linq.IQueryable`1"/> that contains elements from the input sequence that satisfy the condition specified by <paramref name="query"/>.
@@ -67,7 +67,7 @@ namespace ElasticLinq
         }
 
         /// <summary>
-        /// Sorts the elements of a sequence in ascending order by their ElasticSearch score.
+        /// Sorts the elements of a sequence in ascending order by their Elasticsearch score.
         /// </summary>
         /// <returns>
         /// An <see cref="T:System.Linq.IOrderedQueryable`1"/> whose elements are sorted according to score.
@@ -80,7 +80,7 @@ namespace ElasticLinq
         }
 
         /// <summary>
-        /// Sorts the elements of a sequence in descending order by their ElasticSearch score.
+        /// Sorts the elements of a sequence in descending order by their Elasticsearch score.
         /// </summary>
         /// <returns>
         /// An <see cref="T:System.Linq.IOrderedQueryable`1"/> whose elements are sorted according to score.
@@ -93,7 +93,7 @@ namespace ElasticLinq
         }
 
         /// <summary>
-        /// Performs a subsequent ordering of the elements in a sequence in ascending order by their ElasticSearch score.
+        /// Performs a subsequent ordering of the elements in a sequence in ascending order by their Elasticsearch score.
         /// </summary>
         /// <returns>
         /// An <see cref="T:System.Linq.IOrderedQueryable`1"/> whose elements are sorted according to score.
@@ -106,7 +106,7 @@ namespace ElasticLinq
         }
 
         /// <summary>
-        /// Performs a subsequent ordering of the elements in a sequence in descending order by their ElasticSearch score.
+        /// Performs a subsequent ordering of the elements in a sequence in descending order by their Elasticsearch score.
         /// </summary>
         /// <returns>
         /// An <see cref="T:System.Linq.IOrderedQueryable`1"/> whose elements are sorted according to score.
@@ -119,12 +119,11 @@ namespace ElasticLinq
         }
 
         /// <summary>
-        /// Converts an <see cref="IElasticQuery{T}"/> into the JSON that would be submitted
-        /// to ElasticSearch.
+        /// Converts an <see cref="IElasticQuery{T}"/> into the JSON that would be submitted to Elasticsearch.
         /// </summary>
         /// <param name="source">An <see cref="T:System.Linq.IQueryable{T}"/> to query.</param>
         /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
-        /// <returns>The ElasticSearch JSON representing this query.</returns>
+        /// <returns>The Elasticsearch JSON representing this query.</returns>
         /// <exception cref="ArgumentException"><paramref name="source"/> is not of type <see cref="IElasticQuery{T}"/>.</exception>
         public static string ToElasticSearchQuery<TSource>(this IQueryable<TSource> source)
         {

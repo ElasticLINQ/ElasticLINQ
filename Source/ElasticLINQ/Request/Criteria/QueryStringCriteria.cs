@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace ElasticLinq.Request.Criteria
 {
     /// <summary>
-    /// Criteria that specifies a query string to be passed to ElasticSearch.
+    /// Criteria that specifies a query string to be passed to Elasticsearch.
     /// </summary>
     public class QueryStringCriteria : ICriteria
     {

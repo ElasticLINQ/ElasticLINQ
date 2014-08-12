@@ -4,6 +4,9 @@ using System.Linq.Expressions;
 
 namespace ElasticLinq.Utility
 {
+    /// <summary>
+    /// Extension methods for Expression objects.
+    /// </summary>
     internal static class ExpressionExtensions
     {
         public static Expression StripQuotes(this Expression expression)

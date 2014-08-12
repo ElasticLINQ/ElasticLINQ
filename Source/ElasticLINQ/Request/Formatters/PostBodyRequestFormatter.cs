@@ -15,7 +15,7 @@ namespace ElasticLinq.Request.Formatters
 {
     /// <summary>
     /// Formats an ElasticSearchRequest into a JSON POST body to be sent
-    /// to ElasticSearch for querying.
+    /// to Elasticsearch for processing.
     /// </summary>
     internal class PostBodyRequestFormatter
     {

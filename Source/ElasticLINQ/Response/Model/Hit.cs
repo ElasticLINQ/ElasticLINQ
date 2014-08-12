@@ -8,7 +8,7 @@ using System.Diagnostics;
 namespace ElasticLinq.Response.Model
 {
     /// <summary>
-    /// Individual hit response from ElasticSearch.
+    /// An individual hit response from Elasticsearch.
     /// </summary>
     [DebuggerDisplay("{_type} in {_index} id {_id}")]
     public class Hit

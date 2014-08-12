@@ -6,7 +6,7 @@ using System.Diagnostics;
 namespace ElasticLinq.Response.Model
 {
     /// <summary>
-    /// Container of hit responses from ElasticSearch.
+    /// A container of hit responses from Elasticsearch.
     /// </summary>
     [DebuggerDisplay("{hits.Count} hits of {total}")]
     public class Hits

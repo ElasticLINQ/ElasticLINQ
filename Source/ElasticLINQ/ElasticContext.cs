@@ -9,14 +9,14 @@ using System.Linq;
 namespace ElasticLinq
 {
     /// <summary>
-    /// Provides an entry point to easily create LINQ queries for ElasticSearch.
+    /// Provides an entry point to easily create LINQ queries for Elasticsearch.
     /// </summary>
     public class ElasticContext : IElasticContext
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ElasticContext"/> class.
         /// </summary>
-        /// <param name="connection">The information on how to connect to the ElasticSearch server.</param>
+        /// <param name="connection">The information on how to connect to the Elasticsearch server.</param>
         /// <param name="mapping">The object that helps map queries (optional, defaults to <see cref="TrivialElasticMapping"/>).</param>
         /// <param name="log">The object which logs information (optional, defaults to <see cref="NullLog"/>).</param>
         /// <param name="retryPolicy">The object which controls retry policy for the search (optional, defaults to <see cref="RetryPolicy"/>).</param>

@@ -12,6 +12,11 @@ namespace ElasticLinq.Utility
     /// </summary>
     internal static class TypeHelper
     {
+        /// <summary>
+        /// Find the element type given a generic sequence type.
+        /// </summary>
+        /// <param name="sequenceType">Sequence type to examine.</param>
+        /// <returns>Element type of the sequence or null if none found.</returns>
         public static Type GetSequenceElementType(Type sequenceType)
         {
             var elementType = FindIEnumerable(sequenceType);
@@ -20,6 +25,11 @@ namespace ElasticLinq.Utility
                 : elementType.GetGenericArguments()[0];
         }
 
+        /// <summary>
+        /// Find the IEnumerable generic interface for a given sequence type.
+        /// </summary>
+        /// <param name="sequenceType">Sequence type to examine.</param>
+        /// <returns>IEnumerable generic interface or null if not found.</returns>
         public static Type FindIEnumerable(Type sequenceType)
         {
             if (sequenceType == null || sequenceType == typeof(string))
@@ -54,11 +64,22 @@ namespace ElasticLinq.Utility
                 && type.IsGenericType && type.GetGenericTypeDefinition() == genericType;
         }
 
+        /// <summary>
+        /// Determine if a type is nullable either because it is a reference type or because
+        /// it uses the Nullable generic container.
+        /// </summary>
+        /// <param name="type">Type of the value to consider.</param>
+        /// <returns>True if the type supports nullability; otherwise, false.</returns>
         public static bool IsNullable(this Type type)
         {
             return !type.IsValueType || type.IsGenericOf(typeof(Nullable<>));
         }
 
+        /// <summary>
+        /// Create a default value for either a value type or reference type. 
+        /// </summary>
+        /// <param name="type">Type of the value to create.</param>
+        /// <returns>Default value for this type.</returns>
         public static object CreateDefault(Type type)
         {
             return type.IsValueType ? Activator.CreateInstance(type) : null;

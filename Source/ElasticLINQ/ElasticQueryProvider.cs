@@ -15,7 +15,7 @@ using System.Runtime.ExceptionServices;
 namespace ElasticLinq
 {
     /// <summary>
-    /// Query provider implementation for ElasticSearch.
+    /// Query provider implementation for Elasticsearch.
     /// </summary>
     public sealed class ElasticQueryProvider : IQueryProvider
     {

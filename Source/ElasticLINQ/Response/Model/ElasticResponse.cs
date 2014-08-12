@@ -7,7 +7,7 @@ using System.Net;
 namespace ElasticLinq.Response.Model
 {
     /// <summary>
-    /// Top-level response from ElasticSearch.
+    /// A top-level response from Elasticsearch.
     /// </summary>
     [DebuggerDisplay("{hits.hits.Count} hits in {took} ms")]
     public class ElasticResponse

@@ -7,10 +7,13 @@ using System.Collections.Generic;
 namespace ElasticLinq.Request
 {
     /// <summary>
-    /// Represents a search request to be sent to ElasticSearch.
+    /// Represents a search request to be sent to Elasticsearch.
     /// </summary>
     internal class ElasticSearchRequest
     {
+        /// <summary>
+        /// Create a new ElasticSearchRequest.
+        /// </summary>
         public ElasticSearchRequest()
         {
             Fields = new List<string>();

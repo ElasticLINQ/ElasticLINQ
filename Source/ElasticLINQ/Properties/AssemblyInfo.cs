@@ -2,6 +2,6 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 
 [assembly: AssemblyTitle("ElasticLINQ")]
-[assembly: AssemblyDescription("LINQ provider for ElasticSearch")]
+[assembly: AssemblyDescription("LINQ provider for Elasticsearch")]
 
 [assembly: InternalsVisibleTo("ElasticLINQ.Test")]

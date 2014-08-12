@@ -6,7 +6,7 @@ using System.Globalization;
 namespace ElasticLinq.Mapping
 {
     /// <summary>
-    /// Mapping appropriate for use with the Couchbase/ElasticSearch adapter.
+    /// Mapping appropriate for use with the Couchbase/Elasticsearch adapter.
     /// </summary>
     public class CouchbaseElasticMapping : ElasticMapping
     {

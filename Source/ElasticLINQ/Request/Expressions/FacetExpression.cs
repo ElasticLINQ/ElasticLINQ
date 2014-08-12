@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 namespace ElasticLinq.Request.Expressions
 {
     /// <summary>
-    /// An expression tree node that represents an ElasticSearch facet.
+    /// An expression tree node that represents an Elasticsearch facet.
     /// </summary>
     internal class FacetExpression : Expression
     {

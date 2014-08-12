@@ -9,14 +9,12 @@ using System.Collections.ObjectModel;
 namespace ElasticLinq.Request.Facets
 {
     /// <summary>
-    /// Represents a stastical facet in ElasticSearch.
+    /// Represents a stastical facet.
     /// Statistical facets return all statistical information such
     /// as counts, sums, mean etc. for a given number of fields
     /// within the documents specified by the filter criteria.
     /// </summary>
-    /// <remarks>
-    /// Mapped to .GroupBy(a => 1).Select(a => a.Count(b => b.SomeField))
-    /// </remarks>
+    /// <remarks>Mapped to .GroupBy(a => 1).Select(a => a.Count(b => b.SomeField))</remarks>
     [DebuggerDisplay("StatisticalFacet {Fields} {Filter}")]
     internal class StatisticalFacet : IFacet
     {

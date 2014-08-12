@@ -5,8 +5,8 @@ using System;
 namespace ElasticLinq
 {
     /// <summary>
-    /// Used to mark serialized fields as being not-analayzed in ElasticSearch (and therefore
-    /// not subject to value transformations like lower-casing).
+    /// Used to mark serialized fields as being "not analayzed" in Elasticsearch
+    /// (and therefore not subject to value transformations like lower-casing).
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
     public sealed class NotAnalyzedAttribute : Attribute { }

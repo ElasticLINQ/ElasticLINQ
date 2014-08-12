@@ -9,12 +9,10 @@ using ElasticLinq.Utility;
 namespace ElasticLinq.Request.Facets
 {
     /// <summary>
-    /// Represents a terms facet in ElasticSearch.
+    /// Represents a terms facet.
     /// Terms facets return count information for terms.
     /// </summary>
-    /// <remarks>
-    /// Mapped to .GroupBy(a => a.Something).Select(a => a.Count())
-    /// </remarks>
+    /// <remarks>Mapped to .GroupBy(a => a.Something).Select(a => a.Count())</remarks>
     [DebuggerDisplay("TermsFacet {Fields} {Filter}")]
     internal class TermsFacet : IOrderableFacet
     {

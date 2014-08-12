@@ -7,13 +7,10 @@ using ElasticLinq.Utility;
 namespace ElasticLinq.Request.Facets
 {
     /// <summary>
-    /// Represents a filter facet in ElasticSearch.
-    /// Filter facets return the number of documents that
-    /// match the specified filter criteria.
+    /// Represents a filter facet.
+    /// Filter facets return the number of documents that  match the specified filter criteria.
     /// </summary>
-    /// <remarks>
-    /// Mapped to .GroupBy(a => 1).Select(a => a.Sum(b => b.Field))
-    /// </remarks>
+    /// <remarks>Mapped to .GroupBy(a => 1).Select(a => a.Sum(b => b.Field))</remarks>
     [DebuggerDisplay("FilterFacet {Filter}")]
     internal class FilterFacet : IFacet
     {

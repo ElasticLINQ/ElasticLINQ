@@ -9,43 +9,75 @@ namespace ElasticLinq.Utility
     /// Argument validation static helpers to reduce noise in other methods.
     /// </summary>
     [DebuggerStepThrough]
-    public static class Argument
+    internal static class Argument
     {
-        public static void EnsureNotNull(string parameterName, object value)
+        /// <summary>
+        /// Throw an ArgumentNullException if the object is null.
+        /// </summary>
+        /// <param name="argumentName">Name of the argument.</param>
+        /// <param name="value">Object to be checked.</param>
+        public static void EnsureNotNull(string argumentName, object value)
         {
             if (value == null)
-                throw new ArgumentNullException(parameterName);
+                throw new ArgumentNullException(argumentName);
         }
 
-        public static void EnsurePositive(string parameterName, TimeSpan value)
+        /// <summary>
+        /// Throw an ArgumentOutOfRangeException if the TimeSpan is not positive.
+        /// </summary>
+        /// <param name="argumentName">Name of the argument.</param>
+        /// <param name="value">TimeSpan to be checked.</param>
+        public static void EnsurePositive(string argumentName, TimeSpan value)
         {
             if (value < TimeSpan.Zero)
-                throw new ArgumentOutOfRangeException(parameterName, "Must be a positive TimeSpan.");
+                throw new ArgumentOutOfRangeException(argumentName, "Must be a positive TimeSpan.");
         }
 
-        public static void EnsureNotBlank(string parameterName, string value)
+        /// <summary>
+        /// Throw an ArgumentException if the string is blank.
+        /// </summary>
+        /// <param name="argumentName">Name of the argument.</param>
+        /// <param name="value">String to be checked.</param>
+        public static void EnsureNotBlank(string argumentName, string value)
         {
-            EnsureNotNull(parameterName, value);
+            EnsureNotNull(argumentName, value);
             if (String.IsNullOrWhiteSpace(value))
-                throw new ArgumentException("Cannot be a blank string.", parameterName);
+                throw new ArgumentException("Cannot be a blank string.", argumentName);
         }
 
-        public static void EnsureIsAssignableFrom<T>(string parameterName, Type type)
+        /// <summary>
+        /// Throw an ArgumentException if the type is not assignable.
+        /// </summary>
+        /// <param name="argumentName">Name of the argument.</param>
+        /// <param name="type">Type being checked for assignment.</param>
+        /// <typeparam name="T">Type being checked against.</typeparam>
+        public static void EnsureIsAssignableFrom<T>(string argumentName, Type type)
         {
             if (!typeof(T).IsAssignableFrom(type))
-                throw new ArgumentException(string.Format("Type {0} must be assignable from {1}", type.Name, typeof(T).Name), parameterName);
+                throw new ArgumentException(string.Format("Type {0} must be assignable from {1}.", type.Name, typeof(T).Name), argumentName);
         }
 
-        public static void EnsureIsDefinedEnum<T>(string parameterName, T value) where T : struct
+        /// <summary>
+        /// Throw an ArgumentOutOfRangeException if the enum is not defined.
+        /// </summary>
+        /// <param name="argumentName">Name of the argument.</param>
+        /// <param name="value">Enum to be checked.</param>
+        /// <typeparam name="TEnum">Type of the enum being checked.</typeparam>
+        public static void EnsureIsDefinedEnum<TEnum>(string argumentName, TEnum value) where TEnum : struct
         {
-            if (!Enum.IsDefined(typeof(T), value))
-                throw new ArgumentOutOfRangeException(parameterName, string.Format("Must be a defined {0} enum value.", typeof(T)));
+            if (!Enum.IsDefined(typeof(TEnum), value))
+                throw new ArgumentOutOfRangeException(argumentName, string.Format("Must be a defined {0} enum value.", typeof(TEnum)));
         }
 
-        public static void EnsureNotEmpty<T>(string parameterName, T[] values)
+        /// <summary>
+        /// Throw an ArgumentOutOfRangeException if the array is empty.
+        /// </summary>
+        /// <param name="argumentName">Name of the argument.</param>
+        /// <param name="values">Array to be checked.</param>
+        public static void EnsureNotEmpty(string argumentName, object[] values)
         {
             if (values == null || values.Length < 1)
-                throw new ArgumentOutOfRangeException(parameterName, "Must contain one or more values");
+                throw new ArgumentOutOfRangeException(argumentName, "Must contain one or more values.");
         }
     }
 }

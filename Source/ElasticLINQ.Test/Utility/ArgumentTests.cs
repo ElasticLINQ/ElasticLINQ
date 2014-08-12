@@ -80,7 +80,7 @@ namespace ElasticLinq.Test.Utility
         [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void EnsureNotEmptyThrowsArgumentExceptionWhenValuesIsNull()
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => Argument.EnsureNotEmpty<string>("a", null));
+            Assert.Throws<ArgumentOutOfRangeException>(() => Argument.EnsureNotEmpty("a", null));
         }
 
         private enum TestEnum

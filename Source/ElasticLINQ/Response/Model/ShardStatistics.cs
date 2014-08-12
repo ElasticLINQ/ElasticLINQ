@@ -5,7 +5,7 @@ using System.Diagnostics;
 namespace ElasticLinq.Response.Model
 {
     /// <summary>
-    /// Shard statistics response from ElasticSearch.
+    /// Shard statistics response from Elasticsearch.
     /// </summary>
     [DebuggerDisplay("{failed} failed, {successful} success")]
     public class ShardStatistics
