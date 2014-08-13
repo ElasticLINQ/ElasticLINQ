@@ -39,7 +39,7 @@ namespace ElasticLinq.Test.TestSupport
                 try
                 {
                     listener.Start();
-                    Task.Factory.StartNew(BackgroundLoop, cancellationTokenSource.Token);
+                    Task.Factory.StartNew<Task>(BackgroundLoop, cancellationTokenSource.Token);
                     return;
                 }
                 catch (HttpListenerException)
@@ -83,7 +83,7 @@ namespace ElasticLinq.Test.TestSupport
             disposed = true;
         }
 
-        private void BackgroundLoop()
+        private async Task BackgroundLoop()
         {
             while (listener.IsListening)
             {
@@ -93,7 +93,7 @@ namespace ElasticLinq.Test.TestSupport
 
                 try
                 {
-                    contextAsync.Wait(cancellationTokenSource.Token);
+                    await contextAsync;
                 }
                 catch (OperationCanceledException)
                 {

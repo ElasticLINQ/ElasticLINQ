@@ -2,6 +2,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace ElasticLinq.Test
@@ -65,13 +66,13 @@ namespace ElasticLinq.Test
 
         [Fact]
         [ExcludeFromCodeCoverage]
-        public void DisposeKillsHttpClient()
+        public async Task DisposeKillsHttpClient()
         {
             var connection = new ElasticConnection(endpoint, UserName, Password);
             
             connection.Dispose();
 
-            Assert.Throws<ObjectDisposedException>(() => connection.HttpClient.GetAsync(new Uri("http://something.com")));
+            await Assert.ThrowsAsync<ObjectDisposedException>(() => connection.HttpClient.GetAsync(new Uri("http://something.com")));
         }
     }
 }
