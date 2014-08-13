@@ -18,16 +18,19 @@ namespace ElasticLinq.Test.TestSupport
         private readonly List<HttpListenerRequest> requests = new List<HttpListenerRequest>();
         private readonly List<HttpListenerResponse> responses = new List<HttpListenerResponse>();
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-        private readonly Action<HttpListenerContext> responder;        
+        private readonly TaskCompletionSource<bool> responseCompletion = new TaskCompletionSource<bool>();
+        private readonly Action<HttpListenerContext> responder;
         private readonly HttpListener listener;
+        private readonly int completeRequestCount;
 
         private bool disposed;
 
         public Uri Uri { get { return new Uri(listener.Prefixes.Single()); } }
 
-        public HttpStub(Action<HttpListenerContext> responder)
+        public HttpStub(Action<HttpListenerContext> responder, int completeRequestCount)
         {
             this.responder = responder;
+            this.completeRequestCount = completeRequestCount;
 
             var attemptsRemaining = MaximumBindAttempts;
             do
@@ -39,7 +42,7 @@ namespace ElasticLinq.Test.TestSupport
                 try
                 {
                     listener.Start();
-                    Task.Factory.StartNew<Task>(BackgroundLoop, cancellationTokenSource.Token);
+                    Task.Factory.StartNew(BackgroundLoop, cancellationTokenSource.Token);
                     return;
                 }
                 catch (HttpListenerException)
@@ -49,6 +52,11 @@ namespace ElasticLinq.Test.TestSupport
                 }
             }
             while (true);
+        }
+
+        public Task Completion
+        {
+            get { return responseCompletion.Task; }
         }
 
         public IReadOnlyList<HttpListenerRequest> Requests
@@ -63,7 +71,7 @@ namespace ElasticLinq.Test.TestSupport
 
         public void Dispose()
         {
-            Dispose(true);           
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
@@ -75,7 +83,7 @@ namespace ElasticLinq.Test.TestSupport
             {
                 cancellationTokenSource.Cancel();
                 listener.Close();
-                foreach(var response in responses)
+                foreach (var response in responses)
                     response.Close();
                 cancellationTokenSource.Dispose();
             }
@@ -83,17 +91,15 @@ namespace ElasticLinq.Test.TestSupport
             disposed = true;
         }
 
-        private async Task BackgroundLoop()
+        private void BackgroundLoop()
         {
-            while (listener.IsListening)
+            while (listener.IsListening && !cancellationTokenSource.IsCancellationRequested)
             {
                 var contextAsync = listener.GetContextAsync();
-                if (cancellationTokenSource.IsCancellationRequested)
-                    return;
 
                 try
                 {
-                    await contextAsync;
+                    contextAsync.Wait(cancellationTokenSource.Token);
                 }
                 catch (OperationCanceledException)
                 {
@@ -109,6 +115,9 @@ namespace ElasticLinq.Test.TestSupport
                     responses.Add(context.Response);
                     // Closing response would dispose the request objects we need
                     context.Response.OutputStream.Close();
+
+                    if (responses.Count >= completeRequestCount)
+                        responseCompletion.SetResult(true);
                 }
             }
         }

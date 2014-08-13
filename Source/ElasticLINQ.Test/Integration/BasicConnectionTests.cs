@@ -28,14 +28,15 @@ namespace ElasticLinq.Test.Integration
         }
 
         [Fact]
-        public void AcceptEncodingIsGzip()
+        public async void AcceptEncodingIsGzip()
         {
-            using(var httpStub = new HttpStub(ZeroHits))
+            using(var httpStub = new HttpStub(ZeroHits, 1))
             {
                 var context = MakeElasticContext(httpStub.Uri);
 
                 var dummy = context.Query<Robot>().FirstOrDefault();
 
+                await httpStub.Completion;
                 var request = httpStub.Requests.Single();
                 Assert.Contains("Accept-Encoding", request.Headers.AllKeys);
                 Assert.Equal("gzip", request.Headers["Accept-Encoding"]);
@@ -43,14 +44,15 @@ namespace ElasticLinq.Test.Integration
         }
 
         [Fact]
-        public void QueryEvaluationCausesPostToConnectionEndpoint()
+        public async void QueryEvaluationCausesPostToConnectionEndpoint()
         {
-            using (var httpStub = new HttpStub(ZeroHits))
+            using (var httpStub = new HttpStub(ZeroHits, 1))
             {
                 var context = MakeElasticContext(httpStub.Uri);
 
                 var dummy = context.Query<Robot>().FirstOrDefault();
 
+                await httpStub.Completion;
                 var request = httpStub.Requests.Single();
                 Assert.Equal("POST", request.HttpMethod);
                 Assert.Equal("/_all/robots/_search", request.RawUrl);
@@ -58,14 +60,15 @@ namespace ElasticLinq.Test.Integration
         }
 
         [Fact]
-        public void QueryEvaluationWithNoNullResponseThrowsInvalidOperationException()
+        public async void QueryEvaluationWithNoNullResponseThrowsInvalidOperationException()
         {
-            using (var httpStub = new HttpStub(c => { }))
+            using (var httpStub = new HttpStub(c => { }, 1))
             {
                 var context = MakeElasticContext(httpStub.Uri);
 
                 Assert.Throws<InvalidOperationException>(() => context.Query<Robot>().FirstOrDefault());
 
+                await httpStub.Completion;
                 var request = httpStub.Requests.Single();
                 Assert.Equal("POST", request.HttpMethod);
                 Assert.Equal("/_all/robots/_search", request.RawUrl);
@@ -73,15 +76,16 @@ namespace ElasticLinq.Test.Integration
         }
 
         [Fact]
-        public void ProviderExecuteCausesPostToConnectionEndpoint()
+        public async void ProviderExecuteCausesPostToConnectionEndpoint()
         {
-            using (var httpStub = new HttpStub(ZeroHits))
+            using (var httpStub = new HttpStub(ZeroHits, 1))
             {
                 var provider = new ElasticQueryProvider(new ElasticConnection(httpStub.Uri), mapping, log, retryPolicy, "prefix");
                 var query = new ElasticQuery<Robot>(provider);
 
                 provider.Execute(query.Expression);
 
+                await httpStub.Completion;
                 var request = httpStub.Requests.Single();
                 Assert.Equal("POST", request.HttpMethod);
                 Assert.Equal("/_all/robots/_search", request.RawUrl);
@@ -89,15 +93,16 @@ namespace ElasticLinq.Test.Integration
         }
 
         [Fact]
-        public void ProviderExecuteTCausesPostToConnectionEndpoint()
+        public async void ProviderExecuteTCausesPostToConnectionEndpoint()
         {
-            using (var httpStub = new HttpStub(ZeroHits))
+            using (var httpStub = new HttpStub(ZeroHits, 1))
             {
                 var provider = new ElasticQueryProvider(new ElasticConnection(httpStub.Uri), mapping, log, retryPolicy, "prefix");
                 var query = new ElasticQuery<Robot>(provider);
 
                 provider.Execute<IEnumerable<Robot>>(query.Expression);
 
+                await httpStub.Completion;
                 var request = httpStub.Requests.Single();
                 Assert.Equal("POST", request.HttpMethod);
                 Assert.Equal("/_all/robots/_search", request.RawUrl);
@@ -105,15 +110,16 @@ namespace ElasticLinq.Test.Integration
         }
 
         [Fact]
-        public void QueryImplicitGetEnumeratorCausesConnection()
+        public async void QueryImplicitGetEnumeratorCausesConnection()
         {
-            using (var httpStub = new HttpStub(ZeroHits))
+            using (var httpStub = new HttpStub(ZeroHits, 1))
             {
                 var provider = new ElasticQueryProvider(new ElasticConnection(httpStub.Uri), mapping, log, retryPolicy, "prefix");
                 var query = new ElasticQuery<Robot>(provider);
 
                 var enumerator = query.GetEnumerator();
 
+                await httpStub.Completion;
                 var request = httpStub.Requests.Single();
                 Assert.Equal("POST", request.HttpMethod);
                 Assert.Equal("/_all/robots/_search", request.RawUrl);
@@ -122,15 +128,16 @@ namespace ElasticLinq.Test.Integration
         }
 
         [Fact]
-        public void QueryExplicitIEnumerableGetEnumeratorCausesConnection()
+        public async void QueryExplicitIEnumerableGetEnumeratorCausesConnection()
         {
-            using (var httpStub = new HttpStub(ZeroHits))
+            using (var httpStub = new HttpStub(ZeroHits, 1))
             {
                 var provider = new ElasticQueryProvider(new ElasticConnection(httpStub.Uri), mapping, log, retryPolicy, "prefix");
                 var query = new ElasticQuery<Robot>(provider);
 
                 var enumerator = ((IEnumerable)query).GetEnumerator();
 
+                await httpStub.Completion;
                 var request = httpStub.Requests.Single();
                 Assert.Equal("POST", request.HttpMethod);
                 Assert.Equal("/_all/robots/_search", request.RawUrl);
