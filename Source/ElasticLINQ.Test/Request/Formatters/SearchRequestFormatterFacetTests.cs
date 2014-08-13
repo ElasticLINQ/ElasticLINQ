@@ -16,7 +16,7 @@ using Xunit;
 
 namespace ElasticLinq.Test.Request.Formatters
 {
-    public class PostBodyRequestFormatterFacetTests
+    public class SearchRequestFormatterFacetTests
     {
         private static readonly ElasticConnection defaultConnection = new ElasticConnection(new Uri("http://a.b.com:9000/"));
         private readonly IElasticMapping mapping = Substitute.For<IElasticMapping>();
@@ -27,7 +27,7 @@ namespace ElasticLinq.Test.Request.Formatters
             var expectedFacet = new StatisticalFacet("TotalSales", "OrderTotal");
             var searchRequest = new SearchRequest { Facets = new List<IFacet>(new [] { expectedFacet }) };
 
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, searchRequest);
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, searchRequest);
             var body = JObject.Parse(formatter.Body);
 
             var result = body.TraverseWithAssert("facets", expectedFacet.Name, expectedFacet.Type, "field");
@@ -41,7 +41,7 @@ namespace ElasticLinq.Test.Request.Formatters
             var expectedFacet = new FilterFacet("LocalSales", expectedFilter);
             var searchRequest = new SearchRequest { Facets = new List<IFacet>(new[] { expectedFacet }) };
 
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, searchRequest);
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, searchRequest);
             var body = JObject.Parse(formatter.Body);
 
             var result = body.TraverseWithAssert("facets", expectedFacet.Name, expectedFacet.Type, expectedFilter.Name, "field");
@@ -54,7 +54,7 @@ namespace ElasticLinq.Test.Request.Formatters
             var expectedFacet = new TermsFacet("Totals", "OrderTotal", "OrderCost");
             var searchRequest = new SearchRequest { Facets = new List<IFacet>(new[] { expectedFacet }) };
 
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, searchRequest);
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, searchRequest);
             var body = JObject.Parse(formatter.Body);
 
             var actualFields = body.TraverseWithAssert("facets", expectedFacet.Name, expectedFacet.Type, "fields").ToArray();
@@ -70,7 +70,7 @@ namespace ElasticLinq.Test.Request.Formatters
             var expectedFacet = new TermsStatsFacet("Name", "Key", "Value", expectedSize);
             var searchRequest = new SearchRequest { Facets = new List<IFacet>(new[] { expectedFacet }) };
 
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, searchRequest);
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, searchRequest);
             var body = JObject.Parse(formatter.Body);
 
             var result = body.TraverseWithAssert("facets", expectedFacet.Name, expectedFacet.Type);
@@ -90,7 +90,7 @@ namespace ElasticLinq.Test.Request.Formatters
 
             var searchRequest = new SearchRequest { Facets = expectedFacets };
 
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, searchRequest);
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, searchRequest);
             var body = JObject.Parse(formatter.Body);
 
             var facetResults = body.TraverseWithAssert("facets");
@@ -109,7 +109,7 @@ namespace ElasticLinq.Test.Request.Formatters
                 Facets = new List<IFacet>(new[] { expectedFacet })
             };
 
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, searchRequest);
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, searchRequest);
             var body = JObject.Parse(formatter.Body);
 
             var andFilter = body.TraverseWithAssert("facets", expectedFacet.Name, expectedFacet.Type, "and");
@@ -120,7 +120,7 @@ namespace ElasticLinq.Test.Request.Formatters
         public void ParseThrowsInvalidOperationForUnknownCriteriaTypes()
         {
             var facets = new List<IFacet> { new FakeFacet() };
-            var formatter = new PostBodyRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Facets = facets });
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Facets = facets });
             Assert.Throws<InvalidOperationException>(() => JObject.Parse(formatter.Body));
         }
 

@@ -41,7 +41,7 @@ namespace ElasticLinq.Request
 
         public Task<ElasticResponse> SearchAsync(SearchRequest searchRequest)
         {
-            var formatter = new PostBodyRequestFormatter(connection, mapping, searchRequest);
+            var formatter = new SearchRequestFormatter(connection, mapping, searchRequest);
             log.Debug(null, null, "Request: POST {0}", formatter.Uri);
             log.Debug(null, null, "Body:\n{0}", formatter.Body);
 

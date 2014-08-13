@@ -84,9 +84,9 @@
     <Compile Include="Request\Facets\TermsStatsFacetTests.cs" />
     <Compile Include="Request\Facets\TermsFacetTests.cs" />
     <Compile Include="Request\Facets\FilterFacetTests.cs" />
-    <Compile Include="Request\Formatters\PostBodyRequestFormatterFilterTests.cs" />
-    <Compile Include="Request\Formatters\PostBodyRequestFormatterTests.cs" />
-    <Compile Include="Request\Formatters\PostBodyRequestFormatterFacetTests.cs" />
+    <Compile Include="Request\Formatters\SearchRequestFormatterFilterTests.cs" />
+    <Compile Include="Request\Formatters\SearchRequestFormatterTests.cs" />
+    <Compile Include="Request\Formatters\SearchRequestFormatterFacetTests.cs" />
     <Compile Include="Request\SortOptionTests.cs" />
     <Compile Include="Request\Visitors\BranchSelectExpressionVisitorTests.cs" />
     <Compile Include="Request\Visitors\ConstantMemberPairTests.cs" />
