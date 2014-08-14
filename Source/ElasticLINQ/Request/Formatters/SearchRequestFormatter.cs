@@ -54,6 +54,17 @@ namespace ElasticLinq.Request.Formatters
                 builder.Path += searchRequest.DocumentType + "/";
 
             builder.Path += "_search";
+
+            var parameters = builder.Query.Split('&')
+                .Select(p => p.Split('='))
+                .ToDictionary(k => k[0], v => v.Length > 1 ? v[1] : null);
+
+            if (!String.IsNullOrEmpty(searchRequest.SearchType))
+                parameters["search_type"] = searchRequest.SearchType;
+
+            builder.Query = String.Join("&",
+                parameters.Select(p => p.Value == null ? p.Key : p.Key + "=" + p.Value));
+
             return builder.Uri;
         }
 

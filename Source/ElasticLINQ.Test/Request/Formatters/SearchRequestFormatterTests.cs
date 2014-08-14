@@ -222,5 +222,29 @@ namespace ElasticLinq.Test.Request.Formatters
 
             Assert.Equal(timespan.TotalMinutes.ToString(CultureInfo.InvariantCulture) + "m", actual);
         }
+
+        [Fact]
+        public void SearchTypeAppearsOnUriWhenSpecified()
+        {
+            var searchRequest = new SearchRequest { SearchType = "count" };
+
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, searchRequest);
+
+            var parameters = formatter.Uri.OriginalString.Split('&');
+
+            Assert.Single(parameters, p => p == "search_type=count");
+        }
+
+        [Fact]
+        public void SearchTypeDoesNotAppearOnUriWhenNotSpecified()
+        {
+            var searchRequest = new SearchRequest { SearchType = "" };
+
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, searchRequest);
+
+            var parameters = formatter.Uri.OriginalString.Split('&');
+
+            Assert.None(parameters, p => p.StartsWith("search_type="));
+        }
     }
 }
