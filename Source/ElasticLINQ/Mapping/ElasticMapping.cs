@@ -1,5 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using System.ComponentModel;
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Utility;
 using Newtonsoft.Json.Linq;
@@ -9,6 +10,8 @@ using System.Reflection;
 
 namespace ElasticLinq.Mapping
 {
+    public enum EnumFormat { Integer, String };
+
     /// <summary>
     /// A base class for mapping Elasticsearch values that can lower-case all field values
     /// (and respects <see cref="NotAnalyzedAttribute"/> to opt-out of the lower-casing), 
@@ -21,6 +24,7 @@ namespace ElasticLinq.Mapping
         private readonly CultureInfo conversionCulture;
         private readonly bool lowerCaseAnalyzedFieldValues;
         private readonly bool pluralizeTypeNames;
+        private readonly EnumFormat enumFormat;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ElasticMapping"/> class.
@@ -29,12 +33,14 @@ namespace ElasticLinq.Mapping
         /// <param name="camelCaseTypeNames">Pass <c>true</c> to automatically camel-case type names (for <see cref="GetDocumentType"/>).</param>
         /// <param name="pluralizeTypeNames">Pass <c>true</c> to automatically pluralize type names (for <see cref="GetDocumentType"/>).</param>
         /// <param name="lowerCaseAnalyzedFieldValues">Pass <c>true</c> to automatically convert field values to lower case (for <see cref="FormatValue"/>).</param>
+        /// <param name="enumFormat">Pass <c>EnumFormat.String</c> to format enums as strings or <c>EnumFormat.Integer</c> to use integers (defaults to string).</param>
         /// <param name="conversionCulture">The culture to use for the lower-casing, camel-casing, and pluralization operations. If <c>null</c>,
         /// uses <see cref="CultureInfo.CurrentCulture"/>.</param>
         public ElasticMapping(bool camelCaseFieldNames = true,
                               bool camelCaseTypeNames = true,
                               bool pluralizeTypeNames = true,
                               bool lowerCaseAnalyzedFieldValues = true,
+                              EnumFormat enumFormat = EnumFormat.String,
                               CultureInfo conversionCulture = null)
         {
             this.camelCaseFieldNames = camelCaseFieldNames;
@@ -42,6 +48,7 @@ namespace ElasticLinq.Mapping
             this.pluralizeTypeNames = pluralizeTypeNames;
             this.lowerCaseAnalyzedFieldValues = lowerCaseAnalyzedFieldValues;
             this.conversionCulture = conversionCulture ?? CultureInfo.CurrentCulture;
+            this.enumFormat = enumFormat;
         }
 
         /// <inheritdoc/>
@@ -52,11 +59,28 @@ namespace ElasticLinq.Mapping
             if (value == null)
                 return new JValue((string)null);
 
+            if (enumFormat == EnumFormat.String)
+                value = ReformatValueIfEnum(member, value);
+
             var result = JToken.FromObject(value);
+
             if (lowerCaseAnalyzedFieldValues && result.Type == JTokenType.String && !IsNotAnalyzed(member))
                 result = new JValue(result.Value<string>().ToLower(conversionCulture));
 
             return result;
+        }
+
+        private static object ReformatValueIfEnum(MemberInfo member, object value)
+        {
+            var returnType = TypeHelper.GetReturnType(member);
+            if (!returnType.IsEnum) return value;
+
+            var nameValue = Enum.GetName(returnType, value);
+            if (nameValue == null)
+                throw new ArgumentOutOfRangeException("value",
+                    String.Format("Value '{0}' is not defined for enum type '{1}'.", value, returnType.FullName));
+
+            return nameValue;
         }
 
         /// <inheritdoc/>

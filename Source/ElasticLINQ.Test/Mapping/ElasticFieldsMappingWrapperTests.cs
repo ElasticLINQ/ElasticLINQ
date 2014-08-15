@@ -1,13 +1,8 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using ElasticLinq.Mapping;
-using ElasticLinq.Response.Model;
-using ElasticLinq.Test.TestSupport;
 using NSubstitute;
-using System;
-using System.Reflection;
 using Xunit;
-using Xunit.Extensions;
 
 namespace ElasticLinq.Test.Mapping
 {

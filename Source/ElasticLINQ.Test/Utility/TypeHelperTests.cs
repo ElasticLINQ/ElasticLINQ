@@ -12,6 +12,40 @@ namespace ElasticLinq.Test.Utility
         private class DirectObjectSubclass : object { }
         private class IndirectObjectSubclass : DirectObjectSubclass { }
         private class SubclassOfList : List<Decimal> { }
+        
+        private class ClassWithMemberInfo
+        {
+            public DirectObjectSubclass AField = null;
+            public IndirectObjectSubclass AProperty { get; set; }
+        }
+
+        [Fact]
+        public static void GetMemberInfoReturnsMemberInfoForMember()
+        {
+            var memberInfo = TypeHelper.GetMemberInfo((ClassWithMemberInfo c) => c.AField);
+
+            Assert.Equal(typeof(ClassWithMemberInfo).GetField("AField"), memberInfo);
+        }
+
+        [Fact]
+        public void GetReturnTypeReturnsFieldTypeForField()
+        {
+            var memberInfo = TypeHelper.GetMemberInfo((ClassWithMemberInfo c) => c.AField);
+
+            var returnType = TypeHelper.GetReturnType(memberInfo);
+
+            Assert.Equal(typeof(DirectObjectSubclass), returnType);
+        }
+
+        [Fact]
+        public void GetReturnTypeReturnsPropertyTypeForProperty()
+        {
+            var memberInfo = TypeHelper.GetMemberInfo((ClassWithMemberInfo c) => c.AProperty);
+
+            var returnType = TypeHelper.GetReturnType(memberInfo);
+
+            Assert.Equal(typeof(IndirectObjectSubclass), returnType);
+        }
 
         [Fact]
         public void GetSequenceElementTypeIdentifiesListElementType()

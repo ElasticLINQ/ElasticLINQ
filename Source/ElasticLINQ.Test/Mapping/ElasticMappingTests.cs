@@ -3,18 +3,20 @@
 using ElasticLinq.Mapping;
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Test.TestSupport;
+using ElasticLinq.Utility;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Xunit;
-using Xunit.Extensions;
 
 namespace ElasticLinq.Test.Mapping
 {
     public class ElasticMappingTests
     {
+        private enum Day { Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday };
+
         private class FormatClass
         {
             public string Analyzed { get; set; }
@@ -27,6 +29,10 @@ namespace ElasticLinq.Test.Mapping
             public int IntegerValue { get; set; }
 
             public Identifier JsonConverterToString { get; set; }
+
+            public Day DayProperty { get; set; }
+
+            public Day DayField = Day.Friday;
         }
 
         public static IEnumerable<object[]> FormatClassData
@@ -135,6 +141,37 @@ namespace ElasticLinq.Test.Mapping
             var mapping = new ElasticMapping();
 
             Assert.Throws<ArgumentNullException>(() => mapping.GetTypeExistsCriteria(null));
+        }
+
+        [Fact]
+        public static void Format_WithEnumPropertyProducesStringWhenMappingSpecifiesStringFormat()
+        {
+            var mapping = new ElasticMapping(enumFormat: EnumFormat.String);
+            var memberInfo = TypeHelper.GetMemberInfo((FormatClass f) => f.DayProperty);
+
+            var actual = mapping.FormatValue(memberInfo, (int)Day.Saturday);
+
+            Assert.Equal("saturday", actual);
+        }
+
+        [Fact]
+        public static void Format_WithEnumPropertyThrowsArgumentOutOfRangeWithUndefinedEnum()
+        {
+            var mapping = new ElasticMapping(enumFormat: EnumFormat.String);
+            var memberInfo = TypeHelper.GetMemberInfo((FormatClass f) => f.DayProperty);
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => mapping.FormatValue(memberInfo, 127));
+        }
+
+        [Fact]
+        public static void Format_WithEnumPropertyProducesIntWhenMappingSpecifiesIntFormat()
+        {
+            var mapping = new ElasticMapping(enumFormat: EnumFormat.Integer);
+            var memberInfo = TypeHelper.GetMemberInfo((FormatClass f) => f.DayProperty);
+
+            var actual = mapping.FormatValue(memberInfo, (int)Day.Saturday);
+
+            Assert.Equal((int)Day.Saturday, actual);
         }
     }
 }

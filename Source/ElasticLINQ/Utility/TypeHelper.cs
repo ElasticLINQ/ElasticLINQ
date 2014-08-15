@@ -3,6 +3,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace ElasticLinq.Utility
 {
@@ -12,6 +14,49 @@ namespace ElasticLinq.Utility
     /// </summary>
     internal static class TypeHelper
     {
+        /// <summary>
+        /// Get the return type of a method, property or field.
+        /// </summary>
+        /// <param name="memberInfo">MemberInfo of the member to be examined.</param>
+        /// <returns>Return type of that member.</returns>
+        public static Type GetReturnType(MemberInfo memberInfo)
+        {
+            if (memberInfo is FieldInfo)
+                return ((FieldInfo)memberInfo).FieldType;
+
+            if (memberInfo is PropertyInfo)
+                return ((PropertyInfo)memberInfo).PropertyType;
+
+            var reflectedName = memberInfo.ReflectedType != null ? memberInfo.ReflectedType.FullName : "unknown";
+            var declaredName = memberInfo.DeclaringType != null ? memberInfo.DeclaringType.FullName : "unknown";
+
+            var typeName = memberInfo.ReflectedType == memberInfo.DeclaringType
+                ? String.Format("'{0}'", reflectedName)
+                : String.Format("'{0}' declared on '{1}'", reflectedName, declaredName);
+
+            throw new NotSupportedException(String.Format("Member '{0}' on type {1} is of unsupported type '{2}'", memberInfo.Name, typeName, memberInfo.GetType().FullName));
+        }
+
+        /// <summary>
+        /// Get the MemberInfo for a given lambda expression such as a property or method.
+        /// </summary>
+        /// <typeparam name="T">Type that declares the property.</typeparam>
+        /// <typeparam name="TValue">Type of property to get the MemberInfo for.</typeparam>
+        /// <param name="lambdaExpression">Lambda expression reference to the property.</param>
+        /// <returns>MemberInfo for the given property (or method).</returns>
+        /// <example>TypeHelper.GetMemberInfo((Customer c) => c.Name);</example>
+        public static MemberInfo GetMemberInfo<T, TValue>(Expression<Func<T, TValue>> lambdaExpression)
+        {
+            switch (lambdaExpression.Body.NodeType)
+            {
+                case ExpressionType.MemberAccess:
+                    return ((MemberExpression)lambdaExpression.Body).Member;
+
+                default:
+                    throw new NotSupportedException(String.Format("Selector node type of '{0}' not supported.", lambdaExpression.Body.NodeType));
+            }
+        }
+
         /// <summary>
         /// Find the element type given a generic sequence type.
         /// </summary>

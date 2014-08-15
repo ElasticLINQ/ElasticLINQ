@@ -11,6 +11,6 @@ namespace ElasticLinq.Mapping
         /// <summary>
         /// Initializes a new instance of the <see cref="TrivialElasticMapping"/> class.
         /// </summary>
-        public TrivialElasticMapping() : base(true, true, true, true, null) { }
+        public TrivialElasticMapping() : base(true, true, true, true, EnumFormat.String, null) { }
     }
 }

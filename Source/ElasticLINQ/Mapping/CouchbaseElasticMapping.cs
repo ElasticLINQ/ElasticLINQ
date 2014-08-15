@@ -20,7 +20,7 @@ namespace ElasticLinq.Mapping
         public CouchbaseElasticMapping(bool camelCaseFieldNames = true,
                                        bool lowerCaseAnalyzedFieldValues = true,
                                        CultureInfo conversionCulture = null)
-            : base(camelCaseFieldNames, false, false, lowerCaseAnalyzedFieldValues, conversionCulture) { }
+            : base(camelCaseFieldNames, false, false, lowerCaseAnalyzedFieldValues, EnumFormat.String, conversionCulture) { }
 
         /// <inheritdoc/>
         public override string GetDocumentMappingPrefix(Type type)
