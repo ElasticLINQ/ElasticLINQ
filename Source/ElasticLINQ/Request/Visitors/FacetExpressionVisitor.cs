@@ -76,7 +76,7 @@ namespace ElasticLinq.Request.Visitors
                         if (aggregateWithoutMember)
                             yield return new TermsFacet(GroupKeyFacet, null, size, groupByField);
 
-                        foreach (var valueField in aggregateMembers.Select(member => Mapping.GetFieldName(Prefix, member)))
+                        foreach (var valueField in aggregateMembers.Select(member => Mapping.GetFieldName(Prefix, member)).Distinct())
                             yield return new TermsStatsFacet(valueField, groupByField, valueField, size);
 
                         foreach (var criteria in aggregateCriteria)
@@ -89,7 +89,7 @@ namespace ElasticLinq.Request.Visitors
                         if (aggregateWithoutMember)
                             yield return new FilterFacet(GroupKeyFacet, new MatchAllCriteria());
 
-                        foreach (var valueField in aggregateMembers.Select(member => Mapping.GetFieldName(Prefix, member)))
+                        foreach (var valueField in aggregateMembers.Select(member => Mapping.GetFieldName(Prefix, member)).Distinct())
                             yield return new StatisticalFacet(valueField, valueField);
 
                         foreach (var criteria in aggregateCriteria)
