@@ -159,5 +159,31 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             Assert.Equal("prefix.name", termCriteria.Field);
             Assert.Equal(expectedTermValue, termCriteria.Value);
         }
+
+        [Fact]
+        public void LongCountTranslatesToSearchTypeOfCount()
+        {
+            var first = MakeQueryableExpression("LongCount", Robots);
+
+            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", first).SearchRequest;
+
+            Assert.Equal("count", request.SearchType);
+            Assert.IsType<ExistsCriteria>(request.Filter);
+        }
+
+        [Fact]
+        public void LongCountWithPredicateTranslatesToSearchTypeOfCount()
+        {
+            const string expectedTermValue = "Josef";
+            Expression<Func<Robot, bool>> lambda = r => r.Name == expectedTermValue;
+            var first = MakeQueryableExpression("LongCount", Robots, lambda);
+
+            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", first).SearchRequest;
+
+            Assert.Equal("count", request.SearchType);
+            var termCriteria = Assert.IsType<TermCriteria>(request.Filter);
+            Assert.Equal("prefix.name", termCriteria.Field);
+            Assert.Equal(expectedTermValue, termCriteria.Value);
+        }
     }
 }

@@ -176,6 +176,7 @@ namespace ElasticLinq.Request.Visitors
                     break;
 
                 case "Count":
+                case "LongCount":
                     return VisitCount(m.Arguments[0], m.Arguments.Count == 2 ? m.Arguments[1] : null);
             }
 
