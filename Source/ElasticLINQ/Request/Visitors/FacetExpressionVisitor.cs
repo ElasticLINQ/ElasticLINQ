@@ -38,7 +38,7 @@ namespace ElasticLinq.Request.Visitors
         };
 
         private bool aggregateWithoutMember;
-        private readonly HashSet<MemberInfo> aggregateMembers = new HashSet<MemberInfo>();
+        private readonly HashSet<MemberExpression> aggregateMembers = new HashSet<MemberExpression>();
         private readonly Dictionary<string, ICriteria> aggregateCriteria = new Dictionary<string, ICriteria>();
         private readonly ParameterExpression bindingParameter = Expression.Parameter(typeof(AggregateRow), "r");
 
@@ -72,11 +72,11 @@ namespace ElasticLinq.Request.Visitors
             {
                 case ExpressionType.MemberAccess:
                     {
-                        var groupByField = Mapping.GetFieldName(Prefix, ((MemberExpression)groupBy).Member);
+                        var groupByField = Mapping.GetFieldName(Prefix, (MemberExpression)groupBy);
                         if (aggregateWithoutMember)
                             yield return new TermsFacet(GroupKeyFacet, null, size, groupByField);
 
-                        foreach (var valueField in aggregateMembers.Select(member => Mapping.GetFieldName(Prefix, member)))
+                        foreach (var valueField in aggregateMembers.Select(member => Mapping.GetFieldName(Prefix, member)).Distinct())
                             yield return new TermsStatsFacet(valueField, groupByField, valueField, size);
 
                         foreach (var criteria in aggregateCriteria)
@@ -89,7 +89,7 @@ namespace ElasticLinq.Request.Visitors
                         if (aggregateWithoutMember)
                             yield return new FilterFacet(GroupKeyFacet, new MatchAllCriteria());
 
-                        foreach (var valueField in aggregateMembers.Select(member => Mapping.GetFieldName(Prefix, member)))
+                        foreach (var valueField in aggregateMembers.Select(member => Mapping.GetFieldName(Prefix, member)).Distinct())
                             yield return new StatisticalFacet(valueField, valueField);
 
                         foreach (var criteria in aggregateCriteria)
@@ -146,7 +146,7 @@ namespace ElasticLinq.Request.Visitors
                 if (aggregateMemberOperations.TryGetValue(m.Method.Name, out operation) && m.Arguments.Count == 2)
                     return VisitAggregateMemberOperation(m.Arguments[1], operation, m.Method.ReturnType);
             }
-            
+
             return m; // Do not base.VisitMethodCall as we don't want to examine the whole tree
         }
 
@@ -189,9 +189,9 @@ namespace ElasticLinq.Request.Visitors
 
         private Expression VisitAggregateMemberOperation(Expression property, string operation, Type returnType)
         {
-            var member = GetMemberInfoFromLambda(property);
-            aggregateMembers.Add(member);
-            return RebindValue(Mapping.GetFieldName(Prefix, member), operation, returnType);
+            var memberExpression = GetMemberExpressionFromLambda(property);
+            aggregateMembers.Add(memberExpression);
+            return RebindValue(Mapping.GetFieldName(Prefix, memberExpression), operation, returnType);
         }
 
         private Expression RebindValue(string valueField, string operation, Type returnType)
@@ -201,7 +201,7 @@ namespace ElasticLinq.Request.Visitors
             return Expression.Convert(getValueExpression, returnType);
         }
 
-        private static MemberInfo GetMemberInfoFromLambda(Expression expression)
+        private static MemberExpression GetMemberExpressionFromLambda(Expression expression)
         {
             var lambda = expression.StripQuotes() as LambdaExpression;
             if (lambda == null)
@@ -211,7 +211,7 @@ namespace ElasticLinq.Request.Visitors
             if (memberExpressionBody == null)
                 throw new NotSupportedException(String.Format("Aggregates must be specified against a member of the entity not {0}", lambda.Body.Type));
 
-            return memberExpressionBody.Member;
+            return memberExpressionBody;
         }
     }
 }

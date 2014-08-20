@@ -3,6 +3,7 @@
 using ElasticLinq.Request.Criteria;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace ElasticLinq.Mapping
@@ -53,9 +54,9 @@ namespace ElasticLinq.Mapping
         /// </summary>
         /// <param name="prefix">The prefix to put in front of this field name, if the field is
         /// an ongoing part of the document search.</param>
-        /// <param name="memberInfo">The member whose name is required.</param>
+        /// <param name="memberExpression">The member expression whose name is required.</param>
         /// <returns>Returns the Elasticsearch field name that matches the member.</returns>
-        string GetFieldName(string prefix, MemberInfo memberInfo);
+        string GetFieldName(string prefix, MemberExpression memberExpression);
 
         /// <summary>
         /// Gets criteria that can be used to find documents of a particular type. Will be used by

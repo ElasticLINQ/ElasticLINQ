@@ -324,6 +324,21 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
         [Fact]
         [ExcludeFromCodeCoverage] // Expression is not "executed"
+        public static void DecimalLessThanOperatorSupportsDeepProperties()
+        {
+            const decimal expectedConstant = 710.956m;
+            var where = Robots.Where(e => e.Stats.Pricing.InvoicePrice < expectedConstant);
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
+
+            var rangeCriteria = Assert.IsType<RangeCriteria>(criteria);
+            Assert.Equal("range", rangeCriteria.Name);
+            Assert.Equal("prefix.stats.pricing.invoicePrice", rangeCriteria.Field);
+            Assert.Single(rangeCriteria.Specifications, s => s.Comparison == RangeComparison.LessThan && Equals(s.Value, expectedConstant));
+            Assert.Equal(1, rangeCriteria.Specifications.Count);
+        }
+
+        [Fact]
+        [ExcludeFromCodeCoverage] // Expression is not "executed"
         public void DecimalLessThanOrEqualsOperatorGeneratesLessThanOrEqualRangeCriteria()
         {
             const decimal expectedConstant = 710.956m;
@@ -333,6 +348,21 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var rangeCriteria = Assert.IsType<RangeCriteria>(criteria);
             Assert.Equal("range", rangeCriteria.Name);
             Assert.Equal("prefix.cost", rangeCriteria.Field);
+            Assert.Single(rangeCriteria.Specifications, s => s.Comparison == RangeComparison.LessThanOrEqual && Equals(s.Value, expectedConstant));
+            Assert.Equal(1, rangeCriteria.Specifications.Count);
+        }
+
+        [Fact]
+        [ExcludeFromCodeCoverage] // Expression is not "executed"
+        public static void DecimalLessThanOrEqualsOperatorSupportsDeepProperties()
+        {
+            const decimal expectedConstant = 710.956m;
+            var where = Robots.Where(e => e.Stats.Pricing.InvoicePrice <= expectedConstant);
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
+
+            var rangeCriteria = Assert.IsType<RangeCriteria>(criteria);
+            Assert.Equal("range", rangeCriteria.Name);
+            Assert.Equal("prefix.stats.pricing.invoicePrice", rangeCriteria.Field);
             Assert.Single(rangeCriteria.Specifications, s => s.Comparison == RangeComparison.LessThanOrEqual && Equals(s.Value, expectedConstant));
             Assert.Equal(1, rangeCriteria.Specifications.Count);
         }
@@ -354,6 +384,21 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
         [Fact]
         [ExcludeFromCodeCoverage] // Expression is not "executed"
+        public static void DecimalGreaterThanOperatorSupportsDeepProperties()
+        {
+            const decimal expectedConstant = 710.956m;
+            var where = Robots.Where(e => e.Stats.Pricing.InvoicePrice > expectedConstant);
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
+
+            var rangeCriteria = Assert.IsType<RangeCriteria>(criteria);
+            Assert.Equal("range", rangeCriteria.Name);
+            Assert.Equal("prefix.stats.pricing.invoicePrice", rangeCriteria.Field);
+            Assert.Single(rangeCriteria.Specifications, s => s.Comparison == RangeComparison.GreaterThan && Equals(s.Value, expectedConstant));
+            Assert.Equal(1, rangeCriteria.Specifications.Count);
+        }
+
+        [Fact]
+        [ExcludeFromCodeCoverage] // Expression is not "executed"
         public void DecimalGreaterThanOrEqualsOperatorGeneratesGreaterThanOrEqualRangeCriteria()
         {
             const decimal expectedConstant = 710.956m;
@@ -363,6 +408,21 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var rangeCriteria = Assert.IsType<RangeCriteria>(criteria);
             Assert.Equal("range", rangeCriteria.Name);
             Assert.Equal("prefix.cost", rangeCriteria.Field);
+            Assert.Single(rangeCriteria.Specifications, s => s.Comparison == RangeComparison.GreaterThanOrEqual && Equals(s.Value, expectedConstant));
+            Assert.Equal(1, rangeCriteria.Specifications.Count);
+        }
+
+        [Fact]
+        [ExcludeFromCodeCoverage] // Expression is not "executed"
+        public static void DecimalGreaterThanOrEqualsOperatorSupportsDeepProperties()
+        {
+            const decimal expectedConstant = 710.956m;
+            var where = Robots.Where(e => e.Stats.Pricing.InvoicePrice >= expectedConstant);
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
+
+            var rangeCriteria = Assert.IsType<RangeCriteria>(criteria);
+            Assert.Equal("range", rangeCriteria.Name);
+            Assert.Equal("prefix.stats.pricing.invoicePrice", rangeCriteria.Field);
             Assert.Single(rangeCriteria.Specifications, s => s.Comparison == RangeComparison.GreaterThanOrEqual && Equals(s.Value, expectedConstant));
             Assert.Equal(1, rangeCriteria.Specifications.Count);
         }
@@ -446,6 +506,31 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
             var termCriteria = Assert.IsType<TermCriteria>(criteria);
             Assert.Equal("prefix.id", termCriteria.Field);
+            Assert.Equal(expectedConstant, termCriteria.Value);
+        }
+
+        [Fact]
+        public static void Int32EqualsOperatorSupportsDeepQueries()
+        {
+            const Int32 expectedConstant = 2;
+            var where = Robots.Where(e => e.Stats.Limbs.HandCount == expectedConstant);
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
+
+            var termCriteria = Assert.IsType<TermCriteria>(criteria);
+            Assert.Equal("prefix.stats.limbs.handCount", termCriteria.Field);
+            Assert.Equal(expectedConstant, termCriteria.Value);
+        }
+
+        [Fact]
+        public static void Int32NotEqualsOperatorSupportsDeepQueries()
+        {
+            const Int32 expectedConstant = 2;
+            var where = Robots.Where(e => e.Stats.Limbs.HandCount != expectedConstant);
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
+
+            var notCriteria = Assert.IsType<NotCriteria>(criteria);
+            var termCriteria = Assert.IsType<TermCriteria>(notCriteria.Criteria);
+            Assert.Equal("prefix.stats.limbs.handCount", termCriteria.Field);
             Assert.Equal(expectedConstant, termCriteria.Value);
         }
 

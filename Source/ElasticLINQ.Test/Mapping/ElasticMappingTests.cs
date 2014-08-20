@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq.Expressions;
 using System.Reflection;
 using Xunit;
 
@@ -93,7 +94,8 @@ namespace ElasticLinq.Test.Mapping
         {
             var mapping = new ElasticMapping();
 
-            Assert.Throws<ArgumentNullException>(() => mapping.GetFieldName("", null));
+            Assert.Throws<ArgumentNullException>(() => mapping.GetFieldName("", (MemberExpression)null));
+            Assert.Throws<ArgumentNullException>(() => mapping.GetFieldName("", (MemberInfo)null));
         }
 
         private class SingularTypeName { }

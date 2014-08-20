@@ -1,11 +1,11 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
-using System.ComponentModel;
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Utility;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Globalization;
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace ElasticLinq.Mapping
@@ -29,7 +29,7 @@ namespace ElasticLinq.Mapping
         /// <summary>
         /// Initializes a new instance of the <see cref="ElasticMapping"/> class.
         /// </summary>
-        /// <param name="camelCaseFieldNames">Pass <c>true</c> to automatically camel-case field names (for <see cref="GetFieldName"/>).</param>
+        /// <param name="camelCaseFieldNames">Pass <c>true</c> to automatically camel-case field names (for <see cref="GetFieldName(string, MemberInfo)"/>).</param>
         /// <param name="camelCaseTypeNames">Pass <c>true</c> to automatically camel-case type names (for <see cref="GetDocumentType"/>).</param>
         /// <param name="pluralizeTypeNames">Pass <c>true</c> to automatically pluralize type names (for <see cref="GetDocumentType"/>).</param>
         /// <param name="lowerCaseAnalyzedFieldValues">Pass <c>true</c> to automatically convert field values to lower case (for <see cref="FormatValue"/>).</param>
@@ -84,6 +84,27 @@ namespace ElasticLinq.Mapping
         }
 
         /// <inheritdoc/>
+        public virtual string GetFieldName(string prefix, MemberExpression memberExpression)
+        {
+            Argument.EnsureNotNull("memberExpression", memberExpression);
+
+            switch (memberExpression.Expression.NodeType)
+            {
+                case ExpressionType.MemberAccess:
+                    return GetFieldName(GetFieldName(prefix, (MemberExpression)memberExpression.Expression), memberExpression.Member);
+
+                case ExpressionType.Parameter:
+                    return GetFieldName(prefix, memberExpression.Member);
+
+                default:
+                    throw new NotSupportedException(String.Format("Unknown expression type {0} for left hand side of expression {1}", memberExpression.Expression.NodeType, memberExpression));
+            }
+        }
+
+        /// <param name="prefix">The prefix to put in front of this field name, if the field is
+        /// an ongoing part of the document search.</param>
+        /// <param name="memberInfo">The member whose field name is required.</param>
+        /// <returns>The Elasticsearch field name that matches the member.</returns>
         public virtual string GetFieldName(string prefix, MemberInfo memberInfo)
         {
             Argument.EnsureNotNull("memberInfo", memberInfo);
