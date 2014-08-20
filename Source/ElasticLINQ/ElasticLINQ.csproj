@@ -90,6 +90,7 @@
     <Compile Include="Request\Visitors\FacetExpressionVisitor.cs" />
     <Compile Include="Request\Visitors\CriteriaExpressionVisitor.cs" />
     <Compile Include="Response\Materializers\Aggregates.cs" />
+    <Compile Include="Response\Materializers\CountElasticMaterializer.cs" />
     <Compile Include="Response\Materializers\ManyFacetsElasticMaterializer.cs" />
     <Compile Include="Request\Criteria\TermsCriteria.cs" />
     <Compile Include="Request\Criteria\TermsExecutionMode.cs" />
