@@ -185,12 +185,11 @@ namespace ElasticLinq.Request.Visitors
         private Expression VisitCount(Expression source, Expression predicate)
         {
             materializer = new CountElasticMaterializer();
-            searchRequest.Size = 0;
+            searchRequest.SearchType = "count";
             return predicate != null 
                 ? VisitWhere(source, predicate) 
                 : Visit(source);
         }
-
 
         private Expression VisitFirstOrSingle(Expression source, Expression predicate, string methodName)
         {

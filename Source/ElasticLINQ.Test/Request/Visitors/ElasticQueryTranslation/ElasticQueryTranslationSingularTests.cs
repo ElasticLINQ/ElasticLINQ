@@ -135,18 +135,18 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
 
         [Fact]
-        public void CountTranslatesToSizeOfZeroFilter()
+        public void CountTranslatesToSearchTypeOfCount()
         {
             var first = MakeQueryableExpression("Count", Robots);
 
             var request = ElasticQueryTranslator.Translate(Mapping, "prefix", first).SearchRequest;
 
-            Assert.Equal(0, request.Size);
+            Assert.Equal("count", request.SearchType);
             Assert.IsType<ExistsCriteria>(request.Filter);
         }
 
         [Fact]
-        public void CountWithPredicateTranslatesToSizeOfZeroFilter()
+        public void CountWithPredicateTranslatesToSearchTypeOfCount()
         {
             const string expectedTermValue = "Josef";
             Expression<Func<Robot, bool>> lambda = r => r.Name == expectedTermValue;
@@ -154,7 +154,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
             var request = ElasticQueryTranslator.Translate(Mapping, "prefix", first).SearchRequest;
 
-            Assert.Equal(0, request.Size);
+            Assert.Equal("count", request.SearchType);
             var termCriteria = Assert.IsType<TermCriteria>(request.Filter);
             Assert.Equal("prefix.name", termCriteria.Field);
             Assert.Equal(expectedTermValue, termCriteria.Value);
