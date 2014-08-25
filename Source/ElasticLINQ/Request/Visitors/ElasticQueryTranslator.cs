@@ -62,14 +62,14 @@ namespace ElasticLinq.Request.Visitors
                 materializer = new ManyHitsElasticMaterializer(itemProjector ?? DefaultItemProjector, finalItemType ?? sourceType);
         }
 
-        private void CompleteFacetTranslation(RebindCollectionResult<IFacet> aggregated)
+        private void CompleteFacetTranslation(FacetRebindCollectionResult aggregated)
         {
             Visit(aggregated.Expression);
             searchRequest.DocumentType = Mapping.GetDocumentType(sourceType);
 
             searchRequest.Facets = aggregated.Collected.ToList();
             searchRequest.SearchType = "count"; // We only want facets, not hits
-            materializer = new ManyFacetsElasticMaterializer(r => aggregated.Projection.Compile().DynamicInvoke(r), aggregated.Projection.ReturnType);
+            materializer = new ManyFacetsElasticMaterializer(r => aggregated.Projection.Compile().DynamicInvoke(r), aggregated.Projection.ReturnType, aggregated.GroupByType);
         }
 
         protected override Expression VisitMethodCall(MethodCallExpression m)

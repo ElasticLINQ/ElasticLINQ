@@ -14,6 +14,20 @@ using System.Reflection;
 
 namespace ElasticLinq.Request.Visitors
 {
+    internal class FacetRebindCollectionResult : RebindCollectionResult<IFacet>
+    {
+        private readonly Type groupByType;
+
+        public FacetRebindCollectionResult(Expression expression, HashSet<IFacet> collected, ParameterExpression parameter,
+            LambdaExpression projection, Type groupByType)
+            : base(expression, collected, parameter, projection)
+        {
+            this.groupByType = groupByType;
+        }
+
+        public Type GroupByType { get { return groupByType; } }
+    }
+
     /// <summary>
     /// Gathers and rebinds aggregate operations into facets.
     /// </summary>
@@ -51,7 +65,7 @@ namespace ElasticLinq.Request.Visitors
         {
         }
 
-        internal static RebindCollectionResult<IFacet> Rebind(IElasticMapping mapping, string prefix, Expression expression)
+        internal static FacetRebindCollectionResult Rebind(IElasticMapping mapping, string prefix, Expression expression)
         {
             Argument.EnsureNotNull("mapping", mapping);
             Argument.EnsureNotNull("expression", expression);
@@ -60,7 +74,9 @@ namespace ElasticLinq.Request.Visitors
             var visitedExpression = visitor.Visit(expression);
             var facets = new HashSet<IFacet>(visitor.GetFacets());
 
-            return new RebindCollectionResult<IFacet>(visitedExpression, facets, visitor.bindingParameter, visitor.selectProjection);
+            var groupByType = visitor.groupBy == null ? null : visitor.groupBy.Type;
+
+            return new FacetRebindCollectionResult(visitedExpression, facets, visitor.bindingParameter, visitor.selectProjection, groupByType);
         }
 
         private IEnumerable<IFacet> GetFacets()
