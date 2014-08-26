@@ -11,21 +11,18 @@ using System.Reflection;
 namespace ElasticLinq.Response.Materializers
 {
     /// <summary>
-    /// Materializes multiple facet requests from the ElasticResponse.
+    /// Materializes facets with terms from the ElasticResponse.
     /// </summary>
-    internal class ManyFacetsElasticMaterializer : IElasticMaterializer
+    internal class TermFacetsElasticMaterializer : IElasticMaterializer
     {
+        private static readonly MethodInfo manyMethodInfo = typeof(TermFacetsElasticMaterializer).GetMethod("Many", BindingFlags.NonPublic | BindingFlags.Static); 
         private static readonly string[] termsFacetTypes = { "terms_stats", "terms" };
-        private static readonly string[] termlessFacetTypes = { "statistical", "filter" };
-
-        private static readonly MethodInfo manyMethodInfo =
-            typeof(ManyFacetsElasticMaterializer).GetMethod("Many", BindingFlags.NonPublic | BindingFlags.Static);
 
         private readonly Func<AggregateRow, object> projector;
         private readonly Type elementType;
         private readonly Type groupKeyType;
 
-        public ManyFacetsElasticMaterializer(Func<AggregateRow, object> projector, Type elementType, Type groupKeyType)
+        public TermFacetsElasticMaterializer(Func<AggregateRow, object> projector, Type elementType, Type groupKeyType)
         {
             this.projector = projector;
             this.elementType = elementType;
@@ -50,18 +47,9 @@ namespace ElasticLinq.Response.Materializers
             var facetValues = facets.Values().ToList();
 
             var facetsWithTerms = facetValues.Where(x => termsFacetTypes.Contains(x["_type"].ToString())).ToList();
-            if (facetsWithTerms.Any())
-                return FlattenTermsStatsToAggregateRows(facetsWithTerms, groupType).Select(projector).Cast<T>().ToList();
-
-            var facetsWithoutTerms = facetValues.Where(x => termlessFacetTypes.Contains(x["_type"].ToString())).ToList();
-            if (facetsWithoutTerms.Any())
-                return Enumerable.Range(1, 1)
-                    .Select(r => new AggregateStatisticalRow(facets))
-                    .Select(projector)
-                    .Cast<T>()
-                    .ToList();
-
-            return new List<T>();
+            return facetsWithTerms.Any()
+                ? FlattenTermsStatsToAggregateRows(facetsWithTerms, groupType).Select(projector).Cast<T>().ToList()
+                : new List<T>();
         }
 
         /// <summary>

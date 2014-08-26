@@ -39,9 +39,13 @@ namespace ElasticLinq.Response.Materializers
 
         internal static object GetKey(AggregateRow row)
         {
-            return row is AggregateTermRow
-                ? ((AggregateTermRow) row).Key
-                : null;
+            if (row is AggregateTermRow)
+                return ((AggregateTermRow)row).Key;
+
+            if (row is AggregateStatisticalRow)
+                return ((AggregateStatisticalRow)row).Key;
+
+            return null;
         }
 
         internal static object ParseValue(JToken token, Type valueType)
@@ -84,10 +88,12 @@ namespace ElasticLinq.Response.Materializers
     [DebuggerDisplay("Statistical Row")]
     internal class AggregateStatisticalRow : AggregateRow
     {
+        private readonly object key;
         private readonly JObject facets;
 
-        public AggregateStatisticalRow(JObject facets)
+        public AggregateStatisticalRow(object key, JObject facets)
         {
+            this.key = key;
             this.facets = facets;
         }
 
@@ -96,10 +102,12 @@ namespace ElasticLinq.Response.Materializers
             JToken facetObject, operationObject;
             return facets.TryGetValue(name, out facetObject)
                    && facetObject is JObject
-                   && ((JObject) facetObject).TryGetValue(operation, out operationObject)
+                   && ((JObject)facetObject).TryGetValue(operation, out operationObject)
                 ? ParseValue(operationObject, valueType)
                 : TypeHelper.CreateDefault(valueType);
         }
+
+        public object Key { get { return key; } }
     }
 
     [DebuggerDisplay("Term Row {Key} Fields({Fields.Count})")]

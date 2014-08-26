@@ -88,7 +88,7 @@ namespace ElasticLinq.Test.Response.Materializers
         [Fact]
         public void AggregateStatisticalRowGetValueParsesMultipleFacetsForString()
         {
-            var row = new AggregateStatisticalRow(expectedFacets);
+            var row = new AggregateStatisticalRow("", expectedFacets);
 
             var actual = row.GetValue("multi", "string", typeof(string));
 
@@ -98,7 +98,7 @@ namespace ElasticLinq.Test.Response.Materializers
         [Fact]
         public void AggregateStatisticalRowGetValueParsesMultipleFacetsForInt()
         {
-            var row = new AggregateStatisticalRow(expectedFacets);
+            var row = new AggregateStatisticalRow(1, expectedFacets);
 
             var actual = row.GetValue("multi", "integer", typeof(int));
 
@@ -107,7 +107,7 @@ namespace ElasticLinq.Test.Response.Materializers
 
         [Fact] public void AggregateStatisticalRowGetValueParsesSingleFacetForDouble()
         {
-            var row = new AggregateStatisticalRow(expectedFacets);
+            var row = new AggregateStatisticalRow(2.00, expectedFacets);
 
             var actual = row.GetValue("single", "double", typeof(double));
 
@@ -117,7 +117,7 @@ namespace ElasticLinq.Test.Response.Materializers
         [Fact]
         public void AggregateStatisticalRowGetValueDefaultsStringValue()
         {
-            var row = new AggregateStatisticalRow(expectedFacets);
+            var row = new AggregateStatisticalRow("3", expectedFacets);
 
             var actual = row.GetValue("missing", "string", typeof(string));
 
@@ -127,7 +127,7 @@ namespace ElasticLinq.Test.Response.Materializers
         [Fact]
         public void AggregateStatisticalRowGetValueDefaultsIntValue()
         {
-            var row = new AggregateStatisticalRow(expectedFacets);
+            var row = new AggregateStatisticalRow(4, expectedFacets);
 
             var actual = row.GetValue("missing", "int", typeof(int));
 

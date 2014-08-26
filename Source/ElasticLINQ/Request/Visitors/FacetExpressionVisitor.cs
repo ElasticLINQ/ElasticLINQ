@@ -16,16 +16,16 @@ namespace ElasticLinq.Request.Visitors
 {
     internal class FacetRebindCollectionResult : RebindCollectionResult<IFacet>
     {
-        private readonly Type groupByType;
+        private readonly Expression groupBy;
 
         public FacetRebindCollectionResult(Expression expression, HashSet<IFacet> collected, ParameterExpression parameter,
-            LambdaExpression projection, Type groupByType)
+            LambdaExpression projection, Expression groupBy)
             : base(expression, collected, parameter, projection)
         {
-            this.groupByType = groupByType;
+            this.groupBy = groupBy;
         }
 
-        public Type GroupByType { get { return groupByType; } }
+        public Expression GroupBy { get { return groupBy; } }
     }
 
     /// <summary>
@@ -74,9 +74,7 @@ namespace ElasticLinq.Request.Visitors
             var visitedExpression = visitor.Visit(expression);
             var facets = new HashSet<IFacet>(visitor.GetFacets());
 
-            var groupByType = visitor.groupBy == null ? null : visitor.groupBy.Type;
-
-            return new FacetRebindCollectionResult(visitedExpression, facets, visitor.bindingParameter, visitor.selectProjection, groupByType);
+            return new FacetRebindCollectionResult(visitedExpression, facets, visitor.bindingParameter, visitor.selectProjection, visitor.groupBy);
         }
 
         private IEnumerable<IFacet> GetFacets()

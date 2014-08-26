@@ -12,7 +12,7 @@ namespace ElasticLinq.Test.Response.Materializers
         [Fact]
         public void MaterializeThrowsArgumentNullExceptionWhenElasticResponseIsNull()
         {
-            var materializer = new ManyFacetsElasticMaterializer(r => r, typeof(SampleClass), typeof(string));
+            var materializer = new TermlessFacetsElasticMaterializer(r => r, typeof(SampleClass), typeof(string));
 
             Assert.Throws<ArgumentNullException>(() => materializer.Materialize(null));
         }
@@ -20,7 +20,7 @@ namespace ElasticLinq.Test.Response.Materializers
         [Fact]
         public void MaterializeWithNullFacetsReturnsBlankList()
         {
-            var materializer = new ManyFacetsElasticMaterializer(r => r, typeof(object), typeof(string));
+            var materializer = new TermlessFacetsElasticMaterializer(r => r, typeof(object), typeof(string));
             var response = new ElasticResponse { facets = null };
 
             var actual = materializer.Materialize(response);
@@ -32,7 +32,7 @@ namespace ElasticLinq.Test.Response.Materializers
         [Fact]
         public void MaterializeWithNoFacetsReturnsBlankList()
         {
-            var materializer = new ManyFacetsElasticMaterializer(r => r, typeof(SampleClass), typeof(string));
+            var materializer = new TermlessFacetsElasticMaterializer(r => r, typeof(SampleClass), typeof(string));
             var response = new ElasticResponse { facets = new JObject() };
 
             var actual = materializer.Materialize(response);
