@@ -34,6 +34,9 @@ namespace ElasticLinq.Test.Mapping
             public Day DayProperty { get; set; }
 
             public Day DayField = Day.Friday;
+
+            [JsonProperty("CustomPropertyName")]
+            public string NotSoCustom { get; set; }
         }
 
         public static IEnumerable<object[]> FormatClassData
@@ -86,6 +89,17 @@ namespace ElasticLinq.Test.Mapping
             var actual = mapping.GetFieldName(prefix, memberInfo);
 
             Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public static void GetFieldName_HonorsJsonPropertyName()
+        {
+            var memberInfo = TypeHelper.GetMemberInfo((FormatClass f) => f.NotSoCustom);
+            var mapping = new ElasticMapping();
+
+            var actual = mapping.GetFieldName("", memberInfo);
+
+            Assert.Equal("CustomPropertyName", actual);
         }
 
         [Fact]

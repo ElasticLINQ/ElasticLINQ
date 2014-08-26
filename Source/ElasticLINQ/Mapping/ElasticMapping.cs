@@ -2,6 +2,7 @@
 
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Utility;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Globalization;
@@ -109,11 +110,21 @@ namespace ElasticLinq.Mapping
         {
             Argument.EnsureNotNull("memberInfo", memberInfo);
 
-            var memberName = memberInfo.Name;
-            if (camelCaseFieldNames)
-                memberName = memberName.ToCamelCase(conversionCulture);
+            var memberName = GetMemberName(memberInfo);
 
             return String.Format("{0}.{1}", prefix, memberName).TrimStart('.');
+        }
+
+        protected string GetMemberName(MemberInfo memberInfo)
+        {
+            var jsonPropertyAttribute = memberInfo.GetCustomAttribute<JsonPropertyAttribute>(inherit: true);
+
+            if (jsonPropertyAttribute != null)
+                return jsonPropertyAttribute.PropertyName;
+
+            return camelCaseFieldNames
+                ? memberInfo.Name.ToCamelCase(conversionCulture)
+                : memberInfo.Name;
         }
 
         /// <inheritdoc/>
