@@ -23,6 +23,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{DF49DB26
 		..\Build\Tests.proj = ..\Build\Tests.proj
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElasticLINQ.Portable", "ElasticLINQ.Portable\ElasticLINQ.Portable.csproj", "{8633ADE5-6F63-4008-8AA4-BE8E8A387809}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Portable", "Portable", "{5F0CC4DE-B1CB-49A4-B448-53CAE930F5AD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElasticLINQ.Portable.Test", "ElasticLINQ.Portable.Test\ElasticLINQ.Portable.Test.csproj", "{DA488B7B-BA05-4F15-9F19-EA1FDB57DA44}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,11 +43,21 @@ Global
 		{752ADF39-9F6D-4FE3-8EEF-3266EF584C2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{752ADF39-9F6D-4FE3-8EEF-3266EF584C2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{752ADF39-9F6D-4FE3-8EEF-3266EF584C2A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8633ADE5-6F63-4008-8AA4-BE8E8A387809}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8633ADE5-6F63-4008-8AA4-BE8E8A387809}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8633ADE5-6F63-4008-8AA4-BE8E8A387809}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8633ADE5-6F63-4008-8AA4-BE8E8A387809}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA488B7B-BA05-4F15-9F19-EA1FDB57DA44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA488B7B-BA05-4F15-9F19-EA1FDB57DA44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA488B7B-BA05-4F15-9F19-EA1FDB57DA44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA488B7B-BA05-4F15-9F19-EA1FDB57DA44}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{DF49DB26-2CDA-437B-94C5-62200CB0ACFC} = {99B0D181-5D19-4E30-96EA-F8E42C81F8E6}
+		{8633ADE5-6F63-4008-8AA4-BE8E8A387809} = {5F0CC4DE-B1CB-49A4-B448-53CAE930F5AD}
+		{DA488B7B-BA05-4F15-9F19-EA1FDB57DA44} = {5F0CC4DE-B1CB-49A4-B448-53CAE930F5AD}
 	EndGlobalSection
 EndGlobal
