@@ -8,6 +8,6 @@
     <owners>CenturyLink Cloud</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>LINQ provider for Elasticsearch</description>
-    <copyright>Copyright (c) 2013-2014 CenturyLink Cloud</copyright>
+    <copyright>Copyright (c) 2013-2014 CenturyLink, Inc.</copyright>
   </metadata>
 </package>
