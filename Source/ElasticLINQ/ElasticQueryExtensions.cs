@@ -30,7 +30,7 @@ namespace ElasticLinq
         public static IQueryable<TSource> Query<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, bool>> predicate)
         {
             Argument.EnsureNotNull("predicate", predicate);
-            return CreateQueryMethodCall(source, (MethodInfo)MethodBase.GetCurrentMethod(), Expression.Quote(predicate));
+            return CreateQueryMethodCall(source, queryMethodInfo, Expression.Quote(predicate));
         }
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace ElasticLinq
         public static IQueryable<TSource> QueryString<TSource>(this IQueryable<TSource> source, string query)
         {
             Argument.EnsureNotNull("query", query);
-            return CreateQueryMethodCall(source, (MethodInfo)MethodBase.GetCurrentMethod(), Expression.Constant(query));
+            return CreateQueryMethodCall(source, queryStringMethodInfo, Expression.Constant(query));
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace ElasticLinq
         {
             Argument.EnsureNotNull("query", query);
             Argument.EnsureNotNull("fields", fields);
-            return CreateQueryMethodCall(source, (MethodInfo)MethodBase.GetCurrentMethod(), Expression.Constant(query), Expression.Constant(fields));
+            return CreateQueryMethodCall(source, queryStringWithFieldsMethodInfo, Expression.Constant(query), Expression.Constant(fields));
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace ElasticLinq
         /// <exception cref="T:System.ArgumentNullException"><paramref name="source"/> is null.</exception>
         public static IOrderedQueryable<TSource> OrderByScore<TSource>(this IQueryable<TSource> source)
         {
-            return (IOrderedQueryable<TSource>)CreateQueryMethodCall(source, (MethodInfo)MethodBase.GetCurrentMethod());
+            return (IOrderedQueryable<TSource>)CreateQueryMethodCall(source, orderByScoreMethodInfo);
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace ElasticLinq
         /// <exception cref="T:System.ArgumentNullException"><paramref name="source"/> is null.</exception>
         public static IOrderedQueryable<TSource> OrderByScoreDescending<TSource>(this IQueryable<TSource> source)
         {
-            return (IOrderedQueryable<TSource>)CreateQueryMethodCall(source, (MethodInfo)MethodBase.GetCurrentMethod());
+            return (IOrderedQueryable<TSource>)CreateQueryMethodCall(source, orderByScoreDescendingMethodInfo);
         }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace ElasticLinq
         /// <exception cref="T:System.ArgumentNullException"><paramref name="source"/> is null.</exception>
         public static IOrderedQueryable<TSource> ThenByScore<TSource>(this IOrderedQueryable<TSource> source)
         {
-            return (IOrderedQueryable<TSource>)CreateQueryMethodCall(source, (MethodInfo)MethodBase.GetCurrentMethod());
+            return (IOrderedQueryable<TSource>)CreateQueryMethodCall(source, thenByScoreMethodInfo);
         }
 
         /// <summary>
@@ -116,7 +116,7 @@ namespace ElasticLinq
         /// <exception cref="T:System.ArgumentNullException"><paramref name="source"/> is null.</exception>
         public static IOrderedQueryable<TSource> ThenByScoreDescending<TSource>(this IOrderedQueryable<TSource> source)
         {
-            return (IOrderedQueryable<TSource>)CreateQueryMethodCall(source, (MethodInfo)MethodBase.GetCurrentMethod());
+            return (IOrderedQueryable<TSource>)CreateQueryMethodCall(source, thenByScoreDescendingMethodInfo);
         }
 
         /// <summary>
@@ -134,6 +134,14 @@ namespace ElasticLinq
 
             return elasticQuery.ToQueryInfo();
         }
+
+        private static readonly MethodInfo queryMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "Query");
+        private static readonly MethodInfo queryStringMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "QueryString" && m.GetParameters().Count() == 2);
+        private static readonly MethodInfo queryStringWithFieldsMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "QueryString" && m.GetParameters().Count() > 2);
+        private static readonly MethodInfo orderByScoreMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "OrderByScore");
+        private static readonly MethodInfo orderByScoreDescendingMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "OrderByScoreDescending");
+        private static readonly MethodInfo thenByScoreMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "ThenByScore");
+        private static readonly MethodInfo thenByScoreDescendingMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "ThenByScoreDescending");
 
         private static IQueryable<TSource> CreateQueryMethodCall<TSource>(IQueryable<TSource> source, MethodInfo method, params Expression[] arguments)
         {

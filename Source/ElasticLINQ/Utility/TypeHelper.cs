@@ -27,23 +27,17 @@ namespace ElasticLinq.Utility
             if (memberInfo is PropertyInfo)
                 return ((PropertyInfo)memberInfo).PropertyType;
 
-            var reflectedName = memberInfo.ReflectedType != null ? memberInfo.ReflectedType.FullName : "unknown";
             var declaredName = memberInfo.DeclaringType != null ? memberInfo.DeclaringType.FullName : "unknown";
-
-            var typeName = memberInfo.ReflectedType == memberInfo.DeclaringType
-                ? String.Format("'{0}'", reflectedName)
-                : String.Format("'{0}' declared on '{1}'", reflectedName, declaredName);
-
-            throw new NotSupportedException(String.Format("Member '{0}' on type {1} is of unsupported type '{2}'", memberInfo.Name, typeName, memberInfo.GetType().FullName));
+            throw new NotSupportedException(String.Format("Member '{0}' on type {1} is of unsupported type '{2}'", memberInfo.Name, declaredName, memberInfo.GetType().FullName));
         }
 
         /// <summary>
-        /// Get the MemberInfo for a given lambda expression such as a property or method.
+        /// Get the MemberInfo for a given lambda expression to a property.
         /// </summary>
         /// <typeparam name="T">Type that declares the property.</typeparam>
         /// <typeparam name="TValue">Type of property to get the MemberInfo for.</typeparam>
         /// <param name="lambdaExpression">Lambda expression reference to the property.</param>
-        /// <returns>MemberInfo for the given property (or method).</returns>
+        /// <returns>MemberInfo for the given property.</returns>
         /// <example>TypeHelper.GetMemberInfo((Customer c) => c.Name);</example>
         public static MemberInfo GetMemberInfo<T, TValue>(Expression<Func<T, TValue>> lambdaExpression)
         {
@@ -58,6 +52,20 @@ namespace ElasticLinq.Utility
         }
 
         /// <summary>
+        /// Get the MethodInfo for a method on a type given a predicate to identify it.
+        /// </summary>
+        /// <remarks>
+        /// This will throw if there are zero or more than one matches.
+        /// </remarks>
+        /// <param name="type">Type to examine for the MethodInfo.</param>
+        /// <param name="predicate">Predicate that identifies which method to select.</param>
+        /// <returns>MethodInfo belonging to the method identified.</returns>
+        public static MethodInfo GetMethodInfo(this Type type, Func<MethodInfo, bool> predicate)
+        {
+            return type.GetTypeInfo().DeclaredMethods.Single(predicate);
+        }
+
+        /// <summary>
         /// Find the element type given a generic sequence type.
         /// </summary>
         /// <param name="sequenceType">Sequence type to examine.</param>
@@ -67,7 +75,7 @@ namespace ElasticLinq.Utility
             var elementType = FindIEnumerable(sequenceType);
             return elementType == null
                 ? sequenceType
-                : elementType.GetGenericArguments()[0];
+                : elementType.GenericTypeArguments[0];
         }
 
         /// <summary>
@@ -83,30 +91,38 @@ namespace ElasticLinq.Utility
             if (sequenceType.IsArray)
                 return typeof(IEnumerable<>).MakeGenericType(sequenceType.GetElementType());
 
+            var sequenceTypeInfo = sequenceType.GetTypeInfo();
+
             while (true)
             {
-                foreach (var argument in sequenceType.GetGenericArguments())
+                foreach (var argument in sequenceType.GenericTypeArguments)
                 {
                     var candidateIEnumerable = typeof(IEnumerable<>).MakeGenericType(argument);
                     if (candidateIEnumerable.IsAssignableFrom(sequenceType))
                         return candidateIEnumerable;
                 }
 
-                foreach (var candidateInterface in sequenceType.GetInterfaces().Select(FindIEnumerable))
+                foreach (var candidateInterface in sequenceTypeInfo.ImplementedInterfaces.Select(FindIEnumerable))
                     if (candidateInterface != null)
                         return candidateInterface;
 
-                if (sequenceType.BaseType == null || sequenceType.BaseType == typeof(object))
+                if (sequenceTypeInfo.BaseType == null || sequenceTypeInfo.BaseType == typeof(object))
                     return null;
 
-                sequenceType = sequenceType.BaseType;
+                sequenceTypeInfo = sequenceTypeInfo.BaseType.GetTypeInfo();
             }
         }
 
+        /// <summary>
+        /// Determine if the type implements the given generic type definition.
+        /// </summary>
+        /// <param name="type">Type being examined.</param>
+        /// <param name="genericType">Generic type being tested for.</param>
+        /// <returns>True if the type implements the generic type; false otherwise.</returns>
         public static bool IsGenericOf(this Type type, Type genericType)
         {
             return type != null && genericType != null
-                && type.IsGenericType && type.GetGenericTypeDefinition() == genericType;
+                && type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == genericType;
         }
 
         /// <summary>
@@ -117,7 +133,7 @@ namespace ElasticLinq.Utility
         /// <returns>True if the type supports nullability; otherwise, false.</returns>
         public static bool IsNullable(this Type type)
         {
-            return !type.IsValueType || type.IsGenericOf(typeof(Nullable<>));
+            return !type.GetTypeInfo().IsValueType || type.IsGenericOf(typeof(Nullable<>));
         }
 
         /// <summary>
@@ -127,7 +143,12 @@ namespace ElasticLinq.Utility
         /// <returns>Default value for this type.</returns>
         public static object CreateDefault(Type type)
         {
-            return type.IsValueType ? Activator.CreateInstance(type) : null;
+            return type.GetTypeInfo().IsValueType ? Activator.CreateInstance(type) : null;
+        }
+
+        public static bool IsAssignableFrom(this Type source, Type target)
+        {
+            return (source.GetTypeInfo().IsAssignableFrom(target.GetTypeInfo()));
         }
     }
 }

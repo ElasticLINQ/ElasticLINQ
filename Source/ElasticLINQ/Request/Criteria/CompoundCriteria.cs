@@ -3,6 +3,7 @@
 using ElasticLinq.Utility;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace ElasticLinq.Request.Criteria
@@ -25,7 +26,7 @@ namespace ElasticLinq.Request.Criteria
 
         public IReadOnlyList<ICriteria> Criteria
         {
-            get { return criteria.AsReadOnly(); }
+            get { return new ReadOnlyCollection<ICriteria>(criteria); }
         }
 
         public override string ToString()

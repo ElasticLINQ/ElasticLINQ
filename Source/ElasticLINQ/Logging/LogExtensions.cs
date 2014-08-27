@@ -3,7 +3,6 @@
 using ElasticLinq.Logging;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 internal static class LogExtensions
 {

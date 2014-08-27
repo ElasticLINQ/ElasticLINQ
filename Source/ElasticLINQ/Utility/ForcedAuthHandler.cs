@@ -30,7 +30,7 @@ namespace ElasticLinq.Utility
             if (!String.IsNullOrEmpty(userName))
             {
                 var credentials = String.Format("{0}:{1}", userName, password);
-                var authToken = Convert.ToBase64String(Encoding.ASCII.GetBytes(credentials));
+                var authToken = Convert.ToBase64String(Encoding.UTF8.GetBytes(credentials));
 
                 request.Headers.Authorization = new AuthenticationHeaderValue("Basic", authToken);
             }

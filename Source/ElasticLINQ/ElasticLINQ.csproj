@@ -57,6 +57,7 @@
     <Compile Include="Logging\ILog.cs" />
     <Compile Include="Logging\LogExtensions.cs" />
     <Compile Include="Logging\NullLog.cs" />
+    <Compile Include="Logging\TraceEventType.cs" />
     <Compile Include="Mapping\CouchbaseElasticMapping.cs" />
     <Compile Include="Mapping\ElasticFieldsMappingWrapper.cs" />
     <Compile Include="Mapping\ElasticMapping.cs" />

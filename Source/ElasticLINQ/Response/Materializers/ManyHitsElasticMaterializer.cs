@@ -14,7 +14,7 @@ namespace ElasticLinq.Response.Materializers
     /// </summary>
     internal class ManyHitsElasticMaterializer : IElasticMaterializer
     {
-        private static readonly MethodInfo manyMethodInfo = typeof(ManyHitsElasticMaterializer).GetMethod("Many", BindingFlags.NonPublic | BindingFlags.Static);
+        private static readonly MethodInfo manyMethodInfo = typeof(ManyHitsElasticMaterializer).GetMethodInfo(f => f.Name == "Many" && f.IsStatic);
 
         private readonly Func<Hit, object> projector;
         private readonly Type elementType;

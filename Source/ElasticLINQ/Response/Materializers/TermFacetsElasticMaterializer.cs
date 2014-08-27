@@ -15,7 +15,7 @@ namespace ElasticLinq.Response.Materializers
     /// </summary>
     internal class TermFacetsElasticMaterializer : IElasticMaterializer
     {
-        private static readonly MethodInfo manyMethodInfo = typeof(TermFacetsElasticMaterializer).GetMethod("Many", BindingFlags.NonPublic | BindingFlags.Static); 
+        private static readonly MethodInfo manyMethodInfo = typeof(TermFacetsElasticMaterializer).GetMethodInfo(f => f.Name == "Many" && f.IsStatic);
         private static readonly string[] termsFacetTypes = { "terms_stats", "terms" };
 
         private readonly Func<AggregateRow, object> projector;

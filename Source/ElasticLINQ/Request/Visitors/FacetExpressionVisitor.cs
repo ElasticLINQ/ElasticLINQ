@@ -34,8 +34,8 @@ namespace ElasticLinq.Request.Visitors
     internal class FacetExpressionVisitor : CriteriaExpressionVisitor
     {
         private const string GroupKeyFacet = "GroupKey";
-        private static readonly MethodInfo getValue = typeof(AggregateRow).GetMethod("GetValue", BindingFlags.Static | BindingFlags.NonPublic);
-        private static readonly MethodInfo getKey = typeof(AggregateRow).GetMethod("GetKey", BindingFlags.Static | BindingFlags.NonPublic);
+        private static readonly MethodInfo getValue = typeof(AggregateRow).GetMethodInfo(m => m.IsStatic && m.Name == "GetValue");
+        private static readonly MethodInfo getKey = typeof(AggregateRow).GetMethodInfo(m => m.Name == "GetKey");
 
         private static readonly Dictionary<string, string> aggregateMemberOperations = new Dictionary<string, string>
         {

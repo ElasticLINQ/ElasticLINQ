@@ -1,5 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using System.Reflection;
 using ElasticLinq.Request;
 using ElasticLinq.Request.Formatters;
 using ElasticLinq.Request.Visitors;

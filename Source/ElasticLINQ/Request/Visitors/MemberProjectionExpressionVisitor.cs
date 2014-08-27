@@ -17,8 +17,8 @@ namespace ElasticLinq.Request.Visitors
     /// </summary>
     internal class MemberProjectionExpressionVisitor : ElasticFieldsExpressionVisitor
     {
-        protected static readonly MethodInfo GetDictionaryValueMethod = typeof(MemberProjectionExpressionVisitor)
-            .GetMethod("GetDictionaryValueOrDefault", BindingFlags.Static | BindingFlags.NonPublic);
+
+        protected static readonly MethodInfo GetDictionaryValueMethod = typeof(MemberProjectionExpressionVisitor).GetMethodInfo(m => m.Name == "GetDictionaryValueOrDefault");
 
         private readonly HashSet<string> fieldNames = new HashSet<string>();
 
@@ -62,12 +62,9 @@ namespace ElasticLinq.Request.Visitors
         internal static object GetDictionaryValueOrDefault(IDictionary<string, JToken> dictionary, string key, Type expectedType)
         {
             JToken token;
-            if (dictionary.TryGetValue(key, out token))
-                return token.ToObject(expectedType);
-
-            return expectedType.IsValueType
-                ? Activator.CreateInstance(expectedType)
-                : null;
+            return dictionary.TryGetValue(key, out token)
+                ? token.ToObject(expectedType)
+                : TypeHelper.CreateDefault(expectedType);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -23,7 +24,7 @@ namespace ElasticLinq.Request.Visitors
 
         public Expression Expression { get { return expression; } }
         public ParameterExpression Parameter { get { return parameter; } }
-        public IReadOnlyList<T> Collected { get { return collected.ToList().AsReadOnly(); } }
+        public IReadOnlyList<T> Collected { get { return new ReadOnlyCollection<T>(collected.ToList()); } }
         public LambdaExpression Projection { get { return projection; } }
     }
 }

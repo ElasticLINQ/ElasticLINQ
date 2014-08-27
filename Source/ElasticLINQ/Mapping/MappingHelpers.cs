@@ -18,8 +18,8 @@ namespace ElasticLinq.Mapping
             Argument.EnsureNotNull("value", value);
 
             return value.Length < 2
-                ? value.ToLower(culture)
-                : char.ToLower(value[0], culture) + value.Substring(1);
+                ? culture.TextInfo.ToLower(value)
+                : culture.TextInfo.ToLower(value[0]) + value.Substring(1);
         }
 
         public static string ToPlural(this string value, CultureInfo culture)
@@ -28,13 +28,16 @@ namespace ElasticLinq.Mapping
 
             return value.Length < 1
                 ? value
-                : value + (value.EndsWith("s", false, culture) ? "" : "s");
+                : value + (value.EndsWith("s", StringComparison.Ordinal) ? "" : "s");
         }
 
         public static PropertyInfo GetSelectionProperty(Type type)
         {
-            var property = type.GetProperties(BindingFlags.Instance | BindingFlags.Public)
-                               .FirstOrDefault(p => p.CanRead && p.CanWrite && p.PropertyType.IsValueType && !p.PropertyType.IsGenericType);
+            var property = type.GetTypeInfo()
+                .DeclaredProperties
+                .FirstOrDefault(p => p.CanRead && p.CanWrite &&
+                    p.PropertyType.GetTypeInfo().IsValueType && !p.PropertyType.GetTypeInfo().IsGenericType &&
+                    p.GetMethod.IsPublic && !p.GetMethod.IsStatic);
 
             if (property == null)
                 throw new InvalidOperationException(String.Format("Could not find public read/write non-generic value type property to use for a default query against {0}.", type.FullName));

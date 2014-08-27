@@ -66,7 +66,10 @@ namespace ElasticLinq.Mapping
             var result = JToken.FromObject(value);
 
             if (lowerCaseAnalyzedFieldValues && result.Type == JTokenType.String && !IsNotAnalyzed(member))
-                result = new JValue(result.Value<string>().ToLower(conversionCulture));
+            {
+                var loweredString = conversionCulture.TextInfo.ToLower(result.Value<string>());
+                result = new JValue(loweredString);
+            }
 
             return result;
         }
@@ -74,7 +77,7 @@ namespace ElasticLinq.Mapping
         private static object ReformatValueIfEnum(MemberInfo member, object value)
         {
             var returnType = TypeHelper.GetReturnType(member);
-            if (!returnType.IsEnum) return value;
+            if (!returnType.GetTypeInfo().IsEnum) return value;
 
             var nameValue = Enum.GetName(returnType, value);
             if (nameValue == null)
