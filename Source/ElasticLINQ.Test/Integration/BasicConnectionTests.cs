@@ -35,6 +35,7 @@ namespace ElasticLinq.Test.Integration
                 var context = MakeElasticContext(httpStub.Uri);
 
                 var dummy = context.Query<Robot>().FirstOrDefault();
+                Assert.Null(dummy);
 
                 await httpStub.Completion;
                 var request = httpStub.Requests.Single();
@@ -51,6 +52,7 @@ namespace ElasticLinq.Test.Integration
                 var context = MakeElasticContext(httpStub.Uri);
 
                 var dummy = context.Query<Robot>().FirstOrDefault();
+                Assert.Null(dummy);
 
                 await httpStub.Completion;
                 var request = httpStub.Requests.Single();
