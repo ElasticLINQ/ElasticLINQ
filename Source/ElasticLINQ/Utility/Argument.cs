@@ -1,8 +1,8 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using System;
+using System.Collections;
 using System.Diagnostics;
-using System.Reflection;
 
 namespace ElasticLinq.Utility
 {
@@ -71,13 +71,13 @@ namespace ElasticLinq.Utility
         }
 
         /// <summary>
-        /// Throw an ArgumentOutOfRangeException if the array is empty.
+        /// Throw an ArgumentOutOfRangeException if the collection is empty.
         /// </summary>
         /// <param name="argumentName">Name of the argument.</param>
         /// <param name="values">Array to be checked.</param>
-        public static void EnsureNotEmpty(string argumentName, object[] values)
+        public static void EnsureNotEmpty(string argumentName, ICollection values)
         {
-            if (values == null || values.Length < 1)
+            if (values == null || values.Count < 1)
                 throw new ArgumentOutOfRangeException(argumentName, "Must contain one or more values.");
         }
     }

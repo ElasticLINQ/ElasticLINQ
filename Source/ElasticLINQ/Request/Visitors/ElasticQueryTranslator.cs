@@ -3,7 +3,6 @@
 using ElasticLinq.Mapping;
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Expressions;
-using ElasticLinq.Request.Facets;
 using ElasticLinq.Response.Materializers;
 using ElasticLinq.Response.Model;
 using ElasticLinq.Utility;

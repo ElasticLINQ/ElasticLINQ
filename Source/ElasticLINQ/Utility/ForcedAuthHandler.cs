@@ -18,6 +18,12 @@ namespace ElasticLinq.Utility
         private readonly string userName;
         private readonly string password;
 
+        /// <summary>
+        /// Creates a new ForcedAuthHandler fora  given username and password.
+        /// </summary>
+        /// <param name="userName">User name to use for authorization.</param>
+        /// <param name="password">Password to use for authorization.</param>
+        /// <param name="innerHandler">HttpMessageHandler to further control HTTP message processing.</param>
         public ForcedAuthHandler(string userName, string password, HttpMessageHandler innerHandler = null)
             : base(innerHandler ?? new HttpClientHandler())
         {
@@ -25,6 +31,7 @@ namespace ElasticLinq.Utility
             this.password = password;
         }
 
+        /// <inheritdoc/>
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             if (!String.IsNullOrEmpty(userName))

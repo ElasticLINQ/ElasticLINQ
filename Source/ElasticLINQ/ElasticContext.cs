@@ -30,12 +30,24 @@ namespace ElasticLinq
             RetryPolicy = retryPolicy ?? new RetryPolicy(Log);
         }
 
+        /// <summary>
+        /// Specifies the connection to the Elasticsearch server.
+        /// </summary>
         public ElasticConnection Connection { get; private set; }
 
+        /// <summary>
+        /// The logging mechanism for diagnostics information.
+        /// </summary>
         public ILog Log { get; private set; }
 
+        /// <summary>
+        /// The mapping to describe how objects and their properties are mapped to Elasticsearch.
+        /// </summary>
         public IElasticMapping Mapping { get; private set; }
 
+        /// <summary>
+        /// The retry policy for handling networking issues.
+        /// </summary>
         public IRetryPolicy RetryPolicy { get; private set; }
 
         /// <inheritdoc/>

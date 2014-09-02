@@ -7,6 +7,10 @@ using System.Linq.Expressions;
 
 namespace ElasticLinq.Request.Visitors
 {
+    /// <summary>
+    /// A pair containing one MemberExpression and one ConstantExpression that might be used
+    /// in a test or assignment.
+    /// </summary>
     [DebuggerDisplay("{MemberExpression,nq}, {ConstantExpression.Value}")]
     internal class ConstantMemberPair
     {
