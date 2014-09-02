@@ -21,6 +21,8 @@ namespace ElasticLinq
         private readonly TimeSpan timeout = defaultTimeout;
         private readonly HttpClient httpClient;
 
+        private bool disposed;
+
         /// <summary>
         /// Create a new ElasticConnection with the given parameters defining its properties.
         /// </summary>
@@ -32,6 +34,16 @@ namespace ElasticLinq
         public ElasticConnection(Uri endpoint, string userName = null, string password = null, TimeSpan? timeout = null, string index = null)
             : this(new HttpClientHandler(), endpoint, userName, password, index, timeout) { }
 
+
+        /// <summary>
+        /// Create a new ElasticConnection with the given parameters for internal testing.
+        /// </summary>
+        /// <param name="innerMessageHandler">The HttpMessageHandler used to intercept network requests for testing.</param>
+        /// <param name="endpoint">The URL endpoint of the Elasticsearch server.</param>
+        /// <param name="userName">UserName to use to connect to the server (optional).</param>
+        /// <param name="password">Password to use to connect to the server (optional).</param>
+        /// <param name="timeout">TimeSpan to wait for network responses before failing (optional, defaults to 10 seconds).</param>
+        /// <param name="index">Name of the index to use on the server (optional).</param>
         internal ElasticConnection(HttpMessageHandler innerMessageHandler, Uri endpoint, string userName = null, string password = null, string index = null, TimeSpan? timeout = null)
         {
             Argument.EnsureNotNull("endpoint", endpoint);
@@ -51,29 +63,66 @@ namespace ElasticLinq
             httpClient = new HttpClient(new ForcedAuthHandler(userName, password, innerMessageHandler), true);
         }
 
+        /// <summary>
+        /// The HttpClient used for issuing HTTP network requests.
+        /// </summary>
         internal HttpClient HttpClient
         {
             get { return httpClient; }
         }
 
+        /// <summary>
+        /// The Uri that specifies the public endpoint for the server.
+        /// </summary>
+        /// <example>http://myserver.example.com:9200</example>
         public Uri Endpoint
         {
             get { return endpoint; }
         }
 
+        /// <summary>
+        /// The name of the index on the Elasticsearch server.
+        /// </summary>
+        /// <example>northwind</example>
         public string Index
         {
             get { return index; }
         }
 
+        /// <summary>
+        /// How long to wait for a response to a network request before
+        /// giving up.
+        /// </summary>
         public TimeSpan Timeout
         {
             get { return timeout; }
         }
 
+        /// <summary>
+        /// Dispose of this ElasticConnection and any associated resources.
+        /// </summary>
         public void Dispose()
         {
-            httpClient.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <inheritdoc/>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposed)
+                return;
+
+            if (disposing)
+                httpClient.Dispose();
+
+            disposed = true;
+        }
+
+        /// <inheritdoc/>
+        ~ElasticConnection()
+        {
+            Dispose(true);
         }
     }
 }
