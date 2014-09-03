@@ -26,20 +26,21 @@ namespace ElasticLinq.Response.Materializers
 
         public object Materialize(ElasticResponse response)
         {
-            var enumerator = response.hits.hits.GetEnumerator();
+            using (var enumerator = response.hits.hits.GetEnumerator())
+            {
+                if (!enumerator.MoveNext())
+                    if (defaultIfNone)
+                        return TypeHelper.CreateDefault(elementType);
+                    else
+                        throw new InvalidOperationException("Sequence contains no elements");
 
-            if (!enumerator.MoveNext())
-                if (defaultIfNone)
-                    return TypeHelper.CreateDefault(elementType);
-                else
-                    throw new InvalidOperationException("Sequence contains no elements");
+                var current = enumerator.Current;
 
-            var current = enumerator.Current;
+                if (throwIfMoreThanOne && enumerator.MoveNext())
+                    throw new InvalidOperationException("Sequence contains more than one element");
 
-            if (throwIfMoreThanOne && enumerator.MoveNext())
-                throw new InvalidOperationException("Sequence contains more than one element");
-
-            return projector(current);
+                return projector(current);
+            }
         }
     }
 }
