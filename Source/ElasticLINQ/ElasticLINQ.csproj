@@ -92,12 +92,13 @@
     <Compile Include="Request\Visitors\CriteriaExpressionVisitor.cs" />
     <Compile Include="Response\Materializers\Aggregates.cs" />
     <Compile Include="Response\Materializers\CountElasticMaterializer.cs" />
-    <Compile Include="Response\Materializers\TermFacetsElasticMaterializer.cs" />
-    <Compile Include="Response\Materializers\TermlessFacetsElasticMaterializer.cs" />
+    <Compile Include="Response\Materializers\ListTermFacetsElasticMaterializer.cs" />
+    <Compile Include="Response\Materializers\TermlessFacetElasticMaterializer.cs" />
+    <Compile Include="Response\Materializers\ListTermlessFacetsElasticMaterializer.cs" />
     <Compile Include="Request\Criteria\TermsCriteria.cs" />
     <Compile Include="Request\Criteria\TermsExecutionMode.cs" />
     <Compile Include="Response\Materializers\OneHitElasticMaterializer.cs" />
-    <Compile Include="Response\Materializers\ManyHitsElasticMaterializer.cs" />
+    <Compile Include="Response\Materializers\ListHitsElasticMaterializer.cs" />
     <Compile Include="Request\SortOption.cs" />
     <Compile Include="Request\Visitors\BranchSelectExpressionVisitor.cs" />
     <Compile Include="Request\Visitors\ConstantMemberPair.cs" />

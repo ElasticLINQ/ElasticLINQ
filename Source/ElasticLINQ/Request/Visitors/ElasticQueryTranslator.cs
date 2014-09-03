@@ -58,7 +58,7 @@ namespace ElasticLinq.Request.Visitors
                 searchRequest.Filter = Mapping.GetTypeExistsCriteria(sourceType);
 
             if (materializer == null)
-                materializer = new ManyHitsElasticMaterializer(itemProjector ?? DefaultItemProjector, finalItemType ?? sourceType);
+                materializer = new ListHitsElasticMaterializer(itemProjector ?? DefaultItemProjector, finalItemType ?? sourceType);
         }
 
         private void CompleteFacetTranslation(FacetRebindCollectionResult aggregated)
@@ -69,10 +69,7 @@ namespace ElasticLinq.Request.Visitors
             searchRequest.Facets = aggregated.Collected.ToList();
             searchRequest.SearchType = "count"; // We only want facets, not hits
 
-            if (aggregated.GroupBy is ConstantExpression)
-                materializer = new TermlessFacetsElasticMaterializer(r => aggregated.Projection.Compile().DynamicInvoke(r), aggregated.Projection.ReturnType, ((ConstantExpression)aggregated.GroupBy).Value);
-            else
-                materializer = new TermFacetsElasticMaterializer(r => aggregated.Projection.Compile().DynamicInvoke(r), aggregated.Projection.ReturnType, aggregated.GroupBy.Type);
+            materializer = aggregated.Materializer;
         }
 
         protected override Expression VisitMethodCall(MethodCallExpression m)

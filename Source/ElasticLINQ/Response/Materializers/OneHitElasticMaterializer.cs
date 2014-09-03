@@ -7,7 +7,7 @@ using System;
 namespace ElasticLinq.Response.Materializers
 {
     /// <summary>
-    /// Materializes one JSON hit into a CLR object throwing necessary exceptions as required to ensure First/Single semantics.
+    /// Materializes one hit into a CLR object throwing necessary exceptions as required to ensure First/Single semantics.
     /// </summary>
     internal class OneHitElasticMaterializer : IElasticMaterializer
     {
@@ -16,6 +16,13 @@ namespace ElasticLinq.Response.Materializers
         private readonly bool throwIfMoreThanOne;
         private readonly bool defaultIfNone;
 
+        /// <summary>
+        /// Create an instance of the OneHitElasticMaterializer with the given parameters.
+        /// </summary>
+        /// <param name="projector">A function to turn a hit into a desired CLR object.</param>
+        /// <param name="elementType">The type of CLR object being materialized.</param>
+        /// <param name="throwIfMoreThanOne">Whether to throw an InvalidOperationException if there are multiple hits.</param>
+        /// <param name="defaultIfNone">Whether to throw an InvalidOperationException if there are no hits.</param>
         public OneHitElasticMaterializer(Func<Hit, object> projector, Type elementType, bool throwIfMoreThanOne, bool defaultIfNone)
         {
             this.projector = projector;
@@ -26,6 +33,8 @@ namespace ElasticLinq.Response.Materializers
 
         public object Materialize(ElasticResponse response)
         {
+            Argument.EnsureNotNull("response", response);
+
             using (var enumerator = response.hits.hits.GetEnumerator())
             {
                 if (!enumerator.MoveNext())

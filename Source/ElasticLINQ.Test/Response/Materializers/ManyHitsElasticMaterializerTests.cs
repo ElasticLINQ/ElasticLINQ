@@ -14,7 +14,7 @@ namespace ElasticLinq.Test.Response.Materializers
         public void ManyOfTMaterializesObjects()
         {
             var hits = MaterializerTestHelper.CreateSampleHits(3);
-            var materialized = ManyHitsElasticMaterializer.Many<SampleClass>(hits, MaterializerTestHelper.ItemCreator);
+            var materialized = ListHitsElasticMaterializer.Many<SampleClass>(hits, MaterializerTestHelper.ItemCreator);
 
             Assert.Equal(hits.Count, materialized.Count);
             var index = 0;
@@ -28,7 +28,7 @@ namespace ElasticLinq.Test.Response.Materializers
             var response = MaterializerTestHelper.CreateSampleResponse(10);
             var expected = response.hits.hits;
 
-            var materializer = new ManyHitsElasticMaterializer(MaterializerTestHelper.ItemCreator, typeof(SampleClass));
+            var materializer = new ListHitsElasticMaterializer(MaterializerTestHelper.ItemCreator, typeof(SampleClass));
             var actual = materializer.Materialize(response);
 
             var actualList = Assert.IsType<List<SampleClass>>(actual);
@@ -42,7 +42,7 @@ namespace ElasticLinq.Test.Response.Materializers
         [Fact]
         public void MaterializeThrowsArgumentNullExceptionWhenElasticResponseIsNull()
         {
-            var materializer = new ManyHitsElasticMaterializer(MaterializerTestHelper.ItemCreator, typeof(SampleClass));
+            var materializer = new ListHitsElasticMaterializer(MaterializerTestHelper.ItemCreator, typeof(SampleClass));
 
             Assert.Throws<ArgumentNullException>(() => materializer.Materialize(null));
         }
@@ -50,7 +50,7 @@ namespace ElasticLinq.Test.Response.Materializers
         [Fact]
         public void MaterializeReturnsEmptyListWhenHitsIsNull()
         {
-            var materializer = new ManyHitsElasticMaterializer(MaterializerTestHelper.ItemCreator, typeof(SampleClass));
+            var materializer = new ListHitsElasticMaterializer(MaterializerTestHelper.ItemCreator, typeof(SampleClass));
             var response = new ElasticResponse { hits = null };
 
             var materialized = materializer.Materialize(response);
@@ -62,7 +62,7 @@ namespace ElasticLinq.Test.Response.Materializers
         [Fact]
         public void MaterializeReturnsEmptyListWhenHitsHitsAreNull()
         {
-            var materializer = new ManyHitsElasticMaterializer(MaterializerTestHelper.ItemCreator, typeof(SampleClass));
+            var materializer = new ListHitsElasticMaterializer(MaterializerTestHelper.ItemCreator, typeof(SampleClass));
             var response = new ElasticResponse { hits = new Hits { hits = null } };
 
             var materialized = materializer.Materialize(response);
@@ -74,7 +74,7 @@ namespace ElasticLinq.Test.Response.Materializers
         [Fact]
         public void MaterializeReturnsEmptyListWhenHitsHitsAreEmpty()
         {
-            var materializer = new ManyHitsElasticMaterializer(MaterializerTestHelper.ItemCreator, typeof(SampleClass));
+            var materializer = new ListHitsElasticMaterializer(MaterializerTestHelper.ItemCreator, typeof(SampleClass));
             var response = new ElasticResponse { hits = null };
 
             var materialized = materializer.Materialize(response);
