@@ -1,5 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using System;
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Facets;
 using ElasticLinq.Request.Visitors;
@@ -18,7 +19,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
             var translation = ElasticQueryTranslator.Translate(Mapping, "p", query.Expression);
 
-            Assert.Equal(typeof(decimal), Assert.IsType<TermlessFacetsElasticMaterializer>(translation.Materializer).ElementType);
+            Assert.Equal(typeof(decimal), Assert.IsType<ListTermlessFacetsElasticMaterializer>(translation.Materializer).ElementType);
             Assert.Equal("count", translation.SearchRequest.SearchType);
             Assert.Equal(1, translation.SearchRequest.Facets.Count);
 
@@ -35,7 +36,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
             var translation = ElasticQueryTranslator.Translate(Mapping, "", query.Expression);
 
-            Assert.Equal(typeof(int), Assert.IsType<TermlessFacetsElasticMaterializer>(translation.Materializer).ElementType);
+            Assert.Equal(typeof(int), Assert.IsType<ListTermlessFacetsElasticMaterializer>(translation.Materializer).ElementType);
             Assert.Equal("count", translation.SearchRequest.SearchType);
             Assert.Equal(1, translation.SearchRequest.Facets.Count);
 
@@ -50,7 +51,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
             var translation = ElasticQueryTranslator.Translate(Mapping, "e", query.Expression);
 
-            Assert.Equal(typeof(int), Assert.IsType<TermlessFacetsElasticMaterializer>(translation.Materializer).ElementType);
+            Assert.Equal(typeof(int), Assert.IsType<ListTermlessFacetsElasticMaterializer>(translation.Materializer).ElementType);
             Assert.Equal("count", translation.SearchRequest.SearchType);
             Assert.Equal(1, translation.SearchRequest.Facets.Count);
 
@@ -69,7 +70,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
             var translation = ElasticQueryTranslator.Translate(Mapping, "", query.Expression);
 
-            Assert.Equal(typeof(long), Assert.IsType<TermlessFacetsElasticMaterializer>(translation.Materializer).ElementType);
+            Assert.Equal(typeof(long), Assert.IsType<ListTermlessFacetsElasticMaterializer>(translation.Materializer).ElementType);
             Assert.Equal("count", translation.SearchRequest.SearchType);
             Assert.Equal(1, translation.SearchRequest.Facets.Count);
 
@@ -84,7 +85,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
             var translation = ElasticQueryTranslator.Translate(Mapping, "", grouped.Expression);
 
-            Assert.Equal(typeof(long), Assert.IsType<TermlessFacetsElasticMaterializer>(translation.Materializer).ElementType);
+            Assert.Equal(typeof(long), Assert.IsType<ListTermlessFacetsElasticMaterializer>(translation.Materializer).ElementType);
             Assert.Equal("count", translation.SearchRequest.SearchType);
             Assert.Equal(1, translation.SearchRequest.Facets.Count);
 
@@ -114,7 +115,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
             var translation = ElasticQueryTranslator.Translate(Mapping, "", query.Expression);
 
-            Assert.Contains("AnonymousType", Assert.IsType<TermlessFacetsElasticMaterializer>(translation.Materializer).ElementType.FullName);
+            Assert.Contains("AnonymousType", Assert.IsType<ListTermlessFacetsElasticMaterializer>(translation.Materializer).ElementType.FullName);
             Assert.Equal("count", translation.SearchRequest.SearchType);
             Assert.Equal(expectedFields.Length, translation.SearchRequest.Facets.Count);
             foreach (var expectedField in expectedFields)
@@ -137,7 +138,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
             var translation = ElasticQueryTranslator.Translate(Mapping, "", query.Expression);
 
-            Assert.Contains("AnonymousType", Assert.IsType<TermlessFacetsElasticMaterializer>(translation.Materializer).ElementType.FullName);
+            Assert.Contains("AnonymousType", Assert.IsType<ListTermlessFacetsElasticMaterializer>(translation.Materializer).ElementType.FullName);
             Assert.Equal(1, translation.SearchRequest.Facets.Count);
             var facet = Assert.IsType<StatisticalFacet>(translation.SearchRequest.Facets[0]);
             Assert.Null(facet.Filter);
@@ -157,7 +158,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
             var translation = ElasticQueryTranslator.Translate(Mapping, "", query.Expression);
 
-            Assert.Contains("AnonymousType", Assert.IsType<TermlessFacetsElasticMaterializer>(translation.Materializer).ElementType.FullName);
+            Assert.Contains("AnonymousType", Assert.IsType<ListTermlessFacetsElasticMaterializer>(translation.Materializer).ElementType.FullName);
             Assert.Equal("count", translation.SearchRequest.SearchType);
             Assert.Equal(2, translation.SearchRequest.Facets.Count);
 

@@ -10,26 +10,31 @@ using System.Reflection;
 namespace ElasticLinq.Response.Materializers
 {
     /// <summary>
-    /// Materializes multiple JSON hits into CLR objects.
+    /// Materializes multiple hits into a list of CLR objects.
     /// </summary>
-    internal class ManyHitsElasticMaterializer : IElasticMaterializer
+    internal class ListHitsElasticMaterializer : IElasticMaterializer
     {
-        private static readonly MethodInfo manyMethodInfo = typeof(ManyHitsElasticMaterializer).GetMethodInfo(f => f.Name == "Many" && f.IsStatic);
+        private static readonly MethodInfo manyMethodInfo = typeof(ListHitsElasticMaterializer).GetMethodInfo(f => f.Name == "Many" && f.IsStatic);
 
         private readonly Func<Hit, object> projector;
         private readonly Type elementType;
 
-        public ManyHitsElasticMaterializer(Func<Hit, object> projector, Type elementType)
+        /// <summary>
+        /// Create an instance of the ListHitsElasticMaterializer with the given parameters.
+        /// </summary>
+        /// <param name="projector">A function to turn a hit into a desired CLR object.</param>
+        /// <param name="elementType">The type of CLR object being materialized.</param>
+        public ListHitsElasticMaterializer(Func<Hit, object> projector, Type elementType)
         {
             this.projector = projector;
             this.elementType = elementType;
         }
 
-        public object Materialize(ElasticResponse elasticResponse)
+        public object Materialize(ElasticResponse response)
         {
-            Argument.EnsureNotNull("elasticResponse", elasticResponse);
+            Argument.EnsureNotNull("response", response);
 
-            var hits = elasticResponse.hits;
+            var hits = response.hits;
             if (hits == null || hits.hits == null || !hits.hits.Any())
                 return Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType));
 

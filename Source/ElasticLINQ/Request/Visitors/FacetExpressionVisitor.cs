@@ -16,16 +16,16 @@ namespace ElasticLinq.Request.Visitors
 {
     internal class FacetRebindCollectionResult : RebindCollectionResult<IFacet>
     {
-        private readonly Expression groupBy;
+        private readonly IElasticMaterializer materializer;
 
         public FacetRebindCollectionResult(Expression expression, HashSet<IFacet> collected, ParameterExpression parameter,
-            LambdaExpression projection, Expression groupBy)
+            LambdaExpression projection, IElasticMaterializer materializer)
             : base(expression, collected, parameter, projection)
         {
-            this.groupBy = groupBy;
+            this.materializer = materializer;
         }
 
-        public Expression GroupBy { get { return groupBy; } }
+        public IElasticMaterializer Materializer { get { return materializer; } }
     }
 
     /// <summary>
@@ -72,49 +72,68 @@ namespace ElasticLinq.Request.Visitors
 
             var visitor = new FacetExpressionVisitor(mapping, prefix);
             var visitedExpression = visitor.Visit(expression);
-            var facets = new HashSet<IFacet>(visitor.GetFacets());
+            var facets = new HashSet<IFacet>(visitor.GetFacets());            
+            var materializer = GetFacetMaterializer(visitor.selectProjection, visitor.groupBy);
 
-            return new FacetRebindCollectionResult(visitedExpression, facets, visitor.bindingParameter, visitor.selectProjection, visitor.groupBy);
+            return new FacetRebindCollectionResult(visitedExpression, facets, visitor.bindingParameter, visitor.selectProjection, materializer);
+        }
+
+        private static IElasticMaterializer GetFacetMaterializer(LambdaExpression projection, Expression groupBy)
+        {
+            if (projection == null)
+                return null;
+
+            Func<AggregateRow, object> projector = r => projection.Compile().DynamicInvoke(r);
+
+            // Top level sum/count etc. Single result.
+            if (groupBy == null)
+                return new TermlessFacetElasticMaterializer(projector, projection.ReturnType);
+
+            // GroupBy on a constant. Single result in a list.
+            if (groupBy is ConstantExpression)
+                return new ListTermlessFacetsElasticMaterializer(projector, projection.ReturnType, ((ConstantExpression)groupBy).Value);
+
+            // GroupBy on a member. Multiple results in a list.
+            return new ListTermFacetsElasticMaterializer(projector, projection.ReturnType, groupBy.Type);
         }
 
         private IEnumerable<IFacet> GetFacets()
         {
-            if (groupBy == null)
-                yield break;
+            if (groupBy == null || groupBy.NodeType == ExpressionType.Constant)
+                return GetTermlessFacets();
 
-            switch (groupBy.NodeType)
+            if (groupBy.NodeType == ExpressionType.MemberAccess)
+                return GetTermFacets();
+
+            throw new NotSupportedException(String.Format("GroupBy must be either a Member or a Constant not {0}", groupBy.NodeType));
+        }
+
+        private IEnumerable<IFacet> GetTermlessFacets()
+        {
+            if (groupBy != null) // Top level counts and count predicates will be left to main translator
             {
-                case ExpressionType.MemberAccess:
-                    {
-                        var groupByField = Mapping.GetFieldName(Prefix, (MemberExpression)groupBy);
-                        if (aggregateWithoutMember)
-                            yield return new TermsFacet(GroupKeyFacet, null, size, groupByField);
+                if (aggregateWithoutMember)
+                    yield return new FilterFacet(GroupKeyFacet, new MatchAllCriteria());
 
-                        foreach (var valueField in aggregateMembers.Select(member => Mapping.GetFieldName(Prefix, member)).Distinct())
-                            yield return new TermsStatsFacet(valueField, groupByField, valueField, size);
-
-                        foreach (var criteria in aggregateCriteria)
-                            yield return new TermsFacet(criteria.Key, criteria.Value, size, groupByField);
-
-                        break;
-                    }
-                case ExpressionType.Constant:
-                    {
-                        if (aggregateWithoutMember)
-                            yield return new FilterFacet(GroupKeyFacet, new MatchAllCriteria());
-
-                        foreach (var valueField in aggregateMembers.Select(member => Mapping.GetFieldName(Prefix, member)).Distinct())
-                            yield return new StatisticalFacet(valueField, valueField);
-
-                        foreach (var criteria in aggregateCriteria)
-                            yield return new FilterFacet(criteria.Key, criteria.Value);
-
-                        break;
-                    }
-
-                default:
-                    throw new NotSupportedException(String.Format("GroupBy must be either a Member or a Constant not {0}", groupBy.NodeType));
+                foreach (var criteria in aggregateCriteria)
+                    yield return new FilterFacet(criteria.Key, criteria.Value);
             }
+
+            foreach (var valueField in aggregateMembers.Select(member => Mapping.GetFieldName(Prefix, member)).Distinct())
+                yield return new StatisticalFacet(valueField, valueField);
+        }
+
+        private IEnumerable<IFacet> GetTermFacets()
+        {
+            var groupByField = Mapping.GetFieldName(Prefix, (MemberExpression)groupBy);
+            if (aggregateWithoutMember)
+                yield return new TermsFacet(GroupKeyFacet, null, size, groupByField);
+
+            foreach (var valueField in aggregateMembers.Select(member => Mapping.GetFieldName(Prefix, member)).Distinct())
+                yield return new TermsStatsFacet(valueField, groupByField, valueField, size);
+
+            foreach (var criteria in aggregateCriteria)
+                yield return new TermsFacet(criteria.Key, criteria.Value, size, groupByField);
         }
 
         protected override Expression VisitMember(MemberExpression m)
@@ -145,23 +164,44 @@ namespace ElasticLinq.Request.Visitors
                 }
 
                 if (m.Method.Name == "Take" && m.Arguments.Count == 2)
-                    return VisitTake(m.Arguments[0], m.Arguments[1]);
+                    return VisitTake(source, m.Arguments[1]);
 
-                string operation;
-                if (aggregateOperations.TryGetValue(m.Method.Name, out operation))
-                    switch (m.Arguments.Count)
-                    {
-                        case 1:
-                            return VisitAggregateGroupKeyOperation(operation, m.Method.ReturnType);
-                        case 2:
-                            return VisitAggregateGroupPredicateOperation(m.Arguments[1], operation, m.Method.ReturnType);
-                    }
+                var reboundExpression = RebindAggregateOperation(m);
 
-                if (aggregateMemberOperations.TryGetValue(m.Method.Name, out operation) && m.Arguments.Count == 2)
-                    return VisitAggregateMemberOperation(m.Arguments[1], operation, m.Method.ReturnType);
+                // Rebinding the root, need to fake the source
+                if (source is ConstantExpression && reboundExpression != null)
+                {
+                    selectProjection = Expression.Lambda(reboundExpression, bindingParameter);
+                    return Visit(source);
+                }
+
+                // Rebinding an individual element within a Select
+                if (source is ParameterExpression)
+                {
+                    if (reboundExpression != null)
+                        return reboundExpression;
+                }
             }
 
             return m; // Do not base.VisitMethodCall as we don't want to examine the whole tree
+        }
+
+        private Expression RebindAggregateOperation(MethodCallExpression m)
+        {
+            string operation;
+            if (aggregateOperations.TryGetValue(m.Method.Name, out operation))
+                switch (m.Arguments.Count)
+                {
+                    case 1:
+                        return VisitAggregateGroupKeyOperation(operation, m.Method.ReturnType);
+                    case 2:
+                        return VisitAggregateGroupPredicateOperation(m.Arguments[1], operation, m.Method.ReturnType);
+                }
+
+            if (aggregateMemberOperations.TryGetValue(m.Method.Name, out operation) && m.Arguments.Count == 2)
+                return VisitAggregateMemberOperation(m.Arguments[1], operation, m.Method.ReturnType);
+
+            return null;
         }
 
         private Expression VisitTake(Expression source, Expression takeExpression)
@@ -191,7 +231,7 @@ namespace ElasticLinq.Request.Visitors
 
         private Expression VisitGroupKeyAccess(Type returnType)
         {
-            var getKeyExpression = Expression.Call(null, getKey, bindingParameter);
+            var getKeyExpression = Expression.Call(null, getKey, new Expression[] { bindingParameter });
             return Expression.Convert(getKeyExpression, returnType);
         }
 

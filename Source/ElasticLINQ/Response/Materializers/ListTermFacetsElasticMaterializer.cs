@@ -11,35 +11,41 @@ using System.Reflection;
 namespace ElasticLinq.Response.Materializers
 {
     /// <summary>
-    /// Materializes facets with terms from the ElasticResponse.
+    /// Materializes facets with their terms from the ElasticResponse.
     /// </summary>
-    internal class TermFacetsElasticMaterializer : IElasticMaterializer
+    internal class ListTermFacetsElasticMaterializer : IElasticMaterializer
     {
-        private static readonly MethodInfo manyMethodInfo = typeof(TermFacetsElasticMaterializer).GetMethodInfo(f => f.Name == "Many" && f.IsStatic);
+        private static readonly MethodInfo manyMethodInfo = typeof(ListTermFacetsElasticMaterializer).GetMethodInfo(f => f.Name == "Many" && f.IsStatic);
         private static readonly string[] termsFacetTypes = { "terms_stats", "terms" };
 
         private readonly Func<AggregateRow, object> projector;
         private readonly Type elementType;
         private readonly Type groupKeyType;
 
-        public TermFacetsElasticMaterializer(Func<AggregateRow, object> projector, Type elementType, Type groupKeyType)
+        /// <summary>
+        /// Create an instance of the ListTermFacetsElasticMaterializer with the given parameters.
+        /// </summary>
+        /// <param name="projector">A function to turn a hit into a desired CLR object.</param>
+        /// <param name="elementType">The type of CLR object being materialized.</param>
+        /// <param name="groupKeyType">The type of the term/group key field.</param>
+        public ListTermFacetsElasticMaterializer(Func<AggregateRow, object> projector, Type elementType, Type groupKeyType)
         {
             this.projector = projector;
             this.elementType = elementType;
             this.groupKeyType = groupKeyType;
         }
 
-        public object Materialize(ElasticResponse elasticResponse)
+        public object Materialize(ElasticResponse response)
         {
-            Argument.EnsureNotNull("elasticResponse", elasticResponse);
+            Argument.EnsureNotNull("response", response);
 
-            var facets = elasticResponse.facets;
+            var facets = response.facets;
             if (facets == null || facets.Count == 0)
                 return Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType));
 
             return manyMethodInfo
                 .MakeGenericMethod(elementType)
-                .Invoke(null, new object[] { elasticResponse.facets, projector, groupKeyType });
+                .Invoke(null, new object[] { response.facets, projector, groupKeyType });
         }
 
         internal static List<T> Many<T>(JObject facets, Func<AggregateRow, object> projector, Type groupType)
