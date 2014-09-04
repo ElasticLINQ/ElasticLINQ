@@ -17,7 +17,6 @@ namespace ElasticLinq.Request.Visitors
     /// </summary>
     internal class MemberProjectionExpressionVisitor : ElasticFieldsExpressionVisitor
     {
-
         protected static readonly MethodInfo GetDictionaryValueMethod = typeof(MemberProjectionExpressionVisitor).GetMethodInfo(m => m.Name == "GetDictionaryValueOrDefault");
 
         private readonly HashSet<string> fieldNames = new HashSet<string>();
@@ -62,9 +61,15 @@ namespace ElasticLinq.Request.Visitors
         internal static object GetDictionaryValueOrDefault(IDictionary<string, JToken> dictionary, string key, Type expectedType)
         {
             JToken token;
-            return dictionary.TryGetValue(key, out token)
-                ? token.ToObject(expectedType)
-                : TypeHelper.CreateDefault(expectedType);
+            if (!dictionary.TryGetValue(key, out token))
+                return TypeHelper.CreateDefault(expectedType);
+
+            // Elasticsearch 1.0 now puts fields in an array, unwrap it
+            var jArray = token as JArray;
+            if (jArray != null && jArray.Count == 1)
+                token = jArray[0];
+
+            return token.ToObject(expectedType);
         }
     }
 }
