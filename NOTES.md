@@ -26,6 +26,9 @@ A number of the basic operations are supported including:
 * ``ThenBy``, ``ThenByDescending`` maps to sort desc (see below)
 * ``First``, ``FirstOrDefault`` maps to length 1, filter if predicate supplied
 * ``Single``, ``SingleOrDefault`` maps to length 2, filter if predicate supplied
+* ``Sum``, ``Average``, ``Min``, ``Max`` map to facets
+* ``GroupBy`` causes facets to switch between termless and termed facets
+* ``Count`` maps to count query if top level, facet if within a GroupBy
 
 #### Select
 Select is supported and detects whole entity vs field selection with field, anonymous object and Tuple creation patterns:
@@ -69,6 +72,18 @@ Ordering is achieved by the usual LINQ methods however if you wish to sort by sc
 2. IQueryable methods with score in the name ``OrderByScore()``
 
 The latter is more easily discovered but the former should be kept around as it is the same pattern used in Select projections. Recommend the former for the less common orderings and latter for common.
+
+#### GroupBy/aggregate operations
+There are three different ways you can perform aggregate operations like Sum, Count, Min, Max and Average:
+
+If you want aggregates broken down by a field:
+	db.Query<Robot>().GroupBy(r => r.Zone).Select(g => new { Zone = g.Key, Count = g.Count() });
+
+If you want one aggregate for the entire set:
+	db.Query<Robot>().Count();
+
+We also support a less well-known operation that lets you retrieve multiple aggregates for the set in a single hit using GroupBy and a constant value:
+	db.Query<Robot>().GroupBy(r => 1).Select(g => new { Count = g.Count(), Sum = g.Sum(r => r.Cost) });
 
 ### New operations
 Where Elasticsearch exceeds the basic LINQ patterns some additional extensions are provided to expose that functionality.
@@ -121,11 +136,9 @@ This includes currently:
 
 ### Not yet supported
 1. Primary key look-up to other DB (e.g. Couchbase)
-2. Count operations
-3. Facets
-4. Async<T>
-5. Caching
-6. Any other desired Elasticsearch operations
+2. Async<T>
+3. Caching
+4. Any other desired Elasticsearch operations
 
 ### Not supported; not recommended
 
