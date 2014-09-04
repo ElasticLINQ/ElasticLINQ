@@ -66,11 +66,11 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         [Fact]
         public void SelectLongCountCreatesFilterFacetWithMatchAll()
         {
-            var query = Robots.GroupBy(r => 1).Select(g => Tuple.Create(g.LongCount(), g.Sum(p => p.Cost)));
+            var query = Robots.GroupBy(r => 1).Select(g => g.LongCount());
 
             var translation = ElasticQueryTranslator.Translate(Mapping, "", query.Expression);
 
-            Assert.Equal(typeof(Tuple<long, decimal>), Assert.IsType<ListTermlessFacetsElasticMaterializer>(translation.Materializer).ElementType);
+            Assert.Equal(typeof(long), Assert.IsType<ListTermlessFacetsElasticMaterializer>(translation.Materializer).ElementType);
             Assert.Equal("count", translation.SearchRequest.SearchType);
             Assert.Equal(1, translation.SearchRequest.Facets.Count);
 

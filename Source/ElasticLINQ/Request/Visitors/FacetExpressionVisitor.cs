@@ -80,7 +80,8 @@ namespace ElasticLinq.Request.Visitors
 
         private static IElasticMaterializer GetFacetMaterializer(LambdaExpression projection, Expression groupBy)
         {
-            if (projection == null) return null;
+            if (projection == null)
+                return null;
 
             Func<AggregateRow, object> projector = r => projection.Compile().DynamicInvoke(r);
 
@@ -109,11 +110,17 @@ namespace ElasticLinq.Request.Visitors
 
         private IEnumerable<IFacet> GetTermlessFacets()
         {
+            if (groupBy != null) // Top level counts and count predicates will be left to main translator
+            {
+                if (aggregateWithoutMember)
+                    yield return new FilterFacet(GroupKeyFacet, new MatchAllCriteria());
+
+                foreach (var criteria in aggregateCriteria)
+                    yield return new FilterFacet(criteria.Key, criteria.Value);
+            }
+
             foreach (var valueField in aggregateMembers.Select(member => Mapping.GetFieldName(Prefix, member)).Distinct())
                 yield return new StatisticalFacet(valueField, valueField);
-
-            foreach (var criteria in aggregateCriteria)
-                yield return new FilterFacet(criteria.Key, criteria.Value);
         }
 
         private IEnumerable<IFacet> GetTermFacets()
