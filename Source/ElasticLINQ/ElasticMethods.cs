@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace ElasticLinq
 {
@@ -10,8 +11,6 @@ namespace ElasticLinq
     /// </summary>
     public static class ElasticMethods
     {
-        private static readonly Exception exception = new InvalidOperationException("This method is for mapping queries to Elasticsearch and should not be called directly.");
-
         /// <summary>
         /// Determines whether a sequence contains any of the specified items.
         /// </summary>
@@ -21,7 +20,7 @@ namespace ElasticLinq
         /// <returns>true if the source sequence contains any of the items; otherwise, false.</returns>
         public static bool ContainsAny<TSource>(IEnumerable<TSource> source, IEnumerable<TSource> items)
         {
-            throw exception;
+            throw BuildException();
         }
 
         /// <summary>
@@ -33,7 +32,7 @@ namespace ElasticLinq
         /// <returns>true if the source sequence contains all of the items; otherwise, false.</returns>
         public static bool ContainsAll<TSource>(IEnumerable<TSource> source, IEnumerable<TSource> items)
         {
-            throw exception;
+            throw BuildException();
         }
 
         /// <summary>
@@ -44,7 +43,7 @@ namespace ElasticLinq
         /// <returns>true if the regular expression matches the field startsWith; otherwise, false.</returns>
         public static bool Regexp(string field, string regexp)
         {
-            throw exception;
+            throw BuildException();
         }
 
         /// <summary>
@@ -55,7 +54,18 @@ namespace ElasticLinq
         /// <returns>true if the field starts with the startsWith; otherwise, false.</returns>
         public static bool Prefix(string field, string startsWith)
         {
-            throw exception;
+            throw BuildException();
+        }
+
+        /// <summary>
+        /// Create the InvalidOperationException fired when trying to execute methods of this proxy class.
+        /// </summary>
+        /// <param name="memberName">Optional name of the member, automatically figured out via CallerMemberName if not specified.</param>
+        /// <returns>InvalidOperationException with appropriate error message.</returns>
+        private static InvalidOperationException BuildException([CallerMemberName] string memberName = null)
+        {
+            return new InvalidOperationException(
+                String.Format("The method ElasticMethods.{0} is for mapping queries to Elasticsearch and should not be called directly.", memberName));
         }
     }
 }

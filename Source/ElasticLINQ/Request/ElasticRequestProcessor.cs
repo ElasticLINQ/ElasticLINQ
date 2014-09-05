@@ -77,8 +77,7 @@ namespace ElasticLinq.Request
         {
             var stopwatch = Stopwatch.StartNew();
 
-            using (var streamReader = new StreamReader(responseStream))
-            using (var textReader = new JsonTextReader(streamReader))
+            using (var textReader = new JsonTextReader(new StreamReader(responseStream)))
             {
                 var results = new JsonSerializer().Deserialize<ElasticResponse>(textReader);
                 stopwatch.Stop();

@@ -12,14 +12,16 @@ namespace ElasticLinq.Test
         [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void ScoreThrowsIfAccessed()
         {
-            Assert.Throws<InvalidOperationException>(() => ElasticFields.Score);
+            var ex = Assert.Throws<InvalidOperationException>(() => ElasticFields.Score);
+            Assert.Contains("ElasticFields.Score", ex.Message);
         }
 
         [Fact]
         [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void IdThrowsIfAccessed()
         {
-            Assert.Throws<InvalidOperationException>(() => ElasticFields.Id);
+            var ex = Assert.Throws<InvalidOperationException>(() => ElasticFields.Id);
+            Assert.Contains("ElasticFields.Id", ex.Message);
         }
     }
 }

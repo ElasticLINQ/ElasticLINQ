@@ -4,6 +4,9 @@ using System;
 
 namespace ElasticLinq.Retry
 {
+#if !PCL
+    [Serializable]
+#endif
     public class RetryFailedException : Exception
     {
         public RetryFailedException(int maxAttempts)

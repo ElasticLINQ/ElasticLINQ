@@ -13,7 +13,6 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using Xunit;
-using Xunit.Extensions;
 
 namespace ElasticLinq.Test.Request.Formatters
 {
