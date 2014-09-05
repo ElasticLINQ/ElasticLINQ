@@ -77,13 +77,13 @@ The latter is more easily discovered but the former should be kept around as it 
 There are three different ways you can perform aggregate operations like Sum, Count, Min, Max and Average:
 
 If you want aggregates broken down by a field:
-	db.Query<Robot>().GroupBy(r => r.Zone).Select(g => new { Zone = g.Key, Count = g.Count() });
+``db.Query<Robot>().GroupBy(r => r.Zone).Select(g => new { Zone = g.Key, Count = g.Count() });``
 
 If you want one aggregate for the entire set:
-	db.Query<Robot>().Count();
+``db.Query<Robot>().Count();``
 
 We also support a less well-known operation that lets you retrieve multiple aggregates for the set in a single hit using GroupBy and a constant value:
-	db.Query<Robot>().GroupBy(r => 1).Select(g => new { Count = g.Count(), Sum = g.Sum(r => r.Cost) });
+``db.Query<Robot>().GroupBy(r => 1).Select(g => new { Count = g.Count(), Sum = g.Sum(r => r.Cost) });``
 
 ### New operations
 Where Elasticsearch exceeds the basic LINQ patterns some additional extensions are provided to expose that functionality.
