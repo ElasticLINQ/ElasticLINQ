@@ -103,26 +103,11 @@ namespace ElasticLinq
         /// </summary>
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <inheritdoc/>
-        protected virtual void Dispose(bool disposing)
-        {
             if (disposed)
                 return;
 
-            if (disposing)
-                httpClient.Dispose();
-
             disposed = true;
-        }
-
-        /// <inheritdoc/>
-        ~ElasticConnection()
-        {
-            Dispose(true);
+            httpClient.Dispose();
         }
     }
 }
