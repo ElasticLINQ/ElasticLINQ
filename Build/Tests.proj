@@ -8,6 +8,6 @@
     <ItemGroup>
       <TestAssemblies Include="$(SolutionDir)**\bin\$(Configuration)\*.Test.dll"/>
     </ItemGroup>
-    <xunit Assemblies="@(TestAssemblies)" />
+    <xunit Assemblies="@(TestAssemblies)" ParallelizeAssemblies="true" />
   </Target>
 </Project>

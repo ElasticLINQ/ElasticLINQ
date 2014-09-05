@@ -5,3 +5,4 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyDescription("LINQ provider for Elasticsearch")]
 
 [assembly: InternalsVisibleTo("ElasticLinq.Test")]
+[assembly: InternalsVisibleTo("ElasticLinq.Portable.Test")]
