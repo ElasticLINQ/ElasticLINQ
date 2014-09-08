@@ -36,6 +36,7 @@ _TeamCity*
 [Nn]u[Gg]et.exe
 [Pp]ackages/
 *.nupkg
+!packages/Microsoft.Bcl.Build.*/tools/Microsoft.Bcl.Build.targets -f
 
 # Windows Store app package directory
 AppPackages/
