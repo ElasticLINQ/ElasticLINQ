@@ -1,7 +1,7 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using System.Collections.ObjectModel;
 using ElasticLinq.Utility;
-using System.Collections.Generic;
 
 namespace ElasticLinq.Request.Criteria
 {
@@ -11,17 +11,17 @@ namespace ElasticLinq.Request.Criteria
     public class QueryStringCriteria : ICriteria
     {
         private readonly string value;
-        private readonly IReadOnlyList<string> fields;
+        private readonly ReadOnlyCollection<string> fields;
 
         public QueryStringCriteria(string value, params string[] fields)
         {
             Argument.EnsureNotBlank("value", value);
 
             this.value = value;
-            this.fields = fields ?? new string[0];
+            this.fields = new ReadOnlyCollection<string>(fields ?? new string[0]);
         }
 
-        public IReadOnlyList<string> Fields
+        public ReadOnlyCollection<string> Fields
         {
             get { return fields; }
         }

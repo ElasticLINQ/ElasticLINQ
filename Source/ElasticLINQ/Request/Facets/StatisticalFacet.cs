@@ -20,7 +20,7 @@ namespace ElasticLinq.Request.Facets
     {
         private readonly string name;
         private readonly ICriteria criteria;
-        private readonly IReadOnlyList<string> fields;
+        private readonly ReadOnlyCollection<string> fields;
 
         public StatisticalFacet(string name, params string[] fields)
             : this(name, null, fields)
@@ -40,6 +40,6 @@ namespace ElasticLinq.Request.Facets
         public string Type { get { return "statistical"; } }
         public string Name { get { return name; } }
         public ICriteria Filter { get { return criteria; } }
-        public IReadOnlyList<string> Fields { get { return fields; } }
+        public ReadOnlyCollection<string> Fields { get { return fields; } }
     }
 }

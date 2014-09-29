@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -59,12 +60,12 @@ namespace ElasticLinq.Test.TestSupport
             get { return responseCompletion.Task; }
         }
 
-        public IReadOnlyList<HttpListenerRequest> Requests
+        public ReadOnlyCollection<HttpListenerRequest> Requests
         {
             get { return requests.AsReadOnly(); }
         }
 
-        public IReadOnlyList<HttpListenerResponse> Responses
+        public ReadOnlyCollection<HttpListenerResponse> Responses
         {
             get { return responses.AsReadOnly(); }
         }

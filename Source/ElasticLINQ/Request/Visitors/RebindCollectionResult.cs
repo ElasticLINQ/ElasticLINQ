@@ -10,21 +10,21 @@ namespace ElasticLinq.Request.Visitors
     internal class RebindCollectionResult<T>
     {
         private readonly Expression expression;
-        private readonly HashSet<T> collected;
+        private readonly ReadOnlyCollection<T> collected;
         private readonly ParameterExpression parameter;
         private readonly LambdaExpression projection;
 
-        public RebindCollectionResult(Expression expression, HashSet<T> collected, ParameterExpression parameter, LambdaExpression projection)
+        public RebindCollectionResult(Expression expression, IEnumerable<T> collected, ParameterExpression parameter, LambdaExpression projection)
         {
             this.expression = expression;
-            this.collected = collected;
+            this.collected = new ReadOnlyCollection<T>(collected.ToArray());
             this.parameter = parameter;
             this.projection = projection;
         }
 
         public Expression Expression { get { return expression; } }
         public ParameterExpression Parameter { get { return parameter; } }
-        public IReadOnlyList<T> Collected { get { return new ReadOnlyCollection<T>(collected.ToList()); } }
+        public ReadOnlyCollection<T> Collected { get { return collected; } }
         public LambdaExpression Projection { get { return projection; } }
     }
 }

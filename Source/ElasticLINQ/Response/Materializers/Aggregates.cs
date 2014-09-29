@@ -1,5 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using System.Collections.ObjectModel;
 using ElasticLinq.Utility;
 using Newtonsoft.Json.Linq;
 using System;
@@ -114,12 +115,12 @@ namespace ElasticLinq.Response.Materializers
     internal class AggregateTermRow : AggregateRow
     {
         private readonly object key;
-        private readonly AggregateField[] fields;
+        private readonly ReadOnlyCollection<AggregateField> fields;
 
         public AggregateTermRow(object key, IEnumerable<AggregateField> fields)
         {
             this.key = key;
-            this.fields = fields.ToArray();
+            this.fields = new ReadOnlyCollection<AggregateField>(fields.ToArray());
         }
 
         public object Key
@@ -127,7 +128,7 @@ namespace ElasticLinq.Response.Materializers
             get { return key; }
         }
 
-        public IReadOnlyList<AggregateField> Fields
+        public ReadOnlyCollection<AggregateField> Fields
         {
             get { return fields; }
         }

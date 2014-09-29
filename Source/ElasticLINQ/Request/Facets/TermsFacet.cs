@@ -18,7 +18,7 @@ namespace ElasticLinq.Request.Facets
     {
         private readonly string name;
         private readonly ICriteria criteria;
-        private readonly IReadOnlyList<string> fields;
+        private readonly ReadOnlyCollection<string> fields;
         private readonly int? size;
 
         public TermsFacet(string name, params string[] fields)
@@ -39,7 +39,7 @@ namespace ElasticLinq.Request.Facets
 
         public string Type { get { return "terms"; } }
         public string Name { get { return name; } }
-        public IReadOnlyList<string> Fields { get { return fields; } }
+        public ReadOnlyCollection<string> Fields { get { return fields; } }
         public ICriteria Filter { get { return criteria; } }
         public int? Size { get { return size; } }
     }

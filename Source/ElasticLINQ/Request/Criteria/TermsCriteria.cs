@@ -14,14 +14,14 @@ namespace ElasticLinq.Request.Criteria
         private readonly TermsExecutionMode? executionMode;
         private readonly string field;
         private readonly MemberInfo member;
-        private readonly HashSet<object> values;
+        private readonly ReadOnlyCollection<object> values;
 
-        private TermsCriteria(TermsExecutionMode? executionMode, string field, MemberInfo member, HashSet<object> values)
+        private TermsCriteria(TermsExecutionMode? executionMode, string field, MemberInfo member, IEnumerable<object> values)
         {
             this.executionMode = executionMode;
             this.field = field;
             this.member = member;
-            this.values = values;
+            this.values = new ReadOnlyCollection<object>(values.ToArray());
         }
 
         public TermsExecutionMode? ExecutionMode
@@ -57,9 +57,9 @@ namespace ElasticLinq.Request.Criteria
             get { return "terms"; }
         }
 
-        public IReadOnlyList<Object> Values
+        public ReadOnlyCollection<Object> Values
         {
-            get { return new ReadOnlyCollection<object>(values.ToList()); }
+            get { return values; }
         }
 
         public override string ToString()

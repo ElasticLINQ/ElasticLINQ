@@ -14,19 +14,19 @@ namespace ElasticLinq.Request.Criteria
     /// </summary>
     internal abstract class CompoundCriteria : ICriteria
     {
-        private readonly List<ICriteria> criteria;
+        private readonly ReadOnlyCollection<ICriteria> criteria;
 
         protected CompoundCriteria(IEnumerable<ICriteria> criteria)
         {
             Argument.EnsureNotNull("criteria", criteria);
-            this.criteria = new List<ICriteria>(criteria);
+            this.criteria = new ReadOnlyCollection<ICriteria>(criteria.ToArray());
         }
 
         public abstract string Name { get; }
 
-        public IReadOnlyList<ICriteria> Criteria
+        public ReadOnlyCollection<ICriteria> Criteria
         {
-            get { return new ReadOnlyCollection<ICriteria>(criteria); }
+            get { return criteria; }
         }
 
         public override string ToString()

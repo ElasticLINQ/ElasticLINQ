@@ -1,5 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using System.Collections.ObjectModel;
 using ElasticLinq.Utility;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,7 @@ namespace ElasticLinq.Request.Criteria
     {
         private readonly string field;
         private readonly MemberInfo member;
-        private readonly List<RangeSpecificationCriteria> specifications;
+        private readonly ReadOnlyCollection<RangeSpecificationCriteria> specifications;
 
         public RangeCriteria(string field, MemberInfo member, IEnumerable<RangeSpecificationCriteria> specifications)
         {
@@ -28,7 +29,7 @@ namespace ElasticLinq.Request.Criteria
 
             this.field = field;
             this.member = member;
-            this.specifications = new List<RangeSpecificationCriteria>(specifications);
+            this.specifications = new ReadOnlyCollection<RangeSpecificationCriteria>(specifications.ToArray());
         }
 
         public RangeCriteria(string field, MemberInfo member, RangeComparison comparison, object value)
@@ -49,7 +50,7 @@ namespace ElasticLinq.Request.Criteria
             get { return field; }
         }
 
-        public IReadOnlyList<RangeSpecificationCriteria> Specifications
+        public ReadOnlyCollection<RangeSpecificationCriteria> Specifications
         {
             get { return specifications; }
         }

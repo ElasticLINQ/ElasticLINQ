@@ -1,5 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using System.Collections.ObjectModel;
 using ElasticLinq.Mapping;
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Facets;
@@ -143,7 +144,7 @@ namespace ElasticLinq.Request.Formatters
         private static JToken Build(StatisticalFacet statisticalFacet)
         {
             return new JObject(
-                BuildFieldProperty(statisticalFacet.Fields.ToArray())
+                BuildFieldProperty(statisticalFacet.Fields)
             );
         }
 
@@ -157,10 +158,10 @@ namespace ElasticLinq.Request.Formatters
 
         private static JToken Build(TermsFacet termsFacet)
         {
-            return new JObject(BuildFieldProperty(termsFacet.Fields.ToArray()));
+            return new JObject(BuildFieldProperty(termsFacet.Fields));
         }
 
-        private static JToken BuildFieldProperty(IReadOnlyCollection<string> fields)
+        private static JToken BuildFieldProperty(ReadOnlyCollection<string> fields)
         {
             return fields.Count == 1
                 ? new JProperty("field", fields.First())

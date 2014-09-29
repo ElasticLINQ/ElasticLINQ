@@ -1,7 +1,7 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Reflection;
 
 namespace ElasticLinq.Request.Criteria
@@ -14,13 +14,13 @@ namespace ElasticLinq.Request.Criteria
     {
         private readonly string field;
         private readonly MemberInfo member;
-        private readonly object value;
+        private readonly ReadOnlyCollection<object> values;
 
         public TermCriteria(string field, MemberInfo member, object value)
         {
             this.field = field;
-            this.value = value;
             this.member = member;
+            values = new ReadOnlyCollection<object>(new[] { value });
         }
 
         public string Field
@@ -46,12 +46,12 @@ namespace ElasticLinq.Request.Criteria
 
         public object Value
         {
-            get { return value; }
+            get { return values[0]; }
         }
 
-        IReadOnlyList<object> ITermsCriteria.Values
+        ReadOnlyCollection<object> ITermsCriteria.Values
         {
-            get { return new[] { Value }; }
+            get { return values; }
         }
 
         public override string ToString()

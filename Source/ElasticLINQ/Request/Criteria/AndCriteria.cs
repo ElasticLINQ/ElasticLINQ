@@ -1,5 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using System.Collections.ObjectModel;
 using ElasticLinq.Utility;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,7 +41,9 @@ namespace ElasticLinq.Request.Criteria
             criteria = strippedCriteria;
 
             // Unwrap and combine ANDs
-            var combinedCriteria = criteria.SelectMany(c => c is AndCriteria ? ((AndCriteria)c).Criteria : new[] { c }).ToList();
+            var combinedCriteria = criteria
+                .SelectMany(c => c is AndCriteria ? ((AndCriteria)c).Criteria : new ReadOnlyCollection<ICriteria>(new[] { c }))
+                .ToList();
             CombineRanges(combinedCriteria);
 
             return combinedCriteria.Count == 1
