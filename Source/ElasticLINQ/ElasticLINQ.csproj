@@ -48,6 +48,7 @@
     <Compile Include="Communication\Attributes\ElasticParameterAttribute.cs" />
     <Compile Include="Communication\Attributes\ElasticRouteAttribute.cs" />
     <Compile Include="Communication\ElasticRouteHelper.cs" />
+    <Compile Include="Communication\Requests\UpdateRequest.cs" />
     <Compile Include="Communication\Requests\PutRequest.cs" />
     <Compile Include="Communication\Requests\DeleteRequest.cs" />
     <Compile Include="Communication\Requests\GetRequest.cs" />
@@ -55,6 +56,7 @@
     <Compile Include="Communication\Requests\PostRequest.cs" />
     <Compile Include="Communication\Requests\SearchRequest.cs" />
     <Compile Include="Communication\Requests\TypeExistsRequest.cs" />
+    <Compile Include="Communication\Responses\UpdateResponse.cs" />
     <Compile Include="Communication\Responses\PutResponse.cs" />
     <Compile Include="Communication\Responses\DeleteResponse.cs" />
     <Compile Include="Communication\Responses\PostResponse.cs" />

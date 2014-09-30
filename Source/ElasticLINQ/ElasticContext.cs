@@ -104,6 +104,18 @@ namespace ElasticLinq
             var response = AsyncHelper.RunSync(() => this.Connection.Put<PutResponse, PutRequest>(request, JsonConvert.SerializeObject(doc), this.Log));
         }
 
+        public void Update<T>(string indexPath, string typePath, T doc, Func<T, string> idExtractor)
+        {
+            var request = new UpdateRequest
+            {
+                Index = indexPath,
+                Type = typePath,
+                Id = idExtractor(doc)
+            };
+
+            var response = AsyncHelper.RunSync(() => this.Connection.Post<UpdateResponse, UpdateRequest>(request, string.Format("{{ \"doc\" : {0} }}", JsonConvert.SerializeObject(doc)), this.Log));
+        }
+
         public void Delete(string indexPath, string typePath, string id)
         {
             var request = new DeleteRequest
