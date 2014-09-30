@@ -1,5 +1,6 @@
 ﻿namespace ElasticLinq.Communication.Requests
 {
+    using System;
     using ElasticLinq.Communication.Attributes;
 
     internal class GetRequest
@@ -21,6 +22,9 @@
 
         [ElasticParameter(Name = "refresh")]
         public bool Refresh { get; set; }
+
+        [ElasticParameter(Name = "version")]
+        public Nullable<int> Version { get; set; }
 
         public GetRequest()
         {

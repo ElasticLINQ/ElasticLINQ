@@ -10,6 +10,7 @@ namespace ElasticLinq
     using ElasticLinq.Path;
     using ElasticLinq.Retry;
     using ElasticLinq.Utility;
+    using Newtonsoft.Json;
 
     /// <summary>
     /// Provides an entry point to easily create LINQ queries for Elasticsearch.
@@ -78,6 +79,17 @@ namespace ElasticLinq
             var response = AsyncHelper.RunSync(() => this.Connection.Get<GetResponse, GetRequest>(request, this.Log));
 
             return response.Source.ToObject<T>();
+        }
+
+        public void Index<T>(ElasticIndexPath indexPath, ElasticTypePath typePath, T doc)
+        {
+            var request = new IndexRequest
+            {
+                Index = indexPath.PathSegment,
+                Type = typePath.PathSegment
+            };
+
+            var response = AsyncHelper.RunSync(() => this.Connection.Post<IndexResponse, IndexRequest>(request, JsonConvert.SerializeObject(doc), this.Log));
         }
 
         public virtual bool IndexExists(ElasticIndexPath indexPath)

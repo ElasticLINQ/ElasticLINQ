@@ -18,9 +18,9 @@
 
         public static IDictionary<string, object> GetParam<TRequest>(TRequest request)
         {
-            var paramProperties = typeof(TRequest).GetProperties().Select(x => new { PropertyInfo = x, Attribute = x.GetCustomAttributes<ElasticParameterAttribute>().SingleOrDefault() });
+            var paramProperties = typeof(TRequest).GetProperties().Select(x => new { PropertyInfo = x, Attribute = x.GetCustomAttributes<ElasticParameterAttribute>().SingleOrDefault() }).Where(x => x.Attribute != null);
 
-            return paramProperties.Where(x => x.Attribute != null).ToDictionary(x => x.Attribute.Name, x => x.PropertyInfo.GetValue(request));
+            return paramProperties.Select(x => new { Value = x.PropertyInfo.GetValue(request), x.Attribute }).Where(x => x.Value != null).ToDictionary(x => x.Attribute.Name, x => x.Value);
         }
     }
 }

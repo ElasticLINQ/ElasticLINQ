@@ -50,8 +50,10 @@
     <Compile Include="Communication\ElasticRouteHelper.cs" />
     <Compile Include="Communication\Requests\GetRequest.cs" />
     <Compile Include="Communication\Requests\IndexExistsRequest.cs" />
+    <Compile Include="Communication\Requests\IndexRequest.cs" />
     <Compile Include="Communication\Requests\SearchRequest.cs" />
     <Compile Include="Communication\Requests\TypeExistsRequest.cs" />
+    <Compile Include="Communication\Responses\IndexResponse.cs" />
     <Compile Include="Connection\HttpElasticConnection.cs" />
     <Compile Include="ElasticConnectionOptions.cs" />
     <Compile Include="ElasticContext.cs" />
