@@ -2,15 +2,16 @@
 
 namespace ElasticLinq
 {
-    using System.Linq;
-    using ElasticLinq.Communication.Requests;
-    using ElasticLinq.Communication.Responses;
-    using ElasticLinq.Logging;
-    using ElasticLinq.Mapping;
-    using ElasticLinq.Path;
-    using ElasticLinq.Retry;
-    using ElasticLinq.Utility;
-    using Newtonsoft.Json;
+    using System;
+using System.Linq;
+using ElasticLinq.Communication.Requests;
+using ElasticLinq.Communication.Responses;
+using ElasticLinq.Logging;
+using ElasticLinq.Mapping;
+using ElasticLinq.Path;
+using ElasticLinq.Retry;
+using ElasticLinq.Utility;
+using Newtonsoft.Json;
 
     /// <summary>
     /// Provides an entry point to easily create LINQ queries for Elasticsearch.
@@ -81,15 +82,39 @@ namespace ElasticLinq
             return response.Source.ToObject<T>();
         }
 
-        public void Index<T>(ElasticIndexPath indexPath, ElasticTypePath typePath, T doc)
+        public void Post<T>(ElasticIndexPath indexPath, ElasticTypePath typePath, T doc)
         {
-            var request = new IndexRequest
+            var request = new PostRequest
             {
                 Index = indexPath.PathSegment,
                 Type = typePath.PathSegment
             };
 
-            var response = AsyncHelper.RunSync(() => this.Connection.Post<IndexResponse, IndexRequest>(request, JsonConvert.SerializeObject(doc), this.Log));
+            var response = AsyncHelper.RunSync(() => this.Connection.Post<PostResponse, PostRequest>(request, JsonConvert.SerializeObject(doc), this.Log));
+        }
+
+        public void Put<T>(ElasticIndexPath indexPath, ElasticTypePath typePath, T doc, Func<T, string> idExtractor)
+        {
+            var request = new PutRequest
+            {
+                Index = indexPath.PathSegment,
+                Type = typePath.PathSegment,
+                Id = idExtractor(doc)
+            };
+
+            var response = AsyncHelper.RunSync(() => this.Connection.Put<PutResponse, PutRequest>(request, JsonConvert.SerializeObject(doc), this.Log));
+        }
+
+        public void Delete(ElasticIndexPath indexPath, ElasticTypePath typePath, string id)
+        {
+            var request = new DeleteRequest
+            {
+                Index = indexPath.PathSegment,
+                Type = typePath.PathSegment,
+                Id = id
+            };
+
+            var response = AsyncHelper.RunSync(() => this.Connection.Delete<DeleteResponse, DeleteRequest>(request, this.Log));
         }
 
         public virtual bool IndexExists(ElasticIndexPath indexPath)

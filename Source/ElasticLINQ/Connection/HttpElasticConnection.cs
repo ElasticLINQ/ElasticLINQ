@@ -135,6 +135,42 @@ namespace ElasticLinq.Connection
             }
         }
 
+        public async Task<TResponse> Put<TResponse, TRequest>(TRequest request, string body, ILog log)
+        {
+            var uri = MakeUri(this.endpoint, request, this.Options);
+
+            using (var requestMessage = new HttpRequestMessage(HttpMethod.Put, uri))
+            {
+                using (var response = await SendRequestAsync(this.httpClient, requestMessage, body, log))
+                {
+                    log.Debug(null, null, "<== HTTP RESPONSE ({0}) {1}", response.StatusCode, response.ReasonPhrase);
+
+                    using (var responseStream = await response.Content.ReadAsStreamAsync())
+                    {
+                        return ParseResponse<TResponse>(responseStream, log);
+                    }
+                }
+            }
+        }
+
+        public async Task<TResponse> Delete<TResponse, TRequest>(TRequest request, ILog log)
+        {
+            var uri = MakeUri(this.endpoint, request, this.Options);
+
+            using (var requestMessage = new HttpRequestMessage(HttpMethod.Delete, uri))
+            {
+                using (var response = await SendRequestAsync(this.httpClient, requestMessage, null, log))
+                {
+                    log.Debug(null, null, "<== HTTP RESPONSE ({0}) {1}", response.StatusCode, response.ReasonPhrase);
+
+                    using (var responseStream = await response.Content.ReadAsStreamAsync())
+                    {
+                        return ParseResponse<TResponse>(responseStream, log);
+                    }
+                }
+            }
+        }
+
         private static Uri MakeUri<TRequest>(Uri endpoint, TRequest request, ElasticConnectionOptions options)
         {
             var builder = new UriBuilder(endpoint);

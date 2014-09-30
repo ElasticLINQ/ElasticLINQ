@@ -2,7 +2,7 @@
 {
     using Newtonsoft.Json;
 
-    internal class IndexResponse
+    internal class PutResponse
     {
         [JsonProperty("_index")]
         public string Index { get; set; }

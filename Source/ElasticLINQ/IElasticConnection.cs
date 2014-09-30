@@ -16,5 +16,9 @@ namespace ElasticLinq
         Task<TResponse> Get<TResponse, TRequest>(TRequest request, ILog log);
 
         Task<TResponse> Post<TResponse, TRequest>(TRequest request, string body, ILog log);
+
+        Task<TResponse> Put<TResponse, TRequest>(TRequest request, string body, ILog log);
+
+        Task<TResponse> Delete<TResponse, TRequest>(TRequest request, ILog log);
     }
 }
