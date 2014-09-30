@@ -3,6 +3,8 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
+using ElasticLinq.Connection;
+using ElasticLinq.Logging;
 using Xunit;
 
 namespace ElasticLinq.Test
@@ -17,21 +19,21 @@ namespace ElasticLinq.Test
         [ExcludeFromCodeCoverage]
         public static void GuardClauses_Constructor()
         {
-            Assert.Throws<ArgumentNullException>(() => new ElasticConnection(null));
-            Assert.Throws<ArgumentException>(() => new ElasticConnection(new Uri("http://localhost/"), index: ""));
+            Assert.Throws<ArgumentNullException>(() => new HttpElasticConnection(null));
+            Assert.Throws<ArgumentException>(() => new HttpElasticConnection(new Uri("http://localhost/"), index: ""));
         }
 
         [Fact]
         [ExcludeFromCodeCoverage]
         public void GuardClauses_Timeout()
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => new ElasticConnection(endpoint, timeout: TimeSpan.FromDays(-1)));
+            Assert.Throws<ArgumentOutOfRangeException>(() => new HttpElasticConnection(endpoint, timeout: TimeSpan.FromDays(-1)));
         }
 
         [Fact]
         public void ConstructorWithOneArgSetsPropertyFromParameter()
         {
-            var connection = new ElasticConnection(endpoint);
+            var connection = new HttpElasticConnection(endpoint);
 
             Assert.Equal(endpoint, connection.Endpoint);
         }
@@ -39,7 +41,7 @@ namespace ElasticLinq.Test
         [Fact]
         public void ConstructorWithThreeArgsSetsPropertiesFromParameters()
         {
-            var connection = new ElasticConnection(endpoint, UserName, Password);
+            var connection = new HttpElasticConnection(endpoint, UserName, Password);
 
             Assert.Equal(endpoint, connection.Endpoint);
         }
@@ -48,9 +50,8 @@ namespace ElasticLinq.Test
         public void ConstructorCreatesHttpClientWithDefaultTimeout()
         {
             var defaultTimeout = TimeSpan.FromSeconds(10);
-            var connection = new ElasticConnection(endpoint, UserName, Password);
+            var connection = new HttpElasticConnection(endpoint, UserName, Password);
 
-            Assert.NotNull(connection.HttpClient);
             Assert.Equal(defaultTimeout, connection.Timeout);
         }
 
@@ -58,9 +59,8 @@ namespace ElasticLinq.Test
         public void ConstructorCreatesHttpClientWithSpecifiedTimeout()
         {
             var timeout = TimeSpan.FromSeconds(3);
-            var connection = new ElasticConnection(endpoint, UserName, Password, timeout);
+            var connection = new HttpElasticConnection(endpoint, UserName, Password, timeout);
 
-            Assert.NotNull(connection.HttpClient);
             Assert.Equal(timeout, connection.Timeout);
         }
 
@@ -68,11 +68,11 @@ namespace ElasticLinq.Test
         [ExcludeFromCodeCoverage]
         public async Task DisposeKillsHttpClient()
         {
-            var connection = new ElasticConnection(endpoint, UserName, Password);
+            var connection = new HttpElasticConnection(endpoint, UserName, Password);
             
             connection.Dispose();
 
-            await Assert.ThrowsAsync<ObjectDisposedException>(() => connection.HttpClient.GetAsync(new Uri("http://something.com")));
+            await Assert.ThrowsAsync<ObjectDisposedException>(() => connection.Get<object>(new Uri("http://something.com"), NullLog.Instance));
         }
     }
 }

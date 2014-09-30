@@ -152,7 +152,7 @@ namespace ElasticLinq.Connection
             }
         }
 
-        private Uri UpdateUri(Uri uri)
+        private static Uri UpdateUri(Uri uri, ElasticConnectionOptions options)
         {
             var builder = new UriBuilder(uri);
 
@@ -160,12 +160,12 @@ namespace ElasticLinq.Connection
                 .Select(p => p.Split('='))
                 .ToDictionary(k => k[0], v => v.Length > 1 ? v[1] : null);
 
-            if (this.Options.Pretty == true)
+            if (options.Pretty == true)
             {
                 parameters["pretty"] = "true";
             }
 
-            if (this.Options.Human == false)
+            if (options.Human == false)
             {
                 parameters["human"] = "false";
             }
@@ -183,7 +183,7 @@ namespace ElasticLinq.Connection
                 requestMessage.Content = new StringContent(body);
             }
 
-            requestMessage.RequestUri = UpdateUri(requestMessage.RequestUri);
+            requestMessage.RequestUri = UpdateUri(requestMessage.RequestUri, this.Options);
 
             log.Debug(null, null, "==> {0} - {1} - {2}", requestMessage.Method, requestMessage.RequestUri, body);
 

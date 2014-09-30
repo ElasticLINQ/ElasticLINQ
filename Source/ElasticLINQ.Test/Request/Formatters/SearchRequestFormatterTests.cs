@@ -13,12 +13,13 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using Xunit;
+using ElasticLinq.Connection;
 
 namespace ElasticLinq.Test.Request.Formatters
 {
     public class SearchRequestFormatterTests
     {
-        private static readonly ElasticConnection defaultConnection = new ElasticConnection(new Uri("http://a.b.com:9000/"));
+        private static readonly IElasticConnection defaultConnection = new HttpElasticConnection(new Uri("http://a.b.com:9000/"));
         private static readonly MemberInfo memberInfo = typeof(string).GetProperty("Length");
         private readonly IElasticMapping mapping = Substitute.For<IElasticMapping>();
 
@@ -35,7 +36,7 @@ namespace ElasticLinq.Test.Request.Formatters
         [InlineData("index1,index2", "docType1,docType2", "http://a.b.com:9000/index1,index2/docType1,docType2/_search")]
         public void UriFormatting(string index, string documentType, string expectedUri)
         {
-            var connection = new ElasticConnection(new Uri("http://a.b.com:9000/"), index: index);
+            var connection = new HttpElasticConnection(new Uri("http://a.b.com:9000/"), index: index);
             var formatter = new SearchRequestFormatter(connection, mapping, new SearchRequest { DocumentType = documentType });
 
             Assert.Equal(expectedUri, formatter.Uri.ToString());
@@ -174,7 +175,7 @@ namespace ElasticLinq.Test.Request.Formatters
         public void BodyContainsTimeoutWhenSpecified()
         {
             const string expectedTimeout = "15s";
-            var connection = new ElasticConnection(new Uri("http://localhost/"), timeout: TimeSpan.FromSeconds(15));
+            var connection = new HttpElasticConnection(new Uri("http://localhost/"), timeout: TimeSpan.FromSeconds(15));
 
             var formatter = new SearchRequestFormatter(connection, mapping, new SearchRequest());
             var body = JObject.Parse(formatter.Body);
@@ -186,7 +187,7 @@ namespace ElasticLinq.Test.Request.Formatters
         [Fact]
         public void BodyDoesNotContainTimeoutWhenZero()
         {
-            var connection = new ElasticConnection(new Uri("http://localhost/"), timeout: TimeSpan.Zero);
+            var connection = new HttpElasticConnection(new Uri("http://localhost/"), timeout: TimeSpan.Zero);
 
             var formatter = new SearchRequestFormatter(connection, mapping, new SearchRequest());
             var body = JObject.Parse(formatter.Body);

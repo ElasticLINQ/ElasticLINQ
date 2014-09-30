@@ -7,12 +7,13 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using Xunit;
+using ElasticLinq.Connection;
 
 namespace ElasticLinq.Test
 {
     public class ElasticQueryProviderTests
     {
-        private static readonly ElasticConnection connection = new ElasticConnection(new Uri("http://localhost"));
+        private static readonly IElasticConnection connection = new HttpElasticConnection(new Uri("http://localhost"));
         private static readonly IElasticMapping mapping = new TrivialElasticMapping();
         private static readonly ILog log = NullLog.Instance;
         private static readonly IRetryPolicy retryPolicy = NullRetryPolicy.Instance;
