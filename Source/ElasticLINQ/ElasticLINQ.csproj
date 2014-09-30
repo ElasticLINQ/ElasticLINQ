@@ -45,13 +45,15 @@
     <Reference Include="System.Net.Http" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ElasticConnection.cs" />
+    <Compile Include="Connection\HttpElasticConnection.cs" />
+    <Compile Include="ElasticConnectionOptions.cs" />
     <Compile Include="ElasticContext.cs" />
     <Compile Include="ElasticFields.cs" />
     <Compile Include="ElasticMethods.cs" />
     <Compile Include="ElasticQuery.cs" />
     <Compile Include="ElasticQueryExtensions.cs" />
     <Compile Include="ElasticQueryProvider.cs" />
+    <Compile Include="IElasticConnection.cs" />
     <Compile Include="IElasticContext.cs" />
     <Compile Include="IElasticQuery.cs" />
     <Compile Include="Logging\ILog.cs" />

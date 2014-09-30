@@ -7,6 +7,7 @@ using ElasticLinq.Retry;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ElasticLinq.Connection;
 
 namespace ElasticLinq.Test
 {
@@ -19,7 +20,7 @@ namespace ElasticLinq.Test
                                       int maxAttempts = 1,
                                       TimeSpan timeout = default(TimeSpan))
         {
-            Connection = new ElasticConnection(new Uri("http://localhost/"), timeout: timeout);
+            Connection = new HttpElasticConnection(new Uri("http://localhost/"), timeout: timeout);
             Mapping = mapping ?? new TrivialElasticMapping();
             Provider = new TestableElasticQueryProvider(this);
             Requests = new List<QueryInfo>();
@@ -27,7 +28,7 @@ namespace ElasticLinq.Test
             RetryPolicy = new RetryPolicy(Log, 0, maxAttempts, NullDelay.Instance);
         }
 
-        public ElasticConnection Connection { get; private set; }
+        public IElasticConnection Connection { get; private set; }
 
         public ILog Log { get; private set; }
 

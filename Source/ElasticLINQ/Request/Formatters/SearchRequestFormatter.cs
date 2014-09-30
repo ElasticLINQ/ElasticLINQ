@@ -21,12 +21,12 @@ namespace ElasticLinq.Request.Formatters
     internal class SearchRequestFormatter
     {
         private readonly Lazy<string> body;
-        private readonly ElasticConnection connection;
+        private readonly IElasticConnection connection;
         private readonly IElasticMapping mapping;
         private readonly SearchRequest searchRequest;
         private readonly Uri uri;
 
-        public SearchRequestFormatter(ElasticConnection connection, IElasticMapping mapping, SearchRequest searchRequest)
+        public SearchRequestFormatter(IElasticConnection connection, IElasticMapping mapping, SearchRequest searchRequest)
         {
             this.connection = connection;
             this.mapping = mapping;
