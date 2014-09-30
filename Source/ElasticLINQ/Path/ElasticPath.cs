@@ -2,6 +2,10 @@
 
 namespace ElasticLinq.Path
 {
+    using System;
+    using System.Linq;
+    using System.Collections.Generic;
+
     public class ElasticPath
     {
         public ElasticIndexPath IndexPath { get; private set; }

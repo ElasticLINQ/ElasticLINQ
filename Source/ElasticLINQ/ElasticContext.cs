@@ -6,6 +6,10 @@ using ElasticLinq.Retry;
 using ElasticLinq.Utility;
 using System.Linq;
 using ElasticLinq.Path;
+using ElasticLinq.Response;
+using ElasticLinq.Request;
+using ElasticLinq.Communication.Responses;
+using ElasticLinq.Communication.Requests;
 
 namespace ElasticLinq
 {
@@ -57,6 +61,25 @@ namespace ElasticLinq
             var prefix = Mapping.GetDocumentMappingPrefix(typeof(T));
             var provider = new ElasticQueryProvider(Connection, Mapping, Log, RetryPolicy, prefix);
             return new ElasticQuery<T>(provider);
+        }
+
+        //public T Get<T>(ElasticIndexPath indexPath, ElasticTypePath typePath, int id)
+        //{
+        //    return this.Get<T>(indexPath, typePath, id.ToString());
+        //}
+
+        public T Get<T>(ElasticIndexPath indexPath, ElasticTypePath typePath, string id)
+        {
+            var request = new GetRequest
+            {
+                Index = indexPath.PathSegment,
+                Type = typePath.PathSegment,
+                Id = id
+            };
+
+            var response = AsyncHelper.RunSync(() => this.Connection.Get<GetResponse, GetRequest>(request, this.Log));
+
+            return response.Source.ToObject<T>();
         }
 
         public virtual bool IndexExists(ElasticIndexPath indexPath)

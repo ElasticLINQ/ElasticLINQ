@@ -19,7 +19,7 @@ namespace ElasticLinq
 
         Task<bool> Head(ElasticPath path, ILog log);
 
-        Task<TResponse> Get<TResponse>(Uri uri, ILog log);
+        Task<TResponse> Get<TResponse, TRequest>(TRequest request, ILog log);
 
         Task<TResponse> Post<TResponse>(Uri uri, string body, ILog log);
     }

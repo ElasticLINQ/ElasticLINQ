@@ -45,6 +45,9 @@
     <Reference Include="System.Net.Http" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Communication\Attributes\ElasticRouteAttribute.cs" />
+    <Compile Include="Communication\ElasticRouteHelper.cs" />
+    <Compile Include="Communication\Requests\GetRequest.cs" />
     <Compile Include="Connection\HttpElasticConnection.cs" />
     <Compile Include="ElasticConnectionOptions.cs" />
     <Compile Include="ElasticContext.cs" />
@@ -95,6 +98,7 @@
     <Compile Include="Request\Expressions\ElasticExpressionType.cs" />
     <Compile Include="Request\Visitors\FacetExpressionVisitor.cs" />
     <Compile Include="Request\Visitors\CriteriaExpressionVisitor.cs" />
+    <Compile Include="Communication\Responses\GetResponse.cs" />
     <Compile Include="Response\Materializers\Aggregates.cs" />
     <Compile Include="Response\Materializers\CountElasticMaterializer.cs" />
     <Compile Include="Response\Materializers\ListTermFacetsElasticMaterializer.cs" />
@@ -145,6 +149,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

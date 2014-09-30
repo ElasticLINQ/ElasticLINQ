@@ -8,7 +8,10 @@ namespace ElasticLinq.Connection
     using System.Linq;
     using System.Net;
     using System.Net.Http;
+    using System.Reflection;
     using System.Threading.Tasks;
+    using ElasticLinq.Communication;
+    using ElasticLinq.Communication.Attributes;
     using ElasticLinq.Logging;
     using ElasticLinq.Path;
     using ElasticLinq.Utility;
@@ -129,8 +132,10 @@ namespace ElasticLinq.Connection
             }
         }
 
-        public async Task<TResponse> Get<TResponse>(Uri uri, ILog log)
+        public async Task<TResponse> Get<TResponse, TRequest>(TRequest request, ILog log)
         {
+            var uri = MakeUri(this.Endpoint, request);
+
             using (var requestMessage = new HttpRequestMessage(HttpMethod.Get, uri))
             {
                 using (var response = await SendRequestAsync(this.httpClient, requestMessage, null, log))
@@ -159,6 +164,20 @@ namespace ElasticLinq.Connection
                     }
                 }
             }
+        }
+
+        private static Uri MakeUri<TRequest>(Uri endpoint, TRequest request)
+        {
+            var builder = new UriBuilder(endpoint);
+
+            var route = ElasticRouteHelper.GetRoute(request);
+
+            if (string.IsNullOrEmpty(route) == false)
+            {
+                builder.Path += route;
+            }
+
+            return builder.Uri;
         }
 
         private static Uri MakeUri(Uri endpoint, ElasticPath path)
