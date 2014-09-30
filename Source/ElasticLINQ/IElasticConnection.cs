@@ -5,7 +5,6 @@ namespace ElasticLinq
     using System;
     using System.Threading.Tasks;
     using ElasticLinq.Logging;
-    using ElasticLinq.Path;
 
     public interface IElasticConnection
     {

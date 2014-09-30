@@ -11,7 +11,6 @@ namespace ElasticLinq.Connection
     using System.Threading.Tasks;
     using ElasticLinq.Communication;
     using ElasticLinq.Logging;
-    using ElasticLinq.Path;
     using ElasticLinq.Utility;
     using Newtonsoft.Json;
 

@@ -3,7 +3,6 @@
 namespace ElasticLinq
 {
     using System.Linq;
-    using ElasticLinq.Path;
 
     /// <summary>
     /// Represents a unit of work in ElasticLINQ.
@@ -15,7 +14,7 @@ namespace ElasticLinq
         /// </summary>
         /// <typeparam name="T">The document type.</typeparam>
         /// <returns>The query that can search for documents of the given type.</returns>
-        IQueryable<T> Query<T>(ElasticPath path = null);
+        IQueryable<T> Query<T>(string indexPath, string typePath);
 
         //bool IndexExists(ElasticIndexPath indexPath);
 

@@ -3,15 +3,14 @@
 namespace ElasticLinq
 {
     using System;
-using System.Linq;
-using ElasticLinq.Communication.Requests;
-using ElasticLinq.Communication.Responses;
-using ElasticLinq.Logging;
-using ElasticLinq.Mapping;
-using ElasticLinq.Path;
-using ElasticLinq.Retry;
-using ElasticLinq.Utility;
-using Newtonsoft.Json;
+    using System.Linq;
+    using ElasticLinq.Communication.Requests;
+    using ElasticLinq.Communication.Responses;
+    using ElasticLinq.Logging;
+    using ElasticLinq.Mapping;
+    using ElasticLinq.Retry;
+    using ElasticLinq.Utility;
+    using Newtonsoft.Json;
 
     /// <summary>
     /// Provides an entry point to easily create LINQ queries for Elasticsearch.
@@ -56,7 +55,7 @@ using Newtonsoft.Json;
         public IRetryPolicy RetryPolicy { get; private set; }
 
         /// <inheritdoc/>
-        public virtual IQueryable<T> Query<T>(ElasticPath path = null)
+        public virtual IQueryable<T> Query<T>(string indexPath, string typePath)
         {
             var prefix = Mapping.GetDocumentMappingPrefix(typeof(T));
             var provider = new ElasticQueryProvider(Connection, Mapping, Log, RetryPolicy, prefix);
@@ -68,12 +67,12 @@ using Newtonsoft.Json;
         //    return this.Get<T>(indexPath, typePath, id.ToString());
         //}
 
-        public T Get<T>(ElasticIndexPath indexPath, ElasticTypePath typePath, string id)
+        public T Get<T>(string indexPath, string typePath, string id)
         {
             var request = new GetRequest
             {
-                Index = indexPath.PathSegment,
-                Type = typePath.PathSegment,
+                Index = indexPath,
+                Type = typePath,
                 Id = id
             };
 
@@ -82,57 +81,57 @@ using Newtonsoft.Json;
             return response.Source.ToObject<T>();
         }
 
-        public void Post<T>(ElasticIndexPath indexPath, ElasticTypePath typePath, T doc)
+        public void Post<T>(string indexPath, string typePath, T doc)
         {
             var request = new PostRequest
             {
-                Index = indexPath.PathSegment,
-                Type = typePath.PathSegment
+                Index = indexPath,
+                Type = typePath
             };
 
             var response = AsyncHelper.RunSync(() => this.Connection.Post<PostResponse, PostRequest>(request, JsonConvert.SerializeObject(doc), this.Log));
         }
 
-        public void Put<T>(ElasticIndexPath indexPath, ElasticTypePath typePath, T doc, Func<T, string> idExtractor)
+        public void Put<T>(string indexPath, string typePath, T doc, Func<T, string> idExtractor)
         {
             var request = new PutRequest
             {
-                Index = indexPath.PathSegment,
-                Type = typePath.PathSegment,
+                Index = indexPath,
+                Type = typePath,
                 Id = idExtractor(doc)
             };
 
             var response = AsyncHelper.RunSync(() => this.Connection.Put<PutResponse, PutRequest>(request, JsonConvert.SerializeObject(doc), this.Log));
         }
 
-        public void Delete(ElasticIndexPath indexPath, ElasticTypePath typePath, string id)
+        public void Delete(string indexPath, string typePath, string id)
         {
             var request = new DeleteRequest
             {
-                Index = indexPath.PathSegment,
-                Type = typePath.PathSegment,
+                Index = indexPath,
+                Type = typePath,
                 Id = id
             };
 
             var response = AsyncHelper.RunSync(() => this.Connection.Delete<DeleteResponse, DeleteRequest>(request, this.Log));
         }
 
-        public virtual bool IndexExists(ElasticIndexPath indexPath)
+        public virtual bool IndexExists(string indexPath)
         {
             var request = new IndexExistsRequest
             {
-                Index = indexPath.PathSegment
+                Index = indexPath
             };
 
             return AsyncHelper.RunSync(() => this.Connection.Head(request, this.Log));
         }
 
-        public virtual bool TypeExists(ElasticIndexPath indexPath, ElasticTypePath typePath)
+        public virtual bool TypeExists(string indexPath, string typePath)
         {
             var request = new TypeExistsRequest
             {
-                Index = indexPath.PathSegment,
-                Type = typePath.PathSegment
+                Index = indexPath,
+                Type = typePath
             };
 
             return AsyncHelper.RunSync(() => this.Connection.Head(request, this.Log));

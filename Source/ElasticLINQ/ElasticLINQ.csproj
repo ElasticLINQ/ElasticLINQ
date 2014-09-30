@@ -62,13 +62,10 @@
     <Compile Include="ElasticConnectionOptions.cs" />
     <Compile Include="ElasticContext.cs" />
     <Compile Include="ElasticFields.cs" />
-    <Compile Include="Path\ElasticIndexPath.cs" />
     <Compile Include="ElasticMethods.cs" />
     <Compile Include="ElasticQuery.cs" />
     <Compile Include="ElasticQueryExtensions.cs" />
     <Compile Include="ElasticQueryProvider.cs" />
-    <Compile Include="Path\ElasticPath.cs" />
-    <Compile Include="Path\ElasticTypePath.cs" />
     <Compile Include="IElasticConnection.cs" />
     <Compile Include="IElasticContext.cs" />
     <Compile Include="IElasticQuery.cs" />
