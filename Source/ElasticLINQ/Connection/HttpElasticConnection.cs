@@ -10,6 +10,7 @@ namespace ElasticLinq.Connection
     using System.Net.Http;
     using System.Threading.Tasks;
     using ElasticLinq.Logging;
+    using ElasticLinq.Path;
     using ElasticLinq.Utility;
     using Newtonsoft.Json;
 
@@ -113,26 +114,16 @@ namespace ElasticLinq.Connection
             httpClient.Dispose();
         }
 
-        public async Task<TResponse> Post<TResponse>(Uri uri, string body, ILog log)
+        public async Task<bool> Head(ElasticPath path, ILog log)
         {
-            using (var requestMessage = new HttpRequestMessage(HttpMethod.Post, uri))
-            {
-                using (var response = await SendRequestAsync(this.httpClient, requestMessage, body, log))
-                {
-                    using (var responseStream = await response.Content.ReadAsStreamAsync())
-                    {
-                        return ParseResponse<TResponse>(responseStream, log);
-                    }
-                }
-            }
-        }
+            var uri = MakeUri(this.Endpoint, path);
 
-        public async Task<bool> Head(Uri uri, ILog log)
-        {
             using (var requestMessage = new HttpRequestMessage(HttpMethod.Head, uri))
             {
                 using (var response = await SendRequestAsync(this.httpClient, requestMessage, null, log))
                 {
+                    log.Debug(null, null, "<== HTTP RESPONSE ({0}) {1}", response.StatusCode, response.ReasonPhrase);
+
                     return response.StatusCode == HttpStatusCode.OK;
                 }
             }
@@ -144,12 +135,54 @@ namespace ElasticLinq.Connection
             {
                 using (var response = await SendRequestAsync(this.httpClient, requestMessage, null, log))
                 {
+                    log.Debug(null, null, "<== HTTP RESPONSE ({0}) {1}", response.StatusCode, response.ReasonPhrase);
+
                     using (var responseStream = await response.Content.ReadAsStreamAsync())
                     {
                         return ParseResponse<TResponse>(responseStream, log);
                     }
                 }
             }
+        }
+
+        public async Task<TResponse> Post<TResponse>(Uri uri, string body, ILog log)
+        {
+            using (var requestMessage = new HttpRequestMessage(HttpMethod.Post, uri))
+            {
+                using (var response = await SendRequestAsync(this.httpClient, requestMessage, body, log))
+                {
+                    log.Debug(null, null, "<== HTTP RESPONSE ({0}) {1}", response.StatusCode, response.ReasonPhrase);
+
+                    using (var responseStream = await response.Content.ReadAsStreamAsync())
+                    {
+                        return ParseResponse<TResponse>(responseStream, log);
+                    }
+                }
+            }
+        }
+
+        private static Uri MakeUri(Uri endpoint, ElasticPath path)
+        {
+            var builder = new UriBuilder(endpoint);
+
+            if (path != null)
+            {
+                string pathSegment = "*";
+
+                if (path.IndexPath != null)
+                {
+                    pathSegment = path.IndexPath.PathSegment;
+                }
+
+                builder.Path += pathSegment + "/";
+
+                if (path.TypePath != null)
+                {
+                    builder.Path += path.TypePath.PathSegment;
+                }
+            }
+
+            return builder.Uri;
         }
 
         private static Uri UpdateUri(Uri uri, ElasticConnectionOptions options)

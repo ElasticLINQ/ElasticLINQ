@@ -5,6 +5,7 @@ namespace ElasticLinq
     using System;
     using System.Threading.Tasks;
     using ElasticLinq.Logging;
+    using ElasticLinq.Path;
 
     public interface IElasticConnection
     {
@@ -16,7 +17,7 @@ namespace ElasticLinq
 
         ElasticConnectionOptions Options { get; }
 
-        Task<bool> Head(Uri uri, ILog log);
+        Task<bool> Head(ElasticPath path, ILog log);
 
         Task<TResponse> Get<TResponse>(Uri uri, ILog log);
 

@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ElasticLinq.Connection;
+using ElasticLinq.Path;
 
 namespace ElasticLinq.Test
 {
@@ -59,7 +60,7 @@ namespace ElasticLinq.Test
             SetData((IEnumerable<T>)values);
         }
 
-        public IQueryable<T> Query<T>()
+        public IQueryable<T> Query<T>(ElasticPath path = null)
         {
             return new TestableElasticQuery<T>(this);
         }

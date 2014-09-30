@@ -5,6 +5,7 @@ using ElasticLinq.Mapping;
 using ElasticLinq.Retry;
 using ElasticLinq.Utility;
 using System.Linq;
+using ElasticLinq.Path;
 
 namespace ElasticLinq
 {
@@ -51,11 +52,26 @@ namespace ElasticLinq
         public IRetryPolicy RetryPolicy { get; private set; }
 
         /// <inheritdoc/>
-        public virtual IQueryable<T> Query<T>()
+        public virtual IQueryable<T> Query<T>(ElasticPath path = null)
         {
             var prefix = Mapping.GetDocumentMappingPrefix(typeof(T));
             var provider = new ElasticQueryProvider(Connection, Mapping, Log, RetryPolicy, prefix);
             return new ElasticQuery<T>(provider);
+        }
+
+        public virtual bool IndexExists(ElasticIndexPath indexPath)
+        {
+            return Exists(new ElasticPath(indexPath, null));
+        }
+
+        public virtual bool TypeExists(ElasticIndexPath indexPath, ElasticTypePath typePath)
+        {
+            return Exists(new ElasticPath(indexPath, typePath));
+        }
+
+        private bool Exists(ElasticPath path = null)
+        {
+            return AsyncHelper.RunSync(() => this.Connection.Head(path, this.Log));
         }
     }
 }
