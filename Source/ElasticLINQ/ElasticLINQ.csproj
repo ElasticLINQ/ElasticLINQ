@@ -45,6 +45,7 @@
     <Reference Include="System.Net.Http" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Communication\Attributes\ElasticParameterAttribute.cs" />
     <Compile Include="Communication\Attributes\ElasticRouteAttribute.cs" />
     <Compile Include="Communication\ElasticRouteHelper.cs" />
     <Compile Include="Communication\Requests\GetRequest.cs" />

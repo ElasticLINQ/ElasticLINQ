@@ -12,5 +12,21 @@
 
         [ElasticRoute(Position = 2, Optional = false)]
         public string Id { get; set; }
+
+        [ElasticParameter(Name = "realtime")]
+        public bool Realtime { get; set; }
+
+        [ElasticParameter(Name = "_source")]
+        public bool Source { get; set; }
+
+        [ElasticParameter(Name = "refresh")]
+        public bool Refresh { get; set; }
+
+        public GetRequest()
+        {
+            this.Realtime = false;
+            this.Source = false;
+            this.Refresh = false;
+        }
     }
 }

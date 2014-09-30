@@ -8,10 +8,8 @@ namespace ElasticLinq.Connection
     using System.Linq;
     using System.Net;
     using System.Net.Http;
-    using System.Reflection;
     using System.Threading.Tasks;
     using ElasticLinq.Communication;
-    using ElasticLinq.Communication.Attributes;
     using ElasticLinq.Logging;
     using ElasticLinq.Path;
     using ElasticLinq.Utility;
@@ -88,7 +86,7 @@ namespace ElasticLinq.Connection
 
         public async Task<bool> Head<TRequest>(TRequest request, ILog log)
         {
-            var uri = MakeUri(this.endpoint, request);
+            var uri = MakeUri(this.endpoint, request, this.Options);
 
             using (var requestMessage = new HttpRequestMessage(HttpMethod.Head, uri))
             {
@@ -103,7 +101,7 @@ namespace ElasticLinq.Connection
 
         public async Task<TResponse> Get<TResponse, TRequest>(TRequest request, ILog log)
         {
-            var uri = MakeUri(this.endpoint, request);
+            var uri = MakeUri(this.endpoint, request, this.Options);
 
             using (var requestMessage = new HttpRequestMessage(HttpMethod.Get, uri))
             {
@@ -121,7 +119,7 @@ namespace ElasticLinq.Connection
 
         public async Task<TResponse> Post<TResponse, TRequest>(TRequest request, string body, ILog log)
         {
-            var uri = MakeUri(this.endpoint, request);
+            var uri = MakeUri(this.endpoint, request, this.Options);
 
             using (var requestMessage = new HttpRequestMessage(HttpMethod.Post, uri))
             {
@@ -137,7 +135,7 @@ namespace ElasticLinq.Connection
             }
         }
 
-        private static Uri MakeUri<TRequest>(Uri endpoint, TRequest request)
+        private static Uri MakeUri<TRequest>(Uri endpoint, TRequest request, ElasticConnectionOptions options)
         {
             var builder = new UriBuilder(endpoint);
 
@@ -148,53 +146,19 @@ namespace ElasticLinq.Connection
                 builder.Path += route;
             }
 
-            return builder.Uri;
-        }
-
-        private static Uri MakeUri(Uri endpoint, ElasticPath path)
-        {
-            var builder = new UriBuilder(endpoint);
-
-            if (path != null)
-            {
-                string pathSegment = "*";
-
-                if (path.IndexPath != null)
-                {
-                    pathSegment = path.IndexPath.PathSegment;
-                }
-
-                builder.Path += pathSegment + "/";
-
-                if (path.TypePath != null)
-                {
-                    builder.Path += path.TypePath.PathSegment;
-                }
-            }
-
-            return builder.Uri;
-        }
-
-        private static Uri UpdateUri(Uri uri, ElasticConnectionOptions options)
-        {
-            var builder = new UriBuilder(uri);
-
-            var parameters = builder.Query.Split('&')
-                .Select(p => p.Split('='))
-                .ToDictionary(k => k[0], v => v.Length > 1 ? v[1] : null);
+            var param = ElasticRouteHelper.GetParam(request);
 
             if (options.Pretty == true)
             {
-                parameters["pretty"] = "true";
+                param["pretty"] = "true";
             }
 
             if (options.Human == false)
             {
-                parameters["human"] = "false";
+                param["human"] = "false";
             }
 
-            builder.Query = String.Join("&",
-                parameters.Select(p => p.Value == null ? p.Key : p.Key + "=" + p.Value));
+            builder.Query = string.Join("&", param.Select(p => p.Value == null ? p.Key : p.Key + "=" + p.Value));
 
             return builder.Uri;
         }
@@ -205,8 +169,6 @@ namespace ElasticLinq.Connection
             {
                 requestMessage.Content = new StringContent(body);
             }
-
-            requestMessage.RequestUri = UpdateUri(requestMessage.RequestUri, this.Options);
 
             log.Debug(null, null, "==> {0} - {1} - {2}", requestMessage.Method, requestMessage.RequestUri, body);
 
