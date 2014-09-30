@@ -24,7 +24,6 @@ namespace ElasticLinq.Request.Formatters
         private readonly IElasticConnection connection;
         private readonly IElasticMapping mapping;
         private readonly SearchRequest searchRequest;
-        private readonly Uri uri;
 
         public SearchRequestFormatter(IElasticConnection connection, IElasticMapping mapping, SearchRequest searchRequest)
         {
@@ -33,40 +32,11 @@ namespace ElasticLinq.Request.Formatters
             this.searchRequest = searchRequest;
 
             body = new Lazy<string>(() => CreateJsonPayload().ToString(Formatting.None));
-            uri = BuildSearchUri();
         }
 
         public string Body
         {
             get { return body.Value; }
-        }
-
-        public Uri Uri
-        {
-            get { return uri; }
-        }
-
-        private Uri BuildSearchUri()
-        {
-            var builder = new UriBuilder(connection.Endpoint);
-            builder.Path += (connection.Index ?? "_all") + "/";
-
-            if (!String.IsNullOrEmpty(searchRequest.DocumentType))
-                builder.Path += searchRequest.DocumentType + "/";
-
-            builder.Path += "_search";
-
-            var parameters = builder.Query.Split('&')
-                .Select(p => p.Split('='))
-                .ToDictionary(k => k[0], v => v.Length > 1 ? v[1] : null);
-
-            if (!String.IsNullOrEmpty(searchRequest.SearchType))
-                parameters["search_type"] = searchRequest.SearchType;
-
-            builder.Query = String.Join("&",
-                parameters.Select(p => p.Value == null ? p.Key : p.Key + "=" + p.Value));
-
-            return builder.Uri;
         }
 
         private JObject CreateJsonPayload()
@@ -95,8 +65,8 @@ namespace ElasticLinq.Request.Formatters
             if (searchRequest.Facets.Any())
                 root.Add("facets", Build(searchRequest.Facets, searchRequest.Filter));
 
-            if (connection.Timeout != TimeSpan.Zero)
-                root.Add("timeout", Format(connection.Timeout));
+            //if (connection.Timeout != TimeSpan.Zero)
+            //    root.Add("timeout", Format(connection.Timeout));
 
             return root;
         }

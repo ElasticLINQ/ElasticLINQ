@@ -42,16 +42,17 @@ namespace ElasticLinq.Request
         public Task<ElasticResponse> SearchAsync(SearchRequest searchRequest)
         {
             var formatter = new SearchRequestFormatter(connection, mapping, searchRequest);
+            var request = new Communication.Requests.SearchRequest { Index = searchRequest.DocumentType, Type = searchRequest.DocumentType };
 
             return retryPolicy.ExecuteAsync(
                 async () =>
                 {
-                    return await connection.Post<ElasticResponse>(formatter.Uri, formatter.Body, this.log);
+                    return await connection.Post<ElasticResponse, Communication.Requests.SearchRequest>(request, formatter.Body, this.log);
                 },
                 (response, exception) => exception is TaskCanceledException,
                 (response, additionalInfo) =>
                 {
-                    additionalInfo["index"] = connection.Index;
+                    //additionalInfo["index"] = connection.Index;
                     additionalInfo["query"] = formatter.Body;
                 });
         }

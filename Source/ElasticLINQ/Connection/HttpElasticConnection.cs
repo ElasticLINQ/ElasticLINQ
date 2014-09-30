@@ -26,7 +26,6 @@ namespace ElasticLinq.Connection
         private static readonly TimeSpan defaultTimeout = TimeSpan.FromSeconds(10);
 
         private readonly Uri endpoint;
-        private readonly string index;
         private readonly TimeSpan timeout = defaultTimeout;
         private readonly HttpClient httpClient;
         private readonly ElasticConnectionOptions options = new ElasticConnectionOptions();
@@ -41,8 +40,8 @@ namespace ElasticLinq.Connection
         /// <param name="password">Password to use to connect to the server (optional).</param>
         /// <param name="timeout">TimeSpan to wait for network responses before failing (optional, defaults to 10 seconds).</param>
         /// <param name="index">Name of the index to use on the server (optional).</param>
-        public HttpElasticConnection(Uri endpoint, string userName = null, string password = null, TimeSpan? timeout = null, string index = null)
-            : this(new HttpClientHandler(), endpoint, userName, password, index, timeout) { }
+        public HttpElasticConnection(Uri endpoint, string userName = null, string password = null, TimeSpan? timeout = null)
+            : this(new HttpClientHandler(), endpoint, userName, password, timeout) { }
 
 
         /// <summary>
@@ -54,16 +53,13 @@ namespace ElasticLinq.Connection
         /// <param name="password">Password to use to connect to the server (optional).</param>
         /// <param name="timeout">TimeSpan to wait for network responses before failing (optional, defaults to 10 seconds).</param>
         /// <param name="index">Name of the index to use on the server (optional).</param>
-        internal HttpElasticConnection(HttpMessageHandler innerMessageHandler, Uri endpoint, string userName = null, string password = null, string index = null, TimeSpan? timeout = null)
+        internal HttpElasticConnection(HttpMessageHandler innerMessageHandler, Uri endpoint, string userName = null, string password = null, TimeSpan? timeout = null)
         {
             Argument.EnsureNotNull("endpoint", endpoint);
             if (timeout.HasValue)
                 Argument.EnsurePositive("value", timeout.Value);
-            if (index != null)
-                Argument.EnsureNotBlank("index", index);
 
             this.endpoint = endpoint;
-            this.index = index;
             this.timeout = timeout ?? defaultTimeout;
 
             var httpClientHandler = innerMessageHandler as HttpClientHandler;
@@ -71,33 +67,6 @@ namespace ElasticLinq.Connection
                 httpClientHandler.AutomaticDecompression = DecompressionMethods.GZip;
 
             httpClient = new HttpClient(new ForcedAuthHandler(userName, password, innerMessageHandler), true);
-        }
-
-        /// <summary>
-        /// The Uri that specifies the public endpoint for the server.
-        /// </summary>
-        /// <example>http://myserver.example.com:9200</example>
-        public Uri Endpoint
-        {
-            get { return endpoint; }
-        }
-
-        /// <summary>
-        /// The name of the index on the Elasticsearch server.
-        /// </summary>
-        /// <example>northwind</example>
-        public string Index
-        {
-            get { return index; }
-        }
-
-        /// <summary>
-        /// How long to wait for a response to a network request before
-        /// giving up.
-        /// </summary>
-        public TimeSpan Timeout
-        {
-            get { return timeout; }
         }
 
         public ElasticConnectionOptions Options
@@ -117,9 +86,9 @@ namespace ElasticLinq.Connection
             httpClient.Dispose();
         }
 
-        public async Task<bool> Head(ElasticPath path, ILog log)
+        public async Task<bool> Head<TRequest>(TRequest request, ILog log)
         {
-            var uri = MakeUri(this.Endpoint, path);
+            var uri = MakeUri(this.endpoint, request);
 
             using (var requestMessage = new HttpRequestMessage(HttpMethod.Head, uri))
             {
@@ -134,7 +103,7 @@ namespace ElasticLinq.Connection
 
         public async Task<TResponse> Get<TResponse, TRequest>(TRequest request, ILog log)
         {
-            var uri = MakeUri(this.Endpoint, request);
+            var uri = MakeUri(this.endpoint, request);
 
             using (var requestMessage = new HttpRequestMessage(HttpMethod.Get, uri))
             {
@@ -150,8 +119,10 @@ namespace ElasticLinq.Connection
             }
         }
 
-        public async Task<TResponse> Post<TResponse>(Uri uri, string body, ILog log)
+        public async Task<TResponse> Post<TResponse, TRequest>(TRequest request, string body, ILog log)
         {
+            var uri = MakeUri(this.endpoint, request);
+
             using (var requestMessage = new HttpRequestMessage(HttpMethod.Post, uri))
             {
                 using (var response = await SendRequestAsync(this.httpClient, requestMessage, body, log))

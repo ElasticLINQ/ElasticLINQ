@@ -1,18 +1,16 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
-using ElasticLinq.Logging;
-using ElasticLinq.Mapping;
-using ElasticLinq.Retry;
-using ElasticLinq.Utility;
-using System.Linq;
-using ElasticLinq.Path;
-using ElasticLinq.Response;
-using ElasticLinq.Request;
-using ElasticLinq.Communication.Responses;
-using ElasticLinq.Communication.Requests;
-
 namespace ElasticLinq
 {
+    using System.Linq;
+    using ElasticLinq.Communication.Requests;
+    using ElasticLinq.Communication.Responses;
+    using ElasticLinq.Logging;
+    using ElasticLinq.Mapping;
+    using ElasticLinq.Path;
+    using ElasticLinq.Retry;
+    using ElasticLinq.Utility;
+
     /// <summary>
     /// Provides an entry point to easily create LINQ queries for Elasticsearch.
     /// </summary>
@@ -84,17 +82,23 @@ namespace ElasticLinq
 
         public virtual bool IndexExists(ElasticIndexPath indexPath)
         {
-            return Exists(new ElasticPath(indexPath, null));
+            var request = new IndexExistsRequest
+            {
+                Index = indexPath.PathSegment
+            };
+
+            return AsyncHelper.RunSync(() => this.Connection.Head(request, this.Log));
         }
 
         public virtual bool TypeExists(ElasticIndexPath indexPath, ElasticTypePath typePath)
         {
-            return Exists(new ElasticPath(indexPath, typePath));
-        }
+            var request = new TypeExistsRequest
+            {
+                Index = indexPath.PathSegment,
+                Type = typePath.PathSegment
+            };
 
-        private bool Exists(ElasticPath path = null)
-        {
-            return AsyncHelper.RunSync(() => this.Connection.Head(path, this.Log));
+            return AsyncHelper.RunSync(() => this.Connection.Head(request, this.Log));
         }
     }
 }

@@ -9,18 +9,12 @@ namespace ElasticLinq
 
     public interface IElasticConnection
     {
-        TimeSpan Timeout { get; }
-
-        string Index { get; }
-
-        Uri Endpoint { get; }
-
         ElasticConnectionOptions Options { get; }
 
-        Task<bool> Head(ElasticPath path, ILog log);
+        Task<bool> Head<TRequest>(TRequest request, ILog log);
 
         Task<TResponse> Get<TResponse, TRequest>(TRequest request, ILog log);
 
-        Task<TResponse> Post<TResponse>(Uri uri, string body, ILog log);
+        Task<TResponse> Post<TResponse, TRequest>(TRequest request, string body, ILog log);
     }
 }

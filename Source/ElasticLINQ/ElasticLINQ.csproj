@@ -48,6 +48,9 @@
     <Compile Include="Communication\Attributes\ElasticRouteAttribute.cs" />
     <Compile Include="Communication\ElasticRouteHelper.cs" />
     <Compile Include="Communication\Requests\GetRequest.cs" />
+    <Compile Include="Communication\Requests\IndexExistsRequest.cs" />
+    <Compile Include="Communication\Requests\SearchRequest.cs" />
+    <Compile Include="Communication\Requests\TypeExistsRequest.cs" />
     <Compile Include="Connection\HttpElasticConnection.cs" />
     <Compile Include="ElasticConnectionOptions.cs" />
     <Compile Include="ElasticContext.cs" />
@@ -124,9 +127,6 @@
     <Compile Include="Retry\RetryPolicy.cs" />
     <Compile Include="Retry\Delay.cs" />
     <Compile Include="Retry\IRetryPolicy.cs" />
-    <Compile Include="Test\TestableElasticContext.cs" />
-    <Compile Include="Test\TestableElasticQuery.cs" />
-    <Compile Include="Test\TestableElasticQueryProvider.cs" />
     <Compile Include="Utility\Argument.cs" />
     <Compile Include="Utility\AsyncHelper.cs" />
     <Compile Include="Utility\ExpressionExtensions.cs" />
