@@ -1,26 +1,44 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using ElasticApi.Attributes;
-
-namespace ElasticApi
+﻿namespace ElasticApi
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
+    using ElasticApi.Attributes;
+
     internal static class RequestHelper
     {
-        public static IEnumerable<string> GetPath<TRequest>(TRequest request)
+        public static object Param<T>(T value)
+            where T : class
         {
-            var routeProperties = typeof(TRequest).GetProperties().Select(x => new { PropertyInfo = x, Attribute = x.GetCustomAttributes<ApiRouteAttribute>().SingleOrDefault() });
-
-            return routeProperties.Where(x => x.Attribute != null).OrderBy(x => x.Attribute.Position).Select(x => x.PropertyInfo.GetValue(request)).Select(x => x != null ? x.ToString() : null);
+            return value;
         }
 
-        public static IDictionary<string, object> GetParameters<TRequest>(TRequest request)
+        public static object Param<T>(Nullable<T> value)
+            where T : struct
         {
-            var paramProperties = typeof(TRequest).GetProperties().Select(x => new { PropertyInfo = x, Attribute = x.GetCustomAttributes<ApiParamAttribute>().SingleOrDefault() }).Where(x => x.Attribute != null);
+            if (value.HasValue == false)
+            {
+                return null;
+            }
 
-            return paramProperties.Select(x => new { Value = x.PropertyInfo.GetValue(request), x.Attribute }).Where(x => x.Value != null).ToDictionary(x => x.Attribute.Name, x => x.Value);
+            return value;
+        }
+
+        public static string Segment(string value)
+        {
+            return value;
+        }
+
+        public static string Segment(IEnumerable<string> value)
+        {
+            return string.Join(",", value);
+        }
+
+        public static void AddCommonParameters(IDictionary<string, object> parameters)
+        {
+            parameters.Add("pretty", true);
+            parameters.Add("human", false);
         }
 
         public static object GetBody<TRequest>(TRequest request)

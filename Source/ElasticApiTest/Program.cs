@@ -17,6 +17,13 @@
                 var response = ElasticApi.Elastic.ClusterHealth(connection, request);
             }
 
+            //  ClusterStats
+            {
+                var request = new ClusterStatsRequest();
+
+                var response = ElasticApi.Elastic.ClusterStats(connection, request);
+            }
+
             //  Index
             {
                 var request = new IndexRequest { Index = "toto", Type = "tata", Id = "1", Body = new { Int = 2, String = "tutu" } };

@@ -48,7 +48,6 @@ namespace ElasticApi.Requests
 		/// <para>Type: url</para>
         /// <para>Required: <#=required#></para>
         /// </summary>
-		[ApiRoute(Part = "<#=part.Name#>", Position = <#=Array.FindIndex(parts, x => x == "{" + part.Name + "}")#>, Required = <#=required ? "true" : "false"#>)]
 		public <#=CSharpType(type, required)#> <#=PascalCase(part.Name)#> { get; set; }
 <#
         }
@@ -63,7 +62,6 @@ namespace ElasticApi.Requests
 		/// <para>Type: parameter</para>
         /// <para>Name: <#=part.Name#></para>
         /// </summary>
-		[ApiParam(Name = "<#=part.Name#>")]
 		public <#=CSharpType(type, false)#> <#=PascalCase(part.Name)#> { get; set; }
 <#
         }
@@ -143,8 +141,8 @@ namespace ElasticApi
 		/// <param name="request">request input</param>
 		public static <#=api#>Response <#=api#>(IConnection connection, <#=api#>Request request)
 		{
-			IEnumerable<string> path = RequestHelper.GetPath(request);
-			IDictionary<string, object> parameters = RequestHelper.GetParameters(request);
+			IEnumerable<string> path = Routing.GetPath(request);
+			IDictionary<string, object> parameters = Routing.GetParameters(request);
 <#
 			if (method == "post" || method == "put")
 			{
@@ -170,6 +168,93 @@ namespace ElasticApi
 		{
 			//	TODO : async version
 			return default(Task<<#=api#>Response>);
+		}
+<#
+    }
+#>
+	}
+}
+
+namespace ElasticApi
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Requests;
+
+	public static class Routing
+	{
+<#
+	foreach(var property in apis)
+    {
+		var api = PascalCase(property.Name);
+#>
+
+		private static readonly List<Func<<#=api#>Request, string>[]> <#=api#>Paths = new List<Func<<#=api#>Request, string>[]>
+		{
+<#
+		foreach(var path in property.Value.url.paths)
+		{
+#>
+			new Func<<#=api#>Request, string>[]
+			{
+<#
+			var segments = path.Value.Split(new [] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+
+			foreach(var segment in segments)
+			{
+#>
+<#
+				if (segment.Contains("}") == true)
+                {
+#>
+				x => RequestHelper.Segment(x.<#=PascalCase(segment.Substring(1, segment.Length - 2))#>),
+<#
+                }
+				else
+                {
+#>
+				x => "<#=segment#>",
+<#
+                }
+#>
+<#
+            }
+#>
+			},
+<#
+        }
+#>
+		};
+		
+		public static IEnumerable<string> GetPath(<#=api#>Request request)
+		{
+			var path = <#=api#>Paths.First();
+
+			return path.Select(x => x(request));
+		}
+
+		public static IDictionary<string, object> GetParameters(<#=api#>Request request)
+		{
+			var parameters = new Dictionary<string, object>();
+<#
+		foreach(var param in property.Value.url.@params)
+		{
+#>
+			{
+				object value = RequestHelper.Param(request.<#=PascalCase(param.Name)#>);
+
+				if (value != null)
+				{
+					parameters.Add("<#=param.Name#>", value);
+				}
+			}
+<#
+		}
+#>
+			RequestHelper.AddCommonParameters(parameters);
+
+			return parameters;
 		}
 <#
     }

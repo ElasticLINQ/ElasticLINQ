@@ -17,98 +17,84 @@
 		/// <para>Type: url</para>
         /// <para>Required: True</para>
         /// </summary>
-		[ApiRoute(Part = "id", Position = 3, Required = true)]
 		public string Id { get; set; }
         /// <summary>
         /// <para>The name of the index</para>
 		/// <para>Type: url</para>
         /// <para>Required: True</para>
         /// </summary>
-		[ApiRoute(Part = "index", Position = 1, Required = true)]
 		public string Index { get; set; }
         /// <summary>
         /// <para>The type of the document (use `_all` to fetch the first document matching the ID across all types)</para>
 		/// <para>Type: url</para>
         /// <para>Required: True</para>
         /// </summary>
-		[ApiRoute(Part = "type", Position = 2, Required = true)]
 		public string Type { get; set; }
         /// <summary>
         /// <para>A comma-separated list of fields to return in the response</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: fields</para>
         /// </summary>
-		[ApiParam(Name = "fields")]
 		public IEnumerable<string> Fields { get; set; }
         /// <summary>
         /// <para>The ID of the parent document</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: parent</para>
         /// </summary>
-		[ApiParam(Name = "parent")]
 		public string Parent { get; set; }
         /// <summary>
         /// <para>Specify the node or shard the operation should be performed on (default: random)</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: preference</para>
         /// </summary>
-		[ApiParam(Name = "preference")]
 		public string Preference { get; set; }
         /// <summary>
         /// <para>Specify whether to perform the operation in realtime or search mode</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: realtime</para>
         /// </summary>
-		[ApiParam(Name = "realtime")]
 		public Nullable<bool> Realtime { get; set; }
         /// <summary>
         /// <para>Refresh the shard containing the document before performing the operation</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: refresh</para>
         /// </summary>
-		[ApiParam(Name = "refresh")]
 		public Nullable<bool> Refresh { get; set; }
         /// <summary>
         /// <para>Specific routing value</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: routing</para>
         /// </summary>
-		[ApiParam(Name = "routing")]
 		public string Routing { get; set; }
         /// <summary>
         /// <para>True or false to return the _source field or not, or a list of fields to return</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: _source</para>
         /// </summary>
-		[ApiParam(Name = "_source")]
 		public IEnumerable<string> Source { get; set; }
         /// <summary>
         /// <para>A list of fields to exclude from the returned _source field</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: _source_exclude</para>
         /// </summary>
-		[ApiParam(Name = "_source_exclude")]
 		public IEnumerable<string> SourceExclude { get; set; }
         /// <summary>
         /// <para>A list of fields to extract and return from the _source field</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: _source_include</para>
         /// </summary>
-		[ApiParam(Name = "_source_include")]
 		public IEnumerable<string> SourceInclude { get; set; }
         /// <summary>
         /// <para>Explicit version number for concurrency control</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: version</para>
         /// </summary>
-		[ApiParam(Name = "version")]
 		public Nullable<long> Version { get; set; }
         /// <summary>
         /// <para>Specific version type</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: version_type</para>
         /// </summary>
-		[ApiParam(Name = "version_type")]
 		public string VersionType { get; set; }
 	}
     /// <summary>
@@ -124,98 +110,84 @@
 		/// <para>Type: url</para>
         /// <para>Required: False</para>
         /// </summary>
-		[ApiRoute(Part = "id", Position = 3, Required = false)]
 		public string Id { get; set; }
         /// <summary>
         /// <para>The name of the index</para>
 		/// <para>Type: url</para>
         /// <para>Required: True</para>
         /// </summary>
-		[ApiRoute(Part = "index", Position = 1, Required = true)]
 		public string Index { get; set; }
         /// <summary>
         /// <para>The type of the document</para>
 		/// <para>Type: url</para>
         /// <para>Required: True</para>
         /// </summary>
-		[ApiRoute(Part = "type", Position = 2, Required = true)]
 		public string Type { get; set; }
         /// <summary>
         /// <para>Explicit write consistency setting for the operation</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: consistency</para>
         /// </summary>
-		[ApiParam(Name = "consistency")]
 		public string Consistency { get; set; }
         /// <summary>
         /// <para>Explicit operation type</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: op_type</para>
         /// </summary>
-		[ApiParam(Name = "op_type")]
 		public string OpType { get; set; }
         /// <summary>
         /// <para>ID of the parent document</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: parent</para>
         /// </summary>
-		[ApiParam(Name = "parent")]
 		public string Parent { get; set; }
         /// <summary>
         /// <para>Refresh the index after performing the operation</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: refresh</para>
         /// </summary>
-		[ApiParam(Name = "refresh")]
 		public Nullable<bool> Refresh { get; set; }
         /// <summary>
         /// <para>Specific replication type</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: replication</para>
         /// </summary>
-		[ApiParam(Name = "replication")]
 		public string Replication { get; set; }
         /// <summary>
         /// <para>Specific routing value</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: routing</para>
         /// </summary>
-		[ApiParam(Name = "routing")]
 		public string Routing { get; set; }
         /// <summary>
         /// <para>Explicit operation timeout</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: timeout</para>
         /// </summary>
-		[ApiParam(Name = "timeout")]
 		public Nullable<TimeSpan> Timeout { get; set; }
         /// <summary>
         /// <para>Explicit timestamp for the document</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: timestamp</para>
         /// </summary>
-		[ApiParam(Name = "timestamp")]
 		public Nullable<TimeSpan> Timestamp { get; set; }
         /// <summary>
         /// <para>Expiration time for the document</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: ttl</para>
         /// </summary>
-		[ApiParam(Name = "ttl")]
 		public Nullable<TimeSpan> Ttl { get; set; }
         /// <summary>
         /// <para>Explicit version number for concurrency control</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: version</para>
         /// </summary>
-		[ApiParam(Name = "version")]
 		public Nullable<long> Version { get; set; }
         /// <summary>
         /// <para>Specific version type</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: version_type</para>
         /// </summary>
-		[ApiParam(Name = "version_type")]
 		public string VersionType { get; set; }
         /// <summary>
         /// <para>The document</para>
@@ -236,77 +208,66 @@
 		/// <para>Type: url</para>
         /// <para>Required: True</para>
         /// </summary>
-		[ApiRoute(Part = "id", Position = 3, Required = true)]
 		public string Id { get; set; }
         /// <summary>
         /// <para>The name of the index</para>
 		/// <para>Type: url</para>
         /// <para>Required: True</para>
         /// </summary>
-		[ApiRoute(Part = "index", Position = 1, Required = true)]
 		public string Index { get; set; }
         /// <summary>
         /// <para>The type of the document</para>
 		/// <para>Type: url</para>
         /// <para>Required: True</para>
         /// </summary>
-		[ApiRoute(Part = "type", Position = 2, Required = true)]
 		public string Type { get; set; }
         /// <summary>
         /// <para>Specific write consistency setting for the operation</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: consistency</para>
         /// </summary>
-		[ApiParam(Name = "consistency")]
 		public string Consistency { get; set; }
         /// <summary>
         /// <para>ID of parent document</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: parent</para>
         /// </summary>
-		[ApiParam(Name = "parent")]
 		public string Parent { get; set; }
         /// <summary>
         /// <para>Refresh the index after performing the operation</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: refresh</para>
         /// </summary>
-		[ApiParam(Name = "refresh")]
 		public Nullable<bool> Refresh { get; set; }
         /// <summary>
         /// <para>Specific replication type</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: replication</para>
         /// </summary>
-		[ApiParam(Name = "replication")]
 		public string Replication { get; set; }
         /// <summary>
         /// <para>Specific routing value</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: routing</para>
         /// </summary>
-		[ApiParam(Name = "routing")]
 		public string Routing { get; set; }
         /// <summary>
         /// <para>Explicit operation timeout</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: timeout</para>
         /// </summary>
-		[ApiParam(Name = "timeout")]
 		public Nullable<TimeSpan> Timeout { get; set; }
         /// <summary>
         /// <para>Explicit version number for concurrency control</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: version</para>
         /// </summary>
-		[ApiParam(Name = "version")]
 		public Nullable<long> Version { get; set; }
         /// <summary>
         /// <para>Specific version type</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: version_type</para>
         /// </summary>
-		[ApiParam(Name = "version_type")]
 		public string VersionType { get; set; }
 	}
     /// <summary>
@@ -322,133 +283,114 @@
 		/// <para>Type: url</para>
         /// <para>Required: True</para>
         /// </summary>
-		[ApiRoute(Part = "id", Position = 3, Required = true)]
 		public string Id { get; set; }
         /// <summary>
         /// <para>The name of the index</para>
 		/// <para>Type: url</para>
         /// <para>Required: True</para>
         /// </summary>
-		[ApiRoute(Part = "index", Position = 1, Required = true)]
 		public string Index { get; set; }
         /// <summary>
         /// <para>The type of the document</para>
 		/// <para>Type: url</para>
         /// <para>Required: True</para>
         /// </summary>
-		[ApiRoute(Part = "type", Position = 2, Required = true)]
 		public string Type { get; set; }
         /// <summary>
         /// <para>Explicit write consistency setting for the operation</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: consistency</para>
         /// </summary>
-		[ApiParam(Name = "consistency")]
 		public string Consistency { get; set; }
         /// <summary>
         /// <para>A comma-separated list of fields to return in the response</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: fields</para>
         /// </summary>
-		[ApiParam(Name = "fields")]
 		public IEnumerable<string> Fields { get; set; }
         /// <summary>
         /// <para>The script language (default: groovy)</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: lang</para>
         /// </summary>
-		[ApiParam(Name = "lang")]
 		public string Lang { get; set; }
         /// <summary>
         /// <para>ID of the parent document</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: parent</para>
         /// </summary>
-		[ApiParam(Name = "parent")]
 		public string Parent { get; set; }
         /// <summary>
         /// <para>Refresh the index after performing the operation</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: refresh</para>
         /// </summary>
-		[ApiParam(Name = "refresh")]
 		public Nullable<bool> Refresh { get; set; }
         /// <summary>
         /// <para>Specific replication type</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: replication</para>
         /// </summary>
-		[ApiParam(Name = "replication")]
 		public string Replication { get; set; }
         /// <summary>
         /// <para>Specify how many times should the operation be retried when a conflict occurs (default: 0)</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: retry_on_conflict</para>
         /// </summary>
-		[ApiParam(Name = "retry_on_conflict")]
 		public Nullable<long> RetryOnConflict { get; set; }
         /// <summary>
         /// <para>Specific routing value</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: routing</para>
         /// </summary>
-		[ApiParam(Name = "routing")]
 		public string Routing { get; set; }
         /// <summary>
         /// <para>The URL-encoded script definition (instead of using request body)</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: script</para>
         /// </summary>
-		[ApiParam(Name = "script")]
 		public string Script { get; set; }
         /// <summary>
         /// <para>The id of a stored script</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: script_id</para>
         /// </summary>
-		[ApiParam(Name = "script_id")]
 		public string ScriptId { get; set; }
         /// <summary>
         /// <para>True if the script referenced in script or script_id should be called to perform inserts - defaults to false</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: scripted_upsert</para>
         /// </summary>
-		[ApiParam(Name = "scripted_upsert")]
 		public Nullable<bool> ScriptedUpsert { get; set; }
         /// <summary>
         /// <para>Explicit operation timeout</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: timeout</para>
         /// </summary>
-		[ApiParam(Name = "timeout")]
 		public Nullable<TimeSpan> Timeout { get; set; }
         /// <summary>
         /// <para>Explicit timestamp for the document</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: timestamp</para>
         /// </summary>
-		[ApiParam(Name = "timestamp")]
 		public Nullable<TimeSpan> Timestamp { get; set; }
         /// <summary>
         /// <para>Expiration time for the document</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: ttl</para>
         /// </summary>
-		[ApiParam(Name = "ttl")]
 		public Nullable<TimeSpan> Ttl { get; set; }
         /// <summary>
         /// <para>Explicit version number for concurrency control</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: version</para>
         /// </summary>
-		[ApiParam(Name = "version")]
 		public Nullable<long> Version { get; set; }
         /// <summary>
         /// <para>Specific version type</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: version_type</para>
         /// </summary>
-		[ApiParam(Name = "version_type")]
 		public string VersionType { get; set; }
         /// <summary>
         /// <para>The request definition using either `script` or partial `doc`</para>
@@ -469,63 +411,54 @@
 		/// <para>Type: url</para>
         /// <para>Required: False</para>
         /// </summary>
-		[ApiRoute(Part = "index", Position = -1, Required = false)]
 		public string Index { get; set; }
         /// <summary>
         /// <para>Specify the level of detail for returned information</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: level</para>
         /// </summary>
-		[ApiParam(Name = "level")]
 		public string Level { get; set; }
         /// <summary>
         /// <para>Return local information, do not retrieve the state from master node (default: false)</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: local</para>
         /// </summary>
-		[ApiParam(Name = "local")]
 		public Nullable<bool> Local { get; set; }
         /// <summary>
         /// <para>Explicit operation timeout for connection to master node</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: master_timeout</para>
         /// </summary>
-		[ApiParam(Name = "master_timeout")]
 		public Nullable<TimeSpan> MasterTimeout { get; set; }
         /// <summary>
         /// <para>Explicit operation timeout</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: timeout</para>
         /// </summary>
-		[ApiParam(Name = "timeout")]
 		public Nullable<TimeSpan> Timeout { get; set; }
         /// <summary>
         /// <para>Wait until the specified number of shards is active</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: wait_for_active_shards</para>
         /// </summary>
-		[ApiParam(Name = "wait_for_active_shards")]
 		public Nullable<long> WaitForActiveShards { get; set; }
         /// <summary>
         /// <para>Wait until the specified number of nodes is available</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: wait_for_nodes</para>
         /// </summary>
-		[ApiParam(Name = "wait_for_nodes")]
 		public string WaitForNodes { get; set; }
         /// <summary>
         /// <para>Wait until the specified number of relocating shards is finished</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: wait_for_relocating_shards</para>
         /// </summary>
-		[ApiParam(Name = "wait_for_relocating_shards")]
 		public Nullable<long> WaitForRelocatingShards { get; set; }
         /// <summary>
         /// <para>Wait until cluster is in a specific state</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: wait_for_status</para>
         /// </summary>
-		[ApiParam(Name = "wait_for_status")]
 		public string WaitForStatus { get; set; }
 	}
     /// <summary>
@@ -541,35 +474,30 @@
 		/// <para>Type: url</para>
         /// <para>Required: False</para>
         /// </summary>
-		[ApiRoute(Part = "index", Position = -1, Required = false)]
 		public IEnumerable<string> Index { get; set; }
         /// <summary>
         /// <para>Limit the information returned to the specified metrics</para>
 		/// <para>Type: url</para>
         /// <para>Required: False</para>
         /// </summary>
-		[ApiRoute(Part = "metric", Position = -1, Required = false)]
 		public IEnumerable<string> Metric { get; set; }
         /// <summary>
         /// <para>Return local information, do not retrieve the state from master node (default: false)</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: local</para>
         /// </summary>
-		[ApiParam(Name = "local")]
 		public Nullable<bool> Local { get; set; }
         /// <summary>
         /// <para>Specify timeout for connection to master</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: master_timeout</para>
         /// </summary>
-		[ApiParam(Name = "master_timeout")]
 		public Nullable<TimeSpan> MasterTimeout { get; set; }
         /// <summary>
         /// <para>Return settings in flat format (default: false)</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: flat_settings</para>
         /// </summary>
-		[ApiParam(Name = "flat_settings")]
 		public Nullable<bool> FlatSettings { get; set; }
 	}
     /// <summary>
@@ -585,21 +513,18 @@
 		/// <para>Type: url</para>
         /// <para>Required: False</para>
         /// </summary>
-		[ApiRoute(Part = "node_id", Position = -1, Required = false)]
 		public IEnumerable<string> NodeId { get; set; }
         /// <summary>
         /// <para>Return settings in flat format (default: false)</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: flat_settings</para>
         /// </summary>
-		[ApiParam(Name = "flat_settings")]
 		public Nullable<bool> FlatSettings { get; set; }
         /// <summary>
         /// <para>Whether to return time and byte values in human-readable format.</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: human</para>
         /// </summary>
-		[ApiParam(Name = "human")]
 		public Nullable<bool> Human { get; set; }
 	}
     /// <summary>
@@ -615,14 +540,12 @@
 		/// <para>Type: parameter</para>
         /// <para>Name: local</para>
         /// </summary>
-		[ApiParam(Name = "local")]
 		public Nullable<bool> Local { get; set; }
         /// <summary>
         /// <para>Specify timeout for connection to master</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: master_timeout</para>
         /// </summary>
-		[ApiParam(Name = "master_timeout")]
 		public Nullable<TimeSpan> MasterTimeout { get; set; }
 	}
     /// <summary>
@@ -638,35 +561,30 @@
 		/// <para>Type: parameter</para>
         /// <para>Name: dry_run</para>
         /// </summary>
-		[ApiParam(Name = "dry_run")]
 		public Nullable<bool> DryRun { get; set; }
         /// <summary>
         /// <para>Return an explanation of why the commands can or cannot be executed</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: explain</para>
         /// </summary>
-		[ApiParam(Name = "explain")]
 		public Nullable<bool> Explain { get; set; }
         /// <summary>
         /// <para>Limit the information returned to the specified metrics. Defaults to all but metadata</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: metric</para>
         /// </summary>
-		[ApiParam(Name = "metric")]
 		public IEnumerable<string> Metric { get; set; }
         /// <summary>
         /// <para>Explicit operation timeout for connection to master node</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: master_timeout</para>
         /// </summary>
-		[ApiParam(Name = "master_timeout")]
 		public Nullable<TimeSpan> MasterTimeout { get; set; }
         /// <summary>
         /// <para>Explicit operation timeout</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: timeout</para>
         /// </summary>
-		[ApiParam(Name = "timeout")]
 		public Nullable<TimeSpan> Timeout { get; set; }
         /// <summary>
         /// <para>The definition of `commands` to perform (`move`, `cancel`, `allocate`)</para>
@@ -687,21 +605,18 @@
 		/// <para>Type: parameter</para>
         /// <para>Name: flat_settings</para>
         /// </summary>
-		[ApiParam(Name = "flat_settings")]
 		public Nullable<bool> FlatSettings { get; set; }
         /// <summary>
         /// <para>Explicit operation timeout for connection to master node</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: master_timeout</para>
         /// </summary>
-		[ApiParam(Name = "master_timeout")]
 		public Nullable<TimeSpan> MasterTimeout { get; set; }
         /// <summary>
         /// <para>Explicit operation timeout</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: timeout</para>
         /// </summary>
-		[ApiParam(Name = "timeout")]
 		public Nullable<TimeSpan> Timeout { get; set; }
 	}
     /// <summary>
@@ -717,7 +632,6 @@
 		/// <para>Type: parameter</para>
         /// <para>Name: flat_settings</para>
         /// </summary>
-		[ApiParam(Name = "flat_settings")]
 		public Nullable<bool> FlatSettings { get; set; }
         /// <summary>
         /// <para>The settings to be updated. Can be either `transient` or `persistent` (survives cluster restart).</para>
@@ -738,70 +652,60 @@
 		/// <para>Type: url</para>
         /// <para>Required: False</para>
         /// </summary>
-		[ApiRoute(Part = "metric", Position = -1, Required = false)]
 		public IEnumerable<string> Metric { get; set; }
         /// <summary>
         /// <para>Limit the information returned for `indices` metric to the specific index metrics. Isn't used if `indices` (or `all`) metric isn't specified.</para>
 		/// <para>Type: url</para>
         /// <para>Required: False</para>
         /// </summary>
-		[ApiRoute(Part = "index_metric", Position = -1, Required = false)]
 		public IEnumerable<string> IndexMetric { get; set; }
         /// <summary>
         /// <para>A comma-separated list of node IDs or names to limit the returned information; use `_local` to return information from the node you're connecting to, leave empty to get information from all nodes</para>
 		/// <para>Type: url</para>
         /// <para>Required: False</para>
         /// </summary>
-		[ApiRoute(Part = "node_id", Position = -1, Required = false)]
 		public IEnumerable<string> NodeId { get; set; }
         /// <summary>
         /// <para>A comma-separated list of fields for `fielddata` and `suggest` index metric (supports wildcards)</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: completion_fields</para>
         /// </summary>
-		[ApiParam(Name = "completion_fields")]
 		public IEnumerable<string> CompletionFields { get; set; }
         /// <summary>
         /// <para>A comma-separated list of fields for `fielddata` index metric (supports wildcards)</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: fielddata_fields</para>
         /// </summary>
-		[ApiParam(Name = "fielddata_fields")]
 		public IEnumerable<string> FielddataFields { get; set; }
         /// <summary>
         /// <para>A comma-separated list of fields for `fielddata` and `completion` index metric (supports wildcards)</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: fields</para>
         /// </summary>
-		[ApiParam(Name = "fields")]
 		public IEnumerable<string> Fields { get; set; }
         /// <summary>
         /// <para>A comma-separated list of search groups for `search` index metric</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: groups</para>
         /// </summary>
-		[ApiParam(Name = "groups")]
 		public Nullable<bool> Groups { get; set; }
         /// <summary>
         /// <para>Whether to return time and byte values in human-readable format.</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: human</para>
         /// </summary>
-		[ApiParam(Name = "human")]
 		public Nullable<bool> Human { get; set; }
         /// <summary>
         /// <para>Return indices stats aggregated at node, index or shard level</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: level</para>
         /// </summary>
-		[ApiParam(Name = "level")]
 		public string Level { get; set; }
         /// <summary>
         /// <para>A comma-separated list of document types for the `indexing` index metric</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: types</para>
         /// </summary>
-		[ApiParam(Name = "types")]
 		public IEnumerable<string> Types { get; set; }
 	}
     /// <summary>
@@ -817,28 +721,24 @@
 		/// <para>Type: url</para>
         /// <para>Required: False</para>
         /// </summary>
-		[ApiRoute(Part = "node_id", Position = -1, Required = false)]
 		public IEnumerable<string> NodeId { get; set; }
         /// <summary>
         /// <para>A comma-separated list of metrics you wish returned. Leave empty to return all.</para>
 		/// <para>Type: url</para>
         /// <para>Required: False</para>
         /// </summary>
-		[ApiRoute(Part = "metric", Position = -1, Required = false)]
 		public IEnumerable<string> Metric { get; set; }
         /// <summary>
         /// <para>Return settings in flat format (default: false)</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: flat_settings</para>
         /// </summary>
-		[ApiParam(Name = "flat_settings")]
 		public Nullable<bool> FlatSettings { get; set; }
         /// <summary>
         /// <para>Whether to return time and byte values in human-readable format.</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: human</para>
         /// </summary>
-		[ApiParam(Name = "human")]
 		public Nullable<bool> Human { get; set; }
 	}
     /// <summary>
@@ -854,35 +754,30 @@
 		/// <para>Type: url</para>
         /// <para>Required: False</para>
         /// </summary>
-		[ApiRoute(Part = "node_id", Position = -1, Required = false)]
 		public IEnumerable<string> NodeId { get; set; }
         /// <summary>
         /// <para>The interval for the second sampling of threads</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: interval</para>
         /// </summary>
-		[ApiParam(Name = "interval")]
 		public Nullable<TimeSpan> Interval { get; set; }
         /// <summary>
         /// <para>Number of samples of thread stacktrace (default: 10)</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: snapshots</para>
         /// </summary>
-		[ApiParam(Name = "snapshots")]
 		public Nullable<long> Snapshots { get; set; }
         /// <summary>
         /// <para>Specify the number of threads to provide information for (default: 3)</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: threads</para>
         /// </summary>
-		[ApiParam(Name = "threads")]
 		public Nullable<long> Threads { get; set; }
         /// <summary>
         /// <para>The type to sample (default: cpu)</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: type</para>
         /// </summary>
-		[ApiParam(Name = "type")]
 		public string Type { get; set; }
 	}
     /// <summary>
@@ -898,21 +793,18 @@
 		/// <para>Type: url</para>
         /// <para>Required: False</para>
         /// </summary>
-		[ApiRoute(Part = "node_id", Position = -1, Required = false)]
 		public IEnumerable<string> NodeId { get; set; }
         /// <summary>
         /// <para>Set the delay for the operation (default: 1s)</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: delay</para>
         /// </summary>
-		[ApiParam(Name = "delay")]
 		public Nullable<TimeSpan> Delay { get; set; }
         /// <summary>
         /// <para>Exit the JVM as well (default: true)</para>
 		/// <para>Type: parameter</para>
         /// <para>Name: exit</para>
         /// </summary>
-		[ApiParam(Name = "exit")]
 		public Nullable<bool> Exit { get; set; }
 	}
 }
@@ -1135,8 +1027,8 @@ namespace ElasticApi
 		/// <param name="request">request input</param>
 		public static GetResponse Get(IConnection connection, GetRequest request)
 		{
-			IEnumerable<string> path = RequestHelper.GetPath(request);
-			IDictionary<string, object> parameters = RequestHelper.GetParameters(request);
+			IEnumerable<string> path = Routing.GetPath(request);
+			IDictionary<string, object> parameters = Routing.GetParameters(request);
 			return connection.Get<GetResponse>(path, parameters);
 		}
 		/// <summary>
@@ -1154,8 +1046,8 @@ namespace ElasticApi
 		/// <param name="request">request input</param>
 		public static IndexResponse Index(IConnection connection, IndexRequest request)
 		{
-			IEnumerable<string> path = RequestHelper.GetPath(request);
-			IDictionary<string, object> parameters = RequestHelper.GetParameters(request);
+			IEnumerable<string> path = Routing.GetPath(request);
+			IDictionary<string, object> parameters = Routing.GetParameters(request);
 			object body = RequestHelper.GetBody(request);
 
 			return connection.Put<IndexResponse>(path, parameters, body);
@@ -1175,8 +1067,8 @@ namespace ElasticApi
 		/// <param name="request">request input</param>
 		public static DeleteResponse Delete(IConnection connection, DeleteRequest request)
 		{
-			IEnumerable<string> path = RequestHelper.GetPath(request);
-			IDictionary<string, object> parameters = RequestHelper.GetParameters(request);
+			IEnumerable<string> path = Routing.GetPath(request);
+			IDictionary<string, object> parameters = Routing.GetParameters(request);
 			return connection.Delete<DeleteResponse>(path, parameters);
 		}
 		/// <summary>
@@ -1194,8 +1086,8 @@ namespace ElasticApi
 		/// <param name="request">request input</param>
 		public static UpdateResponse Update(IConnection connection, UpdateRequest request)
 		{
-			IEnumerable<string> path = RequestHelper.GetPath(request);
-			IDictionary<string, object> parameters = RequestHelper.GetParameters(request);
+			IEnumerable<string> path = Routing.GetPath(request);
+			IDictionary<string, object> parameters = Routing.GetParameters(request);
 			object body = RequestHelper.GetBody(request);
 
 			return connection.Post<UpdateResponse>(path, parameters, body);
@@ -1215,8 +1107,8 @@ namespace ElasticApi
 		/// <param name="request">request input</param>
 		public static ClusterHealthResponse ClusterHealth(IConnection connection, ClusterHealthRequest request)
 		{
-			IEnumerable<string> path = RequestHelper.GetPath(request);
-			IDictionary<string, object> parameters = RequestHelper.GetParameters(request);
+			IEnumerable<string> path = Routing.GetPath(request);
+			IDictionary<string, object> parameters = Routing.GetParameters(request);
 			return connection.Get<ClusterHealthResponse>(path, parameters);
 		}
 		/// <summary>
@@ -1234,8 +1126,8 @@ namespace ElasticApi
 		/// <param name="request">request input</param>
 		public static ClusterStateResponse ClusterState(IConnection connection, ClusterStateRequest request)
 		{
-			IEnumerable<string> path = RequestHelper.GetPath(request);
-			IDictionary<string, object> parameters = RequestHelper.GetParameters(request);
+			IEnumerable<string> path = Routing.GetPath(request);
+			IDictionary<string, object> parameters = Routing.GetParameters(request);
 			return connection.Get<ClusterStateResponse>(path, parameters);
 		}
 		/// <summary>
@@ -1253,8 +1145,8 @@ namespace ElasticApi
 		/// <param name="request">request input</param>
 		public static ClusterStatsResponse ClusterStats(IConnection connection, ClusterStatsRequest request)
 		{
-			IEnumerable<string> path = RequestHelper.GetPath(request);
-			IDictionary<string, object> parameters = RequestHelper.GetParameters(request);
+			IEnumerable<string> path = Routing.GetPath(request);
+			IDictionary<string, object> parameters = Routing.GetParameters(request);
 			return connection.Get<ClusterStatsResponse>(path, parameters);
 		}
 		/// <summary>
@@ -1272,8 +1164,8 @@ namespace ElasticApi
 		/// <param name="request">request input</param>
 		public static ClusterPendingTasksResponse ClusterPendingTasks(IConnection connection, ClusterPendingTasksRequest request)
 		{
-			IEnumerable<string> path = RequestHelper.GetPath(request);
-			IDictionary<string, object> parameters = RequestHelper.GetParameters(request);
+			IEnumerable<string> path = Routing.GetPath(request);
+			IDictionary<string, object> parameters = Routing.GetParameters(request);
 			return connection.Get<ClusterPendingTasksResponse>(path, parameters);
 		}
 		/// <summary>
@@ -1291,8 +1183,8 @@ namespace ElasticApi
 		/// <param name="request">request input</param>
 		public static ClusterRerouteResponse ClusterReroute(IConnection connection, ClusterRerouteRequest request)
 		{
-			IEnumerable<string> path = RequestHelper.GetPath(request);
-			IDictionary<string, object> parameters = RequestHelper.GetParameters(request);
+			IEnumerable<string> path = Routing.GetPath(request);
+			IDictionary<string, object> parameters = Routing.GetParameters(request);
 			object body = RequestHelper.GetBody(request);
 
 			return connection.Post<ClusterRerouteResponse>(path, parameters, body);
@@ -1312,8 +1204,8 @@ namespace ElasticApi
 		/// <param name="request">request input</param>
 		public static ClusterGetSettingsResponse ClusterGetSettings(IConnection connection, ClusterGetSettingsRequest request)
 		{
-			IEnumerable<string> path = RequestHelper.GetPath(request);
-			IDictionary<string, object> parameters = RequestHelper.GetParameters(request);
+			IEnumerable<string> path = Routing.GetPath(request);
+			IDictionary<string, object> parameters = Routing.GetParameters(request);
 			return connection.Get<ClusterGetSettingsResponse>(path, parameters);
 		}
 		/// <summary>
@@ -1331,8 +1223,8 @@ namespace ElasticApi
 		/// <param name="request">request input</param>
 		public static ClusterPutSettingsResponse ClusterPutSettings(IConnection connection, ClusterPutSettingsRequest request)
 		{
-			IEnumerable<string> path = RequestHelper.GetPath(request);
-			IDictionary<string, object> parameters = RequestHelper.GetParameters(request);
+			IEnumerable<string> path = Routing.GetPath(request);
+			IDictionary<string, object> parameters = Routing.GetParameters(request);
 			object body = RequestHelper.GetBody(request);
 
 			return connection.Put<ClusterPutSettingsResponse>(path, parameters, body);
@@ -1352,8 +1244,8 @@ namespace ElasticApi
 		/// <param name="request">request input</param>
 		public static NodesStatsResponse NodesStats(IConnection connection, NodesStatsRequest request)
 		{
-			IEnumerable<string> path = RequestHelper.GetPath(request);
-			IDictionary<string, object> parameters = RequestHelper.GetParameters(request);
+			IEnumerable<string> path = Routing.GetPath(request);
+			IDictionary<string, object> parameters = Routing.GetParameters(request);
 			return connection.Get<NodesStatsResponse>(path, parameters);
 		}
 		/// <summary>
@@ -1371,8 +1263,8 @@ namespace ElasticApi
 		/// <param name="request">request input</param>
 		public static NodesInfoResponse NodesInfo(IConnection connection, NodesInfoRequest request)
 		{
-			IEnumerable<string> path = RequestHelper.GetPath(request);
-			IDictionary<string, object> parameters = RequestHelper.GetParameters(request);
+			IEnumerable<string> path = Routing.GetPath(request);
+			IDictionary<string, object> parameters = Routing.GetParameters(request);
 			return connection.Get<NodesInfoResponse>(path, parameters);
 		}
 		/// <summary>
@@ -1390,8 +1282,8 @@ namespace ElasticApi
 		/// <param name="request">request input</param>
 		public static NodesHotThreadsResponse NodesHotThreads(IConnection connection, NodesHotThreadsRequest request)
 		{
-			IEnumerable<string> path = RequestHelper.GetPath(request);
-			IDictionary<string, object> parameters = RequestHelper.GetParameters(request);
+			IEnumerable<string> path = Routing.GetPath(request);
+			IDictionary<string, object> parameters = Routing.GetParameters(request);
 			return connection.Get<NodesHotThreadsResponse>(path, parameters);
 		}
 		/// <summary>
@@ -1409,8 +1301,8 @@ namespace ElasticApi
 		/// <param name="request">request input</param>
 		public static NodesShutdownResponse NodesShutdown(IConnection connection, NodesShutdownRequest request)
 		{
-			IEnumerable<string> path = RequestHelper.GetPath(request);
-			IDictionary<string, object> parameters = RequestHelper.GetParameters(request);
+			IEnumerable<string> path = Routing.GetPath(request);
+			IDictionary<string, object> parameters = Routing.GetParameters(request);
 			object body = RequestHelper.GetBody(request);
 
 			return connection.Post<NodesShutdownResponse>(path, parameters, body);
@@ -1423,6 +1315,1198 @@ namespace ElasticApi
 		{
 			//	TODO : async version
 			return default(Task<NodesShutdownResponse>);
+		}
+	}
+}
+
+namespace ElasticApi
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Requests;
+
+	public static class Routing
+	{
+
+		private static readonly List<Func<GetRequest, string>[]> GetPaths = new List<Func<GetRequest, string>[]>
+		{
+			new Func<GetRequest, string>[]
+			{
+				x => RequestHelper.Segment(x.Index),
+				x => RequestHelper.Segment(x.Type),
+				x => RequestHelper.Segment(x.Id),
+			},
+		};
+		
+		public static IEnumerable<string> GetPath(GetRequest request)
+		{
+			var path = GetPaths.First();
+
+			return path.Select(x => x(request));
+		}
+
+		public static IDictionary<string, object> GetParameters(GetRequest request)
+		{
+			var parameters = new Dictionary<string, object>();
+			{
+				object value = RequestHelper.Param(request.Fields);
+
+				if (value != null)
+				{
+					parameters.Add("fields", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Parent);
+
+				if (value != null)
+				{
+					parameters.Add("parent", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Preference);
+
+				if (value != null)
+				{
+					parameters.Add("preference", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Realtime);
+
+				if (value != null)
+				{
+					parameters.Add("realtime", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Refresh);
+
+				if (value != null)
+				{
+					parameters.Add("refresh", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Routing);
+
+				if (value != null)
+				{
+					parameters.Add("routing", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Source);
+
+				if (value != null)
+				{
+					parameters.Add("_source", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.SourceExclude);
+
+				if (value != null)
+				{
+					parameters.Add("_source_exclude", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.SourceInclude);
+
+				if (value != null)
+				{
+					parameters.Add("_source_include", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Version);
+
+				if (value != null)
+				{
+					parameters.Add("version", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.VersionType);
+
+				if (value != null)
+				{
+					parameters.Add("version_type", value);
+				}
+			}
+			RequestHelper.AddCommonParameters(parameters);
+
+			return parameters;
+		}
+
+		private static readonly List<Func<IndexRequest, string>[]> IndexPaths = new List<Func<IndexRequest, string>[]>
+		{
+			new Func<IndexRequest, string>[]
+			{
+				x => RequestHelper.Segment(x.Index),
+				x => RequestHelper.Segment(x.Type),
+				x => RequestHelper.Segment(x.Id),
+			},
+			new Func<IndexRequest, string>[]
+			{
+				x => RequestHelper.Segment(x.Index),
+				x => RequestHelper.Segment(x.Type),
+			},
+		};
+		
+		public static IEnumerable<string> GetPath(IndexRequest request)
+		{
+			var path = IndexPaths.First();
+
+			return path.Select(x => x(request));
+		}
+
+		public static IDictionary<string, object> GetParameters(IndexRequest request)
+		{
+			var parameters = new Dictionary<string, object>();
+			{
+				object value = RequestHelper.Param(request.Consistency);
+
+				if (value != null)
+				{
+					parameters.Add("consistency", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.OpType);
+
+				if (value != null)
+				{
+					parameters.Add("op_type", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Parent);
+
+				if (value != null)
+				{
+					parameters.Add("parent", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Refresh);
+
+				if (value != null)
+				{
+					parameters.Add("refresh", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Replication);
+
+				if (value != null)
+				{
+					parameters.Add("replication", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Routing);
+
+				if (value != null)
+				{
+					parameters.Add("routing", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Timeout);
+
+				if (value != null)
+				{
+					parameters.Add("timeout", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Timestamp);
+
+				if (value != null)
+				{
+					parameters.Add("timestamp", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Ttl);
+
+				if (value != null)
+				{
+					parameters.Add("ttl", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Version);
+
+				if (value != null)
+				{
+					parameters.Add("version", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.VersionType);
+
+				if (value != null)
+				{
+					parameters.Add("version_type", value);
+				}
+			}
+			RequestHelper.AddCommonParameters(parameters);
+
+			return parameters;
+		}
+
+		private static readonly List<Func<DeleteRequest, string>[]> DeletePaths = new List<Func<DeleteRequest, string>[]>
+		{
+			new Func<DeleteRequest, string>[]
+			{
+				x => RequestHelper.Segment(x.Index),
+				x => RequestHelper.Segment(x.Type),
+				x => RequestHelper.Segment(x.Id),
+			},
+		};
+		
+		public static IEnumerable<string> GetPath(DeleteRequest request)
+		{
+			var path = DeletePaths.First();
+
+			return path.Select(x => x(request));
+		}
+
+		public static IDictionary<string, object> GetParameters(DeleteRequest request)
+		{
+			var parameters = new Dictionary<string, object>();
+			{
+				object value = RequestHelper.Param(request.Consistency);
+
+				if (value != null)
+				{
+					parameters.Add("consistency", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Parent);
+
+				if (value != null)
+				{
+					parameters.Add("parent", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Refresh);
+
+				if (value != null)
+				{
+					parameters.Add("refresh", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Replication);
+
+				if (value != null)
+				{
+					parameters.Add("replication", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Routing);
+
+				if (value != null)
+				{
+					parameters.Add("routing", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Timeout);
+
+				if (value != null)
+				{
+					parameters.Add("timeout", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Version);
+
+				if (value != null)
+				{
+					parameters.Add("version", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.VersionType);
+
+				if (value != null)
+				{
+					parameters.Add("version_type", value);
+				}
+			}
+			RequestHelper.AddCommonParameters(parameters);
+
+			return parameters;
+		}
+
+		private static readonly List<Func<UpdateRequest, string>[]> UpdatePaths = new List<Func<UpdateRequest, string>[]>
+		{
+			new Func<UpdateRequest, string>[]
+			{
+				x => RequestHelper.Segment(x.Index),
+				x => RequestHelper.Segment(x.Type),
+				x => RequestHelper.Segment(x.Id),
+				x => "_update",
+			},
+		};
+		
+		public static IEnumerable<string> GetPath(UpdateRequest request)
+		{
+			var path = UpdatePaths.First();
+
+			return path.Select(x => x(request));
+		}
+
+		public static IDictionary<string, object> GetParameters(UpdateRequest request)
+		{
+			var parameters = new Dictionary<string, object>();
+			{
+				object value = RequestHelper.Param(request.Consistency);
+
+				if (value != null)
+				{
+					parameters.Add("consistency", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Fields);
+
+				if (value != null)
+				{
+					parameters.Add("fields", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Lang);
+
+				if (value != null)
+				{
+					parameters.Add("lang", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Parent);
+
+				if (value != null)
+				{
+					parameters.Add("parent", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Refresh);
+
+				if (value != null)
+				{
+					parameters.Add("refresh", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Replication);
+
+				if (value != null)
+				{
+					parameters.Add("replication", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.RetryOnConflict);
+
+				if (value != null)
+				{
+					parameters.Add("retry_on_conflict", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Routing);
+
+				if (value != null)
+				{
+					parameters.Add("routing", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Script);
+
+				if (value != null)
+				{
+					parameters.Add("script", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.ScriptId);
+
+				if (value != null)
+				{
+					parameters.Add("script_id", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.ScriptedUpsert);
+
+				if (value != null)
+				{
+					parameters.Add("scripted_upsert", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Timeout);
+
+				if (value != null)
+				{
+					parameters.Add("timeout", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Timestamp);
+
+				if (value != null)
+				{
+					parameters.Add("timestamp", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Ttl);
+
+				if (value != null)
+				{
+					parameters.Add("ttl", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Version);
+
+				if (value != null)
+				{
+					parameters.Add("version", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.VersionType);
+
+				if (value != null)
+				{
+					parameters.Add("version_type", value);
+				}
+			}
+			RequestHelper.AddCommonParameters(parameters);
+
+			return parameters;
+		}
+
+		private static readonly List<Func<ClusterHealthRequest, string>[]> ClusterHealthPaths = new List<Func<ClusterHealthRequest, string>[]>
+		{
+			new Func<ClusterHealthRequest, string>[]
+			{
+				x => "_cluster",
+				x => "health",
+			},
+			new Func<ClusterHealthRequest, string>[]
+			{
+				x => "_cluster",
+				x => "health",
+				x => RequestHelper.Segment(x.Index),
+			},
+		};
+		
+		public static IEnumerable<string> GetPath(ClusterHealthRequest request)
+		{
+			var path = ClusterHealthPaths.First();
+
+			return path.Select(x => x(request));
+		}
+
+		public static IDictionary<string, object> GetParameters(ClusterHealthRequest request)
+		{
+			var parameters = new Dictionary<string, object>();
+			{
+				object value = RequestHelper.Param(request.Level);
+
+				if (value != null)
+				{
+					parameters.Add("level", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Local);
+
+				if (value != null)
+				{
+					parameters.Add("local", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.MasterTimeout);
+
+				if (value != null)
+				{
+					parameters.Add("master_timeout", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Timeout);
+
+				if (value != null)
+				{
+					parameters.Add("timeout", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.WaitForActiveShards);
+
+				if (value != null)
+				{
+					parameters.Add("wait_for_active_shards", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.WaitForNodes);
+
+				if (value != null)
+				{
+					parameters.Add("wait_for_nodes", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.WaitForRelocatingShards);
+
+				if (value != null)
+				{
+					parameters.Add("wait_for_relocating_shards", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.WaitForStatus);
+
+				if (value != null)
+				{
+					parameters.Add("wait_for_status", value);
+				}
+			}
+			RequestHelper.AddCommonParameters(parameters);
+
+			return parameters;
+		}
+
+		private static readonly List<Func<ClusterStateRequest, string>[]> ClusterStatePaths = new List<Func<ClusterStateRequest, string>[]>
+		{
+			new Func<ClusterStateRequest, string>[]
+			{
+				x => "_cluster",
+				x => "state",
+			},
+			new Func<ClusterStateRequest, string>[]
+			{
+				x => "_cluster",
+				x => "state",
+				x => RequestHelper.Segment(x.Metric),
+			},
+			new Func<ClusterStateRequest, string>[]
+			{
+				x => "_cluster",
+				x => "state",
+				x => RequestHelper.Segment(x.Metric),
+				x => RequestHelper.Segment(x.Index),
+			},
+		};
+		
+		public static IEnumerable<string> GetPath(ClusterStateRequest request)
+		{
+			var path = ClusterStatePaths.First();
+
+			return path.Select(x => x(request));
+		}
+
+		public static IDictionary<string, object> GetParameters(ClusterStateRequest request)
+		{
+			var parameters = new Dictionary<string, object>();
+			{
+				object value = RequestHelper.Param(request.Local);
+
+				if (value != null)
+				{
+					parameters.Add("local", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.MasterTimeout);
+
+				if (value != null)
+				{
+					parameters.Add("master_timeout", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.FlatSettings);
+
+				if (value != null)
+				{
+					parameters.Add("flat_settings", value);
+				}
+			}
+			RequestHelper.AddCommonParameters(parameters);
+
+			return parameters;
+		}
+
+		private static readonly List<Func<ClusterStatsRequest, string>[]> ClusterStatsPaths = new List<Func<ClusterStatsRequest, string>[]>
+		{
+			new Func<ClusterStatsRequest, string>[]
+			{
+				x => "_cluster",
+				x => "stats",
+			},
+			new Func<ClusterStatsRequest, string>[]
+			{
+				x => "_cluster",
+				x => "stats",
+				x => "nodes",
+				x => RequestHelper.Segment(x.NodeId),
+			},
+		};
+		
+		public static IEnumerable<string> GetPath(ClusterStatsRequest request)
+		{
+			var path = ClusterStatsPaths.First();
+
+			return path.Select(x => x(request));
+		}
+
+		public static IDictionary<string, object> GetParameters(ClusterStatsRequest request)
+		{
+			var parameters = new Dictionary<string, object>();
+			{
+				object value = RequestHelper.Param(request.FlatSettings);
+
+				if (value != null)
+				{
+					parameters.Add("flat_settings", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Human);
+
+				if (value != null)
+				{
+					parameters.Add("human", value);
+				}
+			}
+			RequestHelper.AddCommonParameters(parameters);
+
+			return parameters;
+		}
+
+		private static readonly List<Func<ClusterPendingTasksRequest, string>[]> ClusterPendingTasksPaths = new List<Func<ClusterPendingTasksRequest, string>[]>
+		{
+			new Func<ClusterPendingTasksRequest, string>[]
+			{
+				x => "_cluster",
+				x => "pending_tasks",
+			},
+		};
+		
+		public static IEnumerable<string> GetPath(ClusterPendingTasksRequest request)
+		{
+			var path = ClusterPendingTasksPaths.First();
+
+			return path.Select(x => x(request));
+		}
+
+		public static IDictionary<string, object> GetParameters(ClusterPendingTasksRequest request)
+		{
+			var parameters = new Dictionary<string, object>();
+			{
+				object value = RequestHelper.Param(request.Local);
+
+				if (value != null)
+				{
+					parameters.Add("local", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.MasterTimeout);
+
+				if (value != null)
+				{
+					parameters.Add("master_timeout", value);
+				}
+			}
+			RequestHelper.AddCommonParameters(parameters);
+
+			return parameters;
+		}
+
+		private static readonly List<Func<ClusterRerouteRequest, string>[]> ClusterReroutePaths = new List<Func<ClusterRerouteRequest, string>[]>
+		{
+			new Func<ClusterRerouteRequest, string>[]
+			{
+				x => "_cluster",
+				x => "reroute",
+			},
+		};
+		
+		public static IEnumerable<string> GetPath(ClusterRerouteRequest request)
+		{
+			var path = ClusterReroutePaths.First();
+
+			return path.Select(x => x(request));
+		}
+
+		public static IDictionary<string, object> GetParameters(ClusterRerouteRequest request)
+		{
+			var parameters = new Dictionary<string, object>();
+			{
+				object value = RequestHelper.Param(request.DryRun);
+
+				if (value != null)
+				{
+					parameters.Add("dry_run", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Explain);
+
+				if (value != null)
+				{
+					parameters.Add("explain", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Metric);
+
+				if (value != null)
+				{
+					parameters.Add("metric", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.MasterTimeout);
+
+				if (value != null)
+				{
+					parameters.Add("master_timeout", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Timeout);
+
+				if (value != null)
+				{
+					parameters.Add("timeout", value);
+				}
+			}
+			RequestHelper.AddCommonParameters(parameters);
+
+			return parameters;
+		}
+
+		private static readonly List<Func<ClusterGetSettingsRequest, string>[]> ClusterGetSettingsPaths = new List<Func<ClusterGetSettingsRequest, string>[]>
+		{
+			new Func<ClusterGetSettingsRequest, string>[]
+			{
+				x => "_cluster",
+				x => "settings",
+			},
+		};
+		
+		public static IEnumerable<string> GetPath(ClusterGetSettingsRequest request)
+		{
+			var path = ClusterGetSettingsPaths.First();
+
+			return path.Select(x => x(request));
+		}
+
+		public static IDictionary<string, object> GetParameters(ClusterGetSettingsRequest request)
+		{
+			var parameters = new Dictionary<string, object>();
+			{
+				object value = RequestHelper.Param(request.FlatSettings);
+
+				if (value != null)
+				{
+					parameters.Add("flat_settings", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.MasterTimeout);
+
+				if (value != null)
+				{
+					parameters.Add("master_timeout", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Timeout);
+
+				if (value != null)
+				{
+					parameters.Add("timeout", value);
+				}
+			}
+			RequestHelper.AddCommonParameters(parameters);
+
+			return parameters;
+		}
+
+		private static readonly List<Func<ClusterPutSettingsRequest, string>[]> ClusterPutSettingsPaths = new List<Func<ClusterPutSettingsRequest, string>[]>
+		{
+			new Func<ClusterPutSettingsRequest, string>[]
+			{
+				x => "_cluster",
+				x => "settings",
+			},
+		};
+		
+		public static IEnumerable<string> GetPath(ClusterPutSettingsRequest request)
+		{
+			var path = ClusterPutSettingsPaths.First();
+
+			return path.Select(x => x(request));
+		}
+
+		public static IDictionary<string, object> GetParameters(ClusterPutSettingsRequest request)
+		{
+			var parameters = new Dictionary<string, object>();
+			{
+				object value = RequestHelper.Param(request.FlatSettings);
+
+				if (value != null)
+				{
+					parameters.Add("flat_settings", value);
+				}
+			}
+			RequestHelper.AddCommonParameters(parameters);
+
+			return parameters;
+		}
+
+		private static readonly List<Func<NodesStatsRequest, string>[]> NodesStatsPaths = new List<Func<NodesStatsRequest, string>[]>
+		{
+			new Func<NodesStatsRequest, string>[]
+			{
+				x => "_nodes",
+				x => "stats",
+			},
+			new Func<NodesStatsRequest, string>[]
+			{
+				x => "_nodes",
+				x => RequestHelper.Segment(x.NodeId),
+				x => "stats",
+			},
+			new Func<NodesStatsRequest, string>[]
+			{
+				x => "_nodes",
+				x => "stats",
+				x => RequestHelper.Segment(x.Metric),
+			},
+			new Func<NodesStatsRequest, string>[]
+			{
+				x => "_nodes",
+				x => RequestHelper.Segment(x.NodeId),
+				x => "stats",
+				x => RequestHelper.Segment(x.Metric),
+			},
+			new Func<NodesStatsRequest, string>[]
+			{
+				x => "_nodes",
+				x => "stats",
+				x => RequestHelper.Segment(x.Metric),
+				x => RequestHelper.Segment(x.IndexMetric),
+			},
+			new Func<NodesStatsRequest, string>[]
+			{
+				x => "_nodes",
+				x => RequestHelper.Segment(x.NodeId),
+				x => "stats",
+				x => RequestHelper.Segment(x.Metric),
+				x => RequestHelper.Segment(x.IndexMetric),
+			},
+		};
+		
+		public static IEnumerable<string> GetPath(NodesStatsRequest request)
+		{
+			var path = NodesStatsPaths.First();
+
+			return path.Select(x => x(request));
+		}
+
+		public static IDictionary<string, object> GetParameters(NodesStatsRequest request)
+		{
+			var parameters = new Dictionary<string, object>();
+			{
+				object value = RequestHelper.Param(request.CompletionFields);
+
+				if (value != null)
+				{
+					parameters.Add("completion_fields", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.FielddataFields);
+
+				if (value != null)
+				{
+					parameters.Add("fielddata_fields", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Fields);
+
+				if (value != null)
+				{
+					parameters.Add("fields", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Groups);
+
+				if (value != null)
+				{
+					parameters.Add("groups", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Human);
+
+				if (value != null)
+				{
+					parameters.Add("human", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Level);
+
+				if (value != null)
+				{
+					parameters.Add("level", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Types);
+
+				if (value != null)
+				{
+					parameters.Add("types", value);
+				}
+			}
+			RequestHelper.AddCommonParameters(parameters);
+
+			return parameters;
+		}
+
+		private static readonly List<Func<NodesInfoRequest, string>[]> NodesInfoPaths = new List<Func<NodesInfoRequest, string>[]>
+		{
+			new Func<NodesInfoRequest, string>[]
+			{
+				x => "_nodes",
+			},
+			new Func<NodesInfoRequest, string>[]
+			{
+				x => "_nodes",
+				x => RequestHelper.Segment(x.NodeId),
+			},
+			new Func<NodesInfoRequest, string>[]
+			{
+				x => "_nodes",
+				x => RequestHelper.Segment(x.Metric),
+			},
+			new Func<NodesInfoRequest, string>[]
+			{
+				x => "_nodes",
+				x => RequestHelper.Segment(x.NodeId),
+				x => RequestHelper.Segment(x.Metric),
+			},
+		};
+		
+		public static IEnumerable<string> GetPath(NodesInfoRequest request)
+		{
+			var path = NodesInfoPaths.First();
+
+			return path.Select(x => x(request));
+		}
+
+		public static IDictionary<string, object> GetParameters(NodesInfoRequest request)
+		{
+			var parameters = new Dictionary<string, object>();
+			{
+				object value = RequestHelper.Param(request.FlatSettings);
+
+				if (value != null)
+				{
+					parameters.Add("flat_settings", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Human);
+
+				if (value != null)
+				{
+					parameters.Add("human", value);
+				}
+			}
+			RequestHelper.AddCommonParameters(parameters);
+
+			return parameters;
+		}
+
+		private static readonly List<Func<NodesHotThreadsRequest, string>[]> NodesHotThreadsPaths = new List<Func<NodesHotThreadsRequest, string>[]>
+		{
+			new Func<NodesHotThreadsRequest, string>[]
+			{
+				x => "_cluster",
+				x => "nodes",
+				x => "hotthreads",
+			},
+			new Func<NodesHotThreadsRequest, string>[]
+			{
+				x => "_cluster",
+				x => "nodes",
+				x => "hot_threads",
+			},
+			new Func<NodesHotThreadsRequest, string>[]
+			{
+				x => "_cluster",
+				x => "nodes",
+				x => RequestHelper.Segment(x.NodeId),
+				x => "hotthreads",
+			},
+			new Func<NodesHotThreadsRequest, string>[]
+			{
+				x => "_cluster",
+				x => "nodes",
+				x => RequestHelper.Segment(x.NodeId),
+				x => "hot_threads",
+			},
+			new Func<NodesHotThreadsRequest, string>[]
+			{
+				x => "_nodes",
+				x => "hotthreads",
+			},
+			new Func<NodesHotThreadsRequest, string>[]
+			{
+				x => "_nodes",
+				x => "hot_threads",
+			},
+			new Func<NodesHotThreadsRequest, string>[]
+			{
+				x => "_nodes",
+				x => RequestHelper.Segment(x.NodeId),
+				x => "hotthreads",
+			},
+			new Func<NodesHotThreadsRequest, string>[]
+			{
+				x => "_nodes",
+				x => RequestHelper.Segment(x.NodeId),
+				x => "hot_threads",
+			},
+		};
+		
+		public static IEnumerable<string> GetPath(NodesHotThreadsRequest request)
+		{
+			var path = NodesHotThreadsPaths.First();
+
+			return path.Select(x => x(request));
+		}
+
+		public static IDictionary<string, object> GetParameters(NodesHotThreadsRequest request)
+		{
+			var parameters = new Dictionary<string, object>();
+			{
+				object value = RequestHelper.Param(request.Interval);
+
+				if (value != null)
+				{
+					parameters.Add("interval", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Snapshots);
+
+				if (value != null)
+				{
+					parameters.Add("snapshots", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Threads);
+
+				if (value != null)
+				{
+					parameters.Add("threads", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Type);
+
+				if (value != null)
+				{
+					parameters.Add("type", value);
+				}
+			}
+			RequestHelper.AddCommonParameters(parameters);
+
+			return parameters;
+		}
+
+		private static readonly List<Func<NodesShutdownRequest, string>[]> NodesShutdownPaths = new List<Func<NodesShutdownRequest, string>[]>
+		{
+			new Func<NodesShutdownRequest, string>[]
+			{
+				x => "_shutdown",
+			},
+			new Func<NodesShutdownRequest, string>[]
+			{
+				x => "_cluster",
+				x => "nodes",
+				x => "_shutdown",
+			},
+			new Func<NodesShutdownRequest, string>[]
+			{
+				x => "_cluster",
+				x => "nodes",
+				x => RequestHelper.Segment(x.NodeId),
+				x => "_shutdown",
+			},
+		};
+		
+		public static IEnumerable<string> GetPath(NodesShutdownRequest request)
+		{
+			var path = NodesShutdownPaths.First();
+
+			return path.Select(x => x(request));
+		}
+
+		public static IDictionary<string, object> GetParameters(NodesShutdownRequest request)
+		{
+			var parameters = new Dictionary<string, object>();
+			{
+				object value = RequestHelper.Param(request.Delay);
+
+				if (value != null)
+				{
+					parameters.Add("delay", value);
+				}
+			}
+			{
+				object value = RequestHelper.Param(request.Exit);
+
+				if (value != null)
+				{
+					parameters.Add("exit", value);
+				}
+			}
+			RequestHelper.AddCommonParameters(parameters);
+
+			return parameters;
 		}
 	}
 }
