@@ -11,12 +11,13 @@ using System;
 using System.Linq;
 using System.Reflection;
 using Xunit;
+using ElasticLinq.Connection;
 
 namespace ElasticLinq.Test.Request.Formatters
 {
     public class SearchRequestFormatterFilterTests
     {
-        private static readonly ElasticConnection defaultConnection = new ElasticConnection(new Uri("http://a.b.com:9000/"));
+        private static readonly IElasticConnection defaultConnection = new HttpElasticConnection(new Uri("http://a.b.com:9000/"));
         private static readonly MemberInfo memberInfo = typeof(string).GetProperty("Length");
         private readonly IElasticMapping mapping = Substitute.For<IElasticMapping>();
 

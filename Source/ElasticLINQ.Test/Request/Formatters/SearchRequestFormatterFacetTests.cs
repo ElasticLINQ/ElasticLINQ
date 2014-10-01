@@ -13,12 +13,13 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Xunit;
+using ElasticLinq.Connection;
 
 namespace ElasticLinq.Test.Request.Formatters
 {
     public class SearchRequestFormatterFacetTests
     {
-        private static readonly ElasticConnection defaultConnection = new ElasticConnection(new Uri("http://a.b.com:9000/"));
+        private static readonly IElasticConnection defaultConnection = new HttpElasticConnection(new Uri("http://a.b.com:9000/"));
         private readonly IElasticMapping mapping = Substitute.For<IElasticMapping>();
 
         [Fact]

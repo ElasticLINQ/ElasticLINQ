@@ -1,0 +1,383 @@
+{
+  "get": {
+    "documentation": "http://www.elasticsearch.org/guide/en/elasticsearch/reference/master/docs-get.html",
+    "methods": ["GET"],
+    "url": {
+      "path": "/{index}/{type}/{id}",
+      "paths": ["/{index}/{type}/{id}"],
+      "parts": {
+        "id": {
+          "type" : "string",
+          "required" : true,
+          "description" : "The document ID"
+        },
+        "index": {
+          "type" : "string",
+          "required" : true,
+          "description" : "The name of the index"
+        },
+        "type": {
+          "type" : "string",
+          "required" : true,
+          "description" : "The type of the document (use `_all` to fetch the first document matching the ID across all types)"
+        }
+      },
+      "params": {
+        "fields": {
+          "type": "list",
+          "description" : "A comma-separated list of fields to return in the response"
+        },
+        "parent": {
+          "type" : "string",
+          "description" : "The ID of the parent document"
+        },
+        "preference": {
+          "type" : "string",
+          "description" : "Specify the node or shard the operation should be performed on (default: random)"
+        },
+        "realtime": {
+          "type" : "boolean",
+          "description" : "Specify whether to perform the operation in realtime or search mode"
+        },
+        "refresh": {
+          "type" : "boolean",
+          "description" : "Refresh the shard containing the document before performing the operation"
+        },
+        "routing": {
+          "type" : "string",
+          "description" : "Specific routing value"
+        },
+        "_source": {
+          "type" : "list",
+          "description" : "True or false to return the _source field or not, or a list of fields to return"
+        },
+        "_source_exclude": {
+          "type" : "list",
+          "description" : "A list of fields to exclude from the returned _source field"
+        },
+        "_source_include": {
+          "type" : "list",
+          "description" : "A list of fields to extract and return from the _source field"
+        },
+        "version" : {
+          "type" : "number",
+          "description" : "Explicit version number for concurrency control"
+        },
+        "version_type": {
+          "type" : "enum",
+          "options" : ["internal", "external", "external_gte", "force"],
+          "description" : "Specific version type"
+        }
+      }
+    },
+    "body": null,
+	"response": {
+	  "_index": {
+        "type" : "string",
+		"description" : "todo"
+	  },
+	  "_type": {
+        "type" : "string",
+		"description" : "todo"
+	  },
+	  "_id": {
+        "type" : "string",
+		"description" : "todo"
+	  },
+	  "_version": {
+        "type" : "number",
+		"description" : "todo"
+	  },
+	  "found": {
+        "type" : "boolean",
+		"description" : "todo"
+	  }
+	}
+  },
+  "index": {
+    "documentation": "http://www.elasticsearch.org/guide/en/elasticsearch/reference/master/docs-index_.html",
+    "methods": ["PUT", "POST"],
+    "url": {
+      "path": "/{index}/{type}/{id}",
+      "paths": ["/{index}/{type}/{id}", "/{index}/{type}"],
+      "parts": {
+        "id": {
+          "type" : "string",
+          "description" : "Document ID"
+        },
+        "index": {
+          "type" : "string",
+          "required" : true,
+          "description" : "The name of the index"
+        },
+        "type": {
+          "type" : "string",
+          "required" : true,
+          "description" : "The type of the document"
+        }
+      },
+      "params": {
+        "consistency": {
+          "type" : "enum",
+          "options" : ["one", "quorum", "all"],
+          "description" : "Explicit write consistency setting for the operation"
+        },
+        "op_type": {
+          "type" : "enum",
+          "options" : ["index", "create"],
+          "default" : "index",
+          "description" : "Explicit operation type"
+        },
+        "parent": {
+          "type" : "string",
+          "description" : "ID of the parent document"
+        },
+        "refresh": {
+          "type" : "boolean",
+          "description" : "Refresh the index after performing the operation"
+        },
+        "replication": {
+          "type" : "enum",
+          "options" : ["sync","async"],
+          "default" : "sync",
+          "description" : "Specific replication type"
+        },
+        "routing": {
+          "type" : "string",
+          "description" : "Specific routing value"
+        },
+        "timeout": {
+          "type" : "time",
+          "description" : "Explicit operation timeout"
+        },
+        "timestamp": {
+          "type" : "time",
+          "description" : "Explicit timestamp for the document"
+        },
+        "ttl": {
+          "type" : "duration",
+          "description" : "Expiration time for the document"
+        },
+        "version" : {
+          "type" : "number",
+          "description" : "Explicit version number for concurrency control"
+        },
+        "version_type": {
+          "type" : "enum",
+          "options" : ["internal", "external", "external_gte", "force"],
+          "description" : "Specific version type"
+        }
+      }
+    },
+    "body": {
+      "description" : "The document",
+      "required" : true
+    },
+	"response": {
+	  "_index": {
+        "type" : "string",
+		"description" : "todo"
+	  },
+	  "_type": {
+        "type" : "string",
+		"description" : "todo"
+	  },
+	  "_id": {
+        "type" : "string",
+		"description" : "todo"
+	  },
+	  "_version": {
+        "type" : "number",
+		"description" : "todo"
+	  },
+	  "created": {
+        "type" : "boolean",
+		"description" : "todo"
+	  }
+	}
+  },
+  "delete": {
+    "documentation": "http://www.elasticsearch.org/guide/en/elasticsearch/reference/master/docs-delete.html",
+    "methods": ["DELETE"],
+    "url": {
+      "path": "/{index}/{type}/{id}",
+      "paths": ["/{index}/{type}/{id}"],
+      "parts": {
+        "id": {
+          "type" : "string",
+          "required" : true,
+          "description" : "The document ID"
+        },
+        "index": {
+          "type" : "string",
+          "required" : true,
+          "description" : "The name of the index"
+        },
+        "type": {
+          "type" : "string",
+          "required" : true,
+          "description" : "The type of the document"
+        }
+      },
+      "params": {
+        "consistency": {
+          "type" : "enum",
+          "options" : ["one", "quorum", "all"],
+          "description" : "Specific write consistency setting for the operation"
+        },
+        "parent": {
+          "type" : "string",
+          "description" : "ID of parent document"
+        },
+        "refresh": {
+          "type" : "boolean",
+          "description" : "Refresh the index after performing the operation"
+        },
+        "replication": {
+          "type" : "enum",
+          "options" : ["sync","async"],
+          "default" : "sync",
+          "description" : "Specific replication type"
+        },
+        "routing": {
+          "type" : "string",
+          "description" : "Specific routing value"
+        },
+        "timeout": {
+          "type" : "time",
+          "description" : "Explicit operation timeout"
+        },
+        "version" : {
+          "type" : "number",
+          "description" : "Explicit version number for concurrency control"
+        },
+        "version_type": {
+          "type" : "enum",
+          "options" : ["internal", "external", "external_gte", "force"],
+          "description" : "Specific version type"
+        }
+      }
+    },
+    "body": null,
+	"response": {
+	  "_index": {
+        "type" : "string",
+		"description" : "todo"
+	  },
+	  "_type": {
+        "type" : "string",
+		"description" : "todo"
+	  },
+	  "_id": {
+        "type" : "string",
+		"description" : "todo"
+	  },
+	  "_version": {
+        "type" : "number",
+		"description" : "todo"
+	  },
+	  "found": {
+        "type" : "boolean",
+		"description" : "todo"
+	  }
+	}
+  },
+  "update": {
+    "documentation": "http://www.elasticsearch.org/guide/en/elasticsearch/reference/master/docs-update.html",
+    "methods": ["POST"],
+    "url": {
+      "path": "/{index}/{type}/{id}/_update",
+      "paths": ["/{index}/{type}/{id}/_update"],
+      "parts": {
+        "id": {
+          "type": "string",
+          "required": true,
+          "description": "Document ID"
+        },
+        "index": {
+          "type": "string",
+          "required": true,
+          "description": "The name of the index"
+        },
+        "type": {
+          "type": "string",
+          "required": true,
+          "description": "The type of the document"
+        }
+      },
+      "params": {
+        "consistency": {
+          "type": "enum",
+          "options": ["one", "quorum", "all"],
+          "description": "Explicit write consistency setting for the operation"
+        },
+        "fields": {
+          "type": "list",
+          "description": "A comma-separated list of fields to return in the response"
+        },
+        "lang": {
+          "type": "string",
+          "description": "The script language (default: groovy)"
+        },
+        "parent": {
+          "type": "string",
+          "description": "ID of the parent document"
+        },
+        "refresh": {
+          "type": "boolean",
+          "description": "Refresh the index after performing the operation"
+        },
+        "replication": {
+          "type": "enum",
+          "options": ["sync", "async"],
+          "default": "sync",
+          "description": "Specific replication type"
+        },
+        "retry_on_conflict": {
+          "type": "number",
+          "description": "Specify how many times should the operation be retried when a conflict occurs (default: 0)"
+        },
+        "routing": {
+          "type": "string",
+          "description": "Specific routing value"
+        },
+        "script": {
+          "description": "The URL-encoded script definition (instead of using request body)"
+        },
+        "script_id": {
+          "description": "The id of a stored script"
+        },
+        "scripted_upsert": {
+          "type": "boolean",        
+          "description": "True if the script referenced in script or script_id should be called to perform inserts - defaults to false"
+        },
+        "timeout": {
+          "type": "time",
+          "description": "Explicit operation timeout"
+        },
+        "timestamp": {
+          "type": "time",
+          "description": "Explicit timestamp for the document"
+        },
+        "ttl": {
+          "type": "duration",
+          "description": "Expiration time for the document"
+        },
+        "version": {
+          "type": "number",
+          "description": "Explicit version number for concurrency control"
+        },
+        "version_type": {
+          "type": "enum",
+          "options": ["internal", "force"],
+          "description": "Specific version type"
+        }
+      }
+    },
+    "body": {
+      "description": "The request definition using either `script` or partial `doc`"
+    },
+	"response": {
+	}
+  }
+}

@@ -1,9 +1,9 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
-using System.Linq;
-
 namespace ElasticLinq
 {
+    using System.Linq;
+
     /// <summary>
     /// Represents a unit of work in ElasticLINQ.
     /// </summary>
@@ -14,6 +14,10 @@ namespace ElasticLinq
         /// </summary>
         /// <typeparam name="T">The document type.</typeparam>
         /// <returns>The query that can search for documents of the given type.</returns>
-        IQueryable<T> Query<T>();
+        IQueryable<T> Query<T>(string indexPath, string typePath);
+
+        //bool IndexExists(ElasticIndexPath indexPath);
+
+        //bool TypeExists(ElasticIndexPath indexPath, ElasticTypePath typePath);
     }
 }

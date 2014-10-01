@@ -6,12 +6,13 @@ using ElasticLinq.Retry;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ElasticLinq.Connection;
 
 namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 {
     public class ElasticQueryTranslationTestsBase
     {
-        protected static readonly ElasticConnection Connection = new ElasticConnection(new Uri("http://localhost"));
+        protected static readonly IElasticConnection Connection = new HttpElasticConnection(new Uri("http://localhost"));
         protected static readonly IElasticMapping Mapping = new TrivialElasticMapping();
         protected static readonly ILog Log = NullLog.Instance;
         protected static readonly IRetryPolicy RetryPolicy = NullRetryPolicy.Instance;

@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
-MinimumVisualStudioVersion = 10.0.40219.1
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElasticLINQ", "ElasticLINQ\ElasticLINQ.csproj", "{875E1599-5B7F-4084-BBE0-0D70C3C80428}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElasticLINQ.Test", "ElasticLINQ.Test\ElasticLINQ.Test.csproj", "{752ADF39-9F6D-4FE3-8EEF-3266EF584C2A}"
@@ -34,6 +32,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{133702
 		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElasticApi", "ElasticApi\ElasticApi.csproj", "{92BF33A5-8451-407B-9572-288545145A21}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElasticApiTest", "ElasticApiTest\ElasticApiTest.csproj", "{2603CA0E-2E90-4FD1-A8BE-8E171B465DF4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -56,6 +58,14 @@ Global
 		{DA488B7B-BA05-4F15-9F19-EA1FDB57DA44}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DA488B7B-BA05-4F15-9F19-EA1FDB57DA44}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DA488B7B-BA05-4F15-9F19-EA1FDB57DA44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92BF33A5-8451-407B-9572-288545145A21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92BF33A5-8451-407B-9572-288545145A21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92BF33A5-8451-407B-9572-288545145A21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92BF33A5-8451-407B-9572-288545145A21}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2603CA0E-2E90-4FD1-A8BE-8E171B465DF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2603CA0E-2E90-4FD1-A8BE-8E171B465DF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2603CA0E-2E90-4FD1-A8BE-8E171B465DF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2603CA0E-2E90-4FD1-A8BE-8E171B465DF4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

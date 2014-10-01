@@ -6,12 +6,13 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using Xunit;
+using ElasticLinq.Connection;
 
 namespace ElasticLinq.Test
 {
     public class ElasticQueryTests
     {
-        private static readonly ElasticConnection connection = new ElasticConnection(new Uri("http://localhost"));
+        private static readonly IElasticConnection connection = new HttpElasticConnection(new Uri("http://localhost"));
         private static readonly ElasticQueryProvider provider = new ElasticQueryProvider(connection, new TrivialElasticMapping(), NullLog.Instance, NullRetryPolicy.Instance, "prefix");
         private static readonly Expression validExpression = Expression.Constant(new ElasticQuery<Sample>(provider));
 

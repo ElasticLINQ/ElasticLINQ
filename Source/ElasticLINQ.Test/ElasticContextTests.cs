@@ -6,12 +6,13 @@ using ElasticLinq.Retry;
 using NSubstitute;
 using System;
 using Xunit;
+using ElasticLinq.Connection;
 
 namespace ElasticLinq.Test
 {
     public class ElasticContextTests
     {
-        private static readonly ElasticConnection connection = new ElasticConnection(new Uri("http://localhost"));
+        private static readonly IElasticConnection connection = new HttpElasticConnection(new Uri("http://localhost"));
 
         private class Sample { };
 
