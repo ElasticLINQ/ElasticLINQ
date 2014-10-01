@@ -1,0 +1,221 @@
+﻿<#@ template debug="false" hostspecific="true" language="C#" #>
+<#@ assembly name="System.Core"#>
+<#@ assembly name="Microsoft.CSharp"#>
+<#@ assembly name="$(SolutionDir)\\packages\\Newtonsoft.Json.6.0.5\\lib\\net40\\Newtonsoft.Json.dll" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Dynamic" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="Newtonsoft.Json" #>
+<#@ import namespace="Newtonsoft.Json.Linq" #>
+<#@ import namespace="Newtonsoft.Json.Converters" #>
+<#
+	string json = File.ReadAllText(this.Host.ResolvePath("Specs/document_apis.json"));
+
+	dynamic dico = JsonConvert.DeserializeObject(json);
+#>
+namespace ElasticApi.Requests
+{
+	using System;
+	using System.Collections.Generic;
+	using Attributes;
+
+<#
+	foreach(var property in dico.Properties())
+    {
+#>
+    /// <summary>
+    /// <para>Request for <#=property.Name#> api</para>
+	/// <para>Path: <#=property.Value.url.path#></para>
+	/// <para>Methods: <#=string.Join(", ", (property.Value.methods as IEnumerable<object>))#></para>
+	/// <para>Paths: <#=string.Join(", ", (property.Value.url.paths as IEnumerable<object>))#></para>
+    /// </summary>
+	public class <#=PascalCase(property.Name)#>Request
+	{
+<#
+		foreach(var part in property.Value.url.parts)
+		{
+			bool required = part.Value.required != null ? part.Value.required.Value : false;
+			string type = part.Value.type != null ? part.Value.type.Value : "string";
+			string[] parts = (property.Value.url.path.Value as string).Split('/');
+#>
+        /// <summary>
+        /// <para><#=part.Value.description#></para>
+		/// <para>Type: url</para>
+        /// <para>Required: <#=required#></para>
+        /// </summary>
+		[ApiRoute(Part = "<#=part.Name#>", Position = <#=Array.FindIndex(parts, x => x == "{" + part.Name + "}")#>, Required = <#=required ? "true" : "false"#>)]
+		public <#=CSharpType(type, required)#> <#=PascalCase(part.Name)#> { get; set; }
+<#
+        }
+#>
+<#
+		foreach(var part in property.Value.url.@params)
+		{
+			string type = part.Value.type != null ? part.Value.type.Value : "string";
+#>
+        /// <summary>
+        /// <para><#=part.Value.description#></para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: <#=part.Name#></para>
+        /// </summary>
+		[ApiParam(Name = "<#=part.Name#>")]
+		public <#=CSharpType(type, false)#> <#=PascalCase(part.Name)#> { get; set; }
+<#
+        }
+#>
+<#
+		if (property.Value.body != null)
+		{
+#>
+        /// <summary>
+        /// <para><#=property.Value.body.description#></para>
+        /// </summary>
+		[ApiBody]
+		public object Body { get; set; }
+<#
+        }
+#>
+	}
+<#
+    }
+#>
+}
+
+namespace ElasticApi.Responses
+{
+	using System;
+	using System.Collections.Generic;
+	using Newtonsoft.Json;
+
+<#
+	foreach(var property in dico.Properties())
+    {
+#>
+    /// <summary>
+    /// <para>Response for <#=property.Name#> api</para>
+    /// </summary>
+	public class <#=PascalCase(property.Name)#>Response
+	{
+<#
+		foreach(var part in property.Value.response)
+		{
+			string type = part.Value.type != null ? part.Value.type.Value : "string";
+#>
+        /// <summary>
+        /// <para><#=part.Value.description#></para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: <#=part.Name#></para>
+        /// </summary>
+		[JsonProperty("<#=part.Name#>")]
+		public <#=CSharpType(type, false)#> <#=PascalCase(part.Name)#> { get; set; }
+<#
+        }
+#>
+	}
+<#
+    }
+#>
+}
+
+namespace ElasticApi
+{
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+    using Requests;
+    using Responses;
+
+	public static class Elastic
+	{
+<#
+	foreach(var property in dico.Properties())
+    {
+		var api = PascalCase(property.Name);
+		var method = (property.Value.methods as IEnumerable<object>).First().ToString().ToLower();
+#>
+		/// <summary>
+		/// <#=property.Value.documentation#>
+		/// </summary>
+		/// <param name="request">request input</param>
+		public static <#=api#>Response <#=api#>(IConnection connection, <#=api#>Request request)
+		{
+			IEnumerable<string> path = RequestHelper.GetPath(request);
+			IDictionary<string, object> parameters = RequestHelper.GetParameters(request);
+<#
+			if (method == "post" || method == "put")
+			{
+#>
+			object body = RequestHelper.GetBody(request);
+
+			return connection.<#=PascalCase(method)#><<#=api#>Response>(path, parameters, body);
+<#
+			}
+			else
+            {
+#>
+			return connection.<#=PascalCase(method)#><<#=api#>Response>(path, parameters);
+<#
+			}
+#>
+		}
+		/// <summary>
+		/// <#=property.Value.documentation#>
+		/// </summary>
+		/// <param name="request">request input</param>
+		public static Task<<#=api#>Response> <#=api#>Async(IConnection connection, <#=api#>Request request)
+		{
+			//	TODO : async version
+			return default(Task<<#=api#>Response>);
+		}
+<#
+    }
+#>
+	}
+}
+<#+
+internal class TypeMapping
+{
+	public readonly string Type;
+	public readonly string NullableType;
+
+	public TypeMapping(string type, string nullableType)
+    {
+		this.Type = type;
+		this.NullableType = nullableType;
+    }
+}
+
+IDictionary<string, TypeMapping> mappings = new Dictionary<string, TypeMapping>
+{
+    { "boolean", new TypeMapping("bool", "Nullable<bool>") },
+    { "number", new TypeMapping("long", "Nullable<long>") },
+    { "string", new TypeMapping("string", "string") },
+    { "enum", new TypeMapping("string", "string") },
+    { "list", new TypeMapping("IEnumerable<string>", "IEnumerable<string>") },
+    { "time", new TypeMapping("TimeSpan", "Nullable<TimeSpan>") },
+    { "duration", new TypeMapping("TimeSpan", "Nullable<TimeSpan>") },
+};
+
+public string CSharpType(string type, bool required)
+{
+	return required == false ? mappings[type].NullableType :  mappings[type].Type;
+}
+#>
+<#+
+public static string PascalCase(string raw)
+{
+	string temp = string.Empty;
+
+	foreach(var c in raw)
+	{
+		if (char.IsUpper(c))
+		{
+			temp += "_";
+		}
+
+		temp += c;
+	}
+
+	return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(temp).Replace("_", "");
+}
+#>
