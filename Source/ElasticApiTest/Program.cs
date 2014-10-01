@@ -10,6 +10,13 @@
         {
             var connection = new HttpConnection(new Uri("http://10.2.0.70:9201"));
 
+            //  ClusterHealth
+            {
+                var request = new ClusterHealthRequest { Index = "toto" };
+
+                var response = ElasticApi.Elastic.ClusterHealth(connection, request);
+            }
+
             //  Index
             {
                 var request = new IndexRequest { Index = "toto", Type = "tata", Id = "1", Body = new { Int = 2, String = "tutu" } };

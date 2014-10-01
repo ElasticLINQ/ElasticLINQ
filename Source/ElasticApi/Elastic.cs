@@ -456,6 +456,465 @@
 		[ApiBody]
 		public object Body { get; set; }
 	}
+    /// <summary>
+    /// <para>Request for cluster_health api</para>
+	/// <para>Path: /_cluster/health</para>
+	/// <para>Methods: GET</para>
+	/// <para>Paths: /_cluster/health, /_cluster/health/{index}</para>
+    /// </summary>
+	public class ClusterHealthRequest
+	{
+        /// <summary>
+        /// <para>Limit the information returned to a specific index</para>
+		/// <para>Type: url</para>
+        /// <para>Required: False</para>
+        /// </summary>
+		[ApiRoute(Part = "index", Position = -1, Required = false)]
+		public string Index { get; set; }
+        /// <summary>
+        /// <para>Specify the level of detail for returned information</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: level</para>
+        /// </summary>
+		[ApiParam(Name = "level")]
+		public string Level { get; set; }
+        /// <summary>
+        /// <para>Return local information, do not retrieve the state from master node (default: false)</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: local</para>
+        /// </summary>
+		[ApiParam(Name = "local")]
+		public Nullable<bool> Local { get; set; }
+        /// <summary>
+        /// <para>Explicit operation timeout for connection to master node</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: master_timeout</para>
+        /// </summary>
+		[ApiParam(Name = "master_timeout")]
+		public Nullable<TimeSpan> MasterTimeout { get; set; }
+        /// <summary>
+        /// <para>Explicit operation timeout</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: timeout</para>
+        /// </summary>
+		[ApiParam(Name = "timeout")]
+		public Nullable<TimeSpan> Timeout { get; set; }
+        /// <summary>
+        /// <para>Wait until the specified number of shards is active</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: wait_for_active_shards</para>
+        /// </summary>
+		[ApiParam(Name = "wait_for_active_shards")]
+		public Nullable<long> WaitForActiveShards { get; set; }
+        /// <summary>
+        /// <para>Wait until the specified number of nodes is available</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: wait_for_nodes</para>
+        /// </summary>
+		[ApiParam(Name = "wait_for_nodes")]
+		public string WaitForNodes { get; set; }
+        /// <summary>
+        /// <para>Wait until the specified number of relocating shards is finished</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: wait_for_relocating_shards</para>
+        /// </summary>
+		[ApiParam(Name = "wait_for_relocating_shards")]
+		public Nullable<long> WaitForRelocatingShards { get; set; }
+        /// <summary>
+        /// <para>Wait until cluster is in a specific state</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: wait_for_status</para>
+        /// </summary>
+		[ApiParam(Name = "wait_for_status")]
+		public string WaitForStatus { get; set; }
+	}
+    /// <summary>
+    /// <para>Request for cluster_state api</para>
+	/// <para>Path: /_cluster/state</para>
+	/// <para>Methods: GET</para>
+	/// <para>Paths: /_cluster/state, /_cluster/state/{metric}, /_cluster/state/{metric}/{index}</para>
+    /// </summary>
+	public class ClusterStateRequest
+	{
+        /// <summary>
+        /// <para>A comma-separated list of index names; use `_all` or empty string to perform the operation on all indices</para>
+		/// <para>Type: url</para>
+        /// <para>Required: False</para>
+        /// </summary>
+		[ApiRoute(Part = "index", Position = -1, Required = false)]
+		public IEnumerable<string> Index { get; set; }
+        /// <summary>
+        /// <para>Limit the information returned to the specified metrics</para>
+		/// <para>Type: url</para>
+        /// <para>Required: False</para>
+        /// </summary>
+		[ApiRoute(Part = "metric", Position = -1, Required = false)]
+		public IEnumerable<string> Metric { get; set; }
+        /// <summary>
+        /// <para>Return local information, do not retrieve the state from master node (default: false)</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: local</para>
+        /// </summary>
+		[ApiParam(Name = "local")]
+		public Nullable<bool> Local { get; set; }
+        /// <summary>
+        /// <para>Specify timeout for connection to master</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: master_timeout</para>
+        /// </summary>
+		[ApiParam(Name = "master_timeout")]
+		public Nullable<TimeSpan> MasterTimeout { get; set; }
+        /// <summary>
+        /// <para>Return settings in flat format (default: false)</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: flat_settings</para>
+        /// </summary>
+		[ApiParam(Name = "flat_settings")]
+		public Nullable<bool> FlatSettings { get; set; }
+	}
+    /// <summary>
+    /// <para>Request for cluster_stats api</para>
+	/// <para>Path: /_cluster/stats</para>
+	/// <para>Methods: GET</para>
+	/// <para>Paths: /_cluster/stats, /_cluster/stats/nodes/{node_id}</para>
+    /// </summary>
+	public class ClusterStatsRequest
+	{
+        /// <summary>
+        /// <para>A comma-separated list of node IDs or names to limit the returned information; use `_local` to return information from the node you're connecting to, leave empty to get information from all nodes</para>
+		/// <para>Type: url</para>
+        /// <para>Required: False</para>
+        /// </summary>
+		[ApiRoute(Part = "node_id", Position = -1, Required = false)]
+		public IEnumerable<string> NodeId { get; set; }
+        /// <summary>
+        /// <para>Return settings in flat format (default: false)</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: flat_settings</para>
+        /// </summary>
+		[ApiParam(Name = "flat_settings")]
+		public Nullable<bool> FlatSettings { get; set; }
+        /// <summary>
+        /// <para>Whether to return time and byte values in human-readable format.</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: human</para>
+        /// </summary>
+		[ApiParam(Name = "human")]
+		public Nullable<bool> Human { get; set; }
+	}
+    /// <summary>
+    /// <para>Request for cluster_pending_tasks api</para>
+	/// <para>Path: /_cluster/pending_tasks</para>
+	/// <para>Methods: GET</para>
+	/// <para>Paths: /_cluster/pending_tasks</para>
+    /// </summary>
+	public class ClusterPendingTasksRequest
+	{
+        /// <summary>
+        /// <para>Return local information, do not retrieve the state from master node (default: false)</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: local</para>
+        /// </summary>
+		[ApiParam(Name = "local")]
+		public Nullable<bool> Local { get; set; }
+        /// <summary>
+        /// <para>Specify timeout for connection to master</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: master_timeout</para>
+        /// </summary>
+		[ApiParam(Name = "master_timeout")]
+		public Nullable<TimeSpan> MasterTimeout { get; set; }
+	}
+    /// <summary>
+    /// <para>Request for cluster_reroute api</para>
+	/// <para>Path: /_cluster/reroute</para>
+	/// <para>Methods: POST</para>
+	/// <para>Paths: /_cluster/reroute</para>
+    /// </summary>
+	public class ClusterRerouteRequest
+	{
+        /// <summary>
+        /// <para>Simulate the operation only and return the resulting state</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: dry_run</para>
+        /// </summary>
+		[ApiParam(Name = "dry_run")]
+		public Nullable<bool> DryRun { get; set; }
+        /// <summary>
+        /// <para>Return an explanation of why the commands can or cannot be executed</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: explain</para>
+        /// </summary>
+		[ApiParam(Name = "explain")]
+		public Nullable<bool> Explain { get; set; }
+        /// <summary>
+        /// <para>Limit the information returned to the specified metrics. Defaults to all but metadata</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: metric</para>
+        /// </summary>
+		[ApiParam(Name = "metric")]
+		public IEnumerable<string> Metric { get; set; }
+        /// <summary>
+        /// <para>Explicit operation timeout for connection to master node</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: master_timeout</para>
+        /// </summary>
+		[ApiParam(Name = "master_timeout")]
+		public Nullable<TimeSpan> MasterTimeout { get; set; }
+        /// <summary>
+        /// <para>Explicit operation timeout</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: timeout</para>
+        /// </summary>
+		[ApiParam(Name = "timeout")]
+		public Nullable<TimeSpan> Timeout { get; set; }
+        /// <summary>
+        /// <para>The definition of `commands` to perform (`move`, `cancel`, `allocate`)</para>
+        /// </summary>
+		[ApiBody]
+		public object Body { get; set; }
+	}
+    /// <summary>
+    /// <para>Request for cluster_get_settings api</para>
+	/// <para>Path: /_cluster/settings</para>
+	/// <para>Methods: GET</para>
+	/// <para>Paths: /_cluster/settings</para>
+    /// </summary>
+	public class ClusterGetSettingsRequest
+	{
+        /// <summary>
+        /// <para>Return settings in flat format (default: false)</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: flat_settings</para>
+        /// </summary>
+		[ApiParam(Name = "flat_settings")]
+		public Nullable<bool> FlatSettings { get; set; }
+        /// <summary>
+        /// <para>Explicit operation timeout for connection to master node</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: master_timeout</para>
+        /// </summary>
+		[ApiParam(Name = "master_timeout")]
+		public Nullable<TimeSpan> MasterTimeout { get; set; }
+        /// <summary>
+        /// <para>Explicit operation timeout</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: timeout</para>
+        /// </summary>
+		[ApiParam(Name = "timeout")]
+		public Nullable<TimeSpan> Timeout { get; set; }
+	}
+    /// <summary>
+    /// <para>Request for cluster_put_settings api</para>
+	/// <para>Path: /_cluster/settings</para>
+	/// <para>Methods: PUT</para>
+	/// <para>Paths: /_cluster/settings</para>
+    /// </summary>
+	public class ClusterPutSettingsRequest
+	{
+        /// <summary>
+        /// <para>Return settings in flat format (default: false)</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: flat_settings</para>
+        /// </summary>
+		[ApiParam(Name = "flat_settings")]
+		public Nullable<bool> FlatSettings { get; set; }
+        /// <summary>
+        /// <para>The settings to be updated. Can be either `transient` or `persistent` (survives cluster restart).</para>
+        /// </summary>
+		[ApiBody]
+		public object Body { get; set; }
+	}
+    /// <summary>
+    /// <para>Request for nodes_stats api</para>
+	/// <para>Path: /_nodes/stats</para>
+	/// <para>Methods: GET</para>
+	/// <para>Paths: /_nodes/stats, /_nodes/{node_id}/stats, /_nodes/stats/{metric}, /_nodes/{node_id}/stats/{metric}, /_nodes/stats/{metric}/{index_metric}, /_nodes/{node_id}/stats/{metric}/{index_metric}</para>
+    /// </summary>
+	public class NodesStatsRequest
+	{
+        /// <summary>
+        /// <para>Limit the information returned to the specified metrics</para>
+		/// <para>Type: url</para>
+        /// <para>Required: False</para>
+        /// </summary>
+		[ApiRoute(Part = "metric", Position = -1, Required = false)]
+		public IEnumerable<string> Metric { get; set; }
+        /// <summary>
+        /// <para>Limit the information returned for `indices` metric to the specific index metrics. Isn't used if `indices` (or `all`) metric isn't specified.</para>
+		/// <para>Type: url</para>
+        /// <para>Required: False</para>
+        /// </summary>
+		[ApiRoute(Part = "index_metric", Position = -1, Required = false)]
+		public IEnumerable<string> IndexMetric { get; set; }
+        /// <summary>
+        /// <para>A comma-separated list of node IDs or names to limit the returned information; use `_local` to return information from the node you're connecting to, leave empty to get information from all nodes</para>
+		/// <para>Type: url</para>
+        /// <para>Required: False</para>
+        /// </summary>
+		[ApiRoute(Part = "node_id", Position = -1, Required = false)]
+		public IEnumerable<string> NodeId { get; set; }
+        /// <summary>
+        /// <para>A comma-separated list of fields for `fielddata` and `suggest` index metric (supports wildcards)</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: completion_fields</para>
+        /// </summary>
+		[ApiParam(Name = "completion_fields")]
+		public IEnumerable<string> CompletionFields { get; set; }
+        /// <summary>
+        /// <para>A comma-separated list of fields for `fielddata` index metric (supports wildcards)</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: fielddata_fields</para>
+        /// </summary>
+		[ApiParam(Name = "fielddata_fields")]
+		public IEnumerable<string> FielddataFields { get; set; }
+        /// <summary>
+        /// <para>A comma-separated list of fields for `fielddata` and `completion` index metric (supports wildcards)</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: fields</para>
+        /// </summary>
+		[ApiParam(Name = "fields")]
+		public IEnumerable<string> Fields { get; set; }
+        /// <summary>
+        /// <para>A comma-separated list of search groups for `search` index metric</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: groups</para>
+        /// </summary>
+		[ApiParam(Name = "groups")]
+		public Nullable<bool> Groups { get; set; }
+        /// <summary>
+        /// <para>Whether to return time and byte values in human-readable format.</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: human</para>
+        /// </summary>
+		[ApiParam(Name = "human")]
+		public Nullable<bool> Human { get; set; }
+        /// <summary>
+        /// <para>Return indices stats aggregated at node, index or shard level</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: level</para>
+        /// </summary>
+		[ApiParam(Name = "level")]
+		public string Level { get; set; }
+        /// <summary>
+        /// <para>A comma-separated list of document types for the `indexing` index metric</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: types</para>
+        /// </summary>
+		[ApiParam(Name = "types")]
+		public IEnumerable<string> Types { get; set; }
+	}
+    /// <summary>
+    /// <para>Request for nodes_info api</para>
+	/// <para>Path: /_nodes</para>
+	/// <para>Methods: GET</para>
+	/// <para>Paths: /_nodes, /_nodes/{node_id}, /_nodes/{metric}, /_nodes/{node_id}/{metric}</para>
+    /// </summary>
+	public class NodesInfoRequest
+	{
+        /// <summary>
+        /// <para>A comma-separated list of node IDs or names to limit the returned information; use `_local` to return information from the node you're connecting to, leave empty to get information from all nodes</para>
+		/// <para>Type: url</para>
+        /// <para>Required: False</para>
+        /// </summary>
+		[ApiRoute(Part = "node_id", Position = -1, Required = false)]
+		public IEnumerable<string> NodeId { get; set; }
+        /// <summary>
+        /// <para>A comma-separated list of metrics you wish returned. Leave empty to return all.</para>
+		/// <para>Type: url</para>
+        /// <para>Required: False</para>
+        /// </summary>
+		[ApiRoute(Part = "metric", Position = -1, Required = false)]
+		public IEnumerable<string> Metric { get; set; }
+        /// <summary>
+        /// <para>Return settings in flat format (default: false)</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: flat_settings</para>
+        /// </summary>
+		[ApiParam(Name = "flat_settings")]
+		public Nullable<bool> FlatSettings { get; set; }
+        /// <summary>
+        /// <para>Whether to return time and byte values in human-readable format.</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: human</para>
+        /// </summary>
+		[ApiParam(Name = "human")]
+		public Nullable<bool> Human { get; set; }
+	}
+    /// <summary>
+    /// <para>Request for nodes_hot_threads api</para>
+	/// <para>Path: /_nodes/hot_threads</para>
+	/// <para>Methods: GET</para>
+	/// <para>Paths: /_cluster/nodes/hotthreads, /_cluster/nodes/hot_threads, /_cluster/nodes/{node_id}/hotthreads, /_cluster/nodes/{node_id}/hot_threads, /_nodes/hotthreads, /_nodes/hot_threads, /_nodes/{node_id}/hotthreads, /_nodes/{node_id}/hot_threads</para>
+    /// </summary>
+	public class NodesHotThreadsRequest
+	{
+        /// <summary>
+        /// <para>A comma-separated list of node IDs or names to limit the returned information; use `_local` to return information from the node you're connecting to, leave empty to get information from all nodes</para>
+		/// <para>Type: url</para>
+        /// <para>Required: False</para>
+        /// </summary>
+		[ApiRoute(Part = "node_id", Position = -1, Required = false)]
+		public IEnumerable<string> NodeId { get; set; }
+        /// <summary>
+        /// <para>The interval for the second sampling of threads</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: interval</para>
+        /// </summary>
+		[ApiParam(Name = "interval")]
+		public Nullable<TimeSpan> Interval { get; set; }
+        /// <summary>
+        /// <para>Number of samples of thread stacktrace (default: 10)</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: snapshots</para>
+        /// </summary>
+		[ApiParam(Name = "snapshots")]
+		public Nullable<long> Snapshots { get; set; }
+        /// <summary>
+        /// <para>Specify the number of threads to provide information for (default: 3)</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: threads</para>
+        /// </summary>
+		[ApiParam(Name = "threads")]
+		public Nullable<long> Threads { get; set; }
+        /// <summary>
+        /// <para>The type to sample (default: cpu)</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: type</para>
+        /// </summary>
+		[ApiParam(Name = "type")]
+		public string Type { get; set; }
+	}
+    /// <summary>
+    /// <para>Request for nodes_shutdown api</para>
+	/// <para>Path: /_shutdown</para>
+	/// <para>Methods: POST</para>
+	/// <para>Paths: /_shutdown, /_cluster/nodes/_shutdown, /_cluster/nodes/{node_id}/_shutdown</para>
+    /// </summary>
+	public class NodesShutdownRequest
+	{
+        /// <summary>
+        /// <para>A comma-separated list of node IDs or names to perform the operation on; use `_local` to perform the operation on the node you're connected to, leave empty to perform the operation on all nodes</para>
+		/// <para>Type: url</para>
+        /// <para>Required: False</para>
+        /// </summary>
+		[ApiRoute(Part = "node_id", Position = -1, Required = false)]
+		public IEnumerable<string> NodeId { get; set; }
+        /// <summary>
+        /// <para>Set the delay for the operation (default: 1s)</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: delay</para>
+        /// </summary>
+		[ApiParam(Name = "delay")]
+		public Nullable<TimeSpan> Delay { get; set; }
+        /// <summary>
+        /// <para>Exit the JVM as well (default: true)</para>
+		/// <para>Type: parameter</para>
+        /// <para>Name: exit</para>
+        /// </summary>
+		[ApiParam(Name = "exit")]
+		public Nullable<bool> Exit { get; set; }
+	}
 }
 
 namespace ElasticApi.Responses
@@ -593,6 +1052,72 @@ namespace ElasticApi.Responses
 	public class UpdateResponse
 	{
 	}
+    /// <summary>
+    /// <para>Response for cluster_health api</para>
+    /// </summary>
+	public class ClusterHealthResponse
+	{
+	}
+    /// <summary>
+    /// <para>Response for cluster_state api</para>
+    /// </summary>
+	public class ClusterStateResponse
+	{
+	}
+    /// <summary>
+    /// <para>Response for cluster_stats api</para>
+    /// </summary>
+	public class ClusterStatsResponse
+	{
+	}
+    /// <summary>
+    /// <para>Response for cluster_pending_tasks api</para>
+    /// </summary>
+	public class ClusterPendingTasksResponse
+	{
+	}
+    /// <summary>
+    /// <para>Response for cluster_reroute api</para>
+    /// </summary>
+	public class ClusterRerouteResponse
+	{
+	}
+    /// <summary>
+    /// <para>Response for cluster_get_settings api</para>
+    /// </summary>
+	public class ClusterGetSettingsResponse
+	{
+	}
+    /// <summary>
+    /// <para>Response for cluster_put_settings api</para>
+    /// </summary>
+	public class ClusterPutSettingsResponse
+	{
+	}
+    /// <summary>
+    /// <para>Response for nodes_stats api</para>
+    /// </summary>
+	public class NodesStatsResponse
+	{
+	}
+    /// <summary>
+    /// <para>Response for nodes_info api</para>
+    /// </summary>
+	public class NodesInfoResponse
+	{
+	}
+    /// <summary>
+    /// <para>Response for nodes_hot_threads api</para>
+    /// </summary>
+	public class NodesHotThreadsResponse
+	{
+	}
+    /// <summary>
+    /// <para>Response for nodes_shutdown api</para>
+    /// </summary>
+	public class NodesShutdownResponse
+	{
+	}
 }
 
 namespace ElasticApi
@@ -683,6 +1208,221 @@ namespace ElasticApi
 		{
 			//	TODO : async version
 			return default(Task<UpdateResponse>);
+		}
+		/// <summary>
+		/// http://www.elasticsearch.org/guide/en/elasticsearch/reference/master/cluster-health.html
+		/// </summary>
+		/// <param name="request">request input</param>
+		public static ClusterHealthResponse ClusterHealth(IConnection connection, ClusterHealthRequest request)
+		{
+			IEnumerable<string> path = RequestHelper.GetPath(request);
+			IDictionary<string, object> parameters = RequestHelper.GetParameters(request);
+			return connection.Get<ClusterHealthResponse>(path, parameters);
+		}
+		/// <summary>
+		/// http://www.elasticsearch.org/guide/en/elasticsearch/reference/master/cluster-health.html
+		/// </summary>
+		/// <param name="request">request input</param>
+		public static Task<ClusterHealthResponse> ClusterHealthAsync(IConnection connection, ClusterHealthRequest request)
+		{
+			//	TODO : async version
+			return default(Task<ClusterHealthResponse>);
+		}
+		/// <summary>
+		/// http://www.elasticsearch.org/guide/en/elasticsearch/reference/master/cluster-state.html
+		/// </summary>
+		/// <param name="request">request input</param>
+		public static ClusterStateResponse ClusterState(IConnection connection, ClusterStateRequest request)
+		{
+			IEnumerable<string> path = RequestHelper.GetPath(request);
+			IDictionary<string, object> parameters = RequestHelper.GetParameters(request);
+			return connection.Get<ClusterStateResponse>(path, parameters);
+		}
+		/// <summary>
+		/// http://www.elasticsearch.org/guide/en/elasticsearch/reference/master/cluster-state.html
+		/// </summary>
+		/// <param name="request">request input</param>
+		public static Task<ClusterStateResponse> ClusterStateAsync(IConnection connection, ClusterStateRequest request)
+		{
+			//	TODO : async version
+			return default(Task<ClusterStateResponse>);
+		}
+		/// <summary>
+		/// http://www.elasticsearch.org/guide/en/elasticsearch/reference/master/cluster-stats.html
+		/// </summary>
+		/// <param name="request">request input</param>
+		public static ClusterStatsResponse ClusterStats(IConnection connection, ClusterStatsRequest request)
+		{
+			IEnumerable<string> path = RequestHelper.GetPath(request);
+			IDictionary<string, object> parameters = RequestHelper.GetParameters(request);
+			return connection.Get<ClusterStatsResponse>(path, parameters);
+		}
+		/// <summary>
+		/// http://www.elasticsearch.org/guide/en/elasticsearch/reference/master/cluster-stats.html
+		/// </summary>
+		/// <param name="request">request input</param>
+		public static Task<ClusterStatsResponse> ClusterStatsAsync(IConnection connection, ClusterStatsRequest request)
+		{
+			//	TODO : async version
+			return default(Task<ClusterStatsResponse>);
+		}
+		/// <summary>
+		/// http://www.elasticsearch.org/guide/en/elasticsearch/reference/master/cluster-pending.html
+		/// </summary>
+		/// <param name="request">request input</param>
+		public static ClusterPendingTasksResponse ClusterPendingTasks(IConnection connection, ClusterPendingTasksRequest request)
+		{
+			IEnumerable<string> path = RequestHelper.GetPath(request);
+			IDictionary<string, object> parameters = RequestHelper.GetParameters(request);
+			return connection.Get<ClusterPendingTasksResponse>(path, parameters);
+		}
+		/// <summary>
+		/// http://www.elasticsearch.org/guide/en/elasticsearch/reference/master/cluster-pending.html
+		/// </summary>
+		/// <param name="request">request input</param>
+		public static Task<ClusterPendingTasksResponse> ClusterPendingTasksAsync(IConnection connection, ClusterPendingTasksRequest request)
+		{
+			//	TODO : async version
+			return default(Task<ClusterPendingTasksResponse>);
+		}
+		/// <summary>
+		/// http://www.elasticsearch.org/guide/en/elasticsearch/reference/master/cluster-reroute.html
+		/// </summary>
+		/// <param name="request">request input</param>
+		public static ClusterRerouteResponse ClusterReroute(IConnection connection, ClusterRerouteRequest request)
+		{
+			IEnumerable<string> path = RequestHelper.GetPath(request);
+			IDictionary<string, object> parameters = RequestHelper.GetParameters(request);
+			object body = RequestHelper.GetBody(request);
+
+			return connection.Post<ClusterRerouteResponse>(path, parameters, body);
+		}
+		/// <summary>
+		/// http://www.elasticsearch.org/guide/en/elasticsearch/reference/master/cluster-reroute.html
+		/// </summary>
+		/// <param name="request">request input</param>
+		public static Task<ClusterRerouteResponse> ClusterRerouteAsync(IConnection connection, ClusterRerouteRequest request)
+		{
+			//	TODO : async version
+			return default(Task<ClusterRerouteResponse>);
+		}
+		/// <summary>
+		/// http://www.elasticsearch.org/guide/en/elasticsearch/reference/master/cluster-update-settings.html
+		/// </summary>
+		/// <param name="request">request input</param>
+		public static ClusterGetSettingsResponse ClusterGetSettings(IConnection connection, ClusterGetSettingsRequest request)
+		{
+			IEnumerable<string> path = RequestHelper.GetPath(request);
+			IDictionary<string, object> parameters = RequestHelper.GetParameters(request);
+			return connection.Get<ClusterGetSettingsResponse>(path, parameters);
+		}
+		/// <summary>
+		/// http://www.elasticsearch.org/guide/en/elasticsearch/reference/master/cluster-update-settings.html
+		/// </summary>
+		/// <param name="request">request input</param>
+		public static Task<ClusterGetSettingsResponse> ClusterGetSettingsAsync(IConnection connection, ClusterGetSettingsRequest request)
+		{
+			//	TODO : async version
+			return default(Task<ClusterGetSettingsResponse>);
+		}
+		/// <summary>
+		/// http://www.elasticsearch.org/guide/en/elasticsearch/reference/master/cluster-update-settings.html
+		/// </summary>
+		/// <param name="request">request input</param>
+		public static ClusterPutSettingsResponse ClusterPutSettings(IConnection connection, ClusterPutSettingsRequest request)
+		{
+			IEnumerable<string> path = RequestHelper.GetPath(request);
+			IDictionary<string, object> parameters = RequestHelper.GetParameters(request);
+			object body = RequestHelper.GetBody(request);
+
+			return connection.Put<ClusterPutSettingsResponse>(path, parameters, body);
+		}
+		/// <summary>
+		/// http://www.elasticsearch.org/guide/en/elasticsearch/reference/master/cluster-update-settings.html
+		/// </summary>
+		/// <param name="request">request input</param>
+		public static Task<ClusterPutSettingsResponse> ClusterPutSettingsAsync(IConnection connection, ClusterPutSettingsRequest request)
+		{
+			//	TODO : async version
+			return default(Task<ClusterPutSettingsResponse>);
+		}
+		/// <summary>
+		/// http://www.elasticsearch.org/guide/en/elasticsearch/reference/master/cluster-nodes-stats.html
+		/// </summary>
+		/// <param name="request">request input</param>
+		public static NodesStatsResponse NodesStats(IConnection connection, NodesStatsRequest request)
+		{
+			IEnumerable<string> path = RequestHelper.GetPath(request);
+			IDictionary<string, object> parameters = RequestHelper.GetParameters(request);
+			return connection.Get<NodesStatsResponse>(path, parameters);
+		}
+		/// <summary>
+		/// http://www.elasticsearch.org/guide/en/elasticsearch/reference/master/cluster-nodes-stats.html
+		/// </summary>
+		/// <param name="request">request input</param>
+		public static Task<NodesStatsResponse> NodesStatsAsync(IConnection connection, NodesStatsRequest request)
+		{
+			//	TODO : async version
+			return default(Task<NodesStatsResponse>);
+		}
+		/// <summary>
+		/// http://www.elasticsearch.org/guide/en/elasticsearch/reference/master/cluster-nodes-info.html
+		/// </summary>
+		/// <param name="request">request input</param>
+		public static NodesInfoResponse NodesInfo(IConnection connection, NodesInfoRequest request)
+		{
+			IEnumerable<string> path = RequestHelper.GetPath(request);
+			IDictionary<string, object> parameters = RequestHelper.GetParameters(request);
+			return connection.Get<NodesInfoResponse>(path, parameters);
+		}
+		/// <summary>
+		/// http://www.elasticsearch.org/guide/en/elasticsearch/reference/master/cluster-nodes-info.html
+		/// </summary>
+		/// <param name="request">request input</param>
+		public static Task<NodesInfoResponse> NodesInfoAsync(IConnection connection, NodesInfoRequest request)
+		{
+			//	TODO : async version
+			return default(Task<NodesInfoResponse>);
+		}
+		/// <summary>
+		/// http://www.elasticsearch.org/guide/en/elasticsearch/reference/master/cluster-nodes-hot-threads.html
+		/// </summary>
+		/// <param name="request">request input</param>
+		public static NodesHotThreadsResponse NodesHotThreads(IConnection connection, NodesHotThreadsRequest request)
+		{
+			IEnumerable<string> path = RequestHelper.GetPath(request);
+			IDictionary<string, object> parameters = RequestHelper.GetParameters(request);
+			return connection.Get<NodesHotThreadsResponse>(path, parameters);
+		}
+		/// <summary>
+		/// http://www.elasticsearch.org/guide/en/elasticsearch/reference/master/cluster-nodes-hot-threads.html
+		/// </summary>
+		/// <param name="request">request input</param>
+		public static Task<NodesHotThreadsResponse> NodesHotThreadsAsync(IConnection connection, NodesHotThreadsRequest request)
+		{
+			//	TODO : async version
+			return default(Task<NodesHotThreadsResponse>);
+		}
+		/// <summary>
+		/// http://www.elasticsearch.org/guide/en/elasticsearch/reference/master/cluster-nodes-shutdown.html
+		/// </summary>
+		/// <param name="request">request input</param>
+		public static NodesShutdownResponse NodesShutdown(IConnection connection, NodesShutdownRequest request)
+		{
+			IEnumerable<string> path = RequestHelper.GetPath(request);
+			IDictionary<string, object> parameters = RequestHelper.GetParameters(request);
+			object body = RequestHelper.GetBody(request);
+
+			return connection.Post<NodesShutdownResponse>(path, parameters, body);
+		}
+		/// <summary>
+		/// http://www.elasticsearch.org/guide/en/elasticsearch/reference/master/cluster-nodes-shutdown.html
+		/// </summary>
+		/// <param name="request">request input</param>
+		public static Task<NodesShutdownResponse> NodesShutdownAsync(IConnection connection, NodesShutdownRequest request)
+		{
+			//	TODO : async version
+			return default(Task<NodesShutdownResponse>);
 		}
 	}
 }

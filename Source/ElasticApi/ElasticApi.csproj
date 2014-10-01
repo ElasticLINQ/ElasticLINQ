@@ -66,6 +66,7 @@
       <LastGenOutput>Elastic.cs</LastGenOutput>
     </None>
     <None Include="packages.config" />
+    <None Include="Specs\cluster_apis.json" />
     <None Include="Specs\document_apis.json" />
   </ItemGroup>
   <ItemGroup>

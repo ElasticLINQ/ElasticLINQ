@@ -10,9 +10,13 @@
 <#@ import namespace="Newtonsoft.Json.Linq" #>
 <#@ import namespace="Newtonsoft.Json.Converters" #>
 <#
-	string json = File.ReadAllText(this.Host.ResolvePath("Specs/document_apis.json"));
+	var xxx_apis = new string[]
+    {
+		File.ReadAllText(this.Host.ResolvePath("Specs/document_apis.json")),
+		File.ReadAllText(this.Host.ResolvePath("Specs/cluster_apis.json")),
+    };
 
-	dynamic dico = JsonConvert.DeserializeObject(json);
+	IEnumerable<dynamic> apis = xxx_apis.Select(x => (dynamic) JsonConvert.DeserializeObject(x)).SelectMany(x => (IEnumerable<dynamic>) x.Properties());
 #>
 namespace ElasticApi.Requests
 {
@@ -21,7 +25,7 @@ namespace ElasticApi.Requests
 	using Attributes;
 
 <#
-	foreach(var property in dico.Properties())
+	foreach(var property in apis)
     {
 #>
     /// <summary>
@@ -89,7 +93,7 @@ namespace ElasticApi.Responses
 	using Newtonsoft.Json;
 
 <#
-	foreach(var property in dico.Properties())
+	foreach(var property in apis)
     {
 #>
     /// <summary>
@@ -128,7 +132,7 @@ namespace ElasticApi
 	public static class Elastic
 	{
 <#
-	foreach(var property in dico.Properties())
+	foreach(var property in apis)
     {
 		var api = PascalCase(property.Name);
 		var method = (property.Value.methods as IEnumerable<object>).First().ToString().ToLower();
