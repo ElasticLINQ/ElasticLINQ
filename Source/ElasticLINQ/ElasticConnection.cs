@@ -20,6 +20,7 @@ namespace ElasticLinq
         private readonly string index;
         private readonly TimeSpan timeout = defaultTimeout;
         private readonly HttpClient httpClient;
+        private readonly ElasticConnectionOptions options;
 
         private bool disposed;
 
@@ -31,8 +32,9 @@ namespace ElasticLinq
         /// <param name="password">Password to use to connect to the server (optional).</param>
         /// <param name="timeout">TimeSpan to wait for network responses before failing (optional, defaults to 10 seconds).</param>
         /// <param name="index">Name of the index to use on the server (optional).</param>
-        public ElasticConnection(Uri endpoint, string userName = null, string password = null, TimeSpan? timeout = null, string index = null)
-            : this(new HttpClientHandler(), endpoint, userName, password, index, timeout) { }
+        /// <param name="options">Additional options that specify how this connection should behave.</param>
+        public ElasticConnection(Uri endpoint, string userName = null, string password = null, TimeSpan? timeout = null, string index = null, ElasticConnectionOptions options = null)
+            : this(new HttpClientHandler(), endpoint, userName, password, index, timeout, options) { }
 
 
         /// <summary>
@@ -44,7 +46,8 @@ namespace ElasticLinq
         /// <param name="password">Password to use to connect to the server (optional).</param>
         /// <param name="timeout">TimeSpan to wait for network responses before failing (optional, defaults to 10 seconds).</param>
         /// <param name="index">Name of the index to use on the server (optional).</param>
-        internal ElasticConnection(HttpMessageHandler innerMessageHandler, Uri endpoint, string userName = null, string password = null, string index = null, TimeSpan? timeout = null)
+        /// <param name="options">Additional options that specify how this connection should behave.</param>
+        internal ElasticConnection(HttpMessageHandler innerMessageHandler, Uri endpoint, string userName = null, string password = null, string index = null, TimeSpan? timeout = null, ElasticConnectionOptions options = null)
         {
             Argument.EnsureNotNull("endpoint", endpoint);
             if (timeout.HasValue)
@@ -54,6 +57,7 @@ namespace ElasticLinq
 
             this.endpoint = endpoint;
             this.index = index;
+            this.options = options ?? new ElasticConnectionOptions();
             this.timeout = timeout ?? defaultTimeout;
 
             var httpClientHandler = innerMessageHandler as HttpClientHandler;
@@ -96,6 +100,14 @@ namespace ElasticLinq
         public TimeSpan Timeout
         {
             get { return timeout; }
+        }
+
+        /// <summary>
+        /// Additional options that specify how this connection should behave.
+        /// </summary>
+        public ElasticConnectionOptions Options
+        {
+            get { return options; }
         }
 
         /// <summary>

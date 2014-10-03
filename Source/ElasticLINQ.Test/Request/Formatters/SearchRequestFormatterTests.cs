@@ -5,6 +5,7 @@ using ElasticLinq.Request;
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Formatters;
 using ElasticLinq.Test.TestSupport;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NSubstitute;
 using System;
@@ -147,6 +148,60 @@ namespace ElasticLinq.Test.Request.Formatters
         }
 
         [Fact]
+        public void PrettyCreatesBodyThatIsOnlyFormattedDifferently()
+        {
+            var plainBody = new SearchRequestFormatter(
+                new ElasticConnection(defaultConnection.Endpoint, options: new ElasticConnectionOptions { Pretty = false }),
+                mapping, new SearchRequest { DocumentType = "type1", Filter = new ExistsCriteria("greenField") }).Body;
+
+            var prettyBody = new SearchRequestFormatter(
+                new ElasticConnection(defaultConnection.Endpoint, options: new ElasticConnectionOptions { Pretty = true }),
+                mapping, new SearchRequest { DocumentType = "type1", Filter = new ExistsCriteria("greenField") }).Body;
+
+            Assert.NotSame(plainBody, prettyBody);
+
+            var unformattedPrettyBody = JObject.Parse(prettyBody).ToString(Formatting.None);
+            Assert.Equal(plainBody, unformattedPrettyBody);
+        }
+
+        [Fact]
+        public void PrettySetsUriQueryWhenNoOtherQueryUriParameters()
+        {
+            var prettyUri = new SearchRequestFormatter(
+                new ElasticConnection(new Uri("http://coruscant.gov/some"), options: new ElasticConnectionOptions { Pretty = true }),
+                mapping, new SearchRequest { DocumentType = "type1", Filter = new ExistsCriteria("greenField") }).Uri;
+
+            Assert.Equal("pretty=true", prettyUri.GetComponents(UriComponents.Query, UriFormat.Unescaped));
+        }
+
+        [Fact]
+        public void PrettyAppendsUriQueryParameterWhenOtherQueryUriParameters()
+        {
+            var prettyUri = new SearchRequestFormatter(
+                new ElasticConnection(new Uri("http://coruscant.gov/some?human=false"), options: new ElasticConnectionOptions { Pretty = true }),
+                mapping, new SearchRequest { DocumentType = "type1", Filter = new ExistsCriteria("greenField") }).Uri;
+
+            var parameters = prettyUri.GetComponents(UriComponents.Query, UriFormat.Unescaped).Split('&');
+            Assert.Equal(2, parameters.Length);
+            Assert.Contains("human=false", parameters);
+            Assert.Contains("pretty=true", parameters);
+        }
+
+
+        [Fact]
+        public void PrettyChangesUriQueryParameterWhenDifferentValueAlreadyExists()
+        {
+            var prettyUri = new SearchRequestFormatter(
+                new ElasticConnection(new Uri("http://coruscant.gov/some?pretty=false&human=true"), options: new ElasticConnectionOptions { Pretty = true }),
+                mapping, new SearchRequest { DocumentType = "type1", Filter = new ExistsCriteria("greenField") }).Uri;
+
+            var parameters = prettyUri.GetComponents(UriComponents.Query, UriFormat.Unescaped).Split('&');
+            Assert.Equal(2, parameters.Length);
+            Assert.Contains("human=true", parameters);
+            Assert.Contains("pretty=true", parameters);
+        }
+
+        [Fact]
         public void BodyContainsFromWhenSpecified()
         {
             const int expectedFrom = 1024;
@@ -229,7 +284,7 @@ namespace ElasticLinq.Test.Request.Formatters
 
             var formatter = new SearchRequestFormatter(defaultConnection, mapping, searchRequest);
 
-            var parameters = formatter.Uri.OriginalString.Split('&');
+            var parameters = formatter.Uri.GetComponents(UriComponents.Query, UriFormat.Unescaped).Split('&');
 
             Assert.Single(parameters, p => p == "search_type=count");
         }
@@ -241,7 +296,7 @@ namespace ElasticLinq.Test.Request.Formatters
 
             var formatter = new SearchRequestFormatter(defaultConnection, mapping, searchRequest);
 
-            var parameters = formatter.Uri.OriginalString.Split('&');
+            var parameters = formatter.Uri.GetComponents(UriComponents.Query, UriFormat.Unescaped).Split('&');
 
             Assert.None(parameters, p => p.StartsWith("search_type="));
         }

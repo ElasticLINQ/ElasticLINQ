@@ -1,6 +1,5 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
-using System.Collections.ObjectModel;
 using ElasticLinq.Mapping;
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Facets;
@@ -9,44 +8,58 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 
 namespace ElasticLinq.Request.Formatters
 {
     /// <summary>
-    /// Formats a SearchRequest into a JSON POST body to be sent
-    /// to Elasticsearch for processing.
+    /// Formats a SearchRequest into a JSON POST to be sent to Elasticsearch.
     /// </summary>
     internal class SearchRequestFormatter
     {
+        private readonly string[] parameterSeparator = { "&" };
+
         private readonly Lazy<string> body;
         private readonly ElasticConnection connection;
         private readonly IElasticMapping mapping;
         private readonly SearchRequest searchRequest;
         private readonly Uri uri;
 
+        /// <summary>
+        /// Create a new SearchRequestFormatter for the given connection, mapping and search request.
+        /// </summary>
+        /// <param name="connection">The ElasticConnection to prepare the SearchRequest for.</param>
+        /// <param name="mapping">The IElasticMapping used to format the SearchRequest.</param>
+        /// <param name="searchRequest">The SearchRequest to be formatted.</param>
         public SearchRequestFormatter(ElasticConnection connection, IElasticMapping mapping, SearchRequest searchRequest)
         {
             this.connection = connection;
             this.mapping = mapping;
             this.searchRequest = searchRequest;
 
-            body = new Lazy<string>(() => CreateJsonPayload().ToString(Formatting.None));
-            uri = BuildSearchUri();
+            body = new Lazy<string>(() => CreateBody().ToString(connection.Options.Pretty ? Formatting.Indented : Formatting.None));
+            uri = CreateUri();
         }
 
+        /// <summary>
+        /// The JSON formatted POST body for the request to be sent to Elasticsearch.
+        /// </summary>
         public string Body
         {
             get { return body.Value; }
         }
 
+        /// <summary>
+        /// The Uri that the body should be posted to in order to execute the SearchRequest.
+        /// </summary>
         public Uri Uri
         {
             get { return uri; }
         }
 
-        private Uri BuildSearchUri()
+        private Uri CreateUri()
         {
             var builder = new UriBuilder(connection.Endpoint);
             builder.Path += (connection.Index ?? "_all") + "/";
@@ -56,20 +69,23 @@ namespace ElasticLinq.Request.Formatters
 
             builder.Path += "_search";
 
-            var parameters = builder.Query.Split('&')
+            var parameters = builder.Uri.GetComponents(UriComponents.Query, UriFormat.Unescaped)
+                .Split(parameterSeparator, StringSplitOptions.RemoveEmptyEntries)
                 .Select(p => p.Split('='))
                 .ToDictionary(k => k[0], v => v.Length > 1 ? v[1] : null);
 
             if (!String.IsNullOrEmpty(searchRequest.SearchType))
                 parameters["search_type"] = searchRequest.SearchType;
 
-            builder.Query = String.Join("&",
-                parameters.Select(p => p.Value == null ? p.Key : p.Key + "=" + p.Value));
+            if (connection.Options.Pretty)
+                parameters["pretty"] = "true";
+
+            builder.Query = String.Join("&", parameters.Select(p => p.Value == null ? p.Key : p.Key + "=" + p.Value));
 
             return builder.Uri;
         }
 
-        private JObject CreateJsonPayload()
+        private JObject CreateBody()
         {
             var root = new JObject();
 
@@ -114,7 +130,7 @@ namespace ElasticLinq.Request.Formatters
             var orderableFacet = facet as IOrderableFacet;
             if (orderableFacet != null && orderableFacet.Size.HasValue)
                 specificBody["size"] = orderableFacet.Size.Value.ToString(CultureInfo.InvariantCulture);
-            
+
             var namedBody = new JObject(new JProperty(facet.Type, specificBody));
 
             var combinedFilter = AndCriteria.Combine(primaryFilter, facet.Filter);
@@ -228,7 +244,7 @@ namespace ElasticLinq.Request.Formatters
         {
             var unformattedValue = criteria.Value; // We do not reformat query_string
 
-            var queryStringCriteria =  new JObject(new JProperty("query", unformattedValue));
+            var queryStringCriteria = new JObject(new JProperty("query", unformattedValue));
 
             if (criteria.Fields.Any())
                 queryStringCriteria.Add(new JProperty("fields", new JArray(criteria.Fields)));

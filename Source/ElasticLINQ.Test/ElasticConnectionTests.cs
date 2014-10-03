@@ -45,6 +45,22 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
+        public void ConstructorWithAllArgsSetsPropertiesFromParameters()
+        {
+            var expectedEndpoint = new Uri("http://coruscant.gov");
+            var expectedTimeout = TimeSpan.FromSeconds(1234);
+            const string expectedIndex = "h2g2";
+            var expectedOptions = new ElasticConnectionOptions { Pretty = true };
+
+            var actual = new ElasticConnection(expectedEndpoint, UserName, Password, expectedTimeout, expectedIndex, expectedOptions);
+
+            Assert.Equal(expectedEndpoint, actual.Endpoint);
+            Assert.Equal(expectedTimeout, actual.Timeout);
+            Assert.Equal(expectedIndex, actual.Index);
+            Assert.Equal(expectedOptions, actual.Options);
+        }
+
+        [Fact]
         public void ConstructorCreatesHttpClientWithDefaultTimeout()
         {
             var defaultTimeout = TimeSpan.FromSeconds(10);
@@ -65,11 +81,19 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
+        public void ConstructorCreatesDefaultOptions()
+        {
+            var actual = new ElasticConnection(endpoint);
+
+            Assert.NotNull(actual.Options);
+        }
+
+        [Fact]
         [ExcludeFromCodeCoverage]
         public async Task DisposeKillsHttpClient()
         {
             var connection = new ElasticConnection(endpoint, UserName, Password);
-            
+
             connection.Dispose();
 
             await Assert.ThrowsAsync<ObjectDisposedException>(() => connection.HttpClient.GetAsync(new Uri("http://something.com")));

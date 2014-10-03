@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ElasticConnection.cs" />
+    <Compile Include="ElasticConnectionOptions.cs" />
     <Compile Include="ElasticContext.cs" />
     <Compile Include="ElasticFields.cs" />
     <Compile Include="ElasticMethods.cs" />
