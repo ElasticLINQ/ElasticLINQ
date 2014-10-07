@@ -3,6 +3,7 @@
 using ElasticLinq.Mapping;
 using ElasticLinq.Request.Visitors;
 using ElasticLinq.Test.TestSupport;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -63,7 +64,7 @@ namespace ElasticLinq.Test.Request.Visitors
         }
 
         [Fact]
-        public void GetDictionaryValueOrDefaultReturnsTokenFromDictionaryIfKeyFound()
+        public void GetDictionaryValueOrDefaultReturnsSimpleTokenFromDictionaryKeyFound()
         {
             var expected = new Sample { Id = "T-900", Name = "Cameron" };
             const string key = "Summer";
@@ -73,6 +74,29 @@ namespace ElasticLinq.Test.Request.Visitors
 
             Assert.Equal(expected.Id, actual.Id);
             Assert.Equal(expected.Name, actual.Name);
+        }
+
+        [Fact]
+        public void GetDictionaryValueOrDefaultReturnsSingleItemInArrayFromDictionaryKeyFound()
+        {
+            const string expected = "Cameron";
+            var dictionary = new Dictionary<string, JToken> { { "fields", JToken.Parse("[ \"" + expected + "\" ]") } };
+
+            var actual = MemberProjectionExpressionVisitor.GetDictionaryValueOrDefault(dictionary, "fields", typeof(string));
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void GetDictionaryValueOrDefaultReturnsArrayIfArrayDesiredFromDictionaryKeyFound()
+        {
+            var expected = new[] { "Cameron" };
+            var dictionary = new Dictionary<string, JToken> { { "fields", JToken.Parse("[ \"" + expected[0] + "\" ]") } };
+
+            var actual = MemberProjectionExpressionVisitor.GetDictionaryValueOrDefault(dictionary, "fields", expected.GetType());
+
+            Assert.IsType(expected.GetType(), actual);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]

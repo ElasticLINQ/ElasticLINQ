@@ -64,9 +64,9 @@ namespace ElasticLinq.Request.Visitors
             if (!dictionary.TryGetValue(key, out token))
                 return TypeHelper.CreateDefault(expectedType);
 
-            // Elasticsearch 1.0 now puts fields in an array, unwrap it
+            // Elasticsearch 1.0+ puts fields in an array, unwrap it if necessary
             var jArray = token as JArray;
-            if (jArray != null && jArray.Count == 1)
+            if (jArray != null && jArray.Count == 1 && !expectedType.IsArray)
                 token = jArray[0];
 
             return token.ToObject(expectedType);

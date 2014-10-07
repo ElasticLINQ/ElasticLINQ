@@ -71,7 +71,7 @@ namespace ElasticLinq.Utility
         }
 
         /// <summary>
-        /// Throw an ArgumentOutOfRangeException if the collection is empty.
+        /// Throw an ArgumentOutOfRangeException if the collection is empty or null.
         /// </summary>
         /// <param name="argumentName">Name of the argument.</param>
         /// <param name="values">Array to be checked.</param>

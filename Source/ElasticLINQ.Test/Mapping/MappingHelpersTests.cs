@@ -124,6 +124,7 @@ namespace ElasticLinq.Test.Mapping
             public int Valid { get; set; }
         }
 
+        [ExcludeFromCodeCoverage]
         class ClassWithNoValidSelectionProperties
         {
             private int backing;

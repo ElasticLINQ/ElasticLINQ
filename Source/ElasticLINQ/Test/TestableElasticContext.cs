@@ -10,6 +10,9 @@ using System.Linq;
 
 namespace ElasticLinq.Test
 {
+    /// <summary>
+    /// Provides an IElasticContext that can be used by unit tests.
+    /// </summary>
     public class TestableElasticContext : IElasticContext
     {
         private readonly Dictionary<Type, object> data = new Dictionary<Type, object>();

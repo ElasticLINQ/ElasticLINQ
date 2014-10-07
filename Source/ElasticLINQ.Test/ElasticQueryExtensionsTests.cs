@@ -30,9 +30,12 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
-        public void QueryStringThrowsArgumentNullWhenArgumentIsNull()
+        [ExcludeFromCodeCoverage] // Expression isn't "executed"
+        public void QueryString_GuardClauses()
         {
             var source = new FakeQueryProvider().CreateQuery<Sample>();
+
+            Assert.Throws<ArgumentNullException>(() => ElasticQueryExtensions.QueryString<Sample>(null, ""));            
             Assert.Throws<ArgumentNullException>(() => source.QueryString(null));
         }
 
@@ -47,8 +50,39 @@ namespace ElasticLinq.Test
             var callExpression = (MethodCallExpression)applied.Expression;
 
             Assert.Equal(2, callExpression.Arguments.Count);
-            var constantExpression = Assert.IsType<ConstantExpression>(callExpression.Arguments[1]);
-            Assert.Equal(constantExpression.Value, expectedQueryString);
+            var queryStringConstantExpression = Assert.IsType<ConstantExpression>(callExpression.Arguments[1]);
+            Assert.Equal(queryStringConstantExpression.Value, expectedQueryString);
+        }
+
+        [Fact]
+        [ExcludeFromCodeCoverage] // Expression isn't "executed"
+        public void QueryStringWithFields_GuardClauses()
+        {
+            var source = new FakeQueryProvider().CreateQuery<Sample>();
+
+            Assert.Throws<ArgumentNullException>(() => ElasticQueryExtensions.QueryString<Sample>(null, "", new[] { "one", "two" }));
+            Assert.Throws<ArgumentNullException>(() => source.QueryString(null, new[] { "one", "two" }));
+            Assert.Throws<ArgumentOutOfRangeException>(() => source.QueryString("hi", null));
+            Assert.Throws<ArgumentOutOfRangeException>(() => source.QueryString("hi", new string[] { }));
+        }
+
+        [Fact]
+        public void QueryStringWithFieldsIsAddedToExpressionTree()
+        {
+            const string expectedQueryString = "abcdef";
+            var expectedFields = new[] { "three", "four" };
+
+            var source = new FakeQueryProvider().CreateQuery<Sample>();
+            var applied = source.QueryString(expectedQueryString, expectedFields);
+
+            Assert.IsAssignableFrom<MethodCallExpression>(applied.Expression);
+            var callExpression = (MethodCallExpression)applied.Expression;
+
+            Assert.Equal(3, callExpression.Arguments.Count);
+            var queryStringConstantExpression = Assert.IsType<ConstantExpression>(callExpression.Arguments[1]);
+            Assert.Equal(queryStringConstantExpression.Value, expectedQueryString);
+            var fieldsConstantExpression = Assert.IsType<ConstantExpression>(callExpression.Arguments[2]);
+            Assert.Equal(fieldsConstantExpression.Value, expectedFields);
         }
 
         [Fact]
@@ -59,7 +93,7 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
-        public void OrderByScoreThrowArgumentNullExceptionIfSourceIsNull()
+        public void OrderByScore_GuardClauses()
         {
             Assert.Throws<ArgumentNullException>(() => ElasticQueryExtensions.OrderByScore<Sample>(null));
         }
@@ -73,7 +107,7 @@ namespace ElasticLinq.Test
 
         [Fact]
         [ExcludeFromCodeCoverage] // Expression isn't "executed"
-        public void OrderByScoreDescendingThrowArgumentNullExceptionIfSourceIsNull()
+        public void OrderByScoreDescending_GuardClauses()
         {
             Assert.Throws<ArgumentNullException>(() => ElasticQueryExtensions.OrderByScoreDescending<Sample>(null));
         }
@@ -87,7 +121,7 @@ namespace ElasticLinq.Test
 
         [Fact]
         [ExcludeFromCodeCoverage] // Expression isn't "executed"
-        public void ThenByScoreThrowArgumentNullExceptionIfSourceIsNull()
+        public static void ThenByScore_GuardClauses()
         {
             Assert.Throws<ArgumentNullException>(() => ElasticQueryExtensions.ThenByScore<Sample>(null));
         }
@@ -101,7 +135,7 @@ namespace ElasticLinq.Test
 
         [Fact]
         [ExcludeFromCodeCoverage] // Expression isn't "executed"
-        public void ThenByScoreDescendingThrowArgumentNullExceptionIfSourceIsNull()
+        public static void ThenByScoreDescending_GuardClauses()
         {
             Assert.Throws<ArgumentNullException>(() => ElasticQueryExtensions.ThenByScoreDescending<Sample>(null));
         }

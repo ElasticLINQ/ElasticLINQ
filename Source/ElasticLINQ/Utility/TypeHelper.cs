@@ -146,6 +146,12 @@ namespace ElasticLinq.Utility
             return type.GetTypeInfo().IsValueType ? Activator.CreateInstance(type) : null;
         }
 
+        /// <summary>
+        /// Determines if the target type can be assigned to the source type.
+        /// </summary>
+        /// <param name="source">Source type being checked to see if it is assignable.</param>
+        /// <param name="target">Target type being checked to see if it is assignable.</param>
+        /// <returns>True if target type can be assigned from source type.</returns>
         public static bool IsAssignableFrom(this Type source, Type target)
         {
             return (source.GetTypeInfo().IsAssignableFrom(target.GetTypeInfo()));

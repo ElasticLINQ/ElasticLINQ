@@ -11,6 +11,10 @@ using System.Linq.Expressions;
 
 namespace ElasticLinq.Test
 {
+    /// <summary>
+    /// Provides an IElasticQuery that can be used by unit tests.
+    /// </summary>
+    /// <typeparam name="T">Element type this query is for.</typeparam>
     public class TestableElasticQuery<T> : IElasticQuery<T>
     {
         public TestableElasticQuery(TestableElasticContext context, Expression expression = null)

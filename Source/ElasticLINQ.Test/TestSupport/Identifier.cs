@@ -29,10 +29,9 @@ namespace ElasticLinq.Test.TestSupport
 
             public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
             {
-                if (reader.Value == null)
-                    return null;
-
-                return new Identifier(reader.Value.ToString());
+                return reader.Value == null
+                    ? null
+                    : new Identifier(reader.Value.ToString());
             }
 
             public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

@@ -5,6 +5,9 @@ using System.Linq.Expressions;
 
 namespace ElasticLinq.Test
 {
+    /// <summary>
+    /// Provides an IQueryProvider that can be used for unit tests.
+    /// </summary>
     public class TestableElasticQueryProvider : IQueryProvider
     {
         private readonly TestableElasticContext context;
@@ -31,7 +34,7 @@ namespace ElasticLinq.Test
 
         public object Execute(Expression expression)
         {
-            return LambdaExpression.Lambda(expression).Compile().DynamicInvoke();
+            return Expression.Lambda(expression).Compile().DynamicInvoke();
         }
     }
 }

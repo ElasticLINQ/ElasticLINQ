@@ -1,5 +1,7 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using System.Diagnostics.CodeAnalysis;
+using System.Linq.Expressions;
 using ElasticLinq.Utility;
 using System;
 using System.Collections.Generic;
@@ -13,10 +15,17 @@ namespace ElasticLinq.Test.Utility
         private class IndirectObjectSubclass : DirectObjectSubclass { }
         private class SubclassOfList : List<Decimal> { }
         
+        [ExcludeFromCodeCoverage]
         private class ClassWithMemberInfo
         {
             public DirectObjectSubclass AField = null;
             public IndirectObjectSubclass AProperty { get; set; }
+        }
+
+        [ExcludeFromCodeCoverage]
+        private class ClassWithMethodInfo : ClassWithMemberInfo
+        {
+            public int SomeMember() {  return 0; }
         }
 
         [Fact]
@@ -25,6 +34,14 @@ namespace ElasticLinq.Test.Utility
             var memberInfo = TypeHelper.GetMemberInfo((ClassWithMemberInfo c) => c.AField);
 
             Assert.Equal(typeof(ClassWithMemberInfo).GetField("AField"), memberInfo);
+        }
+
+        [Fact]
+        public static void GetMemberThrowsNotSupportedExceptionForNonMemberAccessExpressions()
+        {
+            Expression<Func<ClassWithMethodInfo,int>> invalid = c => c.SomeMember();
+
+            Assert.Throws<NotSupportedException>(() => TypeHelper.GetMemberInfo(invalid));
         }
 
         [Fact]
@@ -45,6 +62,16 @@ namespace ElasticLinq.Test.Utility
             var returnType = TypeHelper.GetReturnType(memberInfo);
 
             Assert.Equal(typeof(IndirectObjectSubclass), returnType);
+        }
+
+        [Fact]
+        public void GetReturnTypeThrowsNotSupportedExceptionForOtherTypes()
+        {
+            var methodInfo = typeof (ClassWithMethodInfo).GetMethod("SomeMember");
+
+            var exception = Assert.Throws<NotSupportedException>(() => TypeHelper.GetReturnType(methodInfo));
+            Assert.Contains("SomeMember", exception.Message);
+            Assert.Contains("ClassWithMethodInfo", exception.Message);
         }
 
         [Fact]
@@ -163,6 +190,22 @@ namespace ElasticLinq.Test.Utility
             var isNullable = typeof(int?).IsGenericOf(typeof(Nullable<>));
 
             Assert.True(isNullable);
+        }
+
+        [Fact]
+        public void IsAssignableFromIsTrueForValidAssignment()
+        {
+            var actual = TypeHelper.IsAssignableFrom(typeof(int?), typeof(int));
+
+            Assert.True(actual);
+        }
+
+        [Fact]
+        public void IsAssignableFromIsFalseTrueForInvalidAssignment()
+        {
+            var actual = TypeHelper.IsAssignableFrom(typeof(int), typeof(int?));
+
+            Assert.False(actual);
         }
     }
 }

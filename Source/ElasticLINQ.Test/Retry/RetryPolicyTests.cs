@@ -1,5 +1,7 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using System.Diagnostics;
+using System.Threading;
 using ElasticLinq.Logging;
 using ElasticLinq.Retry;
 using NSubstitute;
@@ -7,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
+using TraceEventType = ElasticLinq.Logging.TraceEventType;
 
 namespace ElasticLinq.Test.Retry
 {
@@ -96,6 +99,43 @@ namespace ElasticLinq.Test.Retry
             var fields = AssertInfoLog(logger, 0, 100, 1);
             Assert.Equal("mykey", fields["couchbaseDocumentKey"]);
             Assert.Equal(1337, fields["result"]);
+        }
+
+        [Fact]
+        public static async void NullDelayDoesNotDelay()
+        {
+            var delay = new NullDelay();
+            var stopwatch = new Stopwatch();
+
+            stopwatch.Start();
+            await delay.For((int)TimeSpan.FromSeconds(10).TotalMilliseconds, CancellationToken.None);
+            stopwatch.Stop();
+
+            Assert.True(stopwatch.ElapsedMilliseconds < 1000);
+        }
+
+        [Fact]
+        public static async void DelayDoesDelay()
+        {
+            var delayTime = TimeSpan.FromSeconds(2);
+            var delay = new Delay();
+            var stopwatch = new Stopwatch();
+
+            stopwatch.Start();
+            await delay.For((int)delayTime.TotalMilliseconds, CancellationToken.None);
+            stopwatch.Stop();
+
+            Assert.True(stopwatch.ElapsedMilliseconds > delayTime.TotalMilliseconds);
+        }
+
+        [Fact]
+        public static void DelayCanBeCancelled()
+        {
+            var cts = new CancellationTokenSource();
+
+            var task = new Delay().For(2000, cts.Token);
+            cts.Cancel();
+            Assert.True(task.IsCanceled);
         }
 
         [Fact]

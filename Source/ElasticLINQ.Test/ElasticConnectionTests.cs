@@ -89,7 +89,6 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
-        [ExcludeFromCodeCoverage]
         public async Task DisposeKillsHttpClient()
         {
             var connection = new ElasticConnection(endpoint, UserName, Password);
@@ -97,6 +96,15 @@ namespace ElasticLinq.Test
             connection.Dispose();
 
             await Assert.ThrowsAsync<ObjectDisposedException>(() => connection.HttpClient.GetAsync(new Uri("http://something.com")));
+        }
+
+        [Fact]
+        public void DoubleDisposeDoesNotThrow()
+        {
+            var connection = new ElasticConnection(endpoint, UserName, Password);
+
+            connection.Dispose();
+            connection.Dispose();
         }
     }
 }

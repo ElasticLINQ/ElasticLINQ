@@ -918,6 +918,21 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         }
 
         [Fact]
+        public void QueryStringWithFieldsGeneratesQueryStringCriteriaWithFields()
+        {
+            const string expectedQueryStringValue = "Data";
+            var expectedFields = new[] {"Green", "Brown"};
+            var where = Robots.QueryString(expectedQueryStringValue, expectedFields);
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest;
+
+            Assert.Null(criteria.Filter);
+            Assert.NotNull(criteria.Query);
+            var queryStringCriteria = Assert.IsType<QueryStringCriteria>(criteria.Query);
+            Assert.Equal(expectedQueryStringValue, queryStringCriteria.Value);
+            Assert.Equal(expectedFields, queryStringCriteria.Fields);
+        }
+
+        [Fact]
         public void QueryStringWithQueryCombinesToAndQueryCriteria()
         {
             const string expectedQueryStringValue = "Data";

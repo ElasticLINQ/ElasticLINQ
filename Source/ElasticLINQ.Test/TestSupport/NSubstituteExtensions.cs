@@ -1,5 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using System.Diagnostics.CodeAnalysis;
 using NSubstitute;
 using NSubstitute.Core;
 using System;
@@ -9,6 +10,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 
+[ExcludeFromCodeCoverage]
 public static class NSubstituteExtensions
 {
     public static T Arg<T>(this CallInfo callInfo, int index)

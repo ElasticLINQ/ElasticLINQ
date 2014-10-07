@@ -65,11 +65,6 @@ namespace ElasticLinq.Test.TestSupport
             get { return requests.AsReadOnly(); }
         }
 
-        public ReadOnlyCollection<HttpListenerResponse> Responses
-        {
-            get { return responses.AsReadOnly(); }
-        }
-
         public void Dispose()
         {
             Dispose(true);

@@ -63,7 +63,7 @@ namespace ElasticLinq
         public static IQueryable<TSource> QueryString<TSource>(this IQueryable<TSource> source, string query, string[] fields)
         {
             Argument.EnsureNotNull("query", query);
-            Argument.EnsureNotNull("fields", fields);
+            Argument.EnsureNotEmpty("fields", fields);
             return CreateQueryMethodCall(source, queryStringWithFieldsMethodInfo, Expression.Constant(query), Expression.Constant(fields));
         }
 

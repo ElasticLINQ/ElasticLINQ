@@ -1,4 +1,6 @@
-﻿using ElasticLinq.Response.Materializers;
+﻿using System;
+using ElasticLinq.Response.Materializers;
+using Newtonsoft.Json.Bson;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using Xunit;
@@ -133,5 +135,79 @@ namespace ElasticLinq.Test.Response.Materializers
 
             Assert.Equal(default(int), actual);
         }
+
+        [Fact]
+        public void AggregateRowGetKeyReturnsKeyForTermRow()
+        {
+            var row = new AggregateTermRow("rowKey", new[] { new AggregateField("field1", "eq", new JObject()) });
+
+            var key = AggregateRow.GetKey(row);
+
+            Assert.Equal(row.Key, key);
+        }
+
+        [Fact]
+        public void AggregateRowGetKeyReturnsKeyForStatisticalRow()
+        {
+            var row = new AggregateStatisticalRow("statisticalKey", new JObject());
+
+            var key = AggregateRow.GetKey(row);
+
+            Assert.Equal(row.Key, key);
+        }
+
+        [Fact]
+        public void AggregateRowGetKeyReturnsNullForUnknownTypes()
+        {
+            var key = AggregateRow.GetKey(null);
+
+            Assert.Null(key);
+        }
+
+        [Fact]
+        public void AggregateRowGetValueReturnsValueForTermRow()
+        {
+            var expectedName = "aField";
+            var expectedOperation = "count";
+            var expectedValue = "aValue";
+
+            var row = new AggregateTermRow("rowKey", new[] { new AggregateField(expectedName, expectedOperation, new JValue(expectedValue) ) });
+
+            var actual = AggregateRow.GetValue(row, expectedName, expectedOperation, expectedValue.GetType());
+
+            Assert.Equal(expectedValue, actual);
+        }
+
+        [Fact]
+        public void AggregateRowParseValueParsesPositiveInfinity()
+        {
+            var token = JToken.Parse("Infinity");
+
+            Assert.Equal(Double.PositiveInfinity, AggregateRow.ParseValue(token, typeof(Double)));
+            Assert.Equal(Single.PositiveInfinity, AggregateRow.ParseValue(token, typeof(Single)));
+        }
+
+        [Fact]
+        public void AggregateRowParseValueParsesNegativeInfinity()
+        {
+            var token = JToken.Parse("-Infinity");
+
+            Assert.Equal(Double.NegativeInfinity, AggregateRow.ParseValue(token, typeof(Double)));
+            Assert.Equal(Single.NegativeInfinity, AggregateRow.ParseValue(token, typeof(Single)));
+        }
+
+        [Fact]
+        public void AggregateRowParseValueParsesNullableDecimalInfinitiesAsNull()
+        {
+            Assert.Null(AggregateRow.ParseValue(JToken.Parse("Infinity"), typeof(Decimal?)));
+            Assert.Null(AggregateRow.ParseValue(JToken.Parse("-Infinity"), typeof(Decimal?)));
+        }
+
+        [Fact]
+        public void AggregateRowParseValueParsesStringInfinitiesAsStrings()
+        {
+            Assert.Equal("Infinity", AggregateRow.ParseValue(JToken.Parse("Infinity"), typeof(String)));
+            Assert.Equal("-Infinity", AggregateRow.ParseValue(JToken.Parse("-Infinity"), typeof(String)));
+        } 
     }
 }

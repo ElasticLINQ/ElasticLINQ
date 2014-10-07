@@ -18,6 +18,8 @@ namespace ElasticLinq.Test.Mapping
     {
         private enum Day { Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday };
 
+        private class FieldClass { public string AField; }
+
         private class FormatClass
         {
             public string Analyzed { get; set; }
@@ -32,8 +34,6 @@ namespace ElasticLinq.Test.Mapping
             public Identifier JsonConverterToString { get; set; }
 
             public Day DayProperty { get; set; }
-
-            public Day DayField = Day.Friday;
 
             [JsonProperty("CustomPropertyName")]
             public string NotSoCustom { get; set; }
@@ -109,6 +109,7 @@ namespace ElasticLinq.Test.Mapping
             var mapping = new ElasticMapping();
 
             Assert.Throws<ArgumentNullException>(() => mapping.GetFieldName("", (MemberExpression)null));
+            Assert.Throws<NotSupportedException>(() => mapping.GetFieldName("", Expression.Field(Expression.Constant(new FieldClass()), "AField")));
             Assert.Throws<ArgumentNullException>(() => mapping.GetFieldName("", (MemberInfo)null));
         }
 

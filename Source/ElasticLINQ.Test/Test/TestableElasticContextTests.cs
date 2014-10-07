@@ -1,4 +1,6 @@
-﻿using ElasticLinq.Logging;
+﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
+
+using ElasticLinq.Logging;
 using ElasticLinq.Mapping;
 using ElasticLinq.Retry;
 using System;

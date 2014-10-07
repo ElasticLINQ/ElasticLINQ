@@ -1,10 +1,12 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using System.Linq;
 using ElasticLinq.Logging;
 using ElasticLinq.Mapping;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
+using ElasticLinq.Request;
 using Xunit;
 
 namespace ElasticLinq.Test
@@ -13,16 +15,19 @@ namespace ElasticLinq.Test
     {
         private static readonly ElasticConnection connection = new ElasticConnection(new Uri("http://localhost"));
         private static readonly ElasticQueryProvider provider = new ElasticQueryProvider(connection, new TrivialElasticMapping(), NullLog.Instance, NullRetryPolicy.Instance, "prefix");
-        private static readonly Expression validExpression = Expression.Constant(new ElasticQuery<Sample>(provider));
+        private static readonly Expression validConstantExpression = Expression.Constant(new ElasticQuery<Sample>(provider));
 
-        private class Sample { };
+        private class Sample
+        {
+            public string Text { get; set; }
+        };
 
         [Fact]
         [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void ConstructorsThrowsArgumentNullExceptionWhenProviderIsNull()
         {
             Assert.Throws<ArgumentNullException>(() => new ElasticQuery<Sample>(null));
-            Assert.Throws<ArgumentNullException>(() => new ElasticQuery<Sample>(null, validExpression));
+            Assert.Throws<ArgumentNullException>(() => new ElasticQuery<Sample>(null, validConstantExpression));
         }
 
         [Fact]
@@ -46,9 +51,9 @@ namespace ElasticLinq.Test
         [Fact]
         public void ConstructorSetsExpressionProperty()
         {
-            var query = new ElasticQuery<Sample>(provider, validExpression);
+            var query = new ElasticQuery<Sample>(provider, validConstantExpression);
 
-            Assert.Equal(validExpression, query.Expression);
+            Assert.Equal(validConstantExpression, query.Expression);
         }
 
         [Fact]
@@ -68,6 +73,28 @@ namespace ElasticLinq.Test
             var elementType = query.ElementType;
 
             Assert.Equal(typeof(Sample), elementType);
+        }
+
+        [Fact]
+        public void LinqMethodReturnsElasticQueryType()
+        {
+            var query = new ElasticQuery<Sample>(provider).Where(s => s.Text == "a");
+
+            Assert.IsType<ElasticQuery<Sample>>(query);
+        }
+
+        [Fact]
+        public void ToQueryInfoReturnsValidQueryInfo()
+        {
+            var elasticQuery = Assert.IsType<ElasticQuery<Sample>>(new ElasticQuery<Sample>(provider).Where(s => s.Text == "something1"));
+
+            var queryInfo = elasticQuery.ToQueryInfo();
+
+            Assert.IsType<QueryInfo>(queryInfo);
+            Assert.NotNull(queryInfo);
+
+            Assert.Contains("something1", queryInfo.Query);
+            Assert.StartsWith(connection.Endpoint.OriginalString, queryInfo.Uri.OriginalString);
         }
     }
 }
