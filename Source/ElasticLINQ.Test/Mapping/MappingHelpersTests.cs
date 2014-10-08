@@ -100,7 +100,7 @@ namespace ElasticLinq.Test.Mapping
         [Fact]
         public static void GetSelectionPropertyReturnsReadWriteNonGenericValueProperty()
         {
-            var selectionProperty = MappingHelpers.GetSelectionProperty(typeof(ClassWithOneValidSelectionProperty));
+            var selectionProperty = MappingHelpers.GetDiscriminatorProperty(typeof(ClassWithOneValidSelectionProperty));
 
             Assert.IsAssignableFrom<PropertyInfo>(selectionProperty);
             Assert.Equal("Valid", selectionProperty.Name);
@@ -111,7 +111,7 @@ namespace ElasticLinq.Test.Mapping
         [Fact]
         public static void GetSelectionPropertyWithNoSuitablePropertyThrows()
         {
-            var ex = Record.Exception(() => MappingHelpers.GetSelectionProperty(typeof(ClassWithNoValidSelectionProperties)));
+            var ex = Record.Exception(() => MappingHelpers.GetDiscriminatorProperty(typeof(ClassWithNoValidSelectionProperties)));
 
             Assert.IsType<InvalidOperationException>(ex);
             Assert.Equal("Could not find public read/write non-generic value type property to use for a default query against ElasticLinq.Test.Mapping.MappingHelpersTests+ClassWithNoValidSelectionProperties.", ex.Message);

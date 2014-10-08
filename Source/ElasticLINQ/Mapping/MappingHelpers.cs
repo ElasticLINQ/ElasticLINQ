@@ -13,6 +13,12 @@ namespace ElasticLinq.Mapping
     /// </summary>
     public static class MappingHelpers
     {
+        /// <summary>
+        /// Convert a string to camel case by lower-casing just the first letter.
+        /// </summary>
+        /// <param name="value">Input string to be camel-cased.</param>
+        /// <param name="culture">CultureInfo to be used to lower-case first character.</param>
+        /// <returns>String where first letter has been lower-cased.</returns>
         public static string ToCamelCase(this string value, CultureInfo culture)
         {
             Argument.EnsureNotNull("value", value);
@@ -22,6 +28,15 @@ namespace ElasticLinq.Mapping
                 : culture.TextInfo.ToLower(value[0]) + value.Substring(1);
         }
 
+        /// <summary>
+        /// Pluralize a string.
+        /// </summary>
+        /// <param name="value">Input string to be pluralized.</param>
+        /// <param name="culture">Culture to be used in pluralization.</param>
+        /// <returns>String that has been pluralized.</returns>
+        /// <remarks>
+        /// This is a dumb implementation that doesn't even handle English correctly.
+        /// </remarks>
         public static string ToPlural(this string value, CultureInfo culture)
         {
             Argument.EnsureNotNull("value", value);
@@ -31,7 +46,17 @@ namespace ElasticLinq.Mapping
                 : value + (value.EndsWith("s", StringComparison.Ordinal) ? "" : "s");
         }
 
-        public static PropertyInfo GetSelectionProperty(Type type)
+        /// <summary>
+        /// Determine a property in the given type that is suitable for using
+        /// as a discriminator to ensure only documents of this type
+        /// are selected from Elasticsearch.
+        /// </summary>
+        /// <param name="type">Type to examine for a suitable discriminator property.</param>
+        /// <returns>PropertyInfo for a suitable property to use as a discriminator.</returns>
+        /// <remarks>
+        /// A discriminator should be a public read/write instance property that is not generic.
+        /// </remarks>
+        public static PropertyInfo GetDiscriminatorProperty(Type type)
         {
             var property = type.GetTypeInfo()
                 .DeclaredProperties

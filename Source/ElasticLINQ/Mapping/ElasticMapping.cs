@@ -157,7 +157,7 @@ namespace ElasticLinq.Mapping
 
             // Without any other guidance, we look for the first non-nullable property.
             var prefix = GetDocumentMappingPrefix(docType);
-            var fieldName = GetFieldName(prefix, MappingHelpers.GetSelectionProperty(docType));
+            var fieldName = GetFieldName(prefix, MappingHelpers.GetDiscriminatorProperty(docType));
             return new ExistsCriteria(fieldName);
         }
 
