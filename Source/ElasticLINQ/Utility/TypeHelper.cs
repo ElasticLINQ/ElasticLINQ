@@ -156,5 +156,16 @@ namespace ElasticLinq.Utility
         {
             return (source.GetTypeInfo().IsAssignableFrom(target.GetTypeInfo()));
         }
+
+        /// <summary>
+        /// Get a method signature for identifying unsupported method overloads that does not include
+        /// the return type.
+        /// </summary>
+        /// <param name="methodInfo">Method info to obtain simplified signature for.</param>
+        /// <returns>String containing the simplified method signature.</returns>
+        public static string GetSimpleSignature(this MethodInfo methodInfo)
+        {
+            return methodInfo.ToString().Substring(methodInfo.ReturnType.ToString().Length + 1);
+        }
     }
 }

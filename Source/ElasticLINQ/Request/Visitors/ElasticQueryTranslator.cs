@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace ElasticLinq.Request.Visitors
 {
@@ -132,7 +133,7 @@ namespace ElasticLinq.Request.Visitors
                 case "Select":
                     if (m.Arguments.Count == 2)
                         return VisitSelect(m.Arguments[0], m.Arguments[1]);
-                    break;
+                    throw GetOverloadUnsupportedException(m.Method);
 
                 case "First":
                 case "FirstOrDefault":
@@ -142,37 +143,50 @@ namespace ElasticLinq.Request.Visitors
                         return VisitFirstOrSingle(m.Arguments[0], null, m.Method.Name);
                     if (m.Arguments.Count == 2)
                         return VisitFirstOrSingle(m.Arguments[0], m.Arguments[1], m.Method.Name);
-                    break;
+                    throw GetOverloadUnsupportedException(m.Method);
 
                 case "Where":
                     if (m.Arguments.Count == 2)
                         return VisitWhere(m.Arguments[0], m.Arguments[1]);
-                    break;
+                    throw GetOverloadUnsupportedException(m.Method);
+
                 case "Skip":
                     if (m.Arguments.Count == 2)
                         return VisitSkip(m.Arguments[0], m.Arguments[1]);
-                    break;
+                    throw GetOverloadUnsupportedException(m.Method);
+
                 case "Take":
                     if (m.Arguments.Count == 2)
                         return VisitTake(m.Arguments[0], m.Arguments[1]);
-                    break;
+                    throw GetOverloadUnsupportedException(m.Method);
+
                 case "OrderBy":
                 case "OrderByDescending":
                     if (m.Arguments.Count == 2)
                         return VisitOrderBy(m.Arguments[0], m.Arguments[1], m.Method.Name == "OrderBy");
-                    break;
+                    throw GetOverloadUnsupportedException(m.Method);
+
                 case "ThenBy":
                 case "ThenByDescending":
                     if (m.Arguments.Count == 2)
                         return VisitOrderBy(m.Arguments[0], m.Arguments[1], m.Method.Name == "ThenBy");
-                    break;
+                    throw GetOverloadUnsupportedException(m.Method);
 
                 case "Count":
                 case "LongCount":
-                    return VisitCount(m.Arguments[0], m.Arguments.Count == 2 ? m.Arguments[1] : null);
+                    if (m.Arguments.Count == 1)
+                        return VisitCount(m.Arguments[0], null);
+                    if (m.Arguments.Count == 2)
+                        return VisitCount(m.Arguments[0], m.Arguments[1]);
+                    throw GetOverloadUnsupportedException(m.Method);
             }
 
             throw new NotSupportedException(string.Format("Queryable.{0} method is not supported", m.Method.Name));
+        }
+
+        private static NotSupportedException GetOverloadUnsupportedException(MethodInfo methodInfo)
+        {
+            return new NotSupportedException(string.Format("Queryable.{0} method overload is not supported", methodInfo.GetSimpleSignature() ));
         }
 
         private Expression VisitCount(Expression source, Expression predicate)
@@ -280,6 +294,10 @@ namespace ElasticLinq.Request.Visitors
         private Expression VisitSelect(Expression source, Expression selectExpression)
         {
             var lambda = selectExpression.GetLambda();
+
+            if (lambda.Parameters.Count != 1)
+                throw new NotSupportedException("Select method with T parameter is supported, additional parameters like index are not");
+
             var selectBody = lambda.Body;
 
             if (selectBody is MemberExpression)
@@ -346,10 +364,9 @@ namespace ElasticLinq.Request.Visitors
             {
                 var takeValue = (int)takeConstant.Value;
 
-                if (searchRequest.Size.HasValue)
-                    searchRequest.Size = Math.Min(searchRequest.Size.GetValueOrDefault(), takeValue);
-                else
-                    searchRequest.Size = takeValue;
+                searchRequest.Size = searchRequest.Size.HasValue
+                    ? Math.Min(searchRequest.Size.GetValueOrDefault(), takeValue)
+                    : takeValue;
             }
             return Visit(source);
         }

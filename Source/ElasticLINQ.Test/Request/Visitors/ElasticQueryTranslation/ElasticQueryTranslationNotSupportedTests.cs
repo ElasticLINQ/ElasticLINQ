@@ -185,6 +185,13 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             Assert.Contains("Queryable.SelectMany method is not supported", ex.Message);
         }
 
+        [Fact]
+        public static void SelectWithIndexCannotBeTranslated()
+        {
+            var ex = Assert.Throws<NotSupportedException>(() => Translate(Robots.Select((r, i) => new { r.Name, i })));
+            Assert.Contains("Select method with T", ex.Message);
+        }
+
         private static ElasticTranslateResult Translate(IQueryable query)
         {
             return ElasticQueryTranslator.Translate(Mapping, "", query.Expression);

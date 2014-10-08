@@ -177,7 +177,10 @@ namespace ElasticLinq.Request.Visitors
                     return m;
 
                 default:
-                    throw new NotSupportedException(string.Format("{0}.{1} is of unsupported type {2}", m.Member.DeclaringType.Name, m.Member.Name, m.NodeType));
+                    var methodName = m.Member.Name;
+                    if (m.Member.DeclaringType != null)
+                        methodName = m.Member.DeclaringType.Name + "." + m.Member.Name;
+                    throw new NotSupportedException(string.Format("{0} is of unsupported type {1}", methodName, m.NodeType));
             }
         }
 
