@@ -4,7 +4,6 @@ using ElasticLinq.Response.Materializers;
 using ElasticLinq.Response.Model;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
 using Xunit;
 
 namespace ElasticLinq.Test.Response.Materializers

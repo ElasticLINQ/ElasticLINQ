@@ -97,6 +97,7 @@
     <Compile Include="Request\Visitors\ConstantMemberPairTests.cs" />
     <Compile Include="Request\Visitors\ElasticFieldsExpressionVisitorTests.cs" />
     <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationGroupByFieldTests.cs" />
+    <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationNotSupportedTests.cs" />
     <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationSingularTests.cs" />
     <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationSelectTests.cs" />
     <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationTestsBase.cs" />

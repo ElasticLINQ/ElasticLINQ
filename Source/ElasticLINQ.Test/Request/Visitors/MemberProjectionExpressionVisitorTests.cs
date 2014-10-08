@@ -3,7 +3,6 @@
 using ElasticLinq.Mapping;
 using ElasticLinq.Request.Visitors;
 using ElasticLinq.Test.TestSupport;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;

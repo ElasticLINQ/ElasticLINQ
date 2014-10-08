@@ -18,13 +18,22 @@ namespace ElasticLinq.Request.Visitors
     /// Expression visitor to translate predicate expressions to criteria expressions.
     /// Used by Where, Query, Single, First, Count etc.
     /// </summary>
-    internal class CriteriaExpressionVisitor : ExpressionVisitor
+    internal abstract class CriteriaExpressionVisitor : ExpressionVisitor
     {
         protected readonly IElasticMapping Mapping;
         protected readonly string Prefix;
 
+        /// <summary>
+        /// Whether we are currently within a Where or Query statement as different
+        /// operations are permitted in each.
+        /// </summary>
         protected CriteriaWithin Within { get; set; }
 
+        /// <summary>
+        /// Creates a new CriteriaExpressionVisitor with a given mapping and prefix.
+        /// </summary>
+        /// <param name="mapping">The IElasticMapping used to translate properties to fields.</param>
+        /// <param name="prefix">The string prefix used to prepend fields</param>
         protected CriteriaExpressionVisitor(IElasticMapping mapping, string prefix)
         {
             Mapping = new ElasticFieldsMappingWrapper(mapping);
@@ -213,24 +222,28 @@ namespace ElasticLinq.Request.Visitors
             return e;
         }
 
-        private Expression VisitPrefix(Expression left, Expression right)
+        private Expression VisitPrefix(Expression fieldExpression, Expression startsWithExpression)
         {
-            var cm = ConstantMemberPair.Create(left, right);
+            // Do not use ConstantMemberPair - these expressions are not reversible
+            if (fieldExpression is MemberExpression && startsWithExpression is ConstantExpression)
+            {
+                var fieldName = Mapping.GetFieldName(Prefix, (MemberExpression) fieldExpression);
+                return new CriteriaExpression(new PrefixCriteria(fieldName, ((ConstantExpression)startsWithExpression).Value.ToString()));
+            }
 
-            if (cm != null)
-                return new CriteriaExpression(new PrefixCriteria(Mapping.GetFieldName(Prefix, cm.MemberExpression), cm.ConstantExpression.Value.ToString()));
-
-            throw new NotSupportedException("Prefix must be between a Member and a Constant");
+            throw new NotSupportedException("ElasticMethods.Prefix must take a member for field and a constant for startsWith");
         }
 
-        private Expression VisitRegexp(Expression left, Expression right)
+        private Expression VisitRegexp(Expression fieldExpression, Expression regexpExpression)
         {
-            var cm = ConstantMemberPair.Create(left, right);
+            // Do not use ConstantMemberPair - these expressions are not reversible
+            if (fieldExpression is MemberExpression && regexpExpression is ConstantExpression)
+            {
+                var fieldName = Mapping.GetFieldName(Prefix, (MemberExpression)fieldExpression);
+                return new CriteriaExpression(new RegexpCriteria(fieldName, ((ConstantExpression)regexpExpression).Value.ToString()));
+            }
 
-            if (cm != null)
-                return new CriteriaExpression(new RegexpCriteria(Mapping.GetFieldName(Prefix, cm.MemberExpression), cm.ConstantExpression.Value.ToString()));
-
-            throw new NotSupportedException("Regexp must be between a Member and a Constant");
+            throw new NotSupportedException("ElasticMethods.Regexp must take a member for field and a constant for startsWith");
         }
 
         private Expression VisitEnumerableContainsMethodCall(Expression source, Expression match)
@@ -265,13 +278,15 @@ namespace ElasticLinq.Request.Visitors
                 return new CriteriaExpression(TermsCriteria.Build(field, memberExpression.Member, value));
             }
 
-            throw new NotSupportedException(string.Format("Unknown source '{0}' for Contains operation", source));
+            throw new NotSupportedException(source is MemberExpression
+                ? string.Format("Match '{0}' in Contains operation must be a constant", match)
+                : string.Format("Unknown source '{0}' for Contains operation", source));
         }
 
         private Expression VisitStringPatternCheckMethodCall(Expression source, Expression match, string pattern, string methodName)
         {
             if (Within != CriteriaWithin.Query)
-                throw new NotSupportedException(string.Format("Method String.'{0}' can only be used within .Query() not in .Where()", methodName));
+                throw new NotSupportedException(string.Format("Method String.{0} can only be used within .Query() not in .Where()", methodName));
 
             var matched = Visit(match);
 
@@ -282,7 +297,9 @@ namespace ElasticLinq.Request.Visitors
                 return new CriteriaExpression(new QueryStringCriteria(String.Format(pattern, value), field));
             }
 
-            throw new NotSupportedException(string.Format("Unknown source '{0}' for '{1}' operation", source, methodName));
+            throw new NotSupportedException(source is MemberExpression
+                ? string.Format("Match '{0}' in Contains operation must be a constant", match)
+                : string.Format("Unknown source '{0}' for Contains operation", source));
         }
 
         private Expression VisitAndAlso(BinaryExpression b)
@@ -390,7 +407,7 @@ namespace ElasticLinq.Request.Visitors
                     ? CreateExists(cm, false)
                     : new CriteriaExpression(NotCriteria.Create(new TermCriteria(Mapping.GetFieldName(Prefix, cm.MemberExpression), cm.MemberExpression.Member, cm.ConstantExpression.Value)));
 
-            throw new NotSupportedException("A not-equal expression must consist of a constant and a member");
+            throw new NotSupportedException("A not-equal expression must be between a constant and a member");
         }
 
         private Expression VisitRange(ExpressionType t, Expression left, Expression right)

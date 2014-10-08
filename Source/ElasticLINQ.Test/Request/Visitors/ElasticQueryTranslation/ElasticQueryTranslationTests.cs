@@ -1,6 +1,5 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
-using ElasticLinq.Mapping;
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Visitors;
 using ElasticLinq.Response.Model;
@@ -8,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
-using Xunit.Extensions;
 
 namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 {
@@ -78,5 +76,5 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             Assert.IsAssignableFrom<IEnumerable<Robot>>(materialized);
             Assert.Empty((IEnumerable<Robot>)materialized);
         }
-   }
+    }
 }

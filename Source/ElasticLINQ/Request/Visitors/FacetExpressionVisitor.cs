@@ -18,9 +18,8 @@ namespace ElasticLinq.Request.Visitors
     {
         private readonly IElasticMaterializer materializer;
 
-        public FacetRebindCollectionResult(Expression expression, HashSet<IFacet> collected, ParameterExpression parameter,
-            LambdaExpression projection, IElasticMaterializer materializer)
-            : base(expression, collected, parameter, projection)
+        public FacetRebindCollectionResult(Expression expression, HashSet<IFacet> collected, ParameterExpression parameter, IElasticMaterializer materializer)
+            : base(expression, collected, parameter)
         {
             this.materializer = materializer;
         }
@@ -72,10 +71,10 @@ namespace ElasticLinq.Request.Visitors
 
             var visitor = new FacetExpressionVisitor(mapping, prefix);
             var visitedExpression = visitor.Visit(expression);
-            var facets = new HashSet<IFacet>(visitor.GetFacets());            
+            var facets = new HashSet<IFacet>(visitor.GetFacets());
             var materializer = GetFacetMaterializer(visitor.selectProjection, visitor.groupBy);
 
-            return new FacetRebindCollectionResult(visitedExpression, facets, visitor.bindingParameter, visitor.selectProjection, materializer);
+            return new FacetRebindCollectionResult(visitedExpression, facets, visitor.bindingParameter, materializer);
         }
 
         private static IElasticMaterializer GetFacetMaterializer(LambdaExpression projection, Expression groupBy)
