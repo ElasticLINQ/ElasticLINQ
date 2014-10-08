@@ -6,7 +6,6 @@ using ElasticLinq.Request.Visitors;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using Xunit;
 
 namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
@@ -195,23 +194,6 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
             var facet = Assert.Single(request.Facets);
             Assert.IsType<FilterFacet>(facet);
-        }
-
-        private static Expression MakeQueryableExpression<TSource>(string name, IQueryable<TSource> source, params Expression[] parameters)
-        {
-            var method = MakeQueryableMethod<TSource>(name, parameters.Length + 1);
-            return Expression.Call(method, new[] { source.Expression }.Concat(parameters).ToArray());
-        }
-
-        private static MethodInfo MakeQueryableMethod<TSource>(string name, int parameterCount)
-        {
-            return typeof(Queryable).FindMembers
-                (MemberTypes.Method,
-                    BindingFlags.Static | BindingFlags.Public,
-                    (info, criteria) => info.Name.Equals(criteria), name)
-                .OfType<MethodInfo>()
-                .Single(a => a.GetParameters().Length == parameterCount)
-                .MakeGenericMethod(typeof(TSource));
         }
     }
 }

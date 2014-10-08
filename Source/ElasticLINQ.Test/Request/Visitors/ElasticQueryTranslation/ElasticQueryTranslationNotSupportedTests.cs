@@ -192,6 +192,17 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             Assert.Contains("Select method with T", ex.Message);
         }
 
+        [Theory]
+        [InlineData("Last")]
+        [InlineData("LastOrDefault")]
+        public static void LastCannotBeTranslated(string method)
+        {
+            // TODO: Consider supporting these in conjunction with OrderBy/ThenBy by reversing all ordering
+            var first = MakeQueryableExpression(method, Robots);
+            var ex = Assert.Throws<NotSupportedException>(() => ElasticQueryTranslator.Translate(Mapping, "prefix", first));
+            Assert.Contains("Queryable." + method + " method is not supported", ex.Message);
+        }
+
         private static ElasticTranslateResult Translate(IQueryable query)
         {
             return ElasticQueryTranslator.Translate(Mapping, "", query.Expression);

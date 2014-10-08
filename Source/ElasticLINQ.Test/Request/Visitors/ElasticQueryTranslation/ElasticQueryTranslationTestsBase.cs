@@ -6,6 +6,8 @@ using ElasticLinq.Retry;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 {
@@ -48,6 +50,23 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         public class RobotPricing
         {
             public decimal InvoicePrice { get; set; }
+        }
+
+        protected static Expression MakeQueryableExpression<TSource>(string name, IQueryable<TSource> source, params Expression[] parameters)
+        {
+            var method = MakeQueryableMethod<TSource>(name, parameters.Length + 1);
+            return Expression.Call(method, new[] { source.Expression }.Concat(parameters).ToArray());
+        }
+
+        protected static MethodInfo MakeQueryableMethod<TSource>(string name, int parameterCount)
+        {
+            return typeof(Queryable).FindMembers
+                (MemberTypes.Method,
+                    BindingFlags.Static | BindingFlags.Public,
+                    (info, criteria) => info.Name.Equals(criteria), name)
+                .OfType<MethodInfo>()
+                .Single(a => a.GetParameters().Length == parameterCount)
+                .MakeGenericMethod(typeof(TSource));
         }
     }
 }
