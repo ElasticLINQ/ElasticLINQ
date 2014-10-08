@@ -94,10 +94,6 @@ namespace ElasticLinq.Test.Request
                 var response = ElasticRequestProcessor.ParseResponse(stream, log);
                 Assert.NotNull(response);
                 Assert.Equal(took, response.took);
-                Assert.Equal(shards, response._shards.successful);
-                Assert.Equal(shards, response._shards.total);
-                Assert.Equal(shards, response._shards.successful);
-                Assert.Equal(0, response._shards.failed);
                 Assert.Equal(hits, response.hits.total);
                 Assert.Equal(score, response.hits.max_score);
 

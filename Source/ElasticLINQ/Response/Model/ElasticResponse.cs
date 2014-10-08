@@ -14,7 +14,6 @@ namespace ElasticLinq.Response.Model
     {
         public int took;
         public bool timed_out;
-        public ShardStatistics _shards;
         public Hits hits;
 
         public JValue error;

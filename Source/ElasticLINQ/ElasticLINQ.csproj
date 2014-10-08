@@ -132,7 +132,6 @@
     <Compile Include="Response\Model\ElasticResponse.cs" />
     <Compile Include="Response\Model\Hit.cs" />
     <Compile Include="Response\Model\Hits.cs" />
-    <Compile Include="Response\Model\ShardStatistics.cs" />
     <Compile Include="Request\Visitors\MemberProjectionExpressionVisitor.cs" />
     <Compile Include="..\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
