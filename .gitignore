@@ -32,6 +32,9 @@ _TeamCity*
 *.ncrunch*
 .*crunch*.local.xml
 
+# NCover
+[Tt]est[Rr]esults/
+
 # NuGet
 [Nn]u[Gg]et.exe
 [Pp]ackages/
