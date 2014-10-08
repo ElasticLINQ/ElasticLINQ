@@ -28,7 +28,7 @@ A number of the basic operations are supported including:
 * ``Single``, ``SingleOrDefault`` maps to length 2, filter if predicate supplied
 * ``Sum``, ``Average``, ``Min``, ``Max`` map to facets
 * ``GroupBy`` causes facets to switch between termless and termed facets
-* ``Count`` maps to count query if top level, facet if within a GroupBy
+* ``Count``, ``LongCount`` maps to count query if top level, facet if within a GroupBy
 
 #### Select
 Select is supported and detects whole entity vs field selection with field, anonymous object and Tuple creation patterns:
@@ -61,7 +61,7 @@ Where creates **filter** operations and supports the following patterns:
 * `HasValue`, ``!=null`` maps to **exists**
 * `!HasValue`, ``==null`` maps to **missing**
 * ``Equals`` for static and instance maps to **term**
-* ``Contains`` on IEnumerable/arrays maps to **terms**
+* ``Contains`` on IEnumerable/array maps to **terms**
 
 To create similar expression as **queries** use the .Query extension operator. It maps very similar operations but **exists** and **missing** are not available within queries on Elasticsearch.
 
@@ -117,15 +117,14 @@ NSubstitute is required for some unit tests.
 Currently around 95% test coverage and some tests use an included HTTP listener to correct sending and receiving of requests.
 
 ### Query optimizations
-The query translator supports a few query optimization's to ensure that the generated ElasticLINQ query looks good and not like it was translated from another language. 
+The query translator supports a few query optimizations to ensure that the generated ElasticLINQ query looks good and not like it was translated from another language. 
 
 This includes currently:
 
 * Combining multiple == for same field in same term
 * Combining multiple < > <= >= for same field into single range
-* Combining CLR OR and AND trees into flattened ORs and ANDs
-* Cancelling out NOT around a NOT
-* Converting missing to exists and exists to missing when in a NOT
+* Combining OR and AND expression trees into flattened ORs and ANDs
+* Cancelling out NOT when inside operation can be inverted
 
 ## Future
 
