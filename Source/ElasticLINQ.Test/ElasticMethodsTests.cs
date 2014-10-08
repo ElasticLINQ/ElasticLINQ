@@ -1,7 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using Xunit;
 
 namespace ElasticLinq.Test
@@ -9,7 +8,6 @@ namespace ElasticLinq.Test
     public class ElasticMethodsTests
     {
         [Fact]
-        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void ContainsAllThrowsIfAccessed()
         {
             var set = new[] { 1, 2, 3 };
@@ -18,7 +16,6 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
-        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void ContainsAnyThrowsIfAccessed()
         {
             var set = new[] { 1, 2, 3 };
@@ -27,7 +24,6 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
-        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void PrefixThrowsIfAccessed()
         {
             var ex = Assert.Throws<InvalidOperationException>(() => ElasticMethods.Prefix("a", "b"));
@@ -35,7 +31,6 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
-        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void RegexpThrowsIfAccessed()
         {
             var ex = Assert.Throws<InvalidOperationException>(() => ElasticMethods.Regexp("a", "b"));

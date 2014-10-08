@@ -6,7 +6,6 @@ using ElasticLinq.Request;
 using ElasticLinq.Retry;
 using ElasticLinq.Test.Utility;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -25,7 +24,6 @@ namespace ElasticLinq.Test.Request
         private static readonly IRetryPolicy retryPolicy = NullRetryPolicy.Instance;
 
         [Fact]
-        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public static void Constructor_GuardClauses()
         {
             Assert.Throws<ArgumentNullException>(() => new ElasticRequestProcessor(null, mapping, log, retryPolicy));

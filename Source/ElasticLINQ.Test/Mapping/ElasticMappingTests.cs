@@ -103,7 +103,6 @@ namespace ElasticLinq.Test.Mapping
         }
 
         [Fact]
-        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public static void GetFieldName_GuardClause()
         {
             var mapping = new ElasticMapping();
@@ -132,7 +131,6 @@ namespace ElasticLinq.Test.Mapping
         }
 
         [Fact]
-        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public static void GetDocumentType_GuardClause()
         {
             var mapping = new ElasticMapping();
@@ -152,7 +150,6 @@ namespace ElasticLinq.Test.Mapping
         }
 
         [Fact]
-        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public static void GetTypeExistsCriteria_GuardClause()
         {
             var mapping = new ElasticMapping();

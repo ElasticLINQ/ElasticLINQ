@@ -2,7 +2,6 @@
 
 using ElasticLinq.Test.TestSupport;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using Xunit;
@@ -30,7 +29,6 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
-        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void QueryString_GuardClauses()
         {
             var source = new FakeQueryProvider().CreateQuery<Sample>();
@@ -55,7 +53,6 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
-        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void QueryStringWithFields_GuardClauses()
         {
             var source = new FakeQueryProvider().CreateQuery<Sample>();
@@ -106,7 +103,6 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
-        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void OrderByScoreDescending_GuardClauses()
         {
             Assert.Throws<ArgumentNullException>(() => ElasticQueryExtensions.OrderByScoreDescending<Sample>(null));
@@ -120,7 +116,6 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
-        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public static void ThenByScore_GuardClauses()
         {
             Assert.Throws<ArgumentNullException>(() => ElasticQueryExtensions.ThenByScore<Sample>(null));
@@ -134,7 +129,6 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
-        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public static void ThenByScoreDescending_GuardClauses()
         {
             Assert.Throws<ArgumentNullException>(() => ElasticQueryExtensions.ThenByScoreDescending<Sample>(null));

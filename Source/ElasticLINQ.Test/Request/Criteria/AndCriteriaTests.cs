@@ -2,7 +2,6 @@
 
 using ElasticLinq.Request.Criteria;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using Xunit;
@@ -34,7 +33,6 @@ namespace ElasticLinq.Test.Request.Criteria
         }
 
         [Fact]
-        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void CombineThrowArgumentNullExceptionWhenCriteriaIsNull()
         {
             Assert.Throws<ArgumentNullException>(() => AndCriteria.Combine(null));

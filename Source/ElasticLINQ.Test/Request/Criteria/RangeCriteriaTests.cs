@@ -2,7 +2,6 @@
 
 using ElasticLinq.Request.Criteria;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using Xunit;
@@ -61,7 +60,6 @@ namespace ElasticLinq.Test.Request.Criteria
         }
 
         [Fact]
-        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void ConstructorThrowsArgumentNullExceptionWhenValueIsNull()
         {
             Assert.Throws<ArgumentNullException>(() => new RangeCriteria("field", memberInfo, RangeComparison.GreaterThan, null));

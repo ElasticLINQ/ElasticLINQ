@@ -338,7 +338,6 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         }
 
         [Fact]
-        [ExcludeFromCodeCoverage] // Expression is not "executed"
         public void DecimalLessThanOrEqualsOperatorGeneratesLessThanOrEqualRangeCriteria()
         {
             const decimal expectedConstant = 710.956m;
@@ -353,7 +352,6 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         }
 
         [Fact]
-        [ExcludeFromCodeCoverage] // Expression is not "executed"
         public static void DecimalLessThanOrEqualsOperatorSupportsDeepProperties()
         {
             const decimal expectedConstant = 710.956m;
@@ -368,7 +366,6 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         }
 
         [Fact]
-        [ExcludeFromCodeCoverage] // Expression is not "executed"
         public void DecimalGreaterThanOperatorGeneratesGreaterThanRangeCriteria()
         {
             const decimal expectedConstant = 710.956m;

@@ -2,7 +2,6 @@
 
 using ElasticLinq.Request.Criteria;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Xunit;
 
@@ -40,7 +39,6 @@ namespace ElasticLinq.Test.Request.Criteria
         }
 
         [Fact]
-        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void ConstructorThrowsArgumentNullExceptionWhenFieldIsNull()
         {
             Assert.Throws<ArgumentNullException>(() => NotCriteria.Create(null));

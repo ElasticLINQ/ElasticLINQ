@@ -11,12 +11,12 @@ namespace ElasticLinq.Test.Mapping
 {
     public class MappingHelpersTests
     {
-        private readonly static CultureInfo USCulture = new CultureInfo(0x0409);
+        private readonly static CultureInfo usCulture = new CultureInfo(0x0409);
 
         [Fact]
         public static void ToCamelCaseWithAllCapsLowersFirstCapitalOnly()
         {
-            var actual = "ALLCAPS".ToCamelCase(USCulture);
+            var actual = "ALLCAPS".ToCamelCase(usCulture);
 
             Assert.Equal("aLLCAPS", actual);
         }
@@ -24,7 +24,7 @@ namespace ElasticLinq.Test.Mapping
         [Fact]
         public static void ToCamelCaseWithAllLowerCaseReturnsAllLowerCase()
         {
-            var actual = "lowercase".ToCamelCase(USCulture);
+            var actual = "lowercase".ToCamelCase(usCulture);
 
             Assert.Equal("lowercase", actual);
         }
@@ -32,7 +32,7 @@ namespace ElasticLinq.Test.Mapping
         [Fact]
         public static void ToCamelCaseWithMixedCaseOnlyChangesFirstLetter()
         {
-            var actual = "MixedCaseExample".ToCamelCase(USCulture);
+            var actual = "MixedCaseExample".ToCamelCase(usCulture);
 
             Assert.Equal("mixedCaseExample", actual);
         }
@@ -40,7 +40,7 @@ namespace ElasticLinq.Test.Mapping
         [Fact]
         public static void ToCamelCaseWithCamelCaseReturnsCamelCase()
         {
-            var actual = "alreadyCamelCase".ToCamelCase(USCulture);
+            var actual = "alreadyCamelCase".ToCamelCase(usCulture);
 
             Assert.Equal("alreadyCamelCase", actual);
         }
@@ -48,7 +48,7 @@ namespace ElasticLinq.Test.Mapping
         [Fact]
         public static void ToCamelCaseWithSingleCharStringReturnsSingleCharLowered()
         {
-            var actual = "S".ToCamelCase(USCulture);
+            var actual = "S".ToCamelCase(usCulture);
 
             Assert.Equal("s", actual);
         }
@@ -56,22 +56,21 @@ namespace ElasticLinq.Test.Mapping
         [Fact]
         public static void ToCamelCaseWithEmptyStringReturnsEmptyString()
         {
-            var actual = "".ToCamelCase(USCulture);
+            var actual = "".ToCamelCase(usCulture);
 
             Assert.Equal("", actual);
         }
 
         [Fact]
-        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public static void ToCamelCaseWithNullThrowsArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => ((string)null).ToCamelCase(USCulture));
+            Assert.Throws<ArgumentNullException>(() => ((string)null).ToCamelCase(usCulture));
         }
 
         [Fact]
         public static void ToPluralWithStringNotEndingInSAddsS()
         {
-            var actual = "test".ToPlural(USCulture);
+            var actual = "test".ToPlural(usCulture);
 
             Assert.Equal("tests", actual);
         }
@@ -79,7 +78,7 @@ namespace ElasticLinq.Test.Mapping
         [Fact]
         public static void ToPluralWithStringEndingInSDoesNotAddS()
         {
-            var actual = "tests".ToPlural(USCulture);
+            var actual = "tests".ToPlural(usCulture);
 
             Assert.Equal("tests", actual);
         }
@@ -87,16 +86,15 @@ namespace ElasticLinq.Test.Mapping
         [Fact]
         public static void ToPluralWithEmptyStringReturnsEmptyString()
         {
-            var actual = "".ToPlural(USCulture);
+            var actual = "".ToPlural(usCulture);
 
             Assert.Equal("", actual);
         }
 
         [Fact]
-        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public static void ToPluralWithNullThrowsArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => ((string)null).ToPlural(USCulture));
+            Assert.Throws<ArgumentNullException>(() => ((string)null).ToPlural(usCulture));
         }
 
         [Fact]

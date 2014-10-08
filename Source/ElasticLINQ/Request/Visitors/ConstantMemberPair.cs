@@ -54,7 +54,7 @@ namespace ElasticLinq.Request.Visitors
                        && memberExpression.Member.DeclaringType.IsGenericOf(typeof(Nullable<>)))
                     return true;
 
-                // something == null (for reference types or Nullable<T>
+                // something == null (for reference types or Nullable<T>)
                 if (constantExpression.Value == null)
                     return memberExpression.Type.IsNullable();
 
