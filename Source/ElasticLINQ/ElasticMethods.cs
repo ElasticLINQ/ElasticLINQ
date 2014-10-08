@@ -65,7 +65,7 @@ namespace ElasticLinq
         private static InvalidOperationException BuildException([CallerMemberName] string memberName = null)
         {
             return new InvalidOperationException(
-                String.Format("The method ElasticMethods.{0} is for mapping queries to Elasticsearch and should not be called directly.", memberName));
+                String.Format("ElasticMethods.{0} is a method for mapping queries to Elasticsearch and should not be called directly.", memberName));
         }
     }
 }

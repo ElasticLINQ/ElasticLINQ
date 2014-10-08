@@ -72,7 +72,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         public static void RangeMustBeBetweenMemberAndConstant()
         {
             var ex = Assert.Throws<NotSupportedException>(() => Translate(Robots.Where(r => r.Zone > r.Id)));
-            Assert.Contains("range must consist", ex.Message);
+            Assert.Contains("must test a constant against a member", ex.Message);
         }
 
         [Fact]
@@ -160,6 +160,29 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             var ex = Assert.Throws<NotSupportedException>(() => Translate(Robots.GroupBy(r => r.Id / 2)));
             Assert.Contains("GroupBy must be either a", ex.Message);
+        }
+
+        [Fact]
+        public static void WhereCannotTakeAFunc()
+        {
+            Func<Robot, bool> wherePredicateFunc = r => r.Name.Contains("a");
+            var ex = Assert.Throws<NotSupportedException>(() => Translate(Robots.Where(r => wherePredicateFunc(r))));
+            Assert.Contains("Where expression ", ex.Message);
+        }
+
+        [Fact]
+        public static void QueryCannotTakeAFunc()
+        {
+            Func<Robot, bool> wherePredicateFunc = r => r.Name.Contains("a");
+            var ex = Assert.Throws<NotSupportedException>(() => Translate(Robots.Query(r => wherePredicateFunc(r))));
+            Assert.Contains("Query expression ", ex.Message);
+        }
+
+        [Fact]
+        public static void SelectManyCannotBeTranslated()
+        {
+            var ex = Assert.Throws<NotSupportedException>(() => Translate(Robots.SelectMany(r => r.Aliases)));
+            Assert.Contains("Queryable.SelectMany method is not supported", ex.Message);
         }
 
         private static ElasticTranslateResult Translate(IQueryable query)

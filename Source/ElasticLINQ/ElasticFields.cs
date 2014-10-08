@@ -34,7 +34,7 @@ namespace ElasticLinq
         private static InvalidOperationException BuildException([CallerMemberName] string memberName = null)
         {
             return new InvalidOperationException(
-                String.Format("The property ElasticFields.{0} is for mapping queries to Elasticsearch and should not be evaluated directly.", memberName));
+                String.Format("ElasticFields.{0} is a property for mapping queries to Elasticsearch and should not be evaluated directly.", memberName));
         }
     }
 }

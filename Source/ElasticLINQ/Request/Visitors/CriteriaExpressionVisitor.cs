@@ -107,7 +107,7 @@ namespace ElasticLinq.Request.Visitors
                     break;
             }
 
-            throw new NotSupportedException(string.Format("The ElasticMethods method '{0}' is not supported", m.Method.Name));
+            throw new NotSupportedException(string.Format("ElasticMethods.{0} method is not supported", m.Method.Name));
         }
 
         protected Expression VisitEnumerableMethodCall(MethodCallExpression m)
@@ -120,7 +120,7 @@ namespace ElasticLinq.Request.Visitors
                     break;
             }
 
-            throw new NotSupportedException(string.Format("The Enumerable method '{0}' is not supported", m.Method.Name));
+            throw new NotSupportedException(string.Format("Enumerable.{0} method is not supported", m.Method.Name));
         }
 
         protected Expression VisitStringMethodCall(MethodCallExpression m)
@@ -177,7 +177,7 @@ namespace ElasticLinq.Request.Visitors
                     return m;
 
                 default:
-                    throw new NotSupportedException(string.Format("The MemberInfo '{0}' is not supported", m.Member.Name));
+                    throw new NotSupportedException(string.Format("{0}.{1} is of unsupported type {2}", m.Member.DeclaringType.Name, m.Member.Name, m.NodeType));
             }
         }
 
@@ -192,15 +192,25 @@ namespace ElasticLinq.Request.Visitors
                     return VisitAndAlso(b);
 
                 case ExpressionType.Equal:
+                    return VisitEquals(Visit(b.Left), Visit(b.Right));
+
                 case ExpressionType.NotEqual:
+                    return VisitNotEqual(Visit(b.Left), Visit(b.Right));
+
                 case ExpressionType.GreaterThan:
+                    return VisitRange(RangeComparison.GreaterThan, Visit(b.Left), Visit(b.Right));
+                
                 case ExpressionType.GreaterThanOrEqual:
+                    return VisitRange(RangeComparison.GreaterThanOrEqual, Visit(b.Left), Visit(b.Right));
+                
                 case ExpressionType.LessThan:
+                    return VisitRange(RangeComparison.LessThan, Visit(b.Left), Visit(b.Right));
+
                 case ExpressionType.LessThanOrEqual:
-                    return VisitComparisonBinary(b);
+                    return VisitRange(RangeComparison.LessThanOrEqual, Visit(b.Left), Visit(b.Right));
 
                 default:
-                    throw new NotSupportedException(string.Format("The binary expression '{0}' is not supported", b.NodeType));
+                    throw new NotSupportedException(string.Format("Binary expression '{0}' is not supported", b.NodeType));
             }
         }
 
@@ -325,30 +335,6 @@ namespace ElasticLinq.Request.Visitors
             }
         }
 
-        private Expression VisitComparisonBinary(BinaryExpression b)
-        {
-            var left = Visit(b.Left);
-            var right = Visit(b.Right);
-
-            switch (b.NodeType)
-            {
-                case ExpressionType.Equal:
-                    return VisitEquals(left, right);
-
-                case ExpressionType.NotEqual:
-                    return VisitNotEqual(left, right);
-
-                case ExpressionType.GreaterThan:
-                case ExpressionType.GreaterThanOrEqual:
-                case ExpressionType.LessThan:
-                case ExpressionType.LessThanOrEqual:
-                    return VisitRange(b.NodeType, left, right);
-
-                default:
-                    throw new NotSupportedException(string.Format("The binary expression '{0}' is not supported", b.NodeType));
-            }
-        }
-
         private Expression VisitContains(string methodName, Expression left, Expression right, TermsExecutionMode executionMode)
         {
             var cm = ConstantMemberPair.Create(left, right);
@@ -402,42 +388,23 @@ namespace ElasticLinq.Request.Visitors
         {
             var cm = ConstantMemberPair.Create(left, right);
 
-            if (cm != null)
-                return cm.IsNullTest
-                    ? CreateExists(cm, false)
-                    : new CriteriaExpression(NotCriteria.Create(new TermCriteria(Mapping.GetFieldName(Prefix, cm.MemberExpression), cm.MemberExpression.Member, cm.ConstantExpression.Value)));
+            if (cm == null)
+                throw new NotSupportedException("A not-equal expression must be between a constant and a member");
 
-            throw new NotSupportedException("A not-equal expression must be between a constant and a member");
+            return cm.IsNullTest
+                ? CreateExists(cm, false)
+                : new CriteriaExpression(NotCriteria.Create(new TermCriteria(Mapping.GetFieldName(Prefix, cm.MemberExpression), cm.MemberExpression.Member, cm.ConstantExpression.Value)));
         }
 
-        private Expression VisitRange(ExpressionType t, Expression left, Expression right)
+        private Expression VisitRange(RangeComparison rangeComparison, Expression left, Expression right)
         {
             var cm = ConstantMemberPair.Create(left, right);
 
-            if (cm != null)
-            {
-                var field = Mapping.GetFieldName(Prefix, cm.MemberExpression);
-                return new CriteriaExpression(new RangeCriteria(field, cm.MemberExpression.Member, ExpressionTypeToRangeType(t), cm.ConstantExpression.Value));
-            }
+            if (cm == null)
+                throw new NotSupportedException("A {0} must test a constant against a member");
 
-            throw new NotSupportedException("A range must consist of a constant and a member");
-        }
-
-        private static RangeComparison ExpressionTypeToRangeType(ExpressionType expressionType)
-        {
-            switch (expressionType)
-            {
-                case ExpressionType.GreaterThan:
-                    return RangeComparison.GreaterThan;
-                case ExpressionType.GreaterThanOrEqual:
-                    return RangeComparison.GreaterThanOrEqual;
-                case ExpressionType.LessThan:
-                    return RangeComparison.LessThan;
-                case ExpressionType.LessThanOrEqual:
-                    return RangeComparison.LessThanOrEqual;
-            }
-
-            throw new ArgumentOutOfRangeException("expressionType");
+            var field = Mapping.GetFieldName(Prefix, cm.MemberExpression);
+            return new CriteriaExpression(new RangeCriteria(field, cm.MemberExpression.Member, rangeComparison, cm.ConstantExpression.Value));
         }
     }
 }

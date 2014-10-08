@@ -83,9 +83,6 @@ namespace ElasticLinq.Request.Visitors
             if (m.Method.DeclaringType == typeof(ElasticMethods))
                 return VisitElasticMethodsMethodCall(m);
 
-            if (m.Method.Name == "Create")
-                return m;
-
             return base.VisitMethodCall(m);
         }
 
@@ -114,7 +111,7 @@ namespace ElasticLinq.Request.Visitors
                     break;
             }
 
-            throw new NotSupportedException(string.Format("The ElasticQuery method '{0}' is not supported", m.Method.Name));
+            throw new NotSupportedException(string.Format("ElasticQuery.{0} method is not supported", m.Method.Name));
         }
 
         private Expression VisitQueryString(Expression source, Expression queryExpression, Expression fieldsExpression = null)
@@ -132,11 +129,6 @@ namespace ElasticLinq.Request.Visitors
         {
             switch (m.Method.Name)
             {
-                case "GroupBy":
-                    if (m.Arguments.Count == 2)
-                        return Visit(m.Arguments[0]); // Already handled by aggregator
-                    break;
-
                 case "Select":
                     if (m.Arguments.Count == 2)
                         return VisitSelect(m.Arguments[0], m.Arguments[1]);
@@ -180,7 +172,7 @@ namespace ElasticLinq.Request.Visitors
                     return VisitCount(m.Arguments[0], m.Arguments.Count == 2 ? m.Arguments[1] : null);
             }
 
-            throw new NotSupportedException(string.Format("The Queryable method '{0}' is not supported", m.Method.Name));
+            throw new NotSupportedException(string.Format("Queryable.{0} method is not supported", m.Method.Name));
         }
 
         private Expression VisitCount(Expression source, Expression predicate)
@@ -233,21 +225,6 @@ namespace ElasticLinq.Request.Visitors
             return base.VisitUnary(node);
         }
 
-        protected override Expression VisitMember(MemberExpression m)
-        {
-            if (m.Member.DeclaringType == typeof(ElasticFields))
-                return m;
-
-            switch (m.Expression.NodeType)
-            {
-                case ExpressionType.Parameter:
-                case ExpressionType.MemberAccess:
-                    return m;
-            }
-
-            throw new NotSupportedException(string.Format("The MemberInfo '{0}' is not supported", m.Member.Name));
-        }
-
         private Expression VisitQuery(Expression source, Expression predicate)
         {
             var lambda = predicate.GetLambda();
@@ -257,7 +234,7 @@ namespace ElasticLinq.Request.Visitors
 
             var criteriaExpression = body as CriteriaExpression;
             if (criteriaExpression == null)
-                throw new NotSupportedException(string.Format("Unknown Query predicate '{0}'", body));
+                throw new NotSupportedException(string.Format("Query expression '{0}' could not be translated", body));
 
             searchRequest.Query = ApplyCriteria(searchRequest.Query, criteriaExpression.Criteria);
             Within = wasWithin;
@@ -273,7 +250,7 @@ namespace ElasticLinq.Request.Visitors
 
             var criteriaExpression = body as CriteriaExpression;
             if (criteriaExpression == null)
-                throw new NotSupportedException(String.Format("Unknown Where predicate '{0}'", body));
+                throw new NotSupportedException(String.Format("Where expression '{0}' could not be translated", body));
 
             searchRequest.Filter = ApplyCriteria(searchRequest.Filter, criteriaExpression.Criteria);
 
