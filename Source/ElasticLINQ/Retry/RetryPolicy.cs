@@ -26,7 +26,7 @@ namespace ElasticLinq.Retry
             Log = log;
             InitialRetryMilliseconds = initialRetryMilliseconds;
             MaxAttempts = maxAttempts;
-            Delay = delay ?? ElasticLinq.Retry.Delay.Instance;
+            Delay = delay ?? Delay.Instance;
         }
 
         internal Delay Delay { get; private set; }

@@ -108,7 +108,7 @@ namespace ElasticLinq.Test.Mapping
             var mapping = new ElasticMapping();
 
             Assert.Throws<ArgumentNullException>(() => mapping.GetFieldName("", (MemberExpression)null));
-            Assert.Throws<NotSupportedException>(() => mapping.GetFieldName("", Expression.Field(Expression.Constant(new FieldClass()), "AField")));
+            Assert.Throws<NotSupportedException>(() => mapping.GetFieldName("", Expression.Field(Expression.Constant(new FieldClass { AField = "test" }), "AField")));
             Assert.Throws<ArgumentNullException>(() => mapping.GetFieldName("", (MemberInfo)null));
         }
 

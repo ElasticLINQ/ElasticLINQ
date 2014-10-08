@@ -18,7 +18,7 @@ namespace ElasticLinq.Request.Visitors
     {
         private readonly IElasticMaterializer materializer;
 
-        public FacetRebindCollectionResult(Expression expression, HashSet<IFacet> collected, ParameterExpression parameter, IElasticMaterializer materializer)
+        public FacetRebindCollectionResult(Expression expression, IEnumerable<IFacet> collected, ParameterExpression parameter, IElasticMaterializer materializer)
             : base(expression, collected, parameter)
         {
             this.materializer = materializer;

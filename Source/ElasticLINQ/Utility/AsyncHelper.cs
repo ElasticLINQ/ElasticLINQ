@@ -10,10 +10,9 @@ namespace ElasticLinq.Utility
     {
         public static T RunSync<T>(Func<Task<T>> action)
         {
-            if (SynchronizationContext.Current != null)
-                return Task.Run(async () => await action()).GetAwaiter().GetResult();
-            else
-                return action().GetAwaiter().GetResult();
+            return SynchronizationContext.Current == null
+                ? action().GetAwaiter().GetResult()
+                : Task.Run(async () => await action()).GetAwaiter().GetResult();
         }
     }
 }
