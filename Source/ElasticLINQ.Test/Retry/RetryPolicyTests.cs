@@ -125,7 +125,7 @@ namespace ElasticLinq.Test.Retry
             await delay.For((int)delayTime.TotalMilliseconds, CancellationToken.None);
             stopwatch.Stop();
 
-            Assert.True(stopwatch.ElapsedMilliseconds > delayTime.TotalMilliseconds);
+            Assert.True(stopwatch.ElapsedMilliseconds >= delayTime.TotalMilliseconds, String.Format("Requested {0}ms delay but only took {1}ms", delayTime.TotalMilliseconds, stopwatch.ElapsedMilliseconds));
         }
 
         [Fact]

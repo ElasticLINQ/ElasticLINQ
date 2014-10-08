@@ -2,10 +2,8 @@
 
 using ElasticLinq.Response.Model;
 using ElasticLinq.Utility;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 namespace ElasticLinq.Response.Materializers
@@ -13,61 +11,48 @@ namespace ElasticLinq.Response.Materializers
     /// <summary>
     /// Materializes a list containing a single termless facet.
     /// </summary>
-    internal class ListTermlessFacetsElasticMaterializer : IElasticMaterializer
+    internal class ListTermlessFacetsElasticMaterializer : TermlessFacetElasticMaterializer
     {
         private static readonly MethodInfo manyMethodInfo = typeof(ListTermlessFacetsElasticMaterializer).GetMethodInfo(f => f.Name == "Many" && f.IsStatic);
-        private static readonly string[] termlessFacetTypes = { "statistical", "filter" };
-
-        private readonly Func<AggregateRow, object> projector;
-        private readonly Type elementType;
-        private readonly Object keyValue;
 
         /// <summary>
         /// Create an instance of the ListTermlessFacetsElasticMaterializer with the given parameters.
         /// </summary>
         /// <param name="projector">A function to turn a hit into a desired CLR object.</param>
         /// <param name="elementType">The type of CLR object being materialized.</param>
-        /// <param name="keyValue">The type of the term/key being materialized.</param>
-        public ListTermlessFacetsElasticMaterializer(Func<AggregateRow, object> projector, Type elementType, object keyValue)
+        /// <param name="key">The constant value for any key references during materialization.</param>
+        public ListTermlessFacetsElasticMaterializer(Func<AggregateRow, object> projector, Type elementType, object key)
+            : base(projector, elementType, key)
         {
-            this.projector = projector;
-            this.elementType = elementType;
-            this.keyValue = keyValue;
-        }
-
-        public object Materialize(ElasticResponse response)
-        {
-            Argument.EnsureNotNull("response", response);
-
-            var facets = response.facets;
-            if (facets == null || facets.Count == 0)
-                return Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType));
-
-            return manyMethodInfo
-                .MakeGenericMethod(elementType)
-                .Invoke(null, new[] { response.facets, projector, keyValue });
-        }
-
-        internal static List<T> Many<T>(JObject facets, Func<AggregateRow, object> projector, object key)
-        {
-            var facetsWithoutTerms = facets.Values()
-                .Where(x => termlessFacetTypes.Contains(x["_type"].ToString()))
-                .ToList();
-
-            var results = new List<T>();
-
-            if (facetsWithoutTerms.Any())
-            {
-                var result = projector(new AggregateStatisticalRow(key, facets));
-                results.Add((T)result);
-            }
-
-            return results;
         }
 
         /// <summary>
-        /// Type of element being materialized.
+        /// Materialize the facets from an ElasticResponse into a List with a single CLR object as determined
+        /// by the projector.
         /// </summary>
-        internal Type ElementType { get { return elementType; } }
+        /// <param name="response">ElasticResponse to obtain the facets from.</param>
+        /// <returns>List containing a single CLR object with these facets projected onto them.</returns>
+        public override object Materialize(ElasticResponse response)
+        {
+            Argument.EnsureNotNull("response", response);
+
+            var element = MaterializeSingle(response);
+            var listType = typeof(List<>).MakeGenericType(ElementType);
+
+            return element == null
+                ? Activator.CreateInstance(listType)
+                : manyMethodInfo.MakeGenericMethod(ElementType).Invoke(null, new[] { element });
+        }
+
+        /// <summary>
+        /// Converts a single item into a generic list containing that item.
+        /// </summary>
+        /// <typeparam name="T">Type of the item and corresponding type of list.</typeparam>
+        /// <param name="item">Item to be included in the new list.</param>
+        /// <returns>New list containing just the item.</returns>
+        internal static List<T> Many<T>(T item)
+        {
+            return new List<T> { item };
+        }
     }
 }

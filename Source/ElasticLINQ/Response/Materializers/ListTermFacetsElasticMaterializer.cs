@@ -15,7 +15,7 @@ namespace ElasticLinq.Response.Materializers
     /// </summary>
     internal class ListTermFacetsElasticMaterializer : IElasticMaterializer
     {
-        private static readonly MethodInfo manyMethodInfo = typeof(ListTermFacetsElasticMaterializer).GetMethodInfo(f => f.Name == "Many" && f.IsStatic);
+        private static readonly MethodInfo manyMethodInfo = typeof(ListTermFacetsElasticMaterializer).GetMethodInfo(f => f.Name == "Many" && !f.IsStatic);
         private static readonly string[] termsFacetTypes = { "terms_stats", "terms" };
 
         private readonly Func<AggregateRow, object> projector;
@@ -30,11 +30,21 @@ namespace ElasticLinq.Response.Materializers
         /// <param name="groupKeyType">The type of the term/group key field.</param>
         public ListTermFacetsElasticMaterializer(Func<AggregateRow, object> projector, Type elementType, Type groupKeyType)
         {
+            Argument.EnsureNotNull("projector", projector);
+            Argument.EnsureNotNull("elementType", elementType);
+            Argument.EnsureNotNull("groupKeyType", groupKeyType);
+
             this.projector = projector;
             this.elementType = elementType;
             this.groupKeyType = groupKeyType;
         }
 
+        /// <summary>
+        /// Materialize the facets from an ElasticResponse into a List of CLR objects as determined
+        /// by the projector.
+        /// </summary>
+        /// <param name="response">ElasticResponse to obtain the facets from.</param>
+        /// <returns>List of CLR objects with these facets projected onto them.</returns>
         public object Materialize(ElasticResponse response)
         {
             Argument.EnsureNotNull("response", response);
@@ -45,16 +55,24 @@ namespace ElasticLinq.Response.Materializers
 
             return manyMethodInfo
                 .MakeGenericMethod(elementType)
-                .Invoke(null, new object[] { response.facets, projector, groupKeyType });
+                .Invoke(this, new object[] { response.facets });
         }
 
-        internal static List<T> Many<T>(JObject facets, Func<AggregateRow, object> projector, Type groupType)
+        /// <summary>
+        /// Given a JObject of facets in an Elasticsearch structure materialize them as the
+        /// desired CLR objects determined by the projector.
+        /// </summary>
+        /// <typeparam name="T">Type of CLR objects to be materialized.</typeparam>
+        /// <param name="facets">Elasticsearch formatted list of facets.</param>
+        /// <returns>List of materialized CLR objects using the projector.</returns>
+        internal List<T> Many<T>(JObject facets)
         {
-            var facetValues = facets.Values().ToList();
+            var termFacetsValues = facets.Values()
+                .Where(x => termsFacetTypes.Contains(x["_type"].ToString()))
+                .ToList();
 
-            var facetsWithTerms = facetValues.Where(x => termsFacetTypes.Contains(x["_type"].ToString())).ToList();
-            return facetsWithTerms.Any()
-                ? FlattenTermsStatsToAggregateRows(facetsWithTerms, groupType).Select(projector).Cast<T>().ToList()
+            return termFacetsValues.Any()
+                ? FlattenTermsToAggregateRows(termFacetsValues).Select(projector).Cast<T>().ToList()
                 : new List<T>();
         }
 
@@ -62,19 +80,26 @@ namespace ElasticLinq.Response.Materializers
         /// terms_stats and terms facet responses have each field in an independent object with all 
         /// possible operations for that field. Multiple fields means multiple objects
         /// each of which might not have all possible terms. Convert that structure into
-        /// a SQL-style row with one term per row containing each aggregate field and operation combination.
+        /// an SQL-style row with one term per row containing each aggregate field and operation combination.
         /// </summary>
         /// <param name="termsStats">Facets of type terms or terms_stats.</param>
-        /// <param name="groupKeyType">Type of the group key property.</param>
         /// <returns>An enumeration of AggregateRows containing appropriate keys and fields.</returns>
-        internal static IEnumerable<AggregateTermRow> FlattenTermsStatsToAggregateRows(IEnumerable<JToken> termsStats, Type groupKeyType)
+        internal IEnumerable<AggregateTermRow> FlattenTermsToAggregateRows(IEnumerable<JToken> termsStats)
         {
             return termsStats
                 .SelectMany(t => t["terms"])
                 .GroupBy(t => t["term"])
-                .Select(g => new AggregateTermRow((g.Key.ToObject(groupKeyType)),
-                    g.SelectMany(v => v.Cast<JProperty>().Select(z =>
-                        new AggregateField(((JProperty)v.Parent.Parent.Parent.Parent).Name, z.Name, z.Value)))));
+                .Select(g => new AggregateTermRow(g.Key.ToObject(groupKeyType), g.SelectMany(CreateAggregateFields)));
+        }
+
+        private static IEnumerable<AggregateField> CreateAggregateFields(JToken termFields)
+        {
+            var name = ((JProperty)termFields.Parent.Parent.Parent.Parent).Name;
+
+            return termFields
+                .Cast<JProperty>()
+                .Where(z => z.Name != "term")
+                .Select(z => new AggregateField(name, z.Name, z.Value));
         }
 
         /// <summary>
