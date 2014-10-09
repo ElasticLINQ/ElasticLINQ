@@ -117,6 +117,7 @@ namespace ElasticLinq.Test.Retry
         [Fact]
         public static async void DelayDoesDelay()
         {
+            const int timingFudge = 10; // Task.Delay sometimes returns a milli too soon...
             var delayTime = TimeSpan.FromSeconds(2);
             var delay = new Delay();
             var stopwatch = new Stopwatch();
@@ -125,7 +126,7 @@ namespace ElasticLinq.Test.Retry
             await delay.For((int)delayTime.TotalMilliseconds, CancellationToken.None);
             stopwatch.Stop();
 
-            Assert.True(stopwatch.ElapsedMilliseconds >= delayTime.TotalMilliseconds, String.Format("Requested {0}ms delay but only took {1}ms", delayTime.TotalMilliseconds, stopwatch.ElapsedMilliseconds));
+            Assert.True(stopwatch.ElapsedMilliseconds + timingFudge >= delayTime.TotalMilliseconds, String.Format("Requested {0}ms delay but only took {1}ms", delayTime.TotalMilliseconds, stopwatch.ElapsedMilliseconds));
         }
 
         [Fact]
