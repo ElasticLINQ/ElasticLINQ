@@ -28,6 +28,24 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         }
 
         [Fact]
+        public void SelectAnonymousKeySumCreatesTermsStatsFacet()
+        {
+            var query = Robots.GroupBy(r => r.Zone).Select(g => new { g.Key, Total = g.Sum(r => r.Cost) });
+
+            var translation = ElasticQueryTranslator.Translate(Mapping, "", query.Expression);
+
+            var materializer = Assert.IsType<ListTermFacetsElasticMaterializer>(translation.Materializer);
+
+            Assert.Contains("AnonymousType", materializer.ElementType.Name);
+            Assert.Equal("count", translation.SearchRequest.SearchType);
+            Assert.Equal(1, translation.SearchRequest.Facets.Count);
+            var facet = Assert.IsType<TermsStatsFacet>(translation.SearchRequest.Facets[0]);
+            Assert.Null(facet.Filter);
+            Assert.Equal("zone", facet.Key);
+            Assert.Equal("cost", facet.Value);
+        }
+
+        [Fact]
         public void SelectCountCreatesTermsFacet()
         {
             var query = Robots.GroupBy(r => r.Zone).Select(g => g.Count());
@@ -71,15 +89,15 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             Assert.Equal(typeof(int), Assert.IsType<ListTermFacetsElasticMaterializer>(translation.Materializer).ElementType);
             Assert.Equal("count", translation.SearchRequest.SearchType);
             Assert.Equal(1, translation.SearchRequest.Facets.Count);
-            
+
             var facet = Assert.IsType<TermsFacet>(translation.SearchRequest.Facets[0]);
             Assert.Equal(1, facet.Fields.Count);
             Assert.Equal("a.zone", facet.Fields[0]);
-            
+
             var filter = Assert.IsType<RangeCriteria>(facet.Filter);
             Assert.Equal("a.cost", filter.Field);
             Assert.Equal(1, filter.Specifications.Count);
-            
+
             var specification = filter.Specifications[0];
             Assert.Equal("gt", specification.Name);
             Assert.Equal(5m, specification.Value);
