@@ -1,9 +1,9 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
-using System.Collections.ObjectModel;
 using ElasticLinq.Utility;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -58,6 +58,12 @@ namespace ElasticLinq.Request.Criteria
         public override string ToString()
         {
             return String.Format("range: {0}({1})", field, String.Join(",", specifications.Select(s => s.ToString())));
+        }
+
+        internal static bool SpecificationsCanBeCombined(List<RangeSpecificationCriteria> specifications)
+        {
+            return specifications.Count(r => r.Comparison == RangeComparison.GreaterThan || r.Comparison == RangeComparison.GreaterThanOrEqual) < 2
+                 && specifications.Count(r => r.Comparison == RangeComparison.LessThan || r.Comparison == RangeComparison.LessThanOrEqual) < 2;
         }
     }
 

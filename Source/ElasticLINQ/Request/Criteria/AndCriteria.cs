@@ -1,5 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using System;
 using System.Collections.ObjectModel;
 using ElasticLinq.Utility;
 using System.Collections.Generic;
@@ -44,6 +45,7 @@ namespace ElasticLinq.Request.Criteria
             var combinedCriteria = criteria
                 .SelectMany(c => c is AndCriteria ? ((AndCriteria)c).Criteria : new ReadOnlyCollection<ICriteria>(new[] { c }))
                 .ToList();
+
             CombineRanges(combinedCriteria);
 
             return combinedCriteria.Count == 1
@@ -53,13 +55,19 @@ namespace ElasticLinq.Request.Criteria
 
         private static void CombineRanges(ICollection<ICriteria> criteria)
         {
-            var combinableRanges = criteria.OfType<RangeCriteria>().GroupBy(r => r.Field).Where(g => g.Count() > 1).ToArray();
-            foreach (var range in combinableRanges)
-            {
-                foreach (var rangeCriteria in range)
-                    criteria.Remove(rangeCriteria);
+            var candidates = criteria.OfType<RangeCriteria>().GroupBy(r => r.Field).Where(g => g.Count() > 1).ToArray();
 
-                criteria.Add(new RangeCriteria(range.Key, range.First().Member, range.SelectMany(r => r.Specifications)));
+            foreach (var range in candidates)
+            {
+                var specifications = range.SelectMany(r => r.Specifications).ToList();
+
+                if (RangeCriteria.SpecificationsCanBeCombined(specifications))  
+                {
+                    foreach (var rangeCriteria in range)
+                        criteria.Remove(rangeCriteria);
+
+                    criteria.Add(new RangeCriteria(range.Key, range.First().Member, specifications));
+                }
             }
         }
     }

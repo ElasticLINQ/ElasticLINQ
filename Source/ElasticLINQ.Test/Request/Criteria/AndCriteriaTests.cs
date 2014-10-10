@@ -122,6 +122,26 @@ namespace ElasticLinq.Test.Request.Criteria
             Assert.Single(rangeCriteria.Specifications, s => s.Comparison == upperRangeCriteria.Specifications.First().Comparison);
         }
 
+        [Theory]
+        [InlineData(RangeComparison.GreaterThan, RangeComparison.GreaterThan)]
+        [InlineData(RangeComparison.LessThan, RangeComparison.LessThan)]
+        [InlineData(RangeComparison.GreaterThan, RangeComparison.GreaterThanOrEqual)]
+        [InlineData(RangeComparison.LessThan, RangeComparison.LessThanOrEqual)]
+        internal void CombineSameFieldRangeNotCombineIntoSingleRangeCriteriaIfConflictingComparisons(RangeComparison leftRangeComparison, RangeComparison rightRangeComparison)
+        {
+            var leftRangeCriteria = new RangeCriteria("a", memberInfo, leftRangeComparison, "leftValue");
+            var rightRangeCriteria = new RangeCriteria("a", memberInfo, rightRangeComparison, "rightValue");
+
+            var criteria = AndCriteria.Combine(leftRangeCriteria, rightRangeCriteria);
+
+            var rangeCriteria = Assert.IsType<AndCriteria>(criteria).Criteria.OfType<RangeCriteria>().ToList();
+            Assert.Equal(2, rangeCriteria.Count());
+            Assert.All(rangeCriteria, c => Assert.True(Assert.IsType<RangeCriteria>(c).Member == memberInfo));
+
+            Assert.Single(rangeCriteria, leftRangeCriteria);
+            Assert.Single(rangeCriteria, rightRangeCriteria);
+        }
+
         [Fact]
         public void CombineWithDifferentFieldRangeCriteriaCombinesRangesIntoAndCriteria()
         {
