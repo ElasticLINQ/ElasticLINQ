@@ -368,6 +368,10 @@ namespace ElasticLinq.Request.Visitors
 
         private Expression VisitEquals(Expression left, Expression right)
         {
+            var booleanEquals = VisitCriteriaEquals(left, right, true);
+            if (booleanEquals != null)
+                return booleanEquals;
+
             var cm = ConstantMemberPair.Create(left, right);
 
             if (cm != null)
@@ -376,6 +380,23 @@ namespace ElasticLinq.Request.Visitors
                     : new CriteriaExpression(new TermCriteria(Mapping.GetFieldName(Prefix, cm.MemberExpression), cm.MemberExpression.Member, cm.ConstantExpression.Value));
 
             throw new NotSupportedException("Equality must be between a Member and a Constant");
+        }
+
+        private static Expression VisitCriteriaEquals(Expression left, Expression right, bool positiveCondition)
+        {
+            var criteria = left as CriteriaExpression ?? right as CriteriaExpression;
+            var constant = left as ConstantExpression ?? right as ConstantExpression;
+
+            if (criteria == null || constant == null)
+                return null;
+
+            if (constant.Value.Equals(positiveCondition))
+                return criteria;
+
+            if (constant.Value.Equals(!positiveCondition))
+                return new CriteriaExpression(NotCriteria.Create(criteria.Criteria));
+
+            return null;
         }
 
         private static MemberExpression UnwrapNullableMethodExpression(MemberExpression m)
@@ -389,6 +410,10 @@ namespace ElasticLinq.Request.Visitors
 
         private Expression VisitNotEqual(Expression left, Expression right)
         {
+            var booleanEquals = VisitCriteriaEquals(left, right, false);
+            if (booleanEquals != null)
+                return booleanEquals;
+
             var cm = ConstantMemberPair.Create(left, right);
 
             if (cm == null)

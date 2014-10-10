@@ -13,6 +13,81 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
     public class ElasticQueryTranslationWhereTests : ElasticQueryTranslationTestsBase
     {
         [Fact]
+        public void EqualsTrueIsTranslatedToEquals()
+        {
+            const string expectedConstant = "Robbie";
+            var where = Robots.Where(e => expectedConstant.Equals(e.Name) == true);
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
+
+            var termCriteria = Assert.IsType<TermCriteria>(criteria);
+            Assert.Equal("prefix.name", termCriteria.Field);
+            Assert.Equal(expectedConstant, termCriteria.Value);
+        }
+
+        [Fact]
+        public void EqualsFalseIsTranslatedToNotEquals()
+        {
+            const string expectedConstant = "Robbie";
+            var where = Robots.Where(e => expectedConstant.Equals(e.Name) == false);
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
+
+            var notCriteria = Assert.IsType<NotCriteria>(criteria);
+            var termCriteria = Assert.IsType<TermCriteria>(notCriteria.Criteria);
+            Assert.Equal("prefix.name", termCriteria.Field);
+            Assert.Equal(expectedConstant, termCriteria.Value);
+        }
+
+        [Fact]
+        public void NegatedEqualsFalseIsTranslatedToEquals()
+        {
+            const string expectedConstant = "Robbie";
+            var where = Robots.Where(e => !expectedConstant.Equals(e.Name) == false);
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
+
+            var termCriteria = Assert.IsType<TermCriteria>(criteria);
+            Assert.Equal("prefix.name", termCriteria.Field);
+            Assert.Equal(expectedConstant, termCriteria.Value);
+        }
+
+        [Fact]
+        public void NegatedEqualsTrueIsTranslatedToNotEquals()
+        {
+            const string expectedConstant = "Robbie";
+            var where = Robots.Where(e => !expectedConstant.Equals(e.Name) == true);
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
+
+            var notCriteria = Assert.IsType<NotCriteria>(criteria);
+            var termCriteria = Assert.IsType<TermCriteria>(notCriteria.Criteria);
+            Assert.Equal("prefix.name", termCriteria.Field);
+            Assert.Equal(expectedConstant, termCriteria.Value);
+        }
+
+        [Fact]
+        public void NotEqualsFalseIsTranslatedToEquals()
+        {
+            const string expectedConstant = "Robbie";
+            var where = Robots.Where(e => expectedConstant.Equals(e.Name) != false);
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
+
+            var termCriteria = Assert.IsType<TermCriteria>(criteria);
+            Assert.Equal("prefix.name", termCriteria.Field);
+            Assert.Equal(expectedConstant, termCriteria.Value);
+        }
+
+        [Fact]
+        public void NotEqualsTrueIsTranslatedToNotEquals()
+        {
+            const string expectedConstant = "Robbie";
+            var where = Robots.Where(e => expectedConstant.Equals(e.Name) != true);
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
+
+            var notCriteria = Assert.IsType<NotCriteria>(criteria);
+            var termCriteria = Assert.IsType<TermCriteria>(notCriteria.Criteria);
+            Assert.Equal("prefix.name", termCriteria.Field);
+            Assert.Equal(expectedConstant, termCriteria.Value);
+        }
+
+        [Fact]
         public void ObjectEqualsMethodFromConstantGeneratesTermCriteria()
         {
             const string expectedConstant = "Robbie";
