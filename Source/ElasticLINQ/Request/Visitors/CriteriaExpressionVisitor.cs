@@ -219,9 +219,6 @@ namespace ElasticLinq.Request.Visitors
 
         protected Expression BooleanMemberAccessBecomesEquals(Expression e)
         {
-            if (e is CriteriaExpression)
-                return e;
-
             e = Visit(e);
 
             var wasNegative = e.NodeType == ExpressionType.Not;

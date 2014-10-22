@@ -103,6 +103,7 @@
     <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationTestsBase.cs" />
     <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationOrderByTests.cs" />
     <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationTests.cs" />
+    <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationQueryTests.cs" />
     <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationWhereTests.cs" />
     <Compile Include="Request\Visitors\ElasticTranslateResultTests.cs" />
     <Compile Include="Request\Visitors\EvaluatingExpressionVisitorTests.cs" />
