@@ -173,7 +173,7 @@ namespace ElasticLinq.Test.Request.Formatters
         [Fact]
         public void BodyContainsMatchAllFilter()
         {
-            var matchAllCriteria = new MatchAllCriteria();
+            var matchAllCriteria = MatchAllCriteria.Instance;
 
             var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = matchAllCriteria });
             var body = JObject.Parse(formatter.Body);

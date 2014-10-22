@@ -10,7 +10,7 @@ namespace ElasticLinq.Test.Request.Criteria
         [Fact]
         public void NamePropertyIsMatchAll()
         {
-            var criteria = new MatchAllCriteria();
+            var criteria = MatchAllCriteria.Instance;
 
             Assert.Equal("match_all", criteria.Name);
         }

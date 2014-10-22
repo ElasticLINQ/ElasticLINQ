@@ -112,7 +112,7 @@ namespace ElasticLinq.Request.Visitors
             if (groupBy != null) // Top level counts and count predicates will be left to main translator
             {
                 if (aggregateWithoutMember)
-                    yield return new FilterFacet(GroupKeyFacet, new MatchAllCriteria());
+                    yield return new FilterFacet(GroupKeyFacet, MatchAllCriteria.Instance);
 
                 foreach (var criteria in aggregateCriteria)
                     yield return new FilterFacet(criteria.Key, criteria.Value);

@@ -58,7 +58,7 @@ namespace ElasticLinq.Test.Request.Criteria
         [Fact]
         public void CombineWithOnlyMatchAllsReturnsOneMatchAllCriteria()
         {
-            var combinedCriteria = AndCriteria.Combine(new MatchAllCriteria(), new MatchAllCriteria());
+            var combinedCriteria = AndCriteria.Combine(MatchAllCriteria.Instance, MatchAllCriteria.Instance);
 
             Assert.IsType<MatchAllCriteria>(combinedCriteria);
         }
@@ -66,7 +66,7 @@ namespace ElasticLinq.Test.Request.Criteria
         [Fact]
         public void CombineWithOneMatchAllReturnsOneMatchAllCriteria()
         {
-            var combinedCriteria = AndCriteria.Combine(new MatchAllCriteria());
+            var combinedCriteria = AndCriteria.Combine(MatchAllCriteria.Instance);
 
             Assert.IsType<MatchAllCriteria>(combinedCriteria);
         }
@@ -76,7 +76,7 @@ namespace ElasticLinq.Test.Request.Criteria
         {
             var existsCriteria = new ExistsCriteria("Field");
 
-            var combinedCriteria = AndCriteria.Combine(new MatchAllCriteria(), existsCriteria);
+            var combinedCriteria = AndCriteria.Combine(MatchAllCriteria.Instance, existsCriteria);
 
             Assert.Same(existsCriteria, combinedCriteria);
         }
@@ -86,7 +86,7 @@ namespace ElasticLinq.Test.Request.Criteria
         {
             var existsCriteria = new ExistsCriteria("Field");
 
-            var combinedCriteria = AndCriteria.Combine(existsCriteria, new MatchAllCriteria(), sampleCriteria1);
+            var combinedCriteria = AndCriteria.Combine(existsCriteria, MatchAllCriteria.Instance, sampleCriteria1);
 
             var andCriteria = Assert.IsType<AndCriteria>(combinedCriteria);
             Assert.Contains(existsCriteria, andCriteria.Criteria);
