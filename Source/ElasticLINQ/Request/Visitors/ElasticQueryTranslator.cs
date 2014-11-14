@@ -47,6 +47,9 @@ namespace ElasticLinq.Request.Visitors
             else
                 CompleteHitTranslation(evaluated);
 
+            if (searchRequest.Filter == null && searchRequest.Query == null)
+                searchRequest.Filter = Mapping.GetTypeExistsCriteria(sourceType);
+
             return new ElasticTranslateResult(searchRequest, materializer);
         }
 
@@ -54,9 +57,6 @@ namespace ElasticLinq.Request.Visitors
         {
             Visit(evaluated);
             searchRequest.DocumentType = Mapping.GetDocumentType(sourceType);
-
-            if (searchRequest.Filter == null && searchRequest.Query == null)
-                searchRequest.Filter = Mapping.GetTypeExistsCriteria(sourceType);
 
             if (materializer == null)
                 materializer = new ListHitsElasticMaterializer(itemProjector ?? DefaultItemProjector, finalItemType ?? sourceType);
@@ -186,15 +186,15 @@ namespace ElasticLinq.Request.Visitors
 
         private static NotSupportedException GetOverloadUnsupportedException(MethodInfo methodInfo)
         {
-            return new NotSupportedException(string.Format("Queryable.{0} method overload is not supported", methodInfo.GetSimpleSignature() ));
+            return new NotSupportedException(string.Format("Queryable.{0} method overload is not supported", methodInfo.GetSimpleSignature()));
         }
 
         private Expression VisitCount(Expression source, Expression predicate)
         {
             materializer = new CountElasticMaterializer();
             searchRequest.SearchType = "count";
-            return predicate != null 
-                ? VisitWhere(source, predicate) 
+            return predicate != null
+                ? VisitWhere(source, predicate)
                 : Visit(source);
         }
 

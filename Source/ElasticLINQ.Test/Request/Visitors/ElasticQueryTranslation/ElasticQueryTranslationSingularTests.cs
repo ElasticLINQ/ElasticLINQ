@@ -150,7 +150,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var request = ElasticQueryTranslator.Translate(Mapping, "prefix", first.Expression).SearchRequest;
 
             Assert.Equal("count", request.SearchType);
-            Assert.Null(request.Filter);
+            Assert.IsType<ExistsCriteria>(request.Filter);
 
             var facet = Assert.Single(request.Facets);
             Assert.IsType<FilterFacet>(facet);
@@ -190,7 +190,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var request = ElasticQueryTranslator.Translate(Mapping, "prefix", first.Expression).SearchRequest;
 
             Assert.Equal("count", request.SearchType);
-            Assert.Null(request.Filter);
+            Assert.IsType<ExistsCriteria>(request.Filter);
 
             var facet = Assert.Single(request.Facets);
             Assert.IsType<FilterFacet>(facet);

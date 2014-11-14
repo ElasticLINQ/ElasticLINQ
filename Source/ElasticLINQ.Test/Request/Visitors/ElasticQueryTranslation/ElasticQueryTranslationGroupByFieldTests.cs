@@ -136,12 +136,22 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             Assert.Equal("count", translation.SearchRequest.SearchType);
             Assert.Equal(1, translation.SearchRequest.Facets.Count);
 
-            Assert.Null(translation.SearchRequest.Filter);
             var facet = Assert.IsType<TermsStatsFacet>(translation.SearchRequest.Facets[0]);
-            Assert.Null(facet.Filter);
+            Assert.IsType<ExistsCriteria>(translation.SearchRequest.Filter);
             Assert.Equal("p.zone", facet.Key);
             Assert.Equal("p.energyUse", facet.Value);
             Assert.Equal(5, facet.Size);
+        }
+
+        [Fact]
+        public void SelectStillUsesTypeCriteria()
+        {
+            var query = Robots.GroupBy(r => r.Zone).Select(g => g.Average(r => r.EnergyUse));
+
+            var translation = ElasticQueryTranslator.Translate(Mapping, "p", query.Expression);
+
+            var typeCriteria = Assert.IsType<ExistsCriteria>(translation.SearchRequest.Filter);
+            Assert.Equal("id", typeCriteria.Field);
         }
 
         [Fact]
