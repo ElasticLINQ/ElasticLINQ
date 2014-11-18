@@ -221,6 +221,15 @@ namespace ElasticLinq.Request.Visitors
         {
             e = Visit(e);
 
+            var c = e as ConstantExpression;
+            if (c != null && c.Value != null)
+            {
+                if (c.Value.Equals(true))
+                    return new CriteriaExpression(ConstantCriteria.True);
+                if (c.Value.Equals(false))
+                    return new CriteriaExpression(ConstantCriteria.False);
+            }
+
             var wasNegative = e.NodeType == ExpressionType.Not;
 
             if (e is UnaryExpression)
@@ -315,16 +324,16 @@ namespace ElasticLinq.Request.Visitors
         private Expression VisitAndAlso(BinaryExpression b)
         {
             return new CriteriaExpression(
-                AndCriteria.Combine(AssertExpressionsOfType<CriteriaExpression>(b.Left, b.Right).Select(f => f.Criteria).ToArray()));
+                AndCriteria.Combine(CombineExpressions<CriteriaExpression>(b.Left, b.Right).Select(f => f.Criteria).ToArray()));
         }
 
         private Expression VisitOrElse(BinaryExpression b)
         {
             return new CriteriaExpression(
-                OrCriteria.Combine(AssertExpressionsOfType<CriteriaExpression>(b.Left, b.Right).Select(f => f.Criteria).ToArray()));
+                OrCriteria.Combine(CombineExpressions<CriteriaExpression>(b.Left, b.Right).Select(f => f.Criteria).ToArray()));
         }
 
-        private IEnumerable<T> AssertExpressionsOfType<T>(params Expression[] expressions) where T : Expression
+        private IEnumerable<T> CombineExpressions<T>(params Expression[] expressions) where T : Expression
         {
             foreach (var expression in expressions.Select(BooleanMemberAccessBecomesEquals))
             {

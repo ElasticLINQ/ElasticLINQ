@@ -924,5 +924,94 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             Assert.Equal("cost", termCriteria.Field);
             Assert.Equal(1d, termCriteria.Value);
         }
+
+        [Fact]
+        public void ConstantTrueAtRootIsOptimizedOut()
+        {
+            var where = Robots.Where(r => true);
+            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest;
+
+            Assert.Null(request.Query);
+            var existsCriteria = Assert.IsType<ExistsCriteria>(request.Filter);
+            Assert.Equal("id", existsCriteria.Field);
+        }
+
+        [Fact]
+        public void ConstantFalseIsTranslatedToConstantFalse()
+        {
+            var where = Robots.Where(r => false);
+            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest;
+
+            Assert.Null(request.Query);
+            Assert.NotNull(request.Filter);
+            Assert.Same(ConstantCriteria.False, request.Filter);
+        }
+
+        [Fact]
+        public void ConstantTrueWithinAndIsOptimizedOut()
+        {
+            var where = Robots.Where(r => true && r.Cost > 1);
+            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest;
+
+            Assert.Null(request.Query);
+            Assert.NotNull(request.Filter);
+            Assert.IsType<RangeCriteria>(request.Filter);
+        }
+
+        [Fact]
+        public void ConstantFalseWithinAndOptimizesOutAllOthers()
+        {
+            var where = Robots.Where(r => r.Cost > 1 && false && r.Zone == 1);
+            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest;
+
+            Assert.Null(request.Query);
+            Assert.Same(ConstantCriteria.False, request.Filter);
+        }
+
+        [Fact]
+        public void ConstantTrueWithinOrOptimizesOutBackToMapping()
+        {
+            var where = Robots.Where(r => r.Cost < 10 || true || r.Cost > 1);
+            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest;
+
+            Assert.Null(request.Query);
+            Assert.IsType<ExistsCriteria>(request.Filter);
+        }
+
+        [Fact]
+        public void ConstantFalseWithinOrIsOptimizedOut()
+        {
+            var where = Robots.Where(r => r.Cost < 10 || false || r.Cost > 1);
+            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest;
+
+            Assert.Null(request.Query);
+            Assert.NotNull(request.Filter);
+            var orCriteria = Assert.IsType<OrCriteria>(request.Filter);
+            Assert.Equal(2, orCriteria.Criteria.Count);
+        }
+
+        [Fact]
+        public void EvaluatedConstantTrueWithinOrOptimizesOutBackToMapping()
+        {
+            Robot dead = null;
+            var where = Robots.Where(r => r.Cost < 10 || dead == null || r.Cost > 1);
+            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest;
+
+            Assert.Null(request.Query);
+            Assert.IsType<ExistsCriteria>(request.Filter);
+        }
+
+        [Fact]
+        public void EvaluatedConstantFalseWithinOrOptimizesOutAllOthers()
+        {
+            Robot dead = null;
+            var where = Robots.Where(r => r.Cost < 10 || dead != null || r.Cost > 1);
+            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest;
+
+            Assert.Null(request.Query);
+            Assert.NotNull(request.Filter);
+            var orCriteria = Assert.IsType<OrCriteria>(request.Filter);
+            Assert.Equal(2, orCriteria.Criteria.Count);
+        }
     }
 }

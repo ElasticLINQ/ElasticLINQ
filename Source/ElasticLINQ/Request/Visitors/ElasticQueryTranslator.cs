@@ -47,7 +47,9 @@ namespace ElasticLinq.Request.Visitors
             else
                 CompleteHitTranslation(evaluated);
 
-            if (searchRequest.Filter == null && searchRequest.Query == null)
+            searchRequest.Filter = ConstantCriteriaFilterReducer.Reduce(searchRequest.Filter);
+
+            if (searchRequest.Query == null && (searchRequest.Filter == null || searchRequest.Filter == ConstantCriteria.True))
                 searchRequest.Filter = Mapping.GetTypeExistsCriteria(sourceType);
 
             return new ElasticTranslateResult(searchRequest, materializer);

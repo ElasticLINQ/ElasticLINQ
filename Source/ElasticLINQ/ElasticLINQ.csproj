@@ -66,6 +66,8 @@
     <Compile Include="NotAnalyzedAttribute.cs" />
     <Compile Include="Request\Criteria\AndCriteria.cs" />
     <Compile Include="Request\Criteria\CompoundCriteria.cs" />
+    <Compile Include="Request\Criteria\ConstantCriteriaFilterReducer.cs" />
+    <Compile Include="Request\Criteria\ConstantCriteria.cs" />
     <Compile Include="Request\Criteria\ExistsCriteria.cs" />
     <Compile Include="Request\Criteria\ICriteria.cs" />
     <Compile Include="Request\Criteria\INegatableCriteria.cs" />

@@ -1,16 +1,14 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
-using System;
-using System.Collections.ObjectModel;
 using ElasticLinq.Utility;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace ElasticLinq.Request.Criteria
 {
     /// <summary>
-    /// Contains criteria all of which must be satisfied
-    /// for a document to be selected.
+    /// Specifies that all subcriteria must be satisfied.
     /// </summary>
     internal class AndCriteria : CompoundCriteria
     {
@@ -34,12 +32,6 @@ namespace ElasticLinq.Request.Criteria
                 return null;
             if (criteria.Length == 1)
                 return criteria[0];
-
-            // MatchAll in an And is redundant when other more restrictive criteria present
-            var strippedCriteria = criteria.Where(c => !(c is MatchAllCriteria)).ToArray();
-            if (strippedCriteria.Length == 0)
-                return criteria[0];
-            criteria = strippedCriteria;
 
             // Unwrap and combine ANDs
             var combinedCriteria = criteria

@@ -3,7 +3,9 @@
 using ElasticLinq.Logging;
 using ElasticLinq.Mapping;
 using ElasticLinq.Request;
+using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Visitors;
+using ElasticLinq.Response.Model;
 using ElasticLinq.Retry;
 using ElasticLinq.Utility;
 using System;
@@ -109,9 +111,17 @@ namespace ElasticLinq
 
             try
             {
-                var response = AsyncHelper.RunSync(() => requestProcessor.SearchAsync(translation.SearchRequest));
-                if (response == null)
-                    throw new InvalidOperationException("No HTTP response received.");
+                ElasticResponse response;
+                if (translation.SearchRequest.Filter == ConstantCriteria.False)
+                {
+                    response = new ElasticResponse();
+                }
+                else
+                {
+                    response = AsyncHelper.RunSync(() => requestProcessor.SearchAsync(translation.SearchRequest));
+                    if (response == null)
+                        throw new InvalidOperationException("No HTTP response received.");
+                }
 
                 return translation.Materializer.Materialize(response);
             }

@@ -147,6 +147,20 @@ namespace ElasticLinq.Test.Integration
             }
         }
 
+        [Fact]
+        public void ConstantFalseDoesNotCauseConnection()
+        {
+            using (var httpStub = new HttpStub(ZeroHits, 1))
+            {
+                var provider = new ElasticQueryProvider(new ElasticConnection(httpStub.Uri), mapping, log, retryPolicy, "prefix");
+                var query = new ElasticQuery<Robot>(provider).Where(f => false);
+
+                ((IEnumerable)query).GetEnumerator();
+
+                Assert.Empty(httpStub.Requests);
+            }
+        }
+
         private static ElasticContext MakeElasticContext(Uri uri)
         {
             return new ElasticContext(new ElasticConnection(uri), mapping, log, retryPolicy);
