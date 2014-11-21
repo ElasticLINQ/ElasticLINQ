@@ -1,6 +1,7 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Linq.Expressions;
 using ElasticLinq.Utility;
 using System;
@@ -206,6 +207,17 @@ namespace ElasticLinq.Test.Utility
             var actual = TypeHelper.IsAssignableFrom(typeof(int), typeof(int?));
 
             Assert.False(actual);
+        }
+
+        [Fact]
+        public void GetMethodInfoReturnsSignatureWithArguments()
+        {
+            var method = typeof(String).GetMethodInfo(s => s.Name == "Replace" && 
+                s.GetParameters().Count() == 2 && s.GetParameters()[0].ParameterType == typeof(string));
+            
+            var actual = method.GetSimpleSignature();
+
+            Assert.Equal("Replace(System.String, System.String)", actual);
         }
     }
 }

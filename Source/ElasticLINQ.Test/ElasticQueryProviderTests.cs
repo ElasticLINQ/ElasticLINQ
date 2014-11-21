@@ -1,5 +1,7 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using ElasticLinq.Logging;
 using ElasticLinq.Mapping;
 using ElasticLinq.Retry;
@@ -15,10 +17,15 @@ namespace ElasticLinq.Test
         private static readonly IElasticMapping mapping = new TrivialElasticMapping();
         private static readonly ILog log = NullLog.Instance;
         private static readonly IRetryPolicy retryPolicy = NullRetryPolicy.Instance;
-        private static readonly ElasticQueryProvider sharedProvider = new ElasticQueryProvider(connection, mapping, log, retryPolicy, "prefix");
-        private static readonly Expression validExpression = Expression.Constant(new ElasticQuery<Sample>(sharedProvider));
+
+        private static readonly ElasticQueryProvider sharedProvider = new ElasticQueryProvider(connection, mapping, log,
+            retryPolicy, "prefix");
+
+        private static readonly Expression validExpression =
+            Expression.Constant(new ElasticQuery<Sample>(sharedProvider));
 
         private class Sample { };
+        private class Sample2 { public int ID { get; set; }}
 
         [Fact]
         public void CreateQueryTReturnsElasticQueryTWithProviderSet()
@@ -47,7 +54,8 @@ namespace ElasticLinq.Test
         {
             var provider = new ElasticQueryProvider(connection, mapping, log, retryPolicy, "prefix");
 
-            Assert.Throws<ArgumentOutOfRangeException>(() => provider.CreateQuery<Sample>(Expression.Constant(new Sample())));
+            Assert.Throws<ArgumentOutOfRangeException>(
+                () => provider.CreateQuery<Sample>(Expression.Constant(new Sample())));
         }
 
         [Fact]
@@ -60,6 +68,28 @@ namespace ElasticLinq.Test
         public void ExecuteTThrowsArgumentNullExceptionIfNull()
         {
             Assert.Throws<ArgumentNullException>(() => sharedProvider.Execute<Sample>(null));
+        }
+
+        [Fact]
+        public void CreateQueryRethrowsTargetException()
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => sharedProvider.CreateQuery(Expression.Constant(null)));
+        }
+
+        [Fact]
+        public void ExecuteRethrowsAggregateException()
+        {
+            var context = new ElasticContext(connection, mapping, log, new ThrowsRetryPolicy());
+            var query = context.Query<Sample2>();
+            Assert.Throws<NotImplementedException>(() => query.Provider.Execute(query.Expression));
+        }
+
+        private class ThrowsRetryPolicy : IRetryPolicy
+        {
+            public Task<TResult> ExecuteAsync<TResult>(Func<Task<TResult>> operationFunc, Func<TResult, Exception, bool> shouldRetryFunc, Action<TResult, Dictionary<string, object>> appendLogInfoFunc = null)
+            {
+                throw new AggregateException(new NotImplementedException("Rethrowing exception for testing"));
+            }
         }
     }
 }
