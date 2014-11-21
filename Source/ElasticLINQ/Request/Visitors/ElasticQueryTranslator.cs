@@ -26,6 +26,7 @@ namespace ElasticLinq.Request.Visitors
         private Type finalItemType;
         private Func<Hit, Object> itemProjector;
         private IElasticMaterializer materializer;
+        private CriteriaWithin within = CriteriaWithin.Filter;
 
         private ElasticQueryTranslator(IElasticMapping mapping, string prefix)
             : base(mapping, prefix)
@@ -87,6 +88,14 @@ namespace ElasticLinq.Request.Visitors
                 return VisitElasticMethodsMethodCall(m);
 
             return base.VisitMethodCall(m);
+        }
+
+        protected override Expression VisitStringPatternCheckMethodCall(Expression source, Expression match, string pattern, string methodName)
+        {
+            if (within != CriteriaWithin.Query)
+                throw new NotSupportedException(string.Format("Method String.{0} can only be used within .Query() not in .Where()", methodName));
+
+            return base.VisitStringPatternCheckMethodCall(source, match, pattern, methodName);
         }
 
         internal Expression VisitElasticQueryExtensionsMethodCall(MethodCallExpression m)
@@ -244,8 +253,8 @@ namespace ElasticLinq.Request.Visitors
         private Expression VisitQuery(Expression source, Expression predicate)
         {
             var lambda = predicate.GetLambda();
-            var wasWithin = Within;
-            Within = CriteriaWithin.Query;
+            var wasWithin = within;
+            within = CriteriaWithin.Query;
             var body = BooleanMemberAccessBecomesEquals(lambda.Body);
 
             var criteriaExpression = body as CriteriaExpression;
@@ -253,7 +262,7 @@ namespace ElasticLinq.Request.Visitors
                 throw new NotSupportedException(string.Format("Query expression '{0}' could not be translated", body));
 
             searchRequest.Query = ApplyCriteria(searchRequest.Query, criteriaExpression.Criteria);
-            Within = wasWithin;
+            within = wasWithin;
 
             return Visit(source);
         }

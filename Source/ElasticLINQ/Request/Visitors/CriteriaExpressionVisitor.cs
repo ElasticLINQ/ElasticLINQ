@@ -24,12 +24,6 @@ namespace ElasticLinq.Request.Visitors
         protected readonly string Prefix;
 
         /// <summary>
-        /// Whether we are currently within a Where or Query statement as different
-        /// operations are permitted in each.
-        /// </summary>
-        protected CriteriaWithin Within { get; set; }
-
-        /// <summary>
         /// Creates a new CriteriaExpressionVisitor with a given mapping and prefix.
         /// </summary>
         /// <param name="mapping">The IElasticMapping used to translate properties to fields.</param>
@@ -38,7 +32,6 @@ namespace ElasticLinq.Request.Visitors
         {
             Mapping = new ElasticFieldsMappingWrapper(mapping);
             Prefix = prefix;
-            Within = CriteriaWithin.Filter;
         }
 
         protected override Expression VisitMethodCall(MethodCallExpression m)
@@ -302,11 +295,8 @@ namespace ElasticLinq.Request.Visitors
                 : string.Format("Unknown source '{0}' for Contains operation", source));
         }
 
-        private Expression VisitStringPatternCheckMethodCall(Expression source, Expression match, string pattern, string methodName)
+        protected virtual Expression VisitStringPatternCheckMethodCall(Expression source, Expression match, string pattern, string methodName)
         {
-            if (Within != CriteriaWithin.Query)
-                throw new NotSupportedException(string.Format("Method String.{0} can only be used within .Query() not in .Where()", methodName));
-
             var matched = Visit(match);
 
             if (source is MemberExpression && matched is ConstantExpression)

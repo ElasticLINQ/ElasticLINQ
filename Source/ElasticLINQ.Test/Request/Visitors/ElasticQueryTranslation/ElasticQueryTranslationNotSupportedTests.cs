@@ -203,6 +203,15 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             Assert.Contains("Queryable." + method + " method is not supported", ex.Message);
         }
 
+        [Fact]
+        public static void WhereContainsFailsAfterQueryTransition()
+        {
+            var query = Robots.Query(r => r.Name.StartsWith("a")).Where(r => r.Name.Contains("b"));
+
+            var ex = Assert.Throws<NotSupportedException>(() => Translate(query));
+            Assert.Contains("String.Contains can only be used within .Query()", ex.Message);
+        }
+
         private static ElasticTranslateResult Translate(IQueryable query)
         {
             return ElasticQueryTranslator.Translate(Mapping, "", query.Expression);
