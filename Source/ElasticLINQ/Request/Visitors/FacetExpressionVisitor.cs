@@ -182,7 +182,7 @@ namespace ElasticLinq.Request.Visitors
                 }
             }
 
-            return m; // Do not base.VisitMethodCall as we don't want to examine the whole tree
+            return base.VisitMethodCall(m);
         }
 
         private Expression RebindAggregateOperation(MethodCallExpression m)
@@ -223,7 +223,7 @@ namespace ElasticLinq.Request.Visitors
             if (criteriaExpression == null)
                 throw new NotSupportedException(string.Format("Unknown Aggregate predicate '{0}'", body));
 
-            var facetName = String.Format(GroupKeyFacet + "." + aggregateCriteria.Count + 1);
+            var facetName = String.Format(GroupKeyFacet + "." + (aggregateCriteria.Count + 1));
             aggregateCriteria.Add(facetName, criteriaExpression.Criteria);
             return RebindValue(facetName, operation, returnType);
         }

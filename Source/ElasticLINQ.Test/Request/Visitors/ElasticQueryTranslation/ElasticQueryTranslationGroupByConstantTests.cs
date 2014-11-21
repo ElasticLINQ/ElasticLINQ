@@ -4,7 +4,9 @@ using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Facets;
 using ElasticLinq.Request.Visitors;
 using ElasticLinq.Response.Materializers;
+using System;
 using System.Linq;
+using System.Linq.Expressions;
 using Xunit;
 
 namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
@@ -176,6 +178,69 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
                 Assert.Equal(RangeComparison.GreaterThan, specification.Comparison);
                 Assert.Equal(50.0, specification.Value);
             }
+        }
+
+        [Fact]
+        public void SelectProjectionCanUseTupleCreate()
+        {
+            var query = Robots.GroupBy(g => 1).Select(g => Tuple.Create(g.Key, g.Count()));
+
+            TestProjectionWithKeyAndCount(query.Expression);
+        }
+
+        [Fact]
+        public void SelectProjectionCanUseAnonymousConstructor()
+        {
+            var query = Robots.GroupBy(g => 1).Select(g => new { g.Key, Count = g.Count() });
+
+            TestProjectionWithKeyAndCount(query.Expression);
+        }
+
+        private static void TestProjectionWithKeyAndCount(Expression query)
+        {
+            var searchRequest = ElasticQueryTranslator.Translate(Mapping, "", query).SearchRequest;
+
+            var facet = Assert.Single(searchRequest.Facets);
+            var filterFacet = Assert.IsType<FilterFacet>(facet);
+            Assert.Equal("GroupKey", filterFacet.Name);
+            Assert.Same(MatchAllCriteria.Instance, filterFacet.Filter);
+            Assert.IsType<ExistsCriteria>(searchRequest.Filter);
+        }
+
+        [Fact]
+        public void SelectProjectionCanUseTupleCreateWithCountPredicate()
+        {
+            var query = Robots.GroupBy(g => 1)
+                .Select(g => Tuple.Create(g.Key, g.Count(r => r.EnergyUse > 1.5), g.Count(r => r.EnergyUse <= 2.0)));
+
+            TestProjectionWithCountPredicate(query.Expression);
+        }
+
+        [Fact]
+        public void SelectProjectionCanUseAnonymousConstructorWithCountPredicate()
+        {
+            var query = Robots.GroupBy(g => 1)
+                .Select(g => new { g.Key, High = g.Count(r => r.EnergyUse > 1.5), Low = g.Count(r => r.EnergyUse <= 2.0) });
+
+            TestProjectionWithCountPredicate(query.Expression);
+        }
+
+        private static void TestProjectionWithCountPredicate(Expression query)
+        {
+            var searchRequest = ElasticQueryTranslator.Translate(Mapping, "", query).SearchRequest;
+
+            Assert.All(searchRequest.Facets, f => Assert.IsType<FilterFacet>(f));
+            var filterFacets = searchRequest.Facets.OfType<FilterFacet>().ToArray();
+            Assert.Equal(2, searchRequest.Facets.Count);
+
+            Assert.All(filterFacets, f => Assert.IsType<RangeCriteria>(f.Filter));
+            Assert.All(filterFacets, f => Assert.Equal(((RangeCriteria)f.Filter).Field, "energyUse"));
+            Assert.All(filterFacets, f => Assert.Equal(((RangeCriteria)f.Filter).Specifications.Count, 1));
+
+            var specifications = filterFacets.SelectMany(f => ((RangeCriteria)f.Filter).Specifications).ToArray();
+
+            Assert.Single(specifications, s => s.Comparison == RangeComparison.GreaterThan && Equals(s.Value, 1.5));
+            Assert.Single(specifications, s => s.Comparison == RangeComparison.LessThanOrEqual && Equals(s.Value, 2.0));
         }
     }
 }

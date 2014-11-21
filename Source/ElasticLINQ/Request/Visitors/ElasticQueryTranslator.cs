@@ -267,15 +267,14 @@ namespace ElasticLinq.Request.Visitors
             return Visit(source);
         }
 
-        private Expression VisitWhere(Expression source, Expression predicate)
+        private Expression VisitWhere(Expression source, Expression lambdaPredicate)
         {
-            var lambda = predicate.GetLambda();
+            var lambda = lambdaPredicate.GetLambda();
 
-            var body = BooleanMemberAccessBecomesEquals(lambda.Body);
+            var criteriaExpression = lambda.Body as CriteriaExpression ?? BooleanMemberAccessBecomesEquals(lambda.Body) as CriteriaExpression;
 
-            var criteriaExpression = body as CriteriaExpression;
             if (criteriaExpression == null)
-                throw new NotSupportedException(String.Format("Where expression '{0}' could not be translated", body));
+                throw new NotSupportedException(String.Format("Where expression '{0}' could not be translated", lambda.Body));
 
             searchRequest.Filter = ApplyCriteria(searchRequest.Filter, criteriaExpression.Criteria);
 
