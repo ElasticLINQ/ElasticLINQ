@@ -92,7 +92,7 @@ namespace ElasticLinq.Test
 
             connection.Dispose();
 
-            await Assert.ThrowsAsync<ObjectDisposedException>(() => connection.HttpClient.GetAsync(new Uri("http://something.com")));
+            await Assert.ThrowsAsync<NullReferenceException>(() => connection.HttpClient.GetAsync(new Uri("http://something.com")));
         }
 
         [Fact]
@@ -102,6 +102,34 @@ namespace ElasticLinq.Test
 
             connection.Dispose();
             connection.Dispose();
+        }
+
+        [Fact]
+        public async Task SubclassDisposeKillsHttpClientAndCallsOwnDispose()
+        {
+            var connection = new MyConnection(endpoint, UserName, Password);
+
+            Assert.Null(connection.Disposing);
+            connection.Dispose();
+
+            await Assert.ThrowsAsync<NullReferenceException>(() => connection.HttpClient.GetAsync(new Uri("http://something.com")));
+            Assert.Equal(connection.Disposing, true);
+        }
+
+        public class MyConnection : ElasticConnection
+        {
+            internal bool? Disposing;
+
+            public MyConnection(Uri endpoint, string userName = null, string password = null, TimeSpan? timeout = null, string index = null, ElasticConnectionOptions options = null)
+                : base(endpoint, userName, password, timeout, index, options)
+            {
+            }
+
+            protected override void Dispose(bool disposing)
+            {
+                Disposing = disposing;
+                base.Dispose(disposing);
+            }
         }
     }
 }

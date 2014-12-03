@@ -18,11 +18,9 @@ namespace ElasticLinq
 
         private readonly Uri endpoint;
         private readonly string index;
-        private readonly TimeSpan timeout = defaultTimeout;
-        private readonly HttpClient httpClient;
+        private readonly TimeSpan timeout;
         private readonly ElasticConnectionOptions options;
-
-        private bool disposed;
+        private HttpClient httpClient;
 
         /// <summary>
         /// Create a new ElasticConnection with the given parameters defining its properties.
@@ -115,11 +113,20 @@ namespace ElasticLinq
         /// </summary>
         public void Dispose()
         {
-            if (disposed)
-                return;
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
-            disposed = true;
-            httpClient.Dispose();
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (httpClient != null)
+                {
+                    httpClient.Dispose();
+                    httpClient = null;
+                }
+            }
         }
     }
 }
