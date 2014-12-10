@@ -130,13 +130,13 @@ This includes currently:
 
 ### Needs improvement
 1. Formatting non-string values for querying - e.g. dates
-2. Error handling for unsupported LINQ syntax
-3. Error handling for bad or incorrect return data
+2. Error reporting for unsupported LINQ syntax
+3. Error reporting for bad or incorrect return data
 
 ### Not yet supported
-1. Primary key look-up to other DB (e.g. Couchbase)
-2. Async<T>
-3. Caching
+1. Async<T>
+2. Caching
+3. Hooks for profiling
 4. Any other desired Elasticsearch operations
 
 ### Not supported; not recommended
