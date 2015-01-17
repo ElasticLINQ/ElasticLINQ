@@ -5,6 +5,7 @@ using System;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace ElasticLinq.Mapping
 {
@@ -14,18 +15,17 @@ namespace ElasticLinq.Mapping
     public static class MappingHelpers
     {
         /// <summary>
-        /// Convert a string to camel case by lower-casing just the first letter.
+        /// Convert a string to camel-case.
         /// </summary>
         /// <param name="value">Input string to be camel-cased.</param>
         /// <param name="culture">CultureInfo to be used to lower-case first character.</param>
-        /// <returns>String where first letter has been lower-cased.</returns>
+        /// <returns>String that has been converted to camel-case.</returns>
         public static string ToCamelCase(this string value, CultureInfo culture)
         {
             Argument.EnsureNotNull("value", value);
 
-            return value.Length < 2
-                ? culture.TextInfo.ToLower(value)
-                : culture.TextInfo.ToLower(value[0]) + value.Substring(1);
+            var words = Regex.Split(value, "(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])");
+            return string.Concat(words.First().ToLowerInvariant(), string.Concat(words.Skip(1)));
         }
 
         /// <summary>
