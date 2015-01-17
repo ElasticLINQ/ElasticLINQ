@@ -14,11 +14,11 @@ namespace ElasticLinq.Test.Mapping
         private readonly static CultureInfo usCulture = new CultureInfo(0x0409);
 
         [Fact]
-        public static void ToCamelCaseWithAllCapsLowersFirstCapitalOnly()
+        public static void ToCamelCaseWithAllCapsLowersAllText()
         {
             var actual = "ALLCAPS".ToCamelCase(usCulture);
 
-            Assert.Equal("aLLCAPS", actual);
+            Assert.Equal("allcaps", actual);
         }
 
         [Fact]
@@ -27,6 +27,22 @@ namespace ElasticLinq.Test.Mapping
             var actual = "lowercase".ToCamelCase(usCulture);
 
             Assert.Equal("lowercase", actual);
+        }
+
+        [Fact]
+        public static void ToCamelCaseWithAcronymLowersAcronym()
+        {
+            var actual = "ACRONYMThenLowerCase".ToCamelCase(usCulture);
+
+            Assert.Equal("acronymThenLowerCase", actual);
+        }
+
+        [Fact]
+        public static void ToCamelCaseEndingWithAcronym()
+        {
+            var actual = "EndsWithACRONYM".ToCamelCase(usCulture);
+
+            Assert.Equal("endsWithACRONYM", actual);
         }
 
         [Fact]
