@@ -154,11 +154,7 @@ namespace ElasticLinq.Mapping
         public virtual ICriteria GetTypeExistsCriteria(Type docType)
         {
             Argument.EnsureNotNull("docType", docType);
-
-            // Without any other guidance, we look for the first non-nullable property.
-            var prefix = GetDocumentMappingPrefix(docType);
-            var fieldName = GetFieldName(prefix, MappingHelpers.GetDiscriminatorProperty(docType));
-            return new ExistsCriteria(fieldName);
+            return null;
         }
 
         /// <summary>

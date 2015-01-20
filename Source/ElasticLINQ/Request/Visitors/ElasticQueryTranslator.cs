@@ -49,11 +49,18 @@ namespace ElasticLinq.Request.Visitors
                 CompleteHitTranslation(evaluated);
 
             searchRequest.Filter = ConstantCriteriaFilterReducer.Reduce(searchRequest.Filter);
-
-            if (searchRequest.Query == null && (searchRequest.Filter == null || searchRequest.Filter == ConstantCriteria.True))
-                searchRequest.Filter = Mapping.GetTypeExistsCriteria(sourceType);
+            ApplyTypeSelectionCriteria();
 
             return new ElasticTranslateResult(searchRequest, materializer);
+        }
+
+        private void ApplyTypeSelectionCriteria()
+        {
+            var typeCriteria = Mapping.GetTypeExistsCriteria(sourceType);
+
+            searchRequest.Filter = searchRequest.Filter == null || searchRequest.Filter == ConstantCriteria.True
+                ? typeCriteria
+                : AndCriteria.Combine(typeCriteria, searchRequest.Filter);
         }
 
         private void CompleteHitTranslation(Expression evaluated)

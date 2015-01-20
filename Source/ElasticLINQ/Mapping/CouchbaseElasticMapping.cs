@@ -2,6 +2,7 @@
 
 using System;
 using System.Globalization;
+using ElasticLinq.Request.Criteria;
 
 namespace ElasticLinq.Mapping
 {
@@ -32,6 +33,15 @@ namespace ElasticLinq.Mapping
         public override string GetDocumentType(Type type)
         {
             return "couchbaseDocument";
+        }
+
+        /// <inheritdoc/>
+        public override ICriteria GetTypeExistsCriteria(Type docType)
+        {
+            // Without any other guidance, we look for the first non-nullable property.
+            var prefix = GetDocumentMappingPrefix(docType);
+            var fieldName = GetFieldName(prefix, MappingHelpers.GetDiscriminatorProperty(docType));
+            return new ExistsCriteria(fieldName);
         }
     }
 }

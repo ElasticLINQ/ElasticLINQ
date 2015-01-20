@@ -132,7 +132,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             var query = Robots.GroupBy(r => r.Zone).Select(g => g.Average(r => r.EnergyUse)).Take(5);
 
-            var translation = ElasticQueryTranslator.Translate(Mapping, "p", query.Expression);
+            var translation = ElasticQueryTranslator.Translate(CouchMapping, "p", query.Expression);
 
             Assert.Equal(typeof(double), Assert.IsType<ListTermFacetsElasticMaterializer>(translation.Materializer).ElementType);
             Assert.Equal("count", translation.SearchRequest.SearchType);
@@ -150,10 +150,10 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             var query = Robots.GroupBy(r => r.Zone).Select(g => g.Average(r => r.EnergyUse));
 
-            var translation = ElasticQueryTranslator.Translate(Mapping, "p", query.Expression);
+            var translation = ElasticQueryTranslator.Translate(CouchMapping, "p", query.Expression);
 
             var typeCriteria = Assert.IsType<ExistsCriteria>(translation.SearchRequest.Filter);
-            Assert.Equal("id", typeCriteria.Field);
+            Assert.Equal("doc.id", typeCriteria.Field);
         }
 
         [Fact]
@@ -284,7 +284,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
         private static void TestProjectionWithKeyAndCount(Expression query)
         {
-            var searchRequest = ElasticQueryTranslator.Translate(Mapping, "", query).SearchRequest;
+            var searchRequest = ElasticQueryTranslator.Translate(CouchMapping, "", query).SearchRequest;
 
             var facet = Assert.Single(searchRequest.Facets);
             var filterFacet = Assert.IsType<TermsFacet>(facet);

@@ -145,8 +145,7 @@ namespace ElasticLinq.Test.Mapping
 
             var criteria = mapping.GetTypeExistsCriteria(typeof(FormatClass));
 
-            var exists = Assert.IsType<ExistsCriteria>(criteria);
-            Assert.Equal("integerValue", exists.Field);
+            Assert.Null(criteria);
         }
 
         [Fact]

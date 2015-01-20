@@ -23,9 +23,64 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         }
 
         [Fact]
-        public void TypeSelectionCriteriaIsAddedWhenNoOtherCriteria()
+        public void TypeExistsCriteriaIsAddedWhenNoOtherCriteria()
         {
-            var translation = ElasticQueryTranslator.Translate(Mapping, "prefix", Robots.Expression);
+            var translation = ElasticQueryTranslator.Translate(CouchMapping, "prefix", Robots.Expression);
+
+            Assert.IsType<ExistsCriteria>(translation.SearchRequest.Filter);
+        }
+
+        [Fact]
+        public void TypeExistsCriteriaIsAppliedWhenFilterIsMissingCriteria()
+        {
+            var query = Robots.Where(r => r.Name == null);
+            var translation = ElasticQueryTranslator.Translate(CouchMapping, "prefix", query.Expression);
+
+            var andCriteria = Assert.IsType<AndCriteria>(translation.SearchRequest.Filter);
+            Assert.Equal(2, andCriteria.Criteria.Count);
+            Assert.Single(andCriteria.Criteria, c => c is ExistsCriteria);
+            Assert.Single(andCriteria.Criteria, c => c is MissingCriteria);
+        }
+
+        [Fact]
+        public void TypeExistsCriteriaIsAppliedWhenFilterIsAndCriteria()
+        {
+            var query = Robots.Where(r => r.Name == "a" && r.Cost > 1);
+            var translation = ElasticQueryTranslator.Translate(CouchMapping, "prefix", query.Expression);
+
+            var andCriteria = Assert.IsType<AndCriteria>(translation.SearchRequest.Filter);
+            Assert.Equal(3, andCriteria.Criteria.Count);
+            Assert.Single(andCriteria.Criteria, c => c is TermCriteria);
+            Assert.Single(andCriteria.Criteria, c => c is RangeCriteria);
+            Assert.Single(andCriteria.Criteria, c => c is ExistsCriteria);
+        }
+
+        [Fact]
+        public void TypeExistsCriteriaIsAppliedWhenFilterIsOrCriteria()
+        {
+            var query = Robots.Where(r => r.Name == "a" || r.Cost > 1);
+            var translation = ElasticQueryTranslator.Translate(CouchMapping, "prefix", query.Expression);
+
+            var andCriteria = Assert.IsType<AndCriteria>(translation.SearchRequest.Filter);
+            Assert.Equal(2, andCriteria.Criteria.Count);
+            Assert.Single(andCriteria.Criteria, c => c is OrCriteria);
+            Assert.Single(andCriteria.Criteria, c => c is ExistsCriteria);
+        }
+
+        [Fact]
+        public void FilterIsWipedWhenConstantTrue()
+        {
+            var query = Robots.Where(r => true);
+            var translation = ElasticQueryTranslator.Translate(Mapping, "prefix", query.Expression);
+
+            Assert.Null(translation.SearchRequest.Filter);
+        }
+
+        [Fact]
+        public void TypeExistsCriteriaIsAppliedWhenFilterIsConstantTrue()
+        {
+            var query = Robots.Where(r => true);
+            var translation = ElasticQueryTranslator.Translate(CouchMapping, "prefix", query.Expression);
 
             Assert.IsType<ExistsCriteria>(translation.SearchRequest.Filter);
         }

@@ -929,11 +929,11 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         public void ConstantTrueAtRootIsOptimizedOut()
         {
             var where = Robots.Where(r => true);
-            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest;
+            var request = ElasticQueryTranslator.Translate(CouchMapping, "prefix", where.Expression).SearchRequest;
 
             Assert.Null(request.Query);
             var existsCriteria = Assert.IsType<ExistsCriteria>(request.Filter);
-            Assert.Equal("id", existsCriteria.Field);
+            Assert.Equal("doc.id", existsCriteria.Field);
         }
 
         [Fact]
@@ -972,7 +972,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         public void ConstantTrueWithinOrOptimizesOutBackToMapping()
         {
             var where = Robots.Where(r => r.Cost < 10 || true || r.Cost > 1);
-            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest;
+            var request = ElasticQueryTranslator.Translate(CouchMapping, "prefix", where.Expression).SearchRequest;
 
             Assert.Null(request.Query);
             Assert.IsType<ExistsCriteria>(request.Filter);
@@ -995,7 +995,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             Robot dead = null;
             var where = Robots.Where(r => r.Cost < 10 || dead == null || r.Cost > 1);
-            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest;
+            var request = ElasticQueryTranslator.Translate(CouchMapping, "prefix", where.Expression).SearchRequest;
 
             Assert.Null(request.Query);
             Assert.IsType<ExistsCriteria>(request.Filter);
