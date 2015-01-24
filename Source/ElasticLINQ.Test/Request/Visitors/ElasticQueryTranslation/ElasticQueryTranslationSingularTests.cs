@@ -195,5 +195,34 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var facet = Assert.Single(request.Facets);
             Assert.IsType<FilterFacet>(facet);
         }
+
+        [Fact]
+        public void AnyTranslatesToSearchTypeCountWithSizeOfOneAndExistFilter()
+        {
+            var first = MakeQueryableExpression("Any", Robots);
+
+            var request = ElasticQueryTranslator.Translate(CouchMapping, "prefix", first).SearchRequest;
+
+            Assert.Equal("count", request.SearchType);
+            Assert.Equal(1, request.Size);
+            var existsCriteria = Assert.IsType<ExistsCriteria>(request.Filter);
+            Assert.Equal("doc.id", existsCriteria.Field);
+        }
+
+        [Fact]
+        public void AnyWithPredicateTranslatesToSearchTypeCountWithSizeOfOneAndExistFilter()
+        {
+            const string expectedTermValue = "Josef";
+            Expression<Func<Robot, bool>> lambda = r => r.Name == expectedTermValue;
+            var first = MakeQueryableExpression("Any", Robots, lambda);
+
+            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", first).SearchRequest;
+
+            Assert.Equal("count", request.SearchType);
+            Assert.Equal(1, request.Size);
+            var termCriteria = Assert.IsType<TermCriteria>(request.Filter);
+            Assert.Equal("prefix.name", termCriteria.Field);
+            Assert.Equal(expectedTermValue, termCriteria.Value);
+        }
     }
 }

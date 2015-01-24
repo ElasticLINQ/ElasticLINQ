@@ -33,6 +33,7 @@ _TeamCity*
 # NCrunch
 *.ncrunch*
 .*crunch*.local.xml
+*.crunchsolution.cache
 
 # NCover
 [Tt]est[Rr]esults/

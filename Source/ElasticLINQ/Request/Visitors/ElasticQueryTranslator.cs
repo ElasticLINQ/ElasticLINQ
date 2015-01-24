@@ -197,6 +197,13 @@ namespace ElasticLinq.Request.Visitors
                     if (m.Arguments.Count == 2)
                         return VisitCount(m.Arguments[0], m.Arguments[1]);
                     throw GetOverloadUnsupportedException(m.Method);
+
+                case "Any":
+                    if (m.Arguments.Count == 1)
+                        return VisitAny(m.Arguments[0], null);
+                    if (m.Arguments.Count == 2)
+                        return VisitAny(m.Arguments[0], m.Arguments[1]);
+                    throw GetOverloadUnsupportedException(m.Method);
             }
 
             throw new NotSupportedException(string.Format("Queryable.{0} method is not supported", m.Method.Name));
@@ -205,6 +212,17 @@ namespace ElasticLinq.Request.Visitors
         private static NotSupportedException GetOverloadUnsupportedException(MethodInfo methodInfo)
         {
             return new NotSupportedException(string.Format("Queryable.{0} method overload is not supported", methodInfo.GetSimpleSignature()));
+        }
+
+        private Expression VisitAny(Expression source, Expression predicate)
+        {
+            materializer = new AnyElasticMaterializer();
+            searchRequest.SearchType = "count";
+            searchRequest.Size = 1;
+
+            return predicate != null
+                ? VisitWhere(source, predicate)
+                : Visit(source);
         }
 
         private Expression VisitCount(Expression source, Expression predicate)
