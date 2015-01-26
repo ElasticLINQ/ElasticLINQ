@@ -63,12 +63,11 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var where = Robots.Query(r => r.Name == "IG-88" && r.Cost > 1);
             var request = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest;
 
-            var andCriteria = Assert.IsType<AndCriteria>(request.Query);
+            var boolCriteria = Assert.IsType<BoolCriteria>(request.Query);
             Assert.Null(request.Filter);
-            Assert.Equal("and", andCriteria.Name);
-            Assert.Single(andCriteria.Criteria, f => f.Name == "term");
-            Assert.Single(andCriteria.Criteria, f => f.Name == "range");
-            Assert.Equal(2, andCriteria.Criteria.Count);
+            Assert.Single(boolCriteria.Must, f => f.Name == "term");
+            Assert.Single(boolCriteria.Must, f => f.Name == "range");
+            Assert.Equal(2, boolCriteria.Must.Count);
         }
 
         [Fact]
@@ -100,7 +99,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         }
 
         [Fact]
-        public void QueryStringWithQueryCombinesToAndQueryCriteria()
+        public void QueryStringWithQueryCombinesToBoolQueryCriteria()
         {
             const string expectedQueryStringValue = "Data";
             var where = Robots.QueryString(expectedQueryStringValue).Query(q => q.Cost > 0);
@@ -108,10 +107,22 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
             Assert.Null(request.Filter);
             Assert.NotNull(request.Query);
-            var andCriteria = Assert.IsType<AndCriteria>(request.Query);
-            Assert.Single(andCriteria.Criteria, a => a.Name == "query_string");
-            Assert.Single(andCriteria.Criteria, a => a.Name == "range");
-            Assert.Equal(2, andCriteria.Criteria.Count);
+            var boolCriteria = Assert.IsType<BoolCriteria>(request.Query);
+            Assert.Single(boolCriteria.Must, a => a.Name == "query_string");
+            Assert.Single(boolCriteria.Must, a => a.Name == "range");
+            Assert.Equal(2, boolCriteria.Must.Count);
         }
+
+        [Fact]
+        public void AndOrQueryGeneratesBoolQueryWithAndArgs()
+        {
+            var query = Robots.Query(q => q.Cost > 0 && (q.EnergyUse > 0 || q.Started < DateTime.Now));
+
+            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", query.Expression).SearchRequest;
+
+            Assert.Null(request.Filter);
+            var boolCriteria = Assert.IsType<BoolCriteria>(request.Query);
+        }
+
     }
 }

@@ -48,6 +48,7 @@ namespace ElasticLinq.Request.Visitors
             else
                 CompleteHitTranslation(evaluated);
 
+            searchRequest.Query = QueryCriteriaRewriter.Compensate(searchRequest.Query);
             searchRequest.Filter = ConstantCriteriaFilterReducer.Reduce(searchRequest.Filter);
             ApplyTypeSelectionCriteria();
 

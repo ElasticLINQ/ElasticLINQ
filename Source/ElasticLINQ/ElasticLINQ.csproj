@@ -64,8 +64,10 @@
     <Compile Include="Mapping\ElasticMapping.cs" />
     <Compile Include="Mapping\MappingHelpers.cs" />
     <Compile Include="NotAnalyzedAttribute.cs" />
+    <Compile Include="Request\Criteria\BoolCriteria.cs" />
     <Compile Include="Request\Criteria\AndCriteria.cs" />
     <Compile Include="Request\Criteria\CompoundCriteria.cs" />
+    <Compile Include="Request\Criteria\QueryCriteriaRewriter.cs" />
     <Compile Include="Request\Criteria\ConstantCriteriaFilterReducer.cs" />
     <Compile Include="Request\Criteria\ConstantCriteria.cs" />
     <Compile Include="Request\Criteria\ExistsCriteria.cs" />

@@ -14,13 +14,13 @@ using Xunit;
 
 namespace ElasticLinq.Test.Request.Formatters
 {
-    public class SearchRequestFormatterFilterTests
+    public class SearchRequestFormatterCriteriaTests
     {
         private static readonly ElasticConnection defaultConnection = new ElasticConnection(new Uri("http://a.b.com:9000/"));
         private static readonly MemberInfo memberInfo = typeof(string).GetProperty("Length");
         private readonly IElasticMapping mapping = Substitute.For<IElasticMapping>();
 
-        public SearchRequestFormatterFilterTests()
+        public SearchRequestFormatterCriteriaTests()
         {
             mapping.FormatValue(null, null)
                    .ReturnsForAnyArgs(callInfo => new JValue(String.Format("!!! {0} !!!", callInfo.Arg<object>(1))));
@@ -193,6 +193,54 @@ namespace ElasticLinq.Test.Request.Formatters
 
             var field = body.TraverseWithAssert("filter", "exists", "field");
             Assert.Equal(expectedFieldName, field);
+        }
+
+        [Fact]
+        public void BodyContainsBoolMustQuery()
+        {
+            var rangeCriteria = new RangeCriteria("ranged", memberInfo, RangeComparison.GreaterThanOrEqual, 88);
+            var boolMust = new BoolCriteria(new[] { rangeCriteria }, null, null);
+
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Query = boolMust });
+            var body = JObject.Parse(formatter.Body);
+
+            var mustItems = body.TraverseWithAssert("query", "bool", "must");
+            Assert.Equal(1, mustItems.Count());
+            mustItems[0].TraverseWithAssert("range");
+        }
+
+        [Fact]
+        public void BodyContainsBoolMustNotQuery()
+        {
+            var rangeCriteria = new RangeCriteria("ranged", memberInfo, RangeComparison.GreaterThanOrEqual, 88);
+            var boolMust = new BoolCriteria(null, null, new[] { rangeCriteria });
+
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Query = boolMust });
+            var body = JObject.Parse(formatter.Body);
+
+            var mustNotItems = body.TraverseWithAssert("query", "bool", "must_not");
+            Assert.Equal(1, mustNotItems.Count());
+            mustNotItems[0].TraverseWithAssert("range");
+        }
+
+        [Fact]
+        public void BodyContainsBoolShouldQuery()
+        {
+            var range1 = new RangeCriteria("range1", memberInfo, RangeComparison.GreaterThanOrEqual, 88);
+            var range2 = new RangeCriteria("range2", memberInfo, RangeComparison.GreaterThanOrEqual, 88);
+            var boolMust = new BoolCriteria(null, new[] { range1, range2 }, null);
+
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Query = boolMust });
+            var body = JObject.Parse(formatter.Body);
+
+            var boolBody = body.TraverseWithAssert("query", "bool");
+
+            var minMatch = boolBody.TraverseWithAssert("minimum_should_match");
+            Assert.Equal(1, minMatch.Value<int>());
+
+            var mustNotItems = boolBody.TraverseWithAssert("should");
+            Assert.Equal(2, mustNotItems.Count());
+            mustNotItems[0].TraverseWithAssert("range");
         }
 
         [Fact]

@@ -67,6 +67,7 @@
     <Compile Include="Mapping\CouchbaseElasticMappingTests.cs" />
     <Compile Include="Mapping\ElasticFieldsMappingWrapperTests.cs" />
     <Compile Include="Mapping\MappingHelpersTests.cs" />
+    <Compile Include="Request\Criteria\QueryCriteriaRewriterTests.cs" />
     <Compile Include="Request\Criteria\ConstantCriteriaFilterReducerTests.cs" />
     <Compile Include="Request\Criteria\ConstantCriteriaTests.cs" />
     <Compile Include="Request\Criteria\MatchAllCriteriaTests.cs" />
@@ -91,7 +92,7 @@
     <Compile Include="Request\Facets\TermsStatsFacetTests.cs" />
     <Compile Include="Request\Facets\TermsFacetTests.cs" />
     <Compile Include="Request\Facets\FilterFacetTests.cs" />
-    <Compile Include="Request\Formatters\SearchRequestFormatterFilterTests.cs" />
+    <Compile Include="Request\Formatters\SearchRequestFormatterCriteriaTests.cs" />
     <Compile Include="Request\Formatters\SearchRequestFormatterTests.cs" />
     <Compile Include="Request\Formatters\SearchRequestFormatterFacetTests.cs" />
     <Compile Include="Request\SortOptionTests.cs" />
