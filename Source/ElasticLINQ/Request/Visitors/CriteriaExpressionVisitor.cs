@@ -68,13 +68,6 @@ namespace ElasticLinq.Request.Visitors
             return base.VisitMethodCall(m);
         }
 
-        protected static ICriteria ApplyCriteria(ICriteria currentRoot, ICriteria newCriteria)
-        {
-            return currentRoot == null
-                ? newCriteria
-                : AndCriteria.Combine(currentRoot, newCriteria);
-        }
-
         protected Expression VisitElasticMethodsMethodCall(MethodCallExpression m)
         {
             switch (m.Method.Name)

@@ -1,5 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using ElasticLinq.Utility;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -23,6 +24,8 @@ namespace ElasticLinq.Request.Criteria
 
         public static ICriteria Combine(params ICriteria[] criteria)
         {
+            Argument.EnsureNotNull("criteria", criteria);
+
             // Combines ((a || b) || c) from expression tree into (a || b || c)
             criteria = UnwrapOrCriteria(criteria).ToArray();
 

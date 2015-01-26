@@ -139,7 +139,7 @@ namespace ElasticLinq.Request.Visitors
             var constantFieldExpression = fieldsExpression as ConstantExpression;
             var constantFields = constantFieldExpression == null ? null : (string[])constantFieldExpression.Value;
             var criteriaExpression = new CriteriaExpression(new QueryStringCriteria(constantQueryExpression.Value.ToString(), constantFields));
-            searchRequest.Query = ApplyCriteria(searchRequest.Query, criteriaExpression.Criteria);
+            searchRequest.Query = AndCriteria.Combine(searchRequest.Query, criteriaExpression.Criteria);
 
             return Visit(source);
         }
@@ -286,7 +286,7 @@ namespace ElasticLinq.Request.Visitors
             if (criteriaExpression == null)
                 throw new NotSupportedException(string.Format("Query expression '{0}' could not be translated", body));
 
-            searchRequest.Query = ApplyCriteria(searchRequest.Query, criteriaExpression.Criteria);
+            searchRequest.Query = AndCriteria.Combine(searchRequest.Query, criteriaExpression.Criteria);
             within = wasWithin;
 
             return Visit(source);
@@ -301,7 +301,7 @@ namespace ElasticLinq.Request.Visitors
             if (criteriaExpression == null)
                 throw new NotSupportedException(String.Format("Where expression '{0}' could not be translated", lambda.Body));
 
-            searchRequest.Filter = ApplyCriteria(searchRequest.Filter, criteriaExpression.Criteria);
+            searchRequest.Filter = AndCriteria.Combine(searchRequest.Filter, criteriaExpression.Criteria);
 
             return Visit(source);
         }

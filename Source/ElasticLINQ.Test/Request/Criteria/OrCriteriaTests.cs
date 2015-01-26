@@ -1,10 +1,10 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using ElasticLinq.Request.Criteria;
+using System;
 using System.Linq;
 using System.Reflection;
 using Xunit;
-using Xunit.Extensions;
 
 namespace ElasticLinq.Test.Request.Criteria
 {
@@ -31,6 +31,12 @@ namespace ElasticLinq.Test.Request.Criteria
             Assert.Contains(salutationMr, criteria.Criteria);
             Assert.Contains(area408, criteria.Criteria);
             Assert.Equal(2, criteria.Criteria.Count);
+        }
+
+        [Fact]
+        public void CombineThrowArgumentNullExceptionWhenCriteriaIsNull()
+        {
+            Assert.Throws<ArgumentNullException>(() => OrCriteria.Combine(null));
         }
 
         [Fact]
