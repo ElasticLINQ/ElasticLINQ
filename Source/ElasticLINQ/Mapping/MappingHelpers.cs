@@ -65,7 +65,7 @@ namespace ElasticLinq.Mapping
                     p.GetMethod.IsPublic && !p.GetMethod.IsStatic);
 
             if (property == null)
-                throw new InvalidOperationException(String.Format("Could not find public read/write non-generic value type property to use for a default query against {0}.", type.FullName));
+                throw new InvalidOperationException("A default query with no additional criteria (e.g. context.Query<Foo>.ToList()) must have at least one read/write non-nullable property so a correct ElasticSearch query can be generated. To resolve this, add additional criteria to your query that uses one of the type's properties (e.g. .Where(f => f.Bar != null))");
 
             return property;
         }
