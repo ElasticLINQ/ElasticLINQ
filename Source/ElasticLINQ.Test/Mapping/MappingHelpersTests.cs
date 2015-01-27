@@ -130,7 +130,7 @@ namespace ElasticLinq.Test.Mapping
             var ex = Record.Exception(() => MappingHelpers.GetDiscriminatorProperty(typeof(ClassWithNoValidSelectionProperties)));
 
             Assert.IsType<InvalidOperationException>(ex);
-            Assert.Equal("Could not find public read/write non-generic value type property to use for a default query against ElasticLinq.Test.Mapping.MappingHelpersTests+ClassWithNoValidSelectionProperties.", ex.Message);
+            Assert.Equal("A default query with no additional criteria (e.g. context.Query<Foo>.ToList()) must have at least one read/write non-nullable property so a correct ElasticSearch query can be generated. To resolve this, add additional criteria to your query that uses one of the type's properties (e.g. .Where(f => f.Bar != null))", ex.Message);
         }
 
         class ClassWithOneValidSelectionProperty
