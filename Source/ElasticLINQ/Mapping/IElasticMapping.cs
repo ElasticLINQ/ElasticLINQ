@@ -65,7 +65,7 @@ namespace ElasticLinq.Mapping
         /// ExistsCriteria for a field that's known to always have a value.
         /// </summary>
         /// <param name="docType">The type that's being searched.</param>
-        /// <returns>The criteria for finding the document.</returns>
-        ICriteria GetTypeExistsCriteria(Type docType);
+        /// <returns>The criteria for selecting documents of this type.</returns>
+        ICriteria GetTypeSelectionCriteria(Type docType);
     }
 }

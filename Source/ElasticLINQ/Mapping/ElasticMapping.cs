@@ -151,7 +151,7 @@ namespace ElasticLinq.Mapping
         }
 
         /// <inheritdoc/>
-        public virtual ICriteria GetTypeExistsCriteria(Type docType)
+        public virtual ICriteria GetTypeSelectionCriteria(Type docType)
         {
             Argument.EnsureNotNull("docType", docType);
             return null;

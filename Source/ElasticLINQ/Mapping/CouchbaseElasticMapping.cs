@@ -35,13 +35,17 @@ namespace ElasticLinq.Mapping
             return "couchbaseDocument";
         }
 
+        private const string TypeCriteriaMissingExceptionMessage = "Unable to determine document type selection criteria for type '{0}'. Ensure the type has a public read/write property that is non-nullable or marked with the Required attribute.";
+
         /// <inheritdoc/>
-        public override ICriteria GetTypeExistsCriteria(Type docType)
+        public override ICriteria GetTypeSelectionCriteria(Type docType)
         {
-            // Without any other guidance, we look for the first non-nullable property.
+            var property = MappingHelpers.GetTypeSelectionProperty(docType);
+            if (property == null)
+                throw new InvalidOperationException(String.Format(TypeCriteriaMissingExceptionMessage, docType.Name));
+
             var prefix = GetDocumentMappingPrefix(docType);
-            var fieldName = GetFieldName(prefix, MappingHelpers.GetDiscriminatorProperty(docType));
-            return new ExistsCriteria(fieldName);
+            return new ExistsCriteria(GetFieldName(prefix, property));
         }
     }
 }

@@ -47,27 +47,21 @@ namespace ElasticLinq.Mapping
         }
 
         /// <summary>
-        /// Determine a property in the given type that is suitable for using
-        /// as a discriminator to ensure only documents of this type
-        /// are selected from Elasticsearch.
+        /// Find a property on the given type that is suitable for identifying
+        /// documents belong to this type within Elasticsearch.
         /// </summary>
-        /// <param name="type">Type to examine for a suitable discriminator property.</param>
-        /// <returns>PropertyInfo for a suitable property to use as a discriminator.</returns>
+        /// <param name="type">Type to examine for a suitable property.</param>
+        /// <returns>PropertyInfo for a suitable property to use as a type selector or null if none are available.</returns>
         /// <remarks>
-        /// A discriminator should be a public read/write instance property that is not generic.
+        /// A type selection property should be a public read/write instance property that is not generic.
         /// </remarks>
-        public static PropertyInfo GetDiscriminatorProperty(Type type)
+        public static PropertyInfo GetTypeSelectionProperty(Type type)
         {
-            var property = type.GetTypeInfo()
+            return type.GetTypeInfo()
                 .DeclaredProperties
                 .FirstOrDefault(p => p.CanRead && p.CanWrite &&
                     p.PropertyType.GetTypeInfo().IsValueType && !p.PropertyType.GetTypeInfo().IsGenericType &&
                     p.GetMethod.IsPublic && !p.GetMethod.IsStatic);
-
-            if (property == null)
-                throw new InvalidOperationException(String.Format("Could not find public read/write non-generic value type property to use for a default query against {0}.", type.FullName));
-
-            return property;
         }
     }
 }

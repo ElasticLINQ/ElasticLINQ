@@ -22,11 +22,11 @@ namespace ElasticLinq.Test.Mapping
 
     public class CouchbaseElasticMappingTests
     {
+        readonly static CouchbaseElasticMapping mapping = new CouchbaseElasticMapping();
+
         [Fact]
         public static void GetDocumentMappingPrefixReturnsDoc()
         {
-            var mapping = new CouchbaseElasticMapping();
-
             var result = mapping.GetDocumentMappingPrefix(null);
 
             Assert.Equal("doc", result);
@@ -35,8 +35,6 @@ namespace ElasticLinq.Test.Mapping
         [Fact]
         public static void GetDocumentTypeIsCouchbaseDocument()
         {
-            var mapping = new CouchbaseElasticMapping();
-
             var result = mapping.GetDocumentType(null);
 
             Assert.Equal("couchbaseDocument", result);
@@ -45,9 +43,7 @@ namespace ElasticLinq.Test.Mapping
         [Fact]
         public static void GetTypeExistsCriteriaReturnsValueType()
         {
-            var mapping = new CouchbaseElasticMapping();
-
-            var result = mapping.GetTypeExistsCriteria(typeof(ClassWithValueType));
+            var result = mapping.GetTypeSelectionCriteria(typeof(ClassWithValueType));
 
             var existsCriteria = Assert.IsType<ExistsCriteria>(result);
             Assert.Equal("doc.candidate", existsCriteria.Field);
@@ -56,9 +52,7 @@ namespace ElasticLinq.Test.Mapping
         [Fact]
         public static void GetTypeExistsCriteriaThrowsInvalidOperationIfClassHasNoRequiredProperties()
         {
-            var mapping = new CouchbaseElasticMapping();
-
-            Assert.Throws<InvalidOperationException>(() => mapping.GetTypeExistsCriteria(typeof(ClassWithNoRequiredProperties)));
+            Assert.Throws<InvalidOperationException>(() => mapping.GetTypeSelectionCriteria(typeof(ClassWithNoRequiredProperties)));
         }
     }
 }

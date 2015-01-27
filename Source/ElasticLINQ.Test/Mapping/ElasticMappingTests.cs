@@ -139,21 +139,21 @@ namespace ElasticLinq.Test.Mapping
         }
 
         [Fact]
-        public static void GetTypeExistsCriteria()
+        public static void GetTypeSelectionCriteria()
         {
             var mapping = new ElasticMapping();
 
-            var criteria = mapping.GetTypeExistsCriteria(typeof(FormatClass));
+            var criteria = mapping.GetTypeSelectionCriteria(typeof(FormatClass));
 
             Assert.Null(criteria);
         }
 
         [Fact]
-        public static void GetTypeExistsCriteria_GuardClause()
+        public static void GetTypeSelectionCriteria_GuardClause()
         {
             var mapping = new ElasticMapping();
 
-            Assert.Throws<ArgumentNullException>(() => mapping.GetTypeExistsCriteria(null));
+            Assert.Throws<ArgumentNullException>(() => mapping.GetTypeSelectionCriteria(null));
         }
 
         [Fact]

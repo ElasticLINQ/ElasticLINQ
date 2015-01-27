@@ -57,7 +57,7 @@ namespace ElasticLinq.Request.Visitors
 
         private void ApplyTypeSelectionCriteria()
         {
-            var typeCriteria = Mapping.GetTypeExistsCriteria(sourceType);
+            var typeCriteria = Mapping.GetTypeSelectionCriteria(sourceType);
 
             searchRequest.Filter = searchRequest.Filter == null || searchRequest.Filter == ConstantCriteria.True
                 ? typeCriteria
