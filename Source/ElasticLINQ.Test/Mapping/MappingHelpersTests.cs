@@ -1,10 +1,11 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using ElasticLinq.Mapping;
+using ElasticLinq.Utility;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using ElasticLinq.Utility;
 using Xunit;
 
 namespace ElasticLinq.Test.Mapping
@@ -124,6 +125,16 @@ namespace ElasticLinq.Test.Mapping
         }
 
         [Fact]
+        public static void GetSelectionPropertyReturnsRequiredProperty()
+        {
+            var expected = TypeHelper.GetMemberInfo((ClassWithRequiredAttributeProperty c) => c.IsRequired);
+
+            var actual = MappingHelpers.GetTypeSelectionProperty(typeof(ClassWithRequiredAttributeProperty));
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
         public static void GetSelectionPropertyWithNoSuitablePropertyReturnsNull()
         {
             var actual = MappingHelpers.GetTypeSelectionProperty(typeof(ClassWithNoValidSelectionProperties));
@@ -146,8 +157,24 @@ namespace ElasticLinq.Test.Mapping
             public int ReadOnly { get { return backing; } }
             public string NotValueType { get; set; }
             private int NonPublic { get; set; }
-
+            public static bool IsStatic { get; set; }
+            public List<string> IsGeneric { get; set; }
             public int Field = 1;
+        }
+
+        // Any attribute named "RequiresAttribute" works.
+        // We don't want to take a dependency on System.ComponentModel.DataAnnotations and 
+        // it isn't available in the version of the PCL we target.
+        class RequiredAttribute : Attribute
+        {
+        }
+
+        class ClassWithRequiredAttributeProperty
+        {
+            public string NotRequired { get; set; }
+
+            [Required]
+            public string IsRequired { get; set; }
         }
     }
 }

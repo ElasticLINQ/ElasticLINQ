@@ -57,11 +57,28 @@ namespace ElasticLinq.Mapping
         /// </remarks>
         public static PropertyInfo GetTypeSelectionProperty(Type type)
         {
-            return type.GetTypeInfo()
-                .DeclaredProperties
-                .FirstOrDefault(p => p.CanRead && p.CanWrite &&
-                    p.PropertyType.GetTypeInfo().IsValueType && !p.PropertyType.GetTypeInfo().IsGenericType &&
-                    p.GetMethod.IsPublic && !p.GetMethod.IsStatic);
+            var typeInfo = type.GetTypeInfo();
+            return typeInfo.DeclaredProperties.FirstOrDefault(BasicTypeSelectionPropertyCriteria)
+                   ?? RequiredProperty(typeInfo);
         }
+
+        /// <summary>
+        /// Determine if a property is suitable to use as a type selector.
+        /// </summary>
+        /// <remarks>
+        /// A type selection property should be a public read/write instance property that is not generic.
+        /// </remarks>
+        public static Func<PropertyInfo, bool> BasicTypeSelectionPropertyCriteria = p =>
+            p.CanRead && p.CanWrite && p.GetMethod.IsPublic && !p.GetMethod.IsStatic &&
+            p.PropertyType.GetTypeInfo().IsValueType && !p.PropertyType.GetTypeInfo().IsGenericType;
+
+        /// <summary>
+        /// Find the first property of a class that has a 'Required' attribute.
+        /// </summary>
+        /// <remarks>
+        /// This is likely System.ComponentModel.DataAnnotations.RequiredAttribute but doesn't have to be.
+        /// </remarks>
+        public static Func<TypeInfo, PropertyInfo> RequiredProperty = t =>
+            t.DeclaredProperties.FirstOrDefault(f => f.CustomAttributes.Any(a => a.AttributeType.Name == "RequiredAttribute"));
     }
 }
