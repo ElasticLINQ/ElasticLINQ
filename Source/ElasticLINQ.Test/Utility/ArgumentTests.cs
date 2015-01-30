@@ -20,7 +20,7 @@ namespace ElasticLinq.Test.Utility
         [Fact]
         public void EnsureNotNullDoesNotThrowsWhenValueIsNotNull()
         {
-            Assert.DoesNotThrow(() => Argument.EnsureNotNull("a", "b"));
+            Argument.EnsureNotNull("a", "b");
         }
 
         [Fact]
@@ -47,7 +47,7 @@ namespace ElasticLinq.Test.Utility
         [Fact]
         public void EnsureNotBlankDoesNotThrowsWhenValueIsNotBlank()
         {
-            Assert.DoesNotThrow(() => Argument.EnsureNotBlank("a", "b"));
+            Argument.EnsureNotBlank("a", "b");
         }
 
         [Fact]
@@ -60,7 +60,7 @@ namespace ElasticLinq.Test.Utility
         [Fact]
         public void EnsureIsDefinedEnumDoesNotThrowWhenValueIsDefinedEnum()
         {
-            Assert.DoesNotThrow(() => Argument.EnsureIsDefinedEnum("a", TestEnum.Two));
+            Argument.EnsureIsDefinedEnum("a", TestEnum.Two);
         }
 
         [Fact]
@@ -73,7 +73,7 @@ namespace ElasticLinq.Test.Utility
         [Fact]
         public void EnsureIsAssignableDoesNotThrowWhenTypeIsAssignable()
         {
-            Assert.DoesNotThrow(() => Argument.EnsureIsAssignableFrom<IEnumerable<object>>("a", typeof(List<object>)));
+            Argument.EnsureIsAssignableFrom<IEnumerable<object>>("a", typeof(List<object>));
         }
 
         [Fact]

@@ -33,7 +33,7 @@ namespace ElasticLinq.Test.Request.Criteria
             var actual = ConstantCriteriaFilterReducer.Reduce(criteria);
 
             var orActual = Assert.IsType<OrCriteria>(actual);
-            Assert.None(orActual.Criteria, c => c == ConstantCriteria.False);
+            Assert.DoesNotContain(orActual.Criteria, c => c == ConstantCriteria.False);
             Assert.Single(orActual.Criteria, exists1);
             Assert.Single(orActual.Criteria, exists2);
         }
@@ -48,7 +48,7 @@ namespace ElasticLinq.Test.Request.Criteria
             var actual = ConstantCriteriaFilterReducer.Reduce(criteria);
 
             var andActual = Assert.IsType<AndCriteria>(actual);
-            Assert.None(andActual.Criteria, c => c == ConstantCriteria.True);
+            Assert.DoesNotContain(andActual.Criteria, c => c == ConstantCriteria.True);
             Assert.Single(andActual.Criteria, exists1);
             Assert.Single(andActual.Criteria, exists2);
         }

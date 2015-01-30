@@ -28,7 +28,9 @@ namespace ElasticLinq.Test.Response.Materializers
         {
             Assert.Throws<ArgumentNullException>(() => new ListTermlessFacetsElasticMaterializer(null, typeof(SampleClass), ""));
             Assert.Throws<ArgumentNullException>(() => new ListTermlessFacetsElasticMaterializer(defaultMaterializer, null, ""));
-            Assert.DoesNotThrow(() => new ListTermlessFacetsElasticMaterializer(defaultMaterializer, typeof(SampleClass), null));
+
+            Assert.IsType<ListTermlessFacetsElasticMaterializer>(new ListTermlessFacetsElasticMaterializer(defaultMaterializer, typeof(SampleClass), null));
+            
         }
 
         [Fact]

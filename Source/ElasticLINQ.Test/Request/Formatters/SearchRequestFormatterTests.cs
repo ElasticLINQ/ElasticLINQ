@@ -47,7 +47,7 @@ namespace ElasticLinq.Test.Request.Formatters
         {
             var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1" });
 
-            Assert.DoesNotThrow(() => JObject.Parse(formatter.Body));
+            JObject.Parse(formatter.Body);
         }
 
         [Fact]
@@ -298,7 +298,7 @@ namespace ElasticLinq.Test.Request.Formatters
 
             var parameters = formatter.Uri.GetComponents(UriComponents.Query, UriFormat.Unescaped).Split('&');
 
-            Assert.None(parameters, p => p.StartsWith("search_type="));
+            Assert.DoesNotContain(parameters, p => p.StartsWith("search_type="));
         }
     }
 }
