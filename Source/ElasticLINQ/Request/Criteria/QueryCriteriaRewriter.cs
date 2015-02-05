@@ -27,6 +27,9 @@ namespace ElasticLinq.Request.Criteria
             if (criteria is NotCriteria)
                 return Rewrite((NotCriteria)criteria);
 
+            if (criteria is ConstantCriteria)
+                return Rewrite((ConstantCriteria)criteria);
+
             return criteria;
         }
 
@@ -67,6 +70,16 @@ namespace ElasticLinq.Request.Criteria
             return new BoolCriteria(must.Select(Compensate),
                 should.SelectMany(c => c.Criteria).Select(Compensate),
                 mustNot.Select(c => c.Criteria).Select(Compensate));
+        }
+
+        /// <summary>
+        /// Rewrite an ConstantCriteria as either a MatchAllCriteria or NotCriteria depending on whether it is true or false respectively.
+        /// </summary>
+        /// <param name="constant">Constant crieteria to rewrite.</param>
+        /// <returns>MatchAllCriteria or NotCriteria wrapped MatchAllCriteria.</returns>
+        private static ICriteria Rewrite(ConstantCriteria constant)
+        {
+            return constant == ConstantCriteria.True ? MatchAllCriteria.Instance : NotCriteria.Create(MatchAllCriteria.Instance);
         }
     }
 }
