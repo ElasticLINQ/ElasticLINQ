@@ -3,9 +3,11 @@
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Visitors;
 using ElasticLinq.Response.Model;
+using ElasticLinq.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using Xunit;
 
 namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation

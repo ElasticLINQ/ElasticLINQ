@@ -102,6 +102,7 @@
     <Compile Include="Request\SortOptionTests.cs" />
     <Compile Include="Request\Visitors\BranchSelectExpressionVisitorTests.cs" />
     <Compile Include="Request\Visitors\ConstantMemberPairTests.cs" />
+    <Compile Include="Request\Visitors\CriteriaExpressionVisitorTests.cs" />
     <Compile Include="Request\Visitors\ElasticFieldsExpressionVisitorTests.cs" />
     <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationGroupByFieldTests.cs" />
     <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationNotSupportedTests.cs" />
