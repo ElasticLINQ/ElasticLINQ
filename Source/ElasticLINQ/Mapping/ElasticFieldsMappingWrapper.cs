@@ -50,9 +50,9 @@ namespace ElasticLinq.Mapping
         }
 
         /// <inheritdoc/>
-        public ICriteria GetTypeExistsCriteria(Type docType)
+        public ICriteria GetTypeSelectionCriteria(Type docType)
         {
-            return wrapped.GetTypeExistsCriteria(docType);
+            return wrapped.GetTypeSelectionCriteria(docType);
         }
     }
 }

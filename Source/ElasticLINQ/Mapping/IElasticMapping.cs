@@ -60,12 +60,12 @@ namespace ElasticLinq.Mapping
 
         /// <summary>
         /// Gets criteria that can be used to find documents of a particular type. Will be used by
-        /// ElasticLINQ when a query does not have any Where clauses, so that it can unambiguously
-        /// find documents of the given type. Typically this should degenerate into an "exists"
-        /// test for a field that's known to always have a value.
+        /// ElasticLINQ when a query does not have any suitable Where or Query criteria, so that it
+        /// can unambiguously select documents of the given type. Typically this should return an 
+        /// ExistsCriteria for a field that's known to always have a value.
         /// </summary>
         /// <param name="docType">The type that's being searched.</param>
-        /// <returns>The criteria for finding the document.</returns>
-        ICriteria GetTypeExistsCriteria(Type docType);
+        /// <returns>The criteria for selecting documents of this type.</returns>
+        ICriteria GetTypeSelectionCriteria(Type docType);
     }
 }

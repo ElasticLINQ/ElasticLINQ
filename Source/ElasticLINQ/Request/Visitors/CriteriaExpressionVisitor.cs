@@ -68,13 +68,6 @@ namespace ElasticLinq.Request.Visitors
             return base.VisitMethodCall(m);
         }
 
-        protected static ICriteria ApplyCriteria(ICriteria currentRoot, ICriteria newCriteria)
-        {
-            return currentRoot == null
-                ? newCriteria
-                : AndCriteria.Combine(currentRoot, newCriteria);
-        }
-
         protected Expression VisitElasticMethodsMethodCall(MethodCallExpression m)
         {
             switch (m.Method.Name)
@@ -170,10 +163,10 @@ namespace ElasticLinq.Request.Visitors
                     return m;
 
                 default:
-                    var methodName = m.Member.Name;
+                    var memberName = m.Member.Name;
                     if (m.Member.DeclaringType != null)
-                        methodName = m.Member.DeclaringType.Name + "." + m.Member.Name;
-                    throw new NotSupportedException(string.Format("{0} is of unsupported type {1}", methodName, m.NodeType));
+                        memberName = m.Member.DeclaringType.Name + "." + m.Member.Name;
+                    throw new NotSupportedException(string.Format("{0} is of unsupported type {1}", memberName, m.Expression.NodeType));
             }
         }
 

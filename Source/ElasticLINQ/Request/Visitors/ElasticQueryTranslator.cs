@@ -48,12 +48,20 @@ namespace ElasticLinq.Request.Visitors
             else
                 CompleteHitTranslation(evaluated);
 
+            searchRequest.Query = QueryCriteriaRewriter.Compensate(searchRequest.Query);
             searchRequest.Filter = ConstantCriteriaFilterReducer.Reduce(searchRequest.Filter);
-
-            if (searchRequest.Query == null && (searchRequest.Filter == null || searchRequest.Filter == ConstantCriteria.True))
-                searchRequest.Filter = Mapping.GetTypeExistsCriteria(sourceType);
+            ApplyTypeSelectionCriteria();
 
             return new ElasticTranslateResult(searchRequest, materializer);
+        }
+
+        private void ApplyTypeSelectionCriteria()
+        {
+            var typeCriteria = Mapping.GetTypeSelectionCriteria(sourceType);
+
+            searchRequest.Filter = searchRequest.Filter == null || searchRequest.Filter == ConstantCriteria.True
+                ? typeCriteria
+                : AndCriteria.Combine(typeCriteria, searchRequest.Filter);
         }
 
         private void CompleteHitTranslation(Expression evaluated)
@@ -132,7 +140,7 @@ namespace ElasticLinq.Request.Visitors
             var constantFieldExpression = fieldsExpression as ConstantExpression;
             var constantFields = constantFieldExpression == null ? null : (string[])constantFieldExpression.Value;
             var criteriaExpression = new CriteriaExpression(new QueryStringCriteria(constantQueryExpression.Value.ToString(), constantFields));
-            searchRequest.Query = ApplyCriteria(searchRequest.Query, criteriaExpression.Criteria);
+            searchRequest.Query = AndCriteria.Combine(searchRequest.Query, criteriaExpression.Criteria);
 
             return Visit(source);
         }
@@ -190,6 +198,13 @@ namespace ElasticLinq.Request.Visitors
                     if (m.Arguments.Count == 2)
                         return VisitCount(m.Arguments[0], m.Arguments[1]);
                     throw GetOverloadUnsupportedException(m.Method);
+
+                case "Any":
+                    if (m.Arguments.Count == 1)
+                        return VisitAny(m.Arguments[0], null);
+                    if (m.Arguments.Count == 2)
+                        return VisitAny(m.Arguments[0], m.Arguments[1]);
+                    throw GetOverloadUnsupportedException(m.Method);
             }
 
             throw new NotSupportedException(string.Format("Queryable.{0} method is not supported", m.Method.Name));
@@ -198,6 +213,17 @@ namespace ElasticLinq.Request.Visitors
         private static NotSupportedException GetOverloadUnsupportedException(MethodInfo methodInfo)
         {
             return new NotSupportedException(string.Format("Queryable.{0} method overload is not supported", methodInfo.GetSimpleSignature()));
+        }
+
+        private Expression VisitAny(Expression source, Expression predicate)
+        {
+            materializer = new AnyElasticMaterializer();
+            searchRequest.SearchType = "count";
+            searchRequest.Size = 1;
+
+            return predicate != null
+                ? VisitWhere(source, predicate)
+                : Visit(source);
         }
 
         private Expression VisitCount(Expression source, Expression predicate)
@@ -261,7 +287,7 @@ namespace ElasticLinq.Request.Visitors
             if (criteriaExpression == null)
                 throw new NotSupportedException(string.Format("Query expression '{0}' could not be translated", body));
 
-            searchRequest.Query = ApplyCriteria(searchRequest.Query, criteriaExpression.Criteria);
+            searchRequest.Query = AndCriteria.Combine(searchRequest.Query, criteriaExpression.Criteria);
             within = wasWithin;
 
             return Visit(source);
@@ -276,7 +302,7 @@ namespace ElasticLinq.Request.Visitors
             if (criteriaExpression == null)
                 throw new NotSupportedException(String.Format("Where expression '{0}' could not be translated", lambda.Body));
 
-            searchRequest.Filter = ApplyCriteria(searchRequest.Filter, criteriaExpression.Criteria);
+            searchRequest.Filter = AndCriteria.Combine(searchRequest.Filter, criteriaExpression.Criteria);
 
             return Visit(source);
         }

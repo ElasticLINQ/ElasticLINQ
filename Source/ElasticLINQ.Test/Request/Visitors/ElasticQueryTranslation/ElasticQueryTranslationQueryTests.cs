@@ -63,12 +63,11 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var where = Robots.Query(r => r.Name == "IG-88" && r.Cost > 1);
             var request = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest;
 
-            var andCriteria = Assert.IsType<AndCriteria>(request.Query);
+            var boolCriteria = Assert.IsType<BoolCriteria>(request.Query);
             Assert.Null(request.Filter);
-            Assert.Equal("and", andCriteria.Name);
-            Assert.Single(andCriteria.Criteria, f => f.Name == "term");
-            Assert.Single(andCriteria.Criteria, f => f.Name == "range");
-            Assert.Equal(2, andCriteria.Criteria.Count);
+            Assert.Single(boolCriteria.Must, f => f.Name == "term");
+            Assert.Single(boolCriteria.Must, f => f.Name == "range");
+            Assert.Equal(2, boolCriteria.Must.Count);
         }
 
         [Fact]
@@ -88,7 +87,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         public void QueryStringWithFieldsGeneratesQueryStringCriteriaWithFields()
         {
             const string expectedQueryStringValue = "Data";
-            var expectedFields = new[] {"Green", "Brown"};
+            var expectedFields = new[] { "Green", "Brown" };
             var where = Robots.QueryString(expectedQueryStringValue, expectedFields);
             var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest;
 
@@ -100,7 +99,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         }
 
         [Fact]
-        public void QueryStringWithQueryCombinesToAndQueryCriteria()
+        public void QueryStringWithQueryCombinesToBoolQueryCriteria()
         {
             const string expectedQueryStringValue = "Data";
             var where = Robots.QueryString(expectedQueryStringValue).Query(q => q.Cost > 0);
@@ -108,10 +107,84 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
             Assert.Null(request.Filter);
             Assert.NotNull(request.Query);
-            var andCriteria = Assert.IsType<AndCriteria>(request.Query);
-            Assert.Single(andCriteria.Criteria, a => a.Name == "query_string");
-            Assert.Single(andCriteria.Criteria, a => a.Name == "range");
-            Assert.Equal(2, andCriteria.Criteria.Count);
+            var boolCriteria = Assert.IsType<BoolCriteria>(request.Query);
+            Assert.Single(boolCriteria.Must, a => a.Name == "query_string");
+            Assert.Single(boolCriteria.Must, a => a.Name == "range");
+            Assert.Equal(2, boolCriteria.Must.Count);
+        }
+
+        [Fact]
+        public void AndOrQueryGeneratesBoolQueryWithAndArgs()
+        {
+            var query = Robots.Query(q => q.Cost > 0 && (q.EnergyUse > 0 || q.Started < DateTime.Now));
+
+            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", query.Expression).SearchRequest;
+
+            Assert.Null(request.Filter);
+            Assert.IsType<BoolCriteria>(request.Query);
+        }
+
+        [Fact]
+        public void BooleanTrueGeneratesMatchAllQuery()
+        {
+            var query = Robots.Query(q => true);
+
+            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", query.Expression).SearchRequest;
+
+            Assert.Null(request.Filter);
+            Assert.IsType<MatchAllCriteria>(request.Query);
+        }
+
+        [Fact]
+        public void EvaluatedTrueGeneratesMatchAllQuery()
+        {
+            var query = Robots.Query(q => 1 == 1);
+
+            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", query.Expression).SearchRequest;
+
+            Assert.Null(request.Filter);
+            Assert.IsType<MatchAllCriteria>(request.Query);
+        }
+
+        [Fact]
+        public void BooleanFalseGeneratesNotMatchAllQuery()
+        {
+            var query = Robots.Query(q => false);
+
+            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", query.Expression).SearchRequest;
+
+            Assert.Null(request.Filter);
+            var notCriteria = Assert.IsType<NotCriteria>(request.Query);
+            Assert.IsType<MatchAllCriteria>(notCriteria.Criteria);
+        }
+
+        [Fact]
+        public void EvaluatedFalseGeneratesNotMatchAllQuery()
+        {
+            var query = Robots.Query(q => 1 > 1);
+
+            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", query.Expression).SearchRequest;
+
+            Assert.Null(request.Filter);
+            var notCriteria = Assert.IsType<NotCriteria>(request.Query);
+            Assert.IsType<MatchAllCriteria>(notCriteria.Criteria);
+        }
+
+        [Fact]
+        public void BooleanConstantsGeneratesBoolMatchAllQueryAndNotMatchAllQuery()
+        {
+            var query = Robots.Query(r => (r.Id > 1 && true) || (r.Id < 1 && false));
+
+            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", query.Expression).SearchRequest;
+
+            Assert.Null(request.Filter);
+            var boolCriteria = Assert.IsType<BoolCriteria>(request.Query);
+            Assert.Empty(boolCriteria.Must);
+            Assert.Empty(boolCriteria.MustNot);
+            Assert.Equal(2, boolCriteria.Should.Count);
+
+            Assert.Single(boolCriteria.Should, c => c is BoolCriteria && ((BoolCriteria)c).Must.Any(s => s is MatchAllCriteria));
+            Assert.Single(boolCriteria.Should, c => c is BoolCriteria && ((BoolCriteria)c).Must.Any(s => s is NotCriteria));
         }
     }
 }

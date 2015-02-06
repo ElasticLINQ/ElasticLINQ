@@ -3,7 +3,6 @@
 using System.Linq;
 using ElasticLinq.Request.Criteria;
 using System;
-using System.Collections.Generic;
 using Xunit;
 
 namespace ElasticLinq.Test.Request.Criteria

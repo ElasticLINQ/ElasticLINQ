@@ -198,7 +198,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
         private static void TestProjectionWithKeyAndCount(Expression query)
         {
-            var searchRequest = ElasticQueryTranslator.Translate(Mapping, "", query).SearchRequest;
+            var searchRequest = ElasticQueryTranslator.Translate(CouchMapping, "", query).SearchRequest;
 
             var facet = Assert.Single(searchRequest.Facets);
             var filterFacet = Assert.IsType<FilterFacet>(facet);

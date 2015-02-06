@@ -1,10 +1,11 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using ElasticLinq.Mapping;
+using ElasticLinq.Utility;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Reflection;
 using Xunit;
 
 namespace ElasticLinq.Test.Mapping
@@ -14,11 +15,11 @@ namespace ElasticLinq.Test.Mapping
         private readonly static CultureInfo usCulture = new CultureInfo(0x0409);
 
         [Fact]
-        public static void ToCamelCaseWithAllCapsLowersFirstCapitalOnly()
+        public static void ToCamelCaseWithAllCapsLowersAllText()
         {
             var actual = "ALLCAPS".ToCamelCase(usCulture);
 
-            Assert.Equal("aLLCAPS", actual);
+            Assert.Equal("allcaps", actual);
         }
 
         [Fact]
@@ -27,6 +28,22 @@ namespace ElasticLinq.Test.Mapping
             var actual = "lowercase".ToCamelCase(usCulture);
 
             Assert.Equal("lowercase", actual);
+        }
+
+        [Fact]
+        public static void ToCamelCaseWithAcronymLowersAcronym()
+        {
+            var actual = "ACRONYMThenLowerCase".ToCamelCase(usCulture);
+
+            Assert.Equal("acronymThenLowerCase", actual);
+        }
+
+        [Fact]
+        public static void ToCamelCaseEndingWithAcronym()
+        {
+            var actual = "EndsWithACRONYM".ToCamelCase(usCulture);
+
+            Assert.Equal("endsWithACRONYM", actual);
         }
 
         [Fact]
@@ -100,21 +117,29 @@ namespace ElasticLinq.Test.Mapping
         [Fact]
         public static void GetSelectionPropertyReturnsReadWriteNonGenericValueProperty()
         {
-            var selectionProperty = MappingHelpers.GetDiscriminatorProperty(typeof(ClassWithOneValidSelectionProperty));
+            var expected = TypeHelper.GetMemberInfo((ClassWithOneValidSelectionProperty c) => c.Valid);
 
-            Assert.IsAssignableFrom<PropertyInfo>(selectionProperty);
-            Assert.Equal("Valid", selectionProperty.Name);
-            Assert.Equal(typeof(ClassWithOneValidSelectionProperty), selectionProperty.DeclaringType);
-            Assert.Equal(typeof(int), selectionProperty.PropertyType);
+            var actual = MappingHelpers.GetTypeSelectionProperty(typeof(ClassWithOneValidSelectionProperty));
+
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
-        public static void GetSelectionPropertyWithNoSuitablePropertyThrows()
+        public static void GetSelectionPropertyReturnsRequiredProperty()
         {
-            var ex = Record.Exception(() => MappingHelpers.GetDiscriminatorProperty(typeof(ClassWithNoValidSelectionProperties)));
+            var expected = TypeHelper.GetMemberInfo((ClassWithRequiredAttributeProperty c) => c.IsRequired);
 
-            Assert.IsType<InvalidOperationException>(ex);
-            Assert.Equal("Could not find public read/write non-generic value type property to use for a default query against ElasticLinq.Test.Mapping.MappingHelpersTests+ClassWithNoValidSelectionProperties.", ex.Message);
+            var actual = MappingHelpers.GetTypeSelectionProperty(typeof(ClassWithRequiredAttributeProperty));
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public static void GetSelectionPropertyWithNoSuitablePropertyReturnsNull()
+        {
+            var actual = MappingHelpers.GetTypeSelectionProperty(typeof(ClassWithNoValidSelectionProperties));
+
+            Assert.Null(actual);
         }
 
         class ClassWithOneValidSelectionProperty
@@ -132,8 +157,24 @@ namespace ElasticLinq.Test.Mapping
             public int ReadOnly { get { return backing; } }
             public string NotValueType { get; set; }
             private int NonPublic { get; set; }
-
+            public static bool IsStatic { get; set; }
+            public List<string> IsGeneric { get; set; }
             public int Field = 1;
+        }
+
+        // Any attribute named "RequiresAttribute" works.
+        // We don't want to take a dependency on System.ComponentModel.DataAnnotations and 
+        // it isn't available in the version of the PCL we target.
+        class RequiredAttribute : Attribute
+        {
+        }
+
+        class ClassWithRequiredAttributeProperty
+        {
+            public string NotRequired { get; set; }
+
+            [Required]
+            public string IsRequired { get; set; }
         }
     }
 }

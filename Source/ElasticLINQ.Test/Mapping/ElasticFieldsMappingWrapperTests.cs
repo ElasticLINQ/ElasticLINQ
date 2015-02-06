@@ -82,9 +82,9 @@ namespace ElasticLinq.Test.Mapping
             var mapping = new ElasticFieldsMappingWrapper(innerMapping);
             var type = typeof(ElasticFieldsMappingWrapperTests);
 
-            mapping.GetTypeExistsCriteria(type);
+            mapping.GetTypeSelectionCriteria(type);
 
-            innerMapping.Received(1).GetTypeExistsCriteria(type);
+            innerMapping.Received(1).GetTypeSelectionCriteria(type);
         }
     }
 }

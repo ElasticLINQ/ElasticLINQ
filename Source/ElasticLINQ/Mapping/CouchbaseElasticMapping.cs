@@ -2,6 +2,7 @@
 
 using System;
 using System.Globalization;
+using ElasticLinq.Request.Criteria;
 
 namespace ElasticLinq.Mapping
 {
@@ -32,6 +33,19 @@ namespace ElasticLinq.Mapping
         public override string GetDocumentType(Type type)
         {
             return "couchbaseDocument";
+        }
+
+        private const string TypeCriteriaMissingExceptionMessage = "Unable to determine document type selection criteria for type '{0}'. Ensure the type has a public read/write property that is non-nullable or marked with the Required attribute.";
+
+        /// <inheritdoc/>
+        public override ICriteria GetTypeSelectionCriteria(Type docType)
+        {
+            var property = MappingHelpers.GetTypeSelectionProperty(docType);
+            if (property == null)
+                throw new InvalidOperationException(String.Format(TypeCriteriaMissingExceptionMessage, docType.Name));
+
+            var prefix = GetDocumentMappingPrefix(docType);
+            return new ExistsCriteria(GetFieldName(prefix, property));
         }
     }
 }

@@ -229,6 +229,9 @@ namespace ElasticLinq.Request.Formatters
             if (criteria is MatchAllCriteria)
                 return Build((MatchAllCriteria)criteria);
 
+            if (criteria is BoolCriteria)
+                return Build((BoolCriteria)criteria);
+
             // Base class formatters using name property
 
             if (criteria is SingleFieldCriteria)
@@ -312,6 +315,26 @@ namespace ElasticLinq.Request.Formatters
             return criteria.Criteria.Count == 1
                 ? Build(criteria.Criteria.First())
                 : new JObject(new JProperty(criteria.Name, new JArray(criteria.Criteria.Select(Build).ToList())));
+        }
+
+        private JObject Build(BoolCriteria criteria)
+        {
+            return new JObject(new JProperty(criteria.Name, new JObject(BuildProperties(criteria))));
+        }
+
+        private IEnumerable<JProperty> BuildProperties(BoolCriteria criteria)
+        {
+            if (criteria.Must.Any())
+                yield return new JProperty("must", new JArray(criteria.Must.Select(Build)));
+
+            if (criteria.MustNot.Any())
+                yield return new JProperty("must_not", new JArray(criteria.MustNot.Select(Build)));
+
+            if (criteria.Should.Any())
+            {
+                yield return new JProperty("should", new JArray(criteria.Should.Select(Build)));
+                yield return new JProperty("minimum_should_match", 1);
+            }
         }
 
         internal static string Format(TimeSpan timeSpan)
