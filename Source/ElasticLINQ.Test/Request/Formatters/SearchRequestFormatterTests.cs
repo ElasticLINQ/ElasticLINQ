@@ -251,6 +251,30 @@ namespace ElasticLinq.Test.Request.Formatters
         }
 
         [Fact]
+        public void BodyContainsMinScoreWhenSpecified()
+        {
+            var searchRequest = new SearchRequest { MinScore = 1.3 };
+
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, searchRequest);
+            var body = JObject.Parse(formatter.Body);
+
+            var result = body.TraverseWithAssert("min_score");
+            Assert.Equal(searchRequest.MinScore.ToString(), result);
+        }
+
+        [Fact]
+        public void BodyDoesNotContainMinScoreWhenUnspecified()
+        {
+            var connection = new ElasticConnection(new Uri("http://localhost/"), timeout: TimeSpan.Zero);
+
+            var formatter = new SearchRequestFormatter(connection, mapping, new SearchRequest());
+            var body = JObject.Parse(formatter.Body);
+
+            var result = body["min_score"];
+            Assert.Null(result);
+        }
+
+        [Fact]
         public void FormatTimeSpanWithMillisecondPrecisionIsUnquantifiedFormat()
         {
             var timespan = TimeSpan.FromMilliseconds(1500);

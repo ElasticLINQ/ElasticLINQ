@@ -120,6 +120,20 @@ namespace ElasticLinq
         }
 
         /// <summary>
+        /// Specifies a minimum Elasticsearch score.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="T:System.Linq.IQueryable`1"/> whose elements have a score greater or equal to the score specified.
+        /// </returns>
+        /// <param name="source">A sequence of values to order.</param>
+        /// <param name="score">The minimal acceptable score for results.</param>
+        /// <exception cref="T:System.ArgumentNullException"><paramref name="source"/> is null.</exception>
+        public static IQueryable<TSource> MinScore<TSource>(this IQueryable<TSource> source, double score)
+        {
+            return CreateQueryMethodCall(source, minimumScoreMethodInfo, Expression.Constant(score));
+        }
+
+        /// <summary>
         /// Return information about a <see cref="IElasticQuery{T}"/> including the JSON that would be submitted to Elasticsearch.
         /// </summary>
         /// <param name="source">An <see cref="T:System.Linq.IQueryable{T}"/> to query.</param>
@@ -142,7 +156,16 @@ namespace ElasticLinq
         private static readonly MethodInfo orderByScoreDescendingMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "OrderByScoreDescending");
         private static readonly MethodInfo thenByScoreMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "ThenByScore");
         private static readonly MethodInfo thenByScoreDescendingMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "ThenByScoreDescending");
+        private static readonly MethodInfo minimumScoreMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "MinScore");
 
+        /// <summary>
+        /// Creates an expression to call a generic version of the given method with the source and arguments as parameters..
+        /// </summary>
+        /// <typeparam name="TSource">Element type of the query derived from the IQueryable source.</typeparam>
+        /// <param name="source">IQueryable source to use as the first parameter for the given method.</param>
+        /// <param name="method">Method to call </param>
+        /// <param name="arguments"></param>
+        /// <returns></returns>
         private static IQueryable<TSource> CreateQueryMethodCall<TSource>(IQueryable<TSource> source, MethodInfo method, params Expression[] arguments)
         {
             Argument.EnsureNotNull("source", source);

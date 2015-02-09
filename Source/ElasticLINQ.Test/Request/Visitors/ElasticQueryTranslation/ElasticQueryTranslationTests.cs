@@ -3,11 +3,9 @@
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Visitors;
 using ElasticLinq.Response.Model;
-using ElasticLinq.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using Xunit;
 
 namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
@@ -132,6 +130,20 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var materialized = translation.Materializer.Materialize(response);
             Assert.IsAssignableFrom<IEnumerable<Robot>>(materialized);
             Assert.Empty((IEnumerable<Robot>)materialized);
+        }
+
+        [Fact]
+        public void MinScoreCreatesRequestWithMinScore()
+        {
+            const double expectedScore = 123.4;
+
+            var query = Robots.Query(q => q.Name.Contains("a")).MinScore(expectedScore);
+
+            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", query.Expression).SearchRequest;
+
+            Assert.Null(request.Filter);
+            Assert.NotNull(request.Query);
+            Assert.Equal(expectedScore, request.MinScore);
         }
     }
 }
