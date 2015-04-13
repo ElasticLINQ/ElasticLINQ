@@ -19,6 +19,7 @@ namespace ElasticLinq.Request.Formatters
     /// </summary>
     internal class SearchRequestFormatter
     {
+        private static readonly CultureInfo transportCulture = CultureInfo.InvariantCulture;
         private readonly string[] parameterSeparator = { "&" };
 
         private readonly Lazy<string> body;
@@ -92,6 +93,9 @@ namespace ElasticLinq.Request.Formatters
             if (searchRequest.Fields.Any())
                 root.Add("fields", new JArray(searchRequest.Fields));
 
+            if (searchRequest.MinScore.HasValue)
+                root.Add("min_score", searchRequest.MinScore.Value);
+
             if (searchRequest.Query != null)
                 root.Add("query", Build(searchRequest.Query));
 
@@ -129,7 +133,7 @@ namespace ElasticLinq.Request.Formatters
             var specificBody = Build(facet);
             var orderableFacet = facet as IOrderableFacet;
             if (orderableFacet != null && orderableFacet.Size.HasValue)
-                specificBody["size"] = orderableFacet.Size.Value.ToString(CultureInfo.InvariantCulture);
+                specificBody["size"] = orderableFacet.Size.Value.ToString(transportCulture);
 
             var namedBody = new JObject(new JProperty(facet.Type, specificBody));
 
@@ -340,12 +344,12 @@ namespace ElasticLinq.Request.Formatters
         internal static string Format(TimeSpan timeSpan)
         {
             if (timeSpan.Milliseconds != 0)
-                return timeSpan.TotalMilliseconds.ToString(CultureInfo.InvariantCulture);
+                return timeSpan.TotalMilliseconds.ToString(transportCulture);
 
             if (timeSpan.Seconds != 0)
-                return timeSpan.TotalSeconds.ToString(CultureInfo.InvariantCulture) + "s";
+                return timeSpan.TotalSeconds.ToString(transportCulture) + "s";
 
-            return timeSpan.TotalMinutes.ToString(CultureInfo.InvariantCulture) + "m";
+            return timeSpan.TotalMinutes.ToString(transportCulture) + "m";
         }
     }
 }

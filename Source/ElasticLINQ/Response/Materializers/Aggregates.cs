@@ -31,6 +31,9 @@ namespace ElasticLinq.Response.Materializers
 
     internal abstract class AggregateRow
     {
+        private static DateTime epocStartDateTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        private static DateTimeOffset epocStartDateTimeOffset = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
+
         internal static object GetValue(AggregateRow row, string name, string operation, Type valueType)
         {
             return row.GetValue(name, operation, valueType);
@@ -80,6 +83,15 @@ namespace ElasticLinq.Response.Materializers
 
                         break;
                     }
+            }
+
+            // Elasticsearch returns dates as milliseconds since epoch when using facets
+            if (token.Type == JTokenType.Float || token.Type == JTokenType.Integer)
+            {
+                if (valueType == typeof(DateTime))
+                    return epocStartDateTime.AddMilliseconds((double)token);
+                if (valueType == typeof(DateTimeOffset))
+                    return epocStartDateTimeOffset.AddMilliseconds((double)token);
             }
 
             return token.ToObject(valueType);

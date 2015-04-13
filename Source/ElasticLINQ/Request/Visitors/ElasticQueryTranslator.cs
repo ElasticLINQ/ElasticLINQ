@@ -129,9 +129,25 @@ namespace ElasticLinq.Request.Visitors
                     if (m.Arguments.Count == 1)
                         return VisitOrderByScore(m.Arguments[0], !m.Method.Name.EndsWith("Descending"));
                     break;
+
+                case "MinScore":
+                    if (m.Arguments.Count == 2)
+                        return VisitMinimumScore(m.Arguments[0], m.Arguments[1]);
+                    break;
             }
 
             throw new NotSupportedException(string.Format("ElasticQuery.{0} method is not supported", m.Method.Name));
+        }
+
+        private Expression VisitMinimumScore(Expression source, Expression minScoreExpression)
+        {
+            if (minScoreExpression is ConstantExpression)
+            {
+                searchRequest.MinScore = Convert.ToDouble(((ConstantExpression) minScoreExpression).Value);
+                return Visit(source);
+            }
+
+            throw new NotSupportedException(string.Format("Score must be a constant expression, not a {0}.", minScoreExpression.NodeType));
         }
 
         private Expression VisitQueryString(Expression source, Expression queryExpression, Expression fieldsExpression = null)
