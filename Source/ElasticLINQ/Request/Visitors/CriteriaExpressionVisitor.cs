@@ -415,13 +415,25 @@ namespace ElasticLinq.Request.Visitors
 
         private Expression VisitRange(RangeComparison rangeComparison, Expression left, Expression right)
         {
+            var inverted = left is ConstantExpression;
             var cm = ConstantMemberPair.Create(left, right);
 
             if (cm == null)
                 throw new NotSupportedException("A {0} must test a constant against a member");
 
+            if (inverted)
+                rangeComparison = invertedRangeComparison[(int)rangeComparison];
+
             var field = Mapping.GetFieldName(Prefix, cm.MemberExpression);
             return new CriteriaExpression(new RangeCriteria(field, cm.MemberExpression.Member, rangeComparison, cm.ConstantExpression.Value));
         }
+
+        private readonly RangeComparison[] invertedRangeComparison =
+        {
+            RangeComparison.LessThan,
+            RangeComparison.LessThanOrEqual,
+            RangeComparison.GreaterThan,
+            RangeComparison.GreaterThanOrEqual
+        };
     }
 }

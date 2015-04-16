@@ -1013,5 +1013,61 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var orCriteria = Assert.IsType<OrCriteria>(request.Filter);
             Assert.Equal(2, orCriteria.Criteria.Count);
         }
+
+        [Fact]
+        public void ConstantLeftSideOfLessThanGeneratesRangeGreaterThan()
+        {
+            const decimal expectedConstant = 12.34m;
+            var where = Robots.Where(e => expectedConstant < e.Cost);
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
+
+            var rangeCriteria = Assert.IsType<RangeCriteria>(criteria);
+            Assert.Equal("range", rangeCriteria.Name);
+            Assert.Equal("prefix.cost", rangeCriteria.Field);
+            Assert.Single(rangeCriteria.Specifications, s => s.Comparison == RangeComparison.GreaterThan && Equals(s.Value, expectedConstant));
+            Assert.Equal(1, rangeCriteria.Specifications.Count);
+        }
+
+        [Fact]
+        public void ConstantLeftSideOfLessThanOrEqualGeneratesRangeGreaterThanOrEqual()
+        {
+            const decimal expectedConstant = 12.34m;
+            var where = Robots.Where(e => expectedConstant <= e.Cost);
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
+
+            var rangeCriteria = Assert.IsType<RangeCriteria>(criteria);
+            Assert.Equal("range", rangeCriteria.Name);
+            Assert.Equal("prefix.cost", rangeCriteria.Field);
+            Assert.Single(rangeCriteria.Specifications, s => s.Comparison == RangeComparison.GreaterThanOrEqual && Equals(s.Value, expectedConstant));
+            Assert.Equal(1, rangeCriteria.Specifications.Count);
+        }
+
+        [Fact]
+        public void ConstantLeftSideOfGreaterThanGeneratesRangeLessThan()
+        {
+            const decimal expectedConstant = 12.34m;
+            var where = Robots.Where(e => expectedConstant > e.Cost);
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
+
+            var rangeCriteria = Assert.IsType<RangeCriteria>(criteria);
+            Assert.Equal("range", rangeCriteria.Name);
+            Assert.Equal("prefix.cost", rangeCriteria.Field);
+            Assert.Single(rangeCriteria.Specifications, s => s.Comparison == RangeComparison.LessThan && Equals(s.Value, expectedConstant));
+            Assert.Equal(1, rangeCriteria.Specifications.Count);
+        }
+
+        [Fact]
+        public void ConstantLeftSideOfGreaterThanOrEqualGeneratesRangeLessThanOrEqual()
+        {
+            const decimal expectedConstant = 12.34m;
+            var where = Robots.Where(e => expectedConstant >= e.Cost);
+            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Filter;
+
+            var rangeCriteria = Assert.IsType<RangeCriteria>(criteria);
+            Assert.Equal("range", rangeCriteria.Name);
+            Assert.Equal("prefix.cost", rangeCriteria.Field);
+            Assert.Single(rangeCriteria.Specifications, s => s.Comparison == RangeComparison.LessThanOrEqual && Equals(s.Value, expectedConstant));
+            Assert.Equal(1, rangeCriteria.Specifications.Count);
+        }
     }
 }
