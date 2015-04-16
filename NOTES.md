@@ -94,12 +94,15 @@ A number of extensions on IQueryable are available via ``ElasticQueryExtensions`
 * ``OrderByScore``, ``OrderByScoreDescending``, ``ThenByScore``, ``ThenByScoreDescending`` to order by the _score field.
 * ``Query`` to specify query criteria the same way ``Where`` maps to filter criteria.
 * ``QueryString(query)`` to pass through a query_string for search.
+* ``MinScore(value)`` to specify a minimum score.
 
 ####ElasticFields
 There is a static class called ElasticFields. This currently provides just Score and Id properties but you can use these to stand-in for the _score and _id values in Elasticsearch, e.g:
 
 ``Select(c => new { c, ElasticFields.Score })`` wraps the entity with its score.
 ``OrderBy(c => ElasticFields.Score)`` orders results by score.
+
+Note: To specify a minimum score in a Where please use the MinScore extension method. ElasticFields.Score is not supported for this as only the >= operator would be valid.
 
 ### Mapping
 There is a mapping interface called IElasticMapping. A default CouchbaseElasticMapping is provided that maps against the current structure shown by Tier 3.
