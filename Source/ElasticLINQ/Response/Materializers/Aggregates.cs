@@ -57,6 +57,7 @@ namespace ElasticLinq.Response.Materializers
             switch (token.ToString())
             {
                 case "Infinity":
+                case "∞":
                     {
                         if (valueType == typeof(Double))
                             return Double.PositiveInfinity;
@@ -71,6 +72,7 @@ namespace ElasticLinq.Response.Materializers
                     }
 
                 case "-Infinity":
+                case "-∞":
                     {
                         if (valueType == typeof(Double))
                             return Double.NegativeInfinity;
