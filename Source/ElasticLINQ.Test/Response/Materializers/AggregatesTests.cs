@@ -4,6 +4,7 @@ using System;
 using ElasticLinq.Response.Materializers;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using System.Globalization;
 using Xunit;
 
 namespace ElasticLinq.Test.Response.Materializers
@@ -108,7 +109,8 @@ namespace ElasticLinq.Test.Response.Materializers
             Assert.Equal(19, actual);
         }
 
-        [Fact] public void AggregateStatisticalRowGetValueParsesSingleFacetForDouble()
+        [Fact]
+        public void AggregateStatisticalRowGetValueParsesSingleFacetForDouble()
         {
             var row = new AggregateStatisticalRow(2.00, expectedFacets);
 
@@ -172,7 +174,7 @@ namespace ElasticLinq.Test.Response.Materializers
             var expectedOperation = "count";
             var expectedValue = "aValue";
 
-            var row = new AggregateTermRow("rowKey", new[] { new AggregateField(expectedName, expectedOperation, new JValue(expectedValue) ) });
+            var row = new AggregateTermRow("rowKey", new[] { new AggregateField(expectedName, expectedOperation, new JValue(expectedValue)) });
 
             var actual = AggregateRow.GetValue(row, expectedName, expectedOperation, expectedValue.GetType());
 
@@ -209,6 +211,41 @@ namespace ElasticLinq.Test.Response.Materializers
         {
             Assert.Equal("Infinity", AggregateRow.ParseValue(JToken.Parse("Infinity"), typeof(String)));
             Assert.Equal("-Infinity", AggregateRow.ParseValue(JToken.Parse("-Infinity"), typeof(String)));
-        } 
+        }
+
+        [Fact]
+        public void AggregateRowParseValueCanParsesDateTimeEpochs()
+        {
+            var expected = WithoutFractionalMilliseconds(DateTime.UtcNow);
+            var expectedMillisSinceEpoch = ((expected - epochDateTime).TotalMilliseconds).ToString(CultureInfo.InvariantCulture);
+
+            var actual = AggregateRow.ParseValue(JToken.Parse(expectedMillisSinceEpoch), typeof(DateTime));
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void AggregateRowParseValueCanParsesDateTimeOffsetEpochs()
+        {
+            var expected = WithoutFractionalMilliseconds(DateTimeOffset.UtcNow);
+            var expectedMillisSinceEpoch = ((expected - epochDateTimeOffset).TotalMilliseconds).ToString(CultureInfo.InvariantCulture);
+
+            var actual = AggregateRow.ParseValue(JToken.Parse(expectedMillisSinceEpoch), typeof(DateTimeOffset));
+
+            Assert.Equal(expected, actual);
+        }
+
+        readonly DateTime epochDateTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        readonly DateTime epochDateTimeOffset = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+        private static DateTime WithoutFractionalMilliseconds(DateTime date)
+        {
+            return new DateTime(date.Year, date.Month, date.Day, date.Hour, date.Minute, date.Second, date.Millisecond, date.Kind);
+        }
+
+        private static DateTimeOffset WithoutFractionalMilliseconds(DateTimeOffset date)
+        {
+            return new DateTimeOffset(date.Year, date.Month, date.Day, date.Hour, date.Minute, date.Second, date.Millisecond, date.Offset);
+        }
     }
 }

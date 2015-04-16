@@ -79,7 +79,6 @@ namespace ElasticLinq.Test.Request.Criteria
             Assert.Equal(lte.Name, "lte");
         }
 
-
         [Fact]
         public void ToStringContainsFieldComparisonAndValue()
         {
