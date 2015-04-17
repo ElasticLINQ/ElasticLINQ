@@ -1,12 +1,10 @@
 # ElasticLINQ
 
-ElasticLINQ is a free C# library for searching Elasticsearch using LINQ syntax in .NET.
-
-## Minimal example
+ElasticLINQ is a free C# library for searching Elasticsearch using LINQ syntax in .NET, e.g.
 
 ```csharp
 var db = new ElasticContext(new ElasticConnection(new Uri("http://myserver:9200")));
-var people = db.Query<People>().Where(p => p.Interests.Contains("tech") && p.State == "WA");
+var p = db.Query<People>().Where(p => p.Tags.Contains("tech") && p.State == "WA");
 ```
 
 ## Installation
