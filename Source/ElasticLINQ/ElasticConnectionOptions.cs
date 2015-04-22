@@ -9,5 +9,11 @@ namespace ElasticLinq
         /// </summary>
         /// <remarks>Defaults to false.</remarks>
         public bool Pretty { get; set; }
+
+        /// <summary>
+        /// The default size for searches to specify the maximum document count.
+        /// </summary>
+        /// <remarks>Defaults to null, resulting in Elasticseach defaulting to 10.</remarks>
+        public long? SearchSizeDefault { get; set; }
     }
 }

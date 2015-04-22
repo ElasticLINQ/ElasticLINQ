@@ -21,6 +21,7 @@ namespace ElasticLinq.Test.Request.Formatters
     {
         private static readonly ElasticConnection defaultConnection = new ElasticConnection(new Uri("http://a.b.com:9000/"));
         private static readonly MemberInfo memberInfo = typeof(string).GetProperty("Length");
+        private static readonly ICriteria criteria = new ExistsCriteria("greenField");
         private readonly IElasticMapping mapping = Substitute.For<IElasticMapping>();
 
         public SearchRequestFormatterTests()
@@ -148,15 +149,15 @@ namespace ElasticLinq.Test.Request.Formatters
         }
 
         [Fact]
-        public void PrettyCreatesBodyThatIsOnlyFormattedDifferently()
+        public void PrettyCreatesBodyThatIsOnlyFormattedNicely()
         {
             var plainBody = new SearchRequestFormatter(
                 new ElasticConnection(defaultConnection.Endpoint, options: new ElasticConnectionOptions { Pretty = false }),
-                mapping, new SearchRequest { DocumentType = "type1", Filter = new ExistsCriteria("greenField") }).Body;
+                mapping, new SearchRequest { DocumentType = "type1", Filter = criteria }).Body;
 
             var prettyBody = new SearchRequestFormatter(
                 new ElasticConnection(defaultConnection.Endpoint, options: new ElasticConnectionOptions { Pretty = true }),
-                mapping, new SearchRequest { DocumentType = "type1", Filter = new ExistsCriteria("greenField") }).Body;
+                mapping, new SearchRequest { DocumentType = "type1", Filter = criteria }).Body;
 
             Assert.NotSame(plainBody, prettyBody);
 
@@ -165,11 +166,39 @@ namespace ElasticLinq.Test.Request.Formatters
         }
 
         [Fact]
+        public void SearchSizeDefaultIsUsedWhenNoSearchRequestSizeSpecified()
+        {
+            const int expectedSize = 1234;
+            var connectionOptions = new ElasticConnectionOptions { SearchSizeDefault = expectedSize };
+            var connection = new ElasticConnection(defaultConnection.Endpoint, options: connectionOptions);
+            var searchRequest = new SearchRequest { DocumentType = "type1", Filter = criteria };
+
+            var formatter = new SearchRequestFormatter(connection, mapping, searchRequest);
+            var body = JObject.Parse(formatter.Body);
+
+            Assert.Equal(expectedSize, body.TraverseWithAssert("size").Value<long>());
+        }
+
+        [Fact]
+        public void SearchSizeDefaultIsNotUsedWhenSearchRequestSizeSpecified()
+        {
+            const long expectedSize = 54321;
+            var connectionOptions = new ElasticConnectionOptions { SearchSizeDefault = 111222 };
+            var connection = new ElasticConnection(defaultConnection.Endpoint, options: connectionOptions);
+            var searchRequest = new SearchRequest { DocumentType = "type1", Filter = criteria, Size = expectedSize};
+
+            var formatter = new SearchRequestFormatter(connection, mapping, searchRequest);
+            var body = JObject.Parse(formatter.Body);
+
+            Assert.Equal(expectedSize, body.TraverseWithAssert("size").Value<long>());
+        }
+
+        [Fact]
         public void PrettySetsUriQueryWhenNoOtherQueryUriParameters()
         {
             var prettyUri = new SearchRequestFormatter(
                 new ElasticConnection(new Uri("http://coruscant.gov/some"), options: new ElasticConnectionOptions { Pretty = true }),
-                mapping, new SearchRequest { DocumentType = "type1", Filter = new ExistsCriteria("greenField") }).Uri;
+                mapping, new SearchRequest { DocumentType = "type1", Filter = criteria }).Uri;
 
             Assert.Equal("pretty=true", prettyUri.GetComponents(UriComponents.Query, UriFormat.Unescaped));
         }
@@ -179,7 +208,7 @@ namespace ElasticLinq.Test.Request.Formatters
         {
             var prettyUri = new SearchRequestFormatter(
                 new ElasticConnection(new Uri("http://coruscant.gov/some?human=false"), options: new ElasticConnectionOptions { Pretty = true }),
-                mapping, new SearchRequest { DocumentType = "type1", Filter = new ExistsCriteria("greenField") }).Uri;
+                mapping, new SearchRequest { DocumentType = "type1", Filter = criteria }).Uri;
 
             var parameters = prettyUri.GetComponents(UriComponents.Query, UriFormat.Unescaped).Split('&');
             Assert.Equal(2, parameters.Length);
@@ -193,7 +222,7 @@ namespace ElasticLinq.Test.Request.Formatters
         {
             var prettyUri = new SearchRequestFormatter(
                 new ElasticConnection(new Uri("http://coruscant.gov/some?pretty=false&human=true"), options: new ElasticConnectionOptions { Pretty = true }),
-                mapping, new SearchRequest { DocumentType = "type1", Filter = new ExistsCriteria("greenField") }).Uri;
+                mapping, new SearchRequest { DocumentType = "type1", Filter = criteria }).Uri;
 
             var parameters = prettyUri.GetComponents(UriComponents.Query, UriFormat.Unescaped).Split('&');
             Assert.Equal(2, parameters.Length);
