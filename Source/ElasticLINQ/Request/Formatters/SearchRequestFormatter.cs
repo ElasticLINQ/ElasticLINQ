@@ -109,8 +109,9 @@ namespace ElasticLinq.Request.Formatters
             if (searchRequest.From > 0)
                 root.Add("from", searchRequest.From);
 
-            if (searchRequest.Size.HasValue)
-                root.Add("size", searchRequest.Size.Value);
+            long? size = searchRequest.Size ?? connection.Options.SearchSizeDefault;
+            if (size.HasValue)
+                root.Add("size", size.Value);
 
             if (searchRequest.Facets.Any())
                 root.Add("facets", Build(searchRequest.Facets, searchRequest.Filter));
