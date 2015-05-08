@@ -11,14 +11,15 @@ namespace ElasticLINQ.IntegrationTest
     {
         private const string Index = "integrationtest";
         private static readonly Uri elasticsearchEndpoint = new Uri("http://elasticlinq.cloudapp.net:9200");
-        private static readonly ElasticConnection connection = new ElasticConnection(elasticsearchEndpoint, index:Index);
+        private static readonly ElasticConnectionOptions options = new ElasticConnectionOptions { SearchSizeDefault = 1000 };
+        private static readonly ElasticConnection connection = new ElasticConnection(elasticsearchEndpoint, index:Index, options:options);
 
         private readonly ElasticContext elasticContext = new ElasticContext(connection, new TrivialElasticMapping());
         private readonly List<object> memory = new List<object>();
 
         public IQueryable<T> Elastic<T>()
         {
-            return elasticContext.Query<T>().Take(1000);
+            return elasticContext.Query<T>();
         }
 
         public IQueryable<T> Memory<T>()
@@ -29,8 +30,8 @@ namespace ElasticLINQ.IntegrationTest
         public void LoadMemoryFromElastic()
         {
             memory.Clear();
-            memory.AddRange(elasticContext.Query<WebUser>().Take(100));
-            memory.AddRange(elasticContext.Query<JobOpening>().Take(100));
+            memory.AddRange(elasticContext.Query<WebUser>());
+            memory.AddRange(elasticContext.Query<JobOpening>());
 
             const int expectedDataCount = 200;
             if (memory.Count != expectedDataCount)

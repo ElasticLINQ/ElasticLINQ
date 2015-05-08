@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using Xunit;
 
 namespace ElasticLINQ.IntegrationTest
@@ -22,13 +21,25 @@ namespace ElasticLINQ.IntegrationTest
 
         public static void Same<TSource, TTarget>(Func<IQueryable<TSource>, IQueryable<TTarget>> query, bool ignoreOrder = false)
         {
-            var expect = query(Data.Memory<TSource>()).ToArray();
-            var actual = query(Data.Elastic<TSource>()).ToArray();
+            var expect = query(Data.Memory<TSource>()).ToList();
+            var actual = query(Data.Elastic<TSource>()).ToList();
 
-            var upperBound = Math.Min(expect.Length, actual.Length);
+            if (ignoreOrder)
+            {
+                var difference = Difference(expect, actual);
+                Assert.Empty(difference);
+            }
+            else
+                AssertSameSequence(expect, actual);
+        }
+
+        private static void AssertSameSequence<TTarget>(List<TTarget> expect, List<TTarget> actual)
+        {
+            var upperBound = Math.Min(expect.Count, actual.Count);
             for (var i = 0; i < upperBound; i++)
                 Assert.Equal(expect[i], actual[i]);
-            Assert.Equal(expect.Length, actual.Length);
+
+            Assert.Equal(expect.Count, actual.Count);
         }
 
         private static IEnumerable<T> Difference<T>(IEnumerable<T> left, IEnumerable<T> right)
