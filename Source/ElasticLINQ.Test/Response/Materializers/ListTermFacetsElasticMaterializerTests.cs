@@ -97,5 +97,31 @@ namespace ElasticLinq.Test.Response.Materializers
             Assert.Single(testItems[1].Fields, f => f.Name == "GroupKey" && f.Operation == "count" && f.Token.ToObject<int>() == 4);
             Assert.Single(testItems[1].Fields, f => f.Name == "unitsInStock" && f.Operation == "max" && Math.Abs(f.Token.ToObject<double>() - 40.0d) < 0.01);
         }
+
+        [Fact]
+        public static void CanMaterializeDateTimeKeys()
+        {
+            var facets = JObject.Parse(
+                "{ \"GroupKey\": { \"_type\": \"terms\", \"terms\" : [ " +
+                    "{ \"term\": 1428394929000, \"count\": 5 }, " +
+                    "{ \"term\": 1428456720000, \"count\": 4 } ] } }");
+
+            var materializer = new ListTermFacetsElasticMaterializer(defaultMaterializer, typeof(AggregateRow), typeof(DateTime));
+
+            var actual = materializer.Materialize(new ElasticResponse { facets = facets });
+
+            var actualList = Assert.IsType<List<AggregateRow>>(actual);
+            Assert.Equal(2, actualList.Count);
+            Assert.All(actualList, a => Assert.IsType<AggregateTermRow>(a));
+
+            var testItems = actualList.OfType<AggregateTermRow>().OrderBy(r => r.Key).ToArray();
+            Assert.Equal(new DateTime(2015,04,07,08,22,09, DateTimeKind.Utc), testItems[0].Key);
+            Assert.Equal(1, testItems[0].Fields.Count);
+            Assert.Single(testItems[0].Fields, f => f.Name == "GroupKey" && f.Operation == "count" && f.Token.ToObject<int>() == 5);
+
+            Assert.Equal(new DateTime(2015, 04, 08, 01, 32, 00, DateTimeKind.Utc), testItems[1].Key);
+            Assert.Equal(1, testItems[1].Fields.Count);
+            Assert.Single(testItems[1].Fields, f => f.Name == "GroupKey" && f.Operation == "count" && f.Token.ToObject<int>() == 4);
+        }
     }
 }

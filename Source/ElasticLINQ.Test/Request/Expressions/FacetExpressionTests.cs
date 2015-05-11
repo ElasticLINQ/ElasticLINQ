@@ -11,7 +11,7 @@ namespace ElasticLinq.Test.Request.Expressions
 {
     public class FacetExpressionTests
     {
-        private readonly TermsFacet termsFacet = new TermsFacet("field", "value");
+        private readonly TermsFacet termsFacet = new TermsFacet("field", 123, "value");
 
         [Fact]
         public void ConstructorSetsFacet()
