@@ -78,5 +78,7 @@ namespace ElasticLinq.Request
         /// Minimum score of results to be returned.
         /// </summary>
         public double? MinScore { get; set; }
+
+        public ICriteria Highlight { get; set; }
     }
 }

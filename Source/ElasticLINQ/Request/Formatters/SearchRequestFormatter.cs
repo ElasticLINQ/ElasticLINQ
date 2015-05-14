@@ -109,6 +109,11 @@ namespace ElasticLinq.Request.Formatters
             if (searchRequest.From > 0)
                 root.Add("from", searchRequest.From);
 
+            if (searchRequest.Highlight != null)
+                root.Add("highlight", Build(searchRequest.Highlight));
+
+
+
             long? size = searchRequest.Size ?? connection.Options.SearchSizeDefault;
             if (size.HasValue)
                 root.Add("size", size.Value);
@@ -237,6 +242,9 @@ namespace ElasticLinq.Request.Formatters
             if (criteria is BoolCriteria)
                 return Build((BoolCriteria)criteria);
 
+            if (criteria is HighlightCriteria)
+                return Build((HighlightCriteria) criteria);
+
             // Base class formatters using name property
 
             if (criteria is SingleFieldCriteria)
@@ -246,6 +254,28 @@ namespace ElasticLinq.Request.Formatters
                 return Build((CompoundCriteria)criteria);
 
             throw new InvalidOperationException(String.Format("Unknown criteria type {0}", criteria.GetType()));
+        }
+
+        private static JObject Build(HighlightCriteria criteria)
+        {
+            var fields = new JObject();
+
+            if (criteria.Fields.Any())
+                foreach (var field in criteria.Fields)
+                {
+                    fields.Add(new JProperty(field,new JObject()));
+                }
+
+            var queryStringCriteria = new JObject(new JProperty("fields",fields));
+            if (criteria.Config != null)
+            {
+                var conf = criteria.Config;
+                if (!String.IsNullOrWhiteSpace(conf.PostTag))
+                    queryStringCriteria.Add(new JProperty("post_tags", new JArray(conf.PostTag)));
+                if (!String.IsNullOrWhiteSpace(conf.PreTag))
+                    queryStringCriteria.Add(new JProperty("pre_tags", new JArray(conf.PreTag)));
+            }
+            return queryStringCriteria;
         }
 
         private static JObject Build(QueryStringCriteria criteria)

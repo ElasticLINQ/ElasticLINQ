@@ -71,6 +71,10 @@ namespace ElasticLinq.Request.Visitors
 
             if (materializer == null)
                 materializer = new ListHitsElasticMaterializer(itemProjector ?? DefaultItemProjector, finalItemType ?? sourceType);
+            else if (materializer is ChainMaterializer && ((ChainMaterializer)materializer).Next==null)
+                ((ChainMaterializer)materializer).Next = new ListHitsElasticMaterializer(itemProjector ?? DefaultItemProjector, finalItemType ?? sourceType);
+
+                
         }
 
         private void CompleteFacetTranslation(FacetRebindCollectionResult aggregated)
@@ -134,9 +138,23 @@ namespace ElasticLinq.Request.Visitors
                     if (m.Arguments.Count == 2)
                         return VisitMinimumScore(m.Arguments[0], m.Arguments[1]);
                     break;
+                case "Highlight":
+                    if (m.Arguments.Count == 3)
+                        return VisitHighlight(m.Arguments[0], m.Arguments[1],m.Arguments[2]);
+                    break;
             }
 
             throw new NotSupportedException(string.Format("ElasticQuery.{0} method is not supported", m.Method.Name));
+        }
+
+        private Expression VisitHighlight(Expression source, Expression highlightExpression,Expression configExpression)
+        {
+            var config = ((ConstantExpression)configExpression).Value as HighlightConfig;
+            
+            searchRequest.Highlight = new HighlightCriteria(config, Mapping.GetFieldName(Prefix,(MemberExpression)((LambdaExpression)((UnaryExpression)highlightExpression).Operand).Body));
+            
+            materializer = new HighlightElasticMaterializer(materializer);
+            return Visit(source);
         }
 
         private Expression VisitMinimumScore(Expression source, Expression minScoreExpression)
