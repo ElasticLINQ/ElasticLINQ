@@ -150,8 +150,9 @@ namespace ElasticLinq.Request.Visitors
         private Expression VisitHighlight(Expression source, Expression highlightExpression,Expression configExpression)
         {
             var config = ((ConstantExpression)configExpression).Value as HighlightConfig;
-            
-            searchRequest.Highlight = new HighlightCriteria(config, Mapping.GetFieldName(Prefix,(MemberExpression)((LambdaExpression)((UnaryExpression)highlightExpression).Operand).Body));
+            if (config==null) config = new HighlightConfig();
+            config.AddField( Mapping.GetFieldName(Prefix,(MemberExpression)((LambdaExpression)((UnaryExpression)highlightExpression).Operand).Body));
+            searchRequest.Highlight = config;
             
             materializer = new HighlightElasticMaterializer(materializer);
             return Visit(source);

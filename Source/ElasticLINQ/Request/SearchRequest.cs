@@ -3,6 +3,7 @@
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Facets;
 using System.Collections.Generic;
+using ElasticLinq.Utility;
 
 namespace ElasticLinq.Request
 {
@@ -79,6 +80,6 @@ namespace ElasticLinq.Request
         /// </summary>
         public double? MinScore { get; set; }
 
-        public ICriteria Highlight { get; set; }
+        public HighlightConfig Highlight { get; set; }
     }
 }
