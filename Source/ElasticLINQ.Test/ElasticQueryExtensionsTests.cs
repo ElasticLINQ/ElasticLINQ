@@ -200,6 +200,26 @@ namespace ElasticLinq.Test
 
         }
 
+        [Fact]
+        public static void HighlightQuery_ReturnsJSON_CallChain_ConfigInLast()
+        {
+            var query = new TestableElasticContext().Query<MultiPropertySample>().Highlight(e => e.Property1, new HighlightConfig()
+                                                                                                              {
+                                                                                                                  PreTag = "<a>"
+                                                                                                                  
+                                                                                                              }).Highlight(e => e.Property2, new HighlightConfig()
+                                                                                                                                          {
+                                                                                                                                              PreTag = "<b>",
+                                                                                                                                              PostTag = "<c>"
+                                                                                                                                          });
+            var info = query.ToQueryInfo().Query;
+
+            Assert.Contains("\"pre_tags\":[\"<b>\"]", info);
+            Assert.Contains("\"post_tags\":[\"<c>\"]", info);
+            Assert.DoesNotContain("\"pre_tags\":[\"<a>\"]",info);
+
+        }
+
         private static void AssertIsAddedToExpressionTree<TSequence, TElement>(TSequence source, Func<TSequence, TSequence> method, string methodName)
             where TSequence : IQueryable<TElement>
         {
