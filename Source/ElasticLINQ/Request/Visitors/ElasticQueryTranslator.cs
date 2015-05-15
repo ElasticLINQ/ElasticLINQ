@@ -71,10 +71,10 @@ namespace ElasticLinq.Request.Visitors
 
             if (materializer == null)
                 materializer = new ListHitsElasticMaterializer(itemProjector ?? DefaultItemProjector, finalItemType ?? sourceType);
-            else if (materializer is ChainMaterializer && ((ChainMaterializer)materializer).Next==null)
+            else if (materializer is ChainMaterializer && ((ChainMaterializer)materializer).Next == null)
                 ((ChainMaterializer)materializer).Next = new ListHitsElasticMaterializer(itemProjector ?? DefaultItemProjector, finalItemType ?? sourceType);
 
-                
+
         }
 
         private void CompleteFacetTranslation(FacetRebindCollectionResult aggregated)
@@ -140,21 +140,36 @@ namespace ElasticLinq.Request.Visitors
                     break;
                 case "Highlight":
                     if (m.Arguments.Count == 3)
-                        return VisitHighlight(m.Arguments[0], m.Arguments[1],m.Arguments[2]);
+                        return VisitHighlight(m.Arguments[0], m.Arguments[1], m.Arguments[2]);
                     break;
             }
 
             throw new NotSupportedException(string.Format("ElasticQuery.{0} method is not supported", m.Method.Name));
         }
 
-        private Expression VisitHighlight(Expression source, Expression highlightExpression,Expression configExpression)
+        private Expression VisitHighlight(Expression source, Expression highlightExpression, Expression configExpression)
         {
-            var config = ((ConstantExpression)configExpression).Value as HighlightConfig;
-            if (config==null) config = new HighlightConfig();
-            config.AddField( Mapping.GetFieldName(Prefix,(MemberExpression)((LambdaExpression)((UnaryExpression)highlightExpression).Operand).Body));
-            searchRequest.Highlight = config;
-            
-            materializer = new HighlightElasticMaterializer(materializer);
+            var unaryExpression = highlightExpression as UnaryExpression;
+            if (unaryExpression == null) throw new NotSupportedException("Highligh expression must point only one property");
+
+            var lambdaExpression = unaryExpression.Operand as LambdaExpression;
+            if (lambdaExpression == null) throw new NotSupportedException("Highligh expression must be lambda");
+
+            var bodyExpression = lambdaExpression.Body as MemberExpression;
+            if (bodyExpression == null) throw new NotSupportedException("Highligh expression must select a member");
+
+            var config = (HighlightConfig)((ConstantExpression)configExpression).Value;
+            config.AddField(Mapping.GetFieldName(Prefix, bodyExpression));
+
+            /*Support to highlight call chain*/
+            if (searchRequest.Highlight == null)
+            {
+                searchRequest.Highlight = config;
+                materializer = new HighlightElasticMaterializer(materializer);
+            }
+            else
+                searchRequest.Highlight.AddFieldRange(config.Fields.ToArray());
+
             return Visit(source);
         }
 
@@ -162,7 +177,7 @@ namespace ElasticLinq.Request.Visitors
         {
             if (minScoreExpression is ConstantExpression)
             {
-                searchRequest.MinScore = Convert.ToDouble(((ConstantExpression) minScoreExpression).Value);
+                searchRequest.MinScore = Convert.ToDouble(((ConstantExpression)minScoreExpression).Value);
                 return Visit(source);
             }
 
