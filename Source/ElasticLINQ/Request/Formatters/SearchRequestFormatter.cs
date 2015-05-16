@@ -242,9 +242,6 @@ namespace ElasticLinq.Request.Formatters
             if (criteria is BoolCriteria)
                 return Build((BoolCriteria)criteria);
 
-            if (criteria is HighlightCriteria)
-                return Build((HighlightCriteria) criteria);
-
             // Base class formatters using name property
 
             if (criteria is SingleFieldCriteria)
@@ -256,25 +253,21 @@ namespace ElasticLinq.Request.Formatters
             throw new InvalidOperationException(String.Format("Unknown criteria type {0}", criteria.GetType()));
         }
 
-        private static JObject Build(HighlightCriteria criteria)
+        private static JObject Build(HighlightConfig config)
         {
             var fields = new JObject();
 
-            if (criteria.Fields.Any())
-                foreach (var field in criteria.Fields)
+            if (config.Fields.Any())
+                foreach (var field in config.Fields)
                 {
-                    fields.Add(new JProperty(field,new JObject()));
+                    fields.Add(new JProperty(field, new JObject()));
                 }
 
-            var queryStringCriteria = new JObject(new JProperty("fields",fields));
-            if (criteria.Config != null)
-            {
-                var conf = criteria.Config;
-                if (!String.IsNullOrWhiteSpace(conf.PostTag))
-                    queryStringCriteria.Add(new JProperty("post_tags", new JArray(conf.PostTag)));
-                if (!String.IsNullOrWhiteSpace(conf.PreTag))
-                    queryStringCriteria.Add(new JProperty("pre_tags", new JArray(conf.PreTag)));
-            }
+            var queryStringCriteria = new JObject(new JProperty("fields", fields));
+            if (!String.IsNullOrWhiteSpace(config.PostTag))
+                queryStringCriteria.Add(new JProperty("post_tags", new JArray(config.PostTag)));
+            if (!String.IsNullOrWhiteSpace(config.PreTag))
+                queryStringCriteria.Add(new JProperty("pre_tags", new JArray(config.PreTag)));
             return queryStringCriteria;
         }
 

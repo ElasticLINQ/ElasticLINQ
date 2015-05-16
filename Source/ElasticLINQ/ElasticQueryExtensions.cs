@@ -1,5 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using System.CodeDom;
 using System.Diagnostics;
 using ElasticLinq.Request;
 using ElasticLinq.Utility;
@@ -134,8 +135,11 @@ namespace ElasticLinq
             return CreateQueryMethodCall(source, minimumScoreMethodInfo, Expression.Constant(score));
         }
 
-        public static IQueryable<TSource> Highlight<TSource, TKey>(this IQueryable<TSource> source, Expression<Func<TSource, TKey>> predicate, HighlightConfig config = null)
+        public static IQueryable<TSource> Highlight<TSource, TKey>(this IQueryable<TSource> source, Expression<Func<TSource, TKey>> predicate, HighlightConfig config=null)
         {
+            Argument.EnsureNotNull("source", source);
+            Argument.EnsureNotNull("predicate", predicate);
+            if (config==null) config = new HighlightConfig();
             return CreateQueryMethodCall<TSource, TKey>(source, highlightScoreMethodInfo, Expression.Quote(predicate), Expression.Constant(config));
         }
 
