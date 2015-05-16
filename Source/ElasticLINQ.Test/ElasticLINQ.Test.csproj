@@ -122,6 +122,7 @@
     <Compile Include="Response\Materializers\AggregatesTests.cs" />
     <Compile Include="Response\Materializers\AnyElasticMaterializerTests.cs" />
     <Compile Include="Response\Materializers\CountElasticMaterializerTests.cs" />
+    <Compile Include="Response\Materializers\HighlightMaterializerTests.cs" />
     <Compile Include="Response\Materializers\TermlessFacetsElasticMaterializerTests.cs" />
     <Compile Include="Response\Materializers\ListTermlessFacetsElasticMaterializerTests.cs" />
     <Compile Include="Response\Materializers\ListTermFacetsElasticMaterializerTests.cs" />

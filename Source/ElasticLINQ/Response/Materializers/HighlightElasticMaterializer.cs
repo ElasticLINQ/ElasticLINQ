@@ -27,7 +27,7 @@ namespace ElasticLinq.Response.Materializers
                 }
             }
             
-            return Next.Materialize(response);
+            return base.Materialize(response);
         }
     }
 }

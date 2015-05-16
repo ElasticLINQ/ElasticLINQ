@@ -24,7 +24,7 @@ namespace ElasticLinq.Response.Materializers
         /// <returns>Return result of previous materializer, previously processed by self</returns>
         public virtual object Materialize(ElasticResponse response)
         {
-            Argument.EnsureNotNull("Next materializer",Next);
+            Argument.EnsureNotNull("Next materializer must be setted.",Next);
 
             return Next.Materialize(response);
         }

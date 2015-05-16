@@ -16,12 +16,22 @@ namespace ElasticLinq.Test.Response.Materializers
             return Enumerable.Range(0, count).Select(i => i.ToString(CultureInfo.InvariantCulture)).Select(CreateHit).ToList();
         }
 
+        public static List<Hit> CreateSampleHitsWithHighlight(int count)
+        {
+            return Enumerable.Range(0, count).Select(i => i.ToString(CultureInfo.InvariantCulture)).Select(CreateHitWithHighlight).ToList();
+        }
+
         public static readonly Func<Hit, SampleClass> ItemCreator =
             h => new SampleClass { SampleField = (string)h.fields["someField"] };
 
         internal static ElasticResponse CreateSampleResponse(int count)
         {
-            return new ElasticResponse { hits = new Hits { hits = CreateSampleHits(count), total = count} };
+            return new ElasticResponse { hits = new Hits { hits = CreateSampleHits(count), total = count } };
+        }
+
+        internal static ElasticResponse CreateSampleResponseWithHighlight(int count)
+        {
+            return new ElasticResponse { hits = new Hits { hits = CreateSampleHitsWithHighlight(count), total = count } };
         }
 
         public static Hit CreateHit(string sampleField)
@@ -29,6 +39,15 @@ namespace ElasticLinq.Test.Response.Materializers
             return new Hit
             {
                 fields = new Dictionary<string, JToken> { { "someField", new JProperty("a", sampleField).Value } }
+            };
+        }
+
+        public static Hit CreateHitWithHighlight(string sampleField)
+        {
+            return new Hit
+            {
+                _source = new JObject(new JProperty("someField", new JProperty("a", sampleField).Value)),
+                highlight = new JObject(new JProperty("sampleField", new JArray("a", "b")))
             };
         }
     }
