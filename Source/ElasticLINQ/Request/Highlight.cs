@@ -22,7 +22,7 @@ namespace ElasticLinq.Request
 
         public ReadOnlyCollection<string> Fields
         {
-            get { return fields.AsReadOnly(); }
+            get { return new ReadOnlyCollection<string>(fields); }
         }
     }
 }

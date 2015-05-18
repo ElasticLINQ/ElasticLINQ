@@ -62,7 +62,7 @@ namespace ElasticLinq.Test.Request
         }
 
         [Fact]
-        public static void NonSuccessfulHttpRequestThrows()
+        public static async void NonSuccessfulHttpRequestThrows()
         {
             var messageHandler = new SpyMessageHandler();
             messageHandler.Response.StatusCode = HttpStatusCode.NotFound;
@@ -70,7 +70,7 @@ namespace ElasticLinq.Test.Request
             var processor = new ElasticRequestProcessor(localConnection, mapping, log, retryPolicy);
             var request = new SearchRequest { DocumentType = "docType" };
 
-            var ex = Record.Exception(() => processor.SearchAsync(request).GetAwaiter().GetResult());
+            var ex = await Record.ExceptionAsync(() => processor.SearchAsync(request));
 
             Assert.IsType<HttpRequestException>(ex);
             Assert.Equal("Response status code does not indicate success: 404 (Not Found).", ex.Message);

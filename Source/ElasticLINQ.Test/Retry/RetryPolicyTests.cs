@@ -63,7 +63,7 @@ namespace ElasticLinq.Test.Retry
         }
 
         [Fact]
-        public static void Throws_WhenExceptionIsNotRetryable()
+        public static async void Throws_WhenExceptionIsNotRetryable()
         {
             var fake = Substitute.For<IFake>();
             var ex = new Exception();
@@ -73,7 +73,7 @@ namespace ElasticLinq.Test.Retry
             var delay = Substitute.For<Delay>();
             var retryHandler = new RetryPolicy(logger, 100, 10, delay);
 
-            var actualEx = Record.Exception(() => retryHandler.ExecuteAsync(fake.DoSomething, fake.IsRetryable).GetAwaiter().GetResult());
+            var actualEx = await Record.ExceptionAsync(() => retryHandler.ExecuteAsync(fake.DoSomething, fake.IsRetryable));
 
             Assert.Equal(ex, actualEx);
         }
@@ -140,7 +140,7 @@ namespace ElasticLinq.Test.Retry
         }
 
         [Fact]
-        public static void Throws_IfRetriesAreExhausted()
+        public static async void Throws_IfRetriesAreExhausted()
         {
             var fake = Substitute.For<IFake>();
             fake.DoSomething().ReturnsTask(1337, 1337);
@@ -150,7 +150,7 @@ namespace ElasticLinq.Test.Retry
             var delay = Substitute.For<Delay>();
             var retryHandler = new RetryPolicy(logger, 100, 2, delay);
 
-            var ex = Assert.Throws<RetryFailedException>(() => retryHandler.ExecuteAsync(fake.DoSomething, fake.IsRetryable).GetAwaiter().GetResult());
+            var ex = await Assert.ThrowsAsync<RetryFailedException>(() => retryHandler.ExecuteAsync(fake.DoSomething, fake.IsRetryable));
             Assert.Equal("The operation did not succeed after the maximum number of retries (2).", ex.Message);
         }
 
