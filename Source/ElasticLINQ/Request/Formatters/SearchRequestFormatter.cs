@@ -109,6 +109,11 @@ namespace ElasticLinq.Request.Formatters
             if (searchRequest.From > 0)
                 root.Add("from", searchRequest.From);
 
+            if (searchRequest.Highlight != null)
+                root.Add("highlight", Build(searchRequest.Highlight));
+
+
+
             long? size = searchRequest.Size ?? connection.Options.SearchSizeDefault;
             if (size.HasValue)
                 root.Add("size", size.Value);
@@ -246,6 +251,24 @@ namespace ElasticLinq.Request.Formatters
                 return Build((CompoundCriteria)criteria);
 
             throw new InvalidOperationException(String.Format("Unknown criteria type {0}", criteria.GetType()));
+        }
+
+        private static JObject Build(HighlightConfig config)
+        {
+            var fields = new JObject();
+
+            if (config.Fields.Any())
+                foreach (var field in config.Fields)
+                {
+                    fields.Add(new JProperty(field, new JObject()));
+                }
+
+            var queryStringCriteria = new JObject(new JProperty("fields", fields));
+            if (!String.IsNullOrWhiteSpace(config.PostTag))
+                queryStringCriteria.Add(new JProperty("post_tags", new JArray(config.PostTag)));
+            if (!String.IsNullOrWhiteSpace(config.PreTag))
+                queryStringCriteria.Add(new JProperty("pre_tags", new JArray(config.PreTag)));
+            return queryStringCriteria;
         }
 
         private static JObject Build(QueryStringCriteria criteria)

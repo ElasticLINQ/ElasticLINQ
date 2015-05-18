@@ -4,6 +4,7 @@ using ElasticLinq.Test.TestSupport;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
+using ElasticLinq.Utility;
 using Xunit;
 
 namespace ElasticLinq.Test
@@ -33,7 +34,7 @@ namespace ElasticLinq.Test
         {
             var source = new FakeQueryProvider().CreateQuery<Sample>();
 
-            Assert.Throws<ArgumentNullException>(() => ElasticQueryExtensions.QueryString<Sample>(null, ""));            
+            Assert.Throws<ArgumentNullException>(() => ElasticQueryExtensions.QueryString<Sample>(null, ""));
             Assert.Throws<ArgumentNullException>(() => source.QueryString(null));
         }
 
@@ -152,6 +153,71 @@ namespace ElasticLinq.Test
             var ex = Assert.Throws<ArgumentException>(() => query.ToQueryInfo());
             Assert.True(ex.Message.StartsWith("Query must be of type IElasticQuery<> to call ToQueryInfo()"));
             Assert.Equal("source", ex.ParamName);
+        }
+        [Fact]
+        public static void HighlightQuery_Throws()
+        {
+            Assert.Throws<ArgumentNullException>(() => ElasticQueryExtensions.Highlight<Sample, String>(null, null));
+            Assert.Throws<ArgumentNullException>(() => ElasticQueryExtensions.Highlight<Sample, String>(null, (e) => e.Property));
+
+            var query = new TestableElasticContext().Query<Sample>().Highlight(e => (e.Property.Equals("")).ToString());
+            Assert.Throws<NotSupportedException>(() => query.ToList());
+        }
+        [Fact]
+        public static void HighlightQuery_ReturnsJSON()
+        {
+            var query = new TestableElasticContext().Query<Sample>().Highlight(e => e.Property);
+            var info = query.ToQueryInfo().Query;
+
+            Assert.Contains("{\"highlight\":{\"fields\":{\"property\":{}}}}",info);
+        }
+
+        [Fact]
+        public static void HighlightQuery_ReturnsJSON_WithConfig_Tags()
+        {
+            var query = new TestableElasticContext().Query<Sample>().Highlight(e => e.Property,new HighlightConfig()
+                                                                                               {
+                                                                                                  PostTag = "<a>",
+                                                                                                  PreTag = "<b>"
+                                                                                               });
+            var info = query.ToQueryInfo().Query;
+
+            Assert.Contains( "\"post_tags\":[\"<a>\"]",info);
+            Assert.Contains( "\"pre_tags\":[\"<b>\"]",info);
+        }
+        public class MultiPropertySample
+        {
+            public String Property1 { get; set; }
+            public String Property2 { get; set; } 
+        }
+        [Fact]
+        public static void HighlightQuery_ReturnsJSON_CallChain()
+        {
+            var query = new TestableElasticContext().Query<MultiPropertySample>().Highlight(e => e.Property1).Highlight(e=>e.Property2);
+            var info = query.ToQueryInfo().Query;
+
+            Assert.Contains("\"fields\":{\"property2\":{},\"property1\":{}}",info);
+
+        }
+
+        [Fact]
+        public static void HighlightQuery_ReturnsJSON_CallChain_ConfigInLast()
+        {
+            var query = new TestableElasticContext().Query<MultiPropertySample>().Highlight(e => e.Property1, new HighlightConfig()
+                                                                                                              {
+                                                                                                                  PreTag = "<a>"
+                                                                                                                  
+                                                                                                              }).Highlight(e => e.Property2, new HighlightConfig()
+                                                                                                                                          {
+                                                                                                                                              PreTag = "<b>",
+                                                                                                                                              PostTag = "<c>"
+                                                                                                                                          });
+            var info = query.ToQueryInfo().Query;
+
+            Assert.Contains("\"pre_tags\":[\"<b>\"]", info);
+            Assert.Contains("\"post_tags\":[\"<c>\"]", info);
+            Assert.DoesNotContain("\"pre_tags\":[\"<a>\"]",info);
+
         }
 
         private static void AssertIsAddedToExpressionTree<TSequence, TElement>(TSequence source, Func<TSequence, TSequence> method, string methodName)

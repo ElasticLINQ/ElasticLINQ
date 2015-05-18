@@ -1,5 +1,7 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using System.CodeDom;
+using System.Diagnostics;
 using ElasticLinq.Request;
 using ElasticLinq.Utility;
 using System;
@@ -133,6 +135,14 @@ namespace ElasticLinq
             return CreateQueryMethodCall(source, minimumScoreMethodInfo, Expression.Constant(score));
         }
 
+        public static IQueryable<TSource> Highlight<TSource, TKey>(this IQueryable<TSource> source, Expression<Func<TSource, TKey>> predicate, HighlightConfig config=null)
+        {
+            Argument.EnsureNotNull("source", source);
+            Argument.EnsureNotNull("predicate", predicate);
+            if (config==null) config = new HighlightConfig();
+            return CreateQueryMethodCall<TSource, TKey>(source, highlightScoreMethodInfo, Expression.Quote(predicate), Expression.Constant(config));
+        }
+
         /// <summary>
         /// Return information about a <see cref="IElasticQuery{T}"/> including the JSON that would be submitted to Elasticsearch.
         /// </summary>
@@ -157,6 +167,7 @@ namespace ElasticLinq
         private static readonly MethodInfo thenByScoreMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "ThenByScore");
         private static readonly MethodInfo thenByScoreDescendingMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "ThenByScoreDescending");
         private static readonly MethodInfo minimumScoreMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "MinScore");
+        private static readonly MethodInfo highlightScoreMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "Highlight");
 
         /// <summary>
         /// Creates an expression to call a generic version of the given method with the source and arguments as parameters..
@@ -172,6 +183,15 @@ namespace ElasticLinq
             Argument.EnsureNotNull("method", source);
 
             var callExpression = Expression.Call(null, method.MakeGenericMethod(typeof(TSource)), new[] { source.Expression }.Concat(arguments));
+            return source.Provider.CreateQuery<TSource>(callExpression);
+        }
+
+        private static IQueryable<TSource> CreateQueryMethodCall<TSource, TKey>(IQueryable<TSource> source, MethodInfo method, params Expression[] arguments)
+        {
+            Argument.EnsureNotNull("source", source);
+            Argument.EnsureNotNull("method", source);
+
+            var callExpression = Expression.Call(null, method.MakeGenericMethod(typeof(TSource), typeof(TKey)), new[] { source.Expression }.Concat(arguments));
             return source.Provider.CreateQuery<TSource>(callExpression);
         }
     }

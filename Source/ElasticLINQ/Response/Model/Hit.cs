@@ -17,6 +17,7 @@ namespace ElasticLinq.Response.Model
         public string _type;
         public string _id;
         public double? _score;
+        public JObject highlight;
 
         public JObject _source;
         public Dictionary<String, JToken> fields = new Dictionary<string, JToken>();
