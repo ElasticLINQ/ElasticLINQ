@@ -1,7 +1,5 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
-using System.CodeDom;
-using System.Diagnostics;
 using ElasticLinq.Request;
 using ElasticLinq.Utility;
 using System;
@@ -127,7 +125,7 @@ namespace ElasticLinq
         /// <returns>
         /// An <see cref="T:System.Linq.IQueryable`1"/> whose elements have a score greater or equal to the score specified.
         /// </returns>
-        /// <param name="source">A sequence of values to order.</param>
+        /// <param name="source">A sequence of values to apply a minimum score to.</param>
         /// <param name="score">The minimal acceptable score for results.</param>
         /// <exception cref="T:System.ArgumentNullException"><paramref name="source"/> is null.</exception>
         public static IQueryable<TSource> MinScore<TSource>(this IQueryable<TSource> source, double score)
@@ -135,12 +133,21 @@ namespace ElasticLinq
             return CreateQueryMethodCall(source, minimumScoreMethodInfo, Expression.Constant(score));
         }
 
-        public static IQueryable<TSource> Highlight<TSource, TKey>(this IQueryable<TSource> source, Expression<Func<TSource, TKey>> predicate, HighlightConfig config=null)
+        /// <summary>
+        /// Specifies highlighting for search results.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="T:System.Linq.IQueryable`1"/> with elements containing hightlights as specified.
+        /// </returns>
+        /// <param name="source">A sequence of values to order.</param>
+        /// <param name="predicate">A function to test each element for a condition.</param>
+        /// <param name="highlight">Highlight specification to apply to search.</param>
+        /// <exception cref="T:System.ArgumentNullException"><paramref name="source"/> or <paramref name="predicate"/> is null.</exception>
+        public static IQueryable<TSource> Highlight<TSource, TKey>(this IQueryable<TSource> source, Expression<Func<TSource, TKey>> predicate, Highlight highlight = null)
         {
             Argument.EnsureNotNull("source", source);
             Argument.EnsureNotNull("predicate", predicate);
-            if (config==null) config = new HighlightConfig();
-            return CreateQueryMethodCall<TSource, TKey>(source, highlightScoreMethodInfo, Expression.Quote(predicate), Expression.Constant(config));
+            return CreateQueryMethodCall<TSource, TKey>(source, highlightScoreMethodInfo, Expression.Quote(predicate), Expression.Constant(highlight ?? new Highlight()));
         }
 
         /// <summary>
@@ -174,9 +181,9 @@ namespace ElasticLinq
         /// </summary>
         /// <typeparam name="TSource">Element type of the query derived from the IQueryable source.</typeparam>
         /// <param name="source">IQueryable source to use as the first parameter for the given method.</param>
-        /// <param name="method">Method to call </param>
-        /// <param name="arguments"></param>
-        /// <returns></returns>
+        /// <param name="method">MethodInfo of the method to call.</param>
+        /// <param name="arguments">Expressions that should be passed to the method as arguments.</param>
+        /// <returns>IQueryable that contains the query with the method call inserted into the query chain.</returns>
         private static IQueryable<TSource> CreateQueryMethodCall<TSource>(IQueryable<TSource> source, MethodInfo method, params Expression[] arguments)
         {
             Argument.EnsureNotNull("source", source);

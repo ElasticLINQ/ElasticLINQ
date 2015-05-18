@@ -257,21 +257,20 @@ namespace ElasticLinq.Request.Formatters
             throw new InvalidOperationException(String.Format("Unknown criteria type {0}", criteria.GetType()));
         }
 
-        private static JObject Build(HighlightConfig config)
+        private static JObject Build(Highlight highlight)
         {
             var fields = new JObject();
 
-            if (config.Fields.Any())
-                foreach (var field in config.Fields)
-                {
-                    fields.Add(new JProperty(field, new JObject()));
-                }
+            foreach (var field in highlight.Fields)
+                fields.Add(new JProperty(field, new JObject()));
 
             var queryStringCriteria = new JObject(new JProperty("fields", fields));
-            if (!String.IsNullOrWhiteSpace(config.PostTag))
-                queryStringCriteria.Add(new JProperty("post_tags", new JArray(config.PostTag)));
-            if (!String.IsNullOrWhiteSpace(config.PreTag))
-                queryStringCriteria.Add(new JProperty("pre_tags", new JArray(config.PreTag)));
+
+            if (!String.IsNullOrWhiteSpace(highlight.PostTag))
+                queryStringCriteria.Add(new JProperty("post_tags", new JArray(highlight.PostTag)));
+            if (!String.IsNullOrWhiteSpace(highlight.PreTag))
+                queryStringCriteria.Add(new JProperty("pre_tags", new JArray(highlight.PreTag)));
+            
             return queryStringCriteria;
         }
 

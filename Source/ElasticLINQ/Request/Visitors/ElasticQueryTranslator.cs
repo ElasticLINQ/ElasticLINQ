@@ -73,8 +73,6 @@ namespace ElasticLinq.Request.Visitors
                 materializer = new ListHitsElasticMaterializer(itemProjector ?? DefaultItemProjector, finalItemType ?? sourceType);
             else if (materializer is ChainMaterializer && ((ChainMaterializer)materializer).Next == null)
                 ((ChainMaterializer)materializer).Next = new ListHitsElasticMaterializer(itemProjector ?? DefaultItemProjector, finalItemType ?? sourceType);
-
-
         }
 
         private void CompleteFacetTranslation(FacetRebindCollectionResult aggregated)
@@ -150,25 +148,22 @@ namespace ElasticLinq.Request.Visitors
         private Expression VisitHighlight(Expression source, Expression highlightExpression, Expression configExpression)
         {
             var unaryExpression = highlightExpression as UnaryExpression;
-            if (unaryExpression == null) throw new NotSupportedException("Highligh expression must point only one property");
+            if (unaryExpression == null) throw new NotSupportedException("Highlight expression specify only one property");
 
             var lambdaExpression = unaryExpression.Operand as LambdaExpression;
-            if (lambdaExpression == null) throw new NotSupportedException("Highligh expression must be lambda");
+            if (lambdaExpression == null) throw new NotSupportedException("Highlight expression must be lambda");
 
             var bodyExpression = lambdaExpression.Body as MemberExpression;
-            if (bodyExpression == null) throw new NotSupportedException("Highligh expression must select a member");
+            if (bodyExpression == null) throw new NotSupportedException("Highlight expression must select a member");
 
-            var config = (HighlightConfig)((ConstantExpression)configExpression).Value;
-            config.AddField(Mapping.GetFieldName(Prefix, bodyExpression));
-
-            /*Support to highlight call chain*/
+            // Highlighting is inserted into the materialization chain
             if (searchRequest.Highlight == null)
             {
-                searchRequest.Highlight = config;
+                searchRequest.Highlight = (Highlight)((ConstantExpression)configExpression).Value;
                 materializer = new HighlightElasticMaterializer(materializer);
             }
-            else
-                searchRequest.Highlight.AddFieldRange(config.Fields.ToArray());
+
+            searchRequest.Highlight.AddFields(Mapping.GetFieldName(Prefix, bodyExpression));
 
             return Visit(source);
         }

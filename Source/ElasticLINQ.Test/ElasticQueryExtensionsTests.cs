@@ -4,23 +4,25 @@ using ElasticLinq.Test.TestSupport;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
-using ElasticLinq.Utility;
+using ElasticLinq.Request;
 using Xunit;
 
 namespace ElasticLinq.Test
 {
     public class ElasticQueryExtensionsTests
     {
+        private static readonly IQueryable<Sample> testableSample = new TestableElasticContext().Query<Sample>();
+        private static readonly IQueryable<Sample> fakeSample = new FakeQueryProvider().CreateQuery<Sample>();
+
         private class Sample
         {
             public string Property { get; set; }
         }
 
         [Fact]
-        public void QueryIsAddedToExpressionTree()
+        public static void QueryIsAddedToExpressionTree()
         {
-            var source = new FakeQueryProvider().CreateQuery<Sample>();
-            var queried = source.Query(s => s.Property == "a");
+            var queried = fakeSample.Query(s => s.Property == "a");
 
             Assert.IsAssignableFrom<MethodCallExpression>(queried.Expression);
             var callExpression = (MethodCallExpression)queried.Expression;
@@ -30,20 +32,17 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
-        public void QueryString_GuardClauses()
+        public static void QueryString_GuardClauses()
         {
-            var source = new FakeQueryProvider().CreateQuery<Sample>();
-
             Assert.Throws<ArgumentNullException>(() => ElasticQueryExtensions.QueryString<Sample>(null, ""));
-            Assert.Throws<ArgumentNullException>(() => source.QueryString(null));
+            Assert.Throws<ArgumentNullException>(() => fakeSample.QueryString(null));
         }
 
         [Fact]
-        public void QueryStringIsAddedToExpressionTree()
+        public static void QueryStringIsAddedToExpressionTree()
         {
             const string expectedQueryString = "abcdef";
-            var source = new FakeQueryProvider().CreateQuery<Sample>();
-            var applied = source.QueryString(expectedQueryString);
+            var applied = fakeSample.QueryString(expectedQueryString);
 
             Assert.IsAssignableFrom<MethodCallExpression>(applied.Expression);
             var callExpression = (MethodCallExpression)applied.Expression;
@@ -54,24 +53,21 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
-        public void QueryStringWithFields_GuardClauses()
+        public static void QueryStringWithFields_GuardClauses()
         {
-            var source = new FakeQueryProvider().CreateQuery<Sample>();
-
             Assert.Throws<ArgumentNullException>(() => ElasticQueryExtensions.QueryString<Sample>(null, "", new[] { "one", "two" }));
-            Assert.Throws<ArgumentNullException>(() => source.QueryString(null, new[] { "one", "two" }));
-            Assert.Throws<ArgumentOutOfRangeException>(() => source.QueryString("hi", null));
-            Assert.Throws<ArgumentOutOfRangeException>(() => source.QueryString("hi", new string[] { }));
+            Assert.Throws<ArgumentNullException>(() => fakeSample.QueryString(null, new[] { "one", "two" }));
+            Assert.Throws<ArgumentOutOfRangeException>(() => fakeSample.QueryString("hi", null));
+            Assert.Throws<ArgumentOutOfRangeException>(() => fakeSample.QueryString("hi", new string[] { }));
         }
 
         [Fact]
-        public void QueryStringWithFieldsIsAddedToExpressionTree()
+        public static void QueryStringWithFieldsIsAddedToExpressionTree()
         {
             const string expectedQueryString = "abcdef";
             var expectedFields = new[] { "three", "four" };
 
-            var source = new FakeQueryProvider().CreateQuery<Sample>();
-            var applied = source.QueryString(expectedQueryString, expectedFields);
+            var applied = fakeSample.QueryString(expectedQueryString, expectedFields);
 
             Assert.IsAssignableFrom<MethodCallExpression>(applied.Expression);
             var callExpression = (MethodCallExpression)applied.Expression;
@@ -86,8 +82,7 @@ namespace ElasticLinq.Test
         [Fact]
         public void OrderByScoreIsAddedToExpressionTree()
         {
-            var source = new FakeQueryProvider().CreateQuery<Sample>();
-            AssertIsAddedToExpressionTree<IQueryable<Sample>, Sample>(source, ElasticQueryExtensions.OrderByScore, "OrderByScore");
+            AssertIsAddedToExpressionTree<IQueryable<Sample>, Sample>(fakeSample, ElasticQueryExtensions.OrderByScore, "OrderByScore");
         }
 
         [Fact]
@@ -99,8 +94,7 @@ namespace ElasticLinq.Test
         [Fact]
         public void OrderByScoreDescendingIsAddedToExpressionTree()
         {
-            var source = new FakeQueryProvider().CreateQuery<Sample>();
-            AssertIsAddedToExpressionTree<IQueryable<Sample>, Sample>(source, ElasticQueryExtensions.OrderByScoreDescending, "OrderByScoreDescending");
+            AssertIsAddedToExpressionTree<IQueryable<Sample>, Sample>(fakeSample, ElasticQueryExtensions.OrderByScoreDescending, "OrderByScoreDescending");
         }
 
         [Fact]
@@ -112,8 +106,7 @@ namespace ElasticLinq.Test
         [Fact]
         public void ThenByScoreIsAddedToExpressionTree()
         {
-            var source = new FakeQueryProvider().CreateQuery<Sample>().OrderByScore();
-            AssertIsAddedToExpressionTree<IOrderedQueryable<Sample>, Sample>(source, ElasticQueryExtensions.ThenByScore, "ThenByScore");
+            AssertIsAddedToExpressionTree<IOrderedQueryable<Sample>, Sample>(fakeSample.OrderByScore(), ElasticQueryExtensions.ThenByScore, "ThenByScore");
         }
 
         [Fact]
@@ -125,8 +118,7 @@ namespace ElasticLinq.Test
         [Fact]
         public void ThenByScoreDescendingIsAddedToExpressionTree()
         {
-            var source = new FakeQueryProvider().CreateQuery<Sample>().OrderByScore();
-            AssertIsAddedToExpressionTree<IOrderedQueryable<Sample>, Sample>(source, ElasticQueryExtensions.ThenByScoreDescending, "ThenByScoreDescending");
+            AssertIsAddedToExpressionTree<IOrderedQueryable<Sample>, Sample>(fakeSample.OrderByScore(), ElasticQueryExtensions.ThenByScoreDescending, "ThenByScoreDescending");
         }
 
         [Fact]
@@ -138,9 +130,7 @@ namespace ElasticLinq.Test
         [Fact]
         public static void WithElasticQuery_ToElasticSearchQuery_ReturnsJSON()
         {
-            var query = new TestableElasticContext().Query<Sample>();
-
-            var queryInfo = query.Where(x => x.Property == "2112").ToQueryInfo();
+            var queryInfo = testableSample.Where(x => x.Property == "2112").ToQueryInfo();
 
             Assert.Equal(@"{""filter"":{""term"":{""property"":""2112""}}}", queryInfo.Query);
         }
@@ -154,70 +144,62 @@ namespace ElasticLinq.Test
             Assert.True(ex.Message.StartsWith("Query must be of type IElasticQuery<> to call ToQueryInfo()"));
             Assert.Equal("source", ex.ParamName);
         }
+
         [Fact]
         public static void HighlightQuery_Throws()
         {
             Assert.Throws<ArgumentNullException>(() => ElasticQueryExtensions.Highlight<Sample, String>(null, null));
-            Assert.Throws<ArgumentNullException>(() => ElasticQueryExtensions.Highlight<Sample, String>(null, (e) => e.Property));
-
-            var query = new TestableElasticContext().Query<Sample>().Highlight(e => (e.Property.Equals("")).ToString());
-            Assert.Throws<NotSupportedException>(() => query.ToList());
+            Assert.Throws<ArgumentNullException>(() => ElasticQueryExtensions.Highlight<Sample, String>(null, e => e.Property));
+            Assert.Throws<NotSupportedException>(() => testableSample.Highlight(e => e.Property.Equals("").ToString()).ToList());
         }
-        [Fact]
-        public static void HighlightQuery_ReturnsJSON()
-        {
-            var query = new TestableElasticContext().Query<Sample>().Highlight(e => e.Property);
-            var info = query.ToQueryInfo().Query;
 
-            Assert.Contains("{\"highlight\":{\"fields\":{\"property\":{}}}}",info);
+        [Fact]
+        public static void HighlightQuery_SpecifiesField()
+        {
+            var body = testableSample.Highlight(e => e.Property).ToQueryInfo().Query;
+
+            Assert.Contains("{\"highlight\":{\"fields\":{\"property\":{}}}}", body);
         }
 
         [Fact]
         public static void HighlightQuery_ReturnsJSON_WithConfig_Tags()
         {
-            var query = new TestableElasticContext().Query<Sample>().Highlight(e => e.Property,new HighlightConfig()
-                                                                                               {
-                                                                                                  PostTag = "<a>",
-                                                                                                  PreTag = "<b>"
-                                                                                               });
-            var info = query.ToQueryInfo().Query;
+            var body = testableSample
+                .Highlight(e => e.Property, new Highlight { PostTag = "<a>", PreTag = "<b>" })
+                .ToQueryInfo().Query;
 
-            Assert.Contains( "\"post_tags\":[\"<a>\"]",info);
-            Assert.Contains( "\"pre_tags\":[\"<b>\"]",info);
+            Assert.Contains("\"post_tags\":[\"<a>\"]", body);
+            Assert.Contains("\"pre_tags\":[\"<b>\"]", body);
         }
+
         public class MultiPropertySample
         {
             public String Property1 { get; set; }
-            public String Property2 { get; set; } 
+            public String Property2 { get; set; }
         }
+
         [Fact]
         public static void HighlightQuery_ReturnsJSON_CallChain()
         {
-            var query = new TestableElasticContext().Query<MultiPropertySample>().Highlight(e => e.Property1).Highlight(e=>e.Property2);
-            var info = query.ToQueryInfo().Query;
+            var body = new TestableElasticContext().Query<MultiPropertySample>()
+                .Highlight(e => e.Property1)
+                .Highlight(e => e.Property2)
+                .ToQueryInfo().Query;
 
-            Assert.Contains("\"fields\":{\"property2\":{},\"property1\":{}}",info);
-
+            Assert.Contains("\"fields\":{\"property2\":{},\"property1\":{}}", body);
         }
 
         [Fact]
         public static void HighlightQuery_ReturnsJSON_CallChain_ConfigInLast()
         {
-            var query = new TestableElasticContext().Query<MultiPropertySample>().Highlight(e => e.Property1, new HighlightConfig()
-                                                                                                              {
-                                                                                                                  PreTag = "<a>"
-                                                                                                                  
-                                                                                                              }).Highlight(e => e.Property2, new HighlightConfig()
-                                                                                                                                          {
-                                                                                                                                              PreTag = "<b>",
-                                                                                                                                              PostTag = "<c>"
-                                                                                                                                          });
-            var info = query.ToQueryInfo().Query;
+            var body = new TestableElasticContext().Query<MultiPropertySample>()
+                .Highlight(e => e.Property1, new Highlight { PreTag = "<a>" })
+                .Highlight(e => e.Property2, new Highlight { PreTag = "<b>", PostTag = "<c>" })
+                .ToQueryInfo().Query;
 
-            Assert.Contains("\"pre_tags\":[\"<b>\"]", info);
-            Assert.Contains("\"post_tags\":[\"<c>\"]", info);
-            Assert.DoesNotContain("\"pre_tags\":[\"<a>\"]",info);
-
+            Assert.Contains("\"pre_tags\":[\"<b>\"]", body);
+            Assert.Contains("\"post_tags\":[\"<c>\"]", body);
+            Assert.DoesNotContain("\"pre_tags\":[\"<a>\"]", body);
         }
 
         private static void AssertIsAddedToExpressionTree<TSequence, TElement>(TSequence source, Func<TSequence, TSequence> method, string methodName)

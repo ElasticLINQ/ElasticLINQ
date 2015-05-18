@@ -130,7 +130,7 @@
     <Compile Include="Utility\AsyncHelper.cs" />
     <Compile Include="Utility\ExpressionExtensions.cs" />
     <Compile Include="Utility\ForcedAuthHandler.cs" />
-    <Compile Include="Utility\HighlighConfig.cs" />
+    <Compile Include="Request\Highlight.cs" />
     <Compile Include="Utility\TypeHelper.cs" />
     <Compile Include="Mapping\IElasticMapping.cs" />
     <Compile Include="Mapping\TrivialElasticMapping.cs" />
