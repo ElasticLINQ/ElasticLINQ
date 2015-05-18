@@ -58,13 +58,13 @@ namespace ElasticLinq.Test.Request.Facets
         [Fact]
         public void ConstructorThrowsArgumentOutOfRangeIfNoExpectedFields()
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => new TermsFacet(ExpectedName));
+            Assert.Throws<ArgumentOutOfRangeException>(() => new TermsFacet(ExpectedName, 10));
         }
 
         [Fact]
         public void TypePropertyIsAlwaysTerms()
         {
-            var facet = new TermsFacet(ExpectedName, expectedFields);
+            var facet = new TermsFacet(ExpectedName, 10, expectedFields);
 
             Assert.Equal("terms", facet.Type);
         }

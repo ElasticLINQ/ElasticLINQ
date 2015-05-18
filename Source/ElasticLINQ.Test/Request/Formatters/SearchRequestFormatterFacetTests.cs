@@ -25,7 +25,7 @@ namespace ElasticLinq.Test.Request.Formatters
         public void BodyContainsStatisticalFacet()
         {
             var expectedFacet = new StatisticalFacet("TotalSales", "OrderTotal");
-            var searchRequest = new SearchRequest { Facets = new List<IFacet>(new [] { expectedFacet }) };
+            var searchRequest = new SearchRequest { Facets = new List<IFacet>(new[] { expectedFacet }) };
 
             var formatter = new SearchRequestFormatter(defaultConnection, mapping, searchRequest);
             var body = JObject.Parse(formatter.Body);
@@ -51,16 +51,66 @@ namespace ElasticLinq.Test.Request.Formatters
         [Fact]
         public void BodyContainsTermsFacet()
         {
-            var expectedFacet = new TermsFacet("Totals", "OrderTotal", "OrderCost");
+            const int expectedSize = 1234;
+            var expectedFacet = new TermsFacet("Totals", expectedSize, "OrderTotal", "OrderCost");
             var searchRequest = new SearchRequest { Facets = new List<IFacet>(new[] { expectedFacet }) };
 
             var formatter = new SearchRequestFormatter(defaultConnection, mapping, searchRequest);
             var body = JObject.Parse(formatter.Body);
 
-            var actualFields = body.TraverseWithAssert("facets", expectedFacet.Name, expectedFacet.Type, "fields").ToArray();
+            var result = body.TraverseWithAssert("facets", expectedFacet.Name, expectedFacet.Type);
 
-            foreach(var expectedField in expectedFacet.Fields)
+            Assert.Equal(expectedSize.ToString(CultureInfo.InvariantCulture), result.TraverseWithAssert("size").ToString());
+
+            var actualFields = result.TraverseWithAssert("fields").ToArray();
+            foreach (var expectedField in expectedFacet.Fields)
                 Assert.Contains(expectedField, actualFields);
+        }
+
+        [Fact]
+        public void BodyContainsTermsFacetWithNoSizeWhenNotSpecified()
+        {
+            var expectedFacet = new TermsFacet("Totals", null, "OrderTotal");
+            var searchRequest = new SearchRequest { Facets = new List<IFacet>(new[] { expectedFacet }) };
+
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, searchRequest);
+            var body = JObject.Parse(formatter.Body);
+
+            var result = body.TraverseWithAssert("facets", expectedFacet.Name, expectedFacet.Type);
+
+            Assert.False(result.Contains("size"));
+        }
+
+        [Fact]
+        public void BodyContainsTermsFacetWithDefaultSizeFromConnection()
+        {
+            const int expectedSize = 678;
+            var sizedConnection = new ElasticConnection(defaultConnection.Endpoint, options:new ElasticConnectionOptions { SearchSizeDefault = expectedSize });
+            var expectedFacet = new TermsFacet("Totals", null, "OrderTotal", "OrderCost");
+            var searchRequest = new SearchRequest { Facets = new List<IFacet>(new[] { expectedFacet }) };
+
+            var formatter = new SearchRequestFormatter(sizedConnection, mapping, searchRequest);
+            var body = JObject.Parse(formatter.Body);
+
+            var result = body.TraverseWithAssert("facets", expectedFacet.Name, expectedFacet.Type);
+
+            Assert.Equal(expectedSize.ToString(CultureInfo.InvariantCulture), result.TraverseWithAssert("size").ToString());
+        }
+
+        [Fact]
+        public void BodyContainsTermsFacetWithSpecifiedSizeOverridingDefaultSizeFromConnection()
+        {
+            const int expectedSize = 678;
+            var sizedConnection = new ElasticConnection(defaultConnection.Endpoint, options: new ElasticConnectionOptions { SearchSizeDefault = 911 });
+            var expectedFacet = new TermsFacet("Totals", expectedSize, "OrderTotal", "OrderCost");
+            var searchRequest = new SearchRequest { Facets = new List<IFacet>(new[] { expectedFacet }) };
+
+            var formatter = new SearchRequestFormatter(sizedConnection, mapping, searchRequest);
+            var body = JObject.Parse(formatter.Body);
+
+            var result = body.TraverseWithAssert("facets", expectedFacet.Name, expectedFacet.Type);
+
+            Assert.Equal(expectedSize.ToString(CultureInfo.InvariantCulture), result.TraverseWithAssert("size").ToString());
         }
 
         [Fact]

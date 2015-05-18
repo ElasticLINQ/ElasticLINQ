@@ -100,7 +100,8 @@ namespace ElasticLinq.Request.Formatters
                 root.Add("query", Build(searchRequest.Query));
 
             // Filters are pushed down to the facets for aggregate queries
-            if (searchRequest.Filter != null && !searchRequest.Facets.Any())
+            var hasFacets = searchRequest.Facets.Any();
+            if (searchRequest.Filter != null && !hasFacets)
                 root.Add("filter", Build(searchRequest.Filter));
 
             if (searchRequest.SortOptions.Any())
@@ -115,11 +116,11 @@ namespace ElasticLinq.Request.Formatters
 
 
             long? size = searchRequest.Size ?? connection.Options.SearchSizeDefault;
-            if (size.HasValue)
+            if (size.HasValue && !hasFacets)
                 root.Add("size", size.Value);
 
             if (searchRequest.Facets.Any())
-                root.Add("facets", Build(searchRequest.Facets, searchRequest.Filter));
+                root.Add("facets", Build(searchRequest.Facets, searchRequest.Filter, size));
 
             if (connection.Timeout != TimeSpan.Zero)
                 root.Add("timeout", Format(connection.Timeout));
@@ -127,19 +128,22 @@ namespace ElasticLinq.Request.Formatters
             return root;
         }
 
-        private JToken Build(IEnumerable<IFacet> facets, ICriteria primaryFilter)
+        private JToken Build(IEnumerable<IFacet> facets, ICriteria primaryFilter, long? defaultSize)
         {
-            return new JObject(facets.Select(facet => Build(facet, primaryFilter)));
+            return new JObject(facets.Select(facet => Build(facet, primaryFilter, defaultSize)));
         }
 
-        private JProperty Build(IFacet facet, ICriteria primaryFilter)
+        private JProperty Build(IFacet facet, ICriteria primaryFilter, long? defaultSize)
         {
             Argument.EnsureNotNull("facet", facet);
 
             var specificBody = Build(facet);
-            var orderableFacet = facet as IOrderableFacet;
-            if (orderableFacet != null && orderableFacet.Size.HasValue)
-                specificBody["size"] = orderableFacet.Size.Value.ToString(transportCulture);
+            if (facet is IOrderableFacet)
+            {
+                var facetSize = ((IOrderableFacet)facet).Size ?? defaultSize;
+                if (facetSize.HasValue)
+                    specificBody["size"] = facetSize.Value.ToString(transportCulture);
+            }
 
             var namedBody = new JObject(new JProperty(facet.Type, specificBody));
 

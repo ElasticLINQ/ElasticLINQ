@@ -20,8 +20,8 @@ namespace ElasticLinq.Request.Facets
         private readonly ReadOnlyCollection<string> fields;
         private readonly int? size;
 
-        public TermsFacet(string name, params string[] fields)
-            : this(name, null, null, fields)
+        public TermsFacet(string name, int? size, params string[] fields)
+            : this(name, null, size, fields)
         {
         }
 
