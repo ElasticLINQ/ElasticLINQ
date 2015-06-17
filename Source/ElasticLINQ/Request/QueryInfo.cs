@@ -22,7 +22,7 @@ namespace ElasticLinq.Request
         }
 
         /// <summary>
-        /// Query body to be sent to Elasticsearch.
+        /// Query JSON body to be sent to Elasticsearch.
         /// </summary>
         public string Query { get { return query; } }
 

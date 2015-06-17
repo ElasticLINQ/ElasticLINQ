@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace ElasticLinq.Retry
 {
+    /// <summary>
+    /// Delay implementation that does not actually delay.
+    /// </summary>
     public class NullDelay : Delay
     {
         public static readonly new NullDelay Instance = new NullDelay();

@@ -11,6 +11,9 @@ namespace ElasticLinq.Mapping
     /// </summary>
     public class CouchbaseElasticMapping : ElasticMapping
     {
+        private const string TypeCriteriaMissingExceptionMessage = "Unable to determine document type selection criteria for type '{0}'. " +
+                                                                   "Ensure the type has a public read/write property that is non-nullable or marked with the Required attribute.";
+
         /// <summary>
         /// Initializes a new instance of the <see cref="CouchbaseElasticMapping"/> class.
         /// </summary>
@@ -34,8 +37,6 @@ namespace ElasticLinq.Mapping
         {
             return "couchbaseDocument";
         }
-
-        private const string TypeCriteriaMissingExceptionMessage = "Unable to determine document type selection criteria for type '{0}'. Ensure the type has a public read/write property that is non-nullable or marked with the Required attribute.";
 
         /// <inheritdoc/>
         public override ICriteria GetTypeSelectionCriteria(Type docType)

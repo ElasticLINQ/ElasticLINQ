@@ -4,6 +4,12 @@ using System.ComponentModel;
 
 namespace ElasticLinq.Logging
 {
+    /// <summary>
+    /// Type of log entry to write to the logging system.
+    /// </summary>
+    /// <remarks>
+    /// Replicates that of the .NET built-in type for PCL compatibility.
+    /// </remarks>
     public enum TraceEventType
     {
         Critical = 1,

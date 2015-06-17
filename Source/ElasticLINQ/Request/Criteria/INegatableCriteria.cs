@@ -3,12 +3,15 @@
 namespace ElasticLinq.Request.Criteria
 {
     /// <summary>
-    /// Interface a Criteria may optionally support if it
-    /// knows of a way to negate it's effects without being
-    /// wrapped in a NotCriteria.
+    /// Interface a criteria may optionally support if it knows of a way to 
+    /// negate its effects without being wrapped in a NotCriteria.
     /// </summary>
     public interface INegatableCriteria
     {
+        /// <summary>
+        /// Provide a negative representation of this criteria.
+        /// </summary>
+        /// <returns>Negative represenation of this criteria.</returns>
         ICriteria Negate();
     }
 }

@@ -41,26 +41,31 @@ namespace ElasticLinq
             this.expression = expression;
         }
 
+        /// <inheritdoc/>
         public IEnumerator<T> GetEnumerator()
         {
             return ((IEnumerable<T>)provider.Execute(expression)).GetEnumerator();
         }
 
+        /// <inheritdoc/>
         IEnumerator IEnumerable.GetEnumerator()
         {
             return ((IEnumerable)provider.Execute(expression)).GetEnumerator();
         }
 
+        /// <inheritdoc/>
         public Type ElementType
         {
             get { return typeof(T); }
         }
 
+        /// <inheritdoc/>
         public Expression Expression
         {
             get { return expression; }
         }
 
+        /// <inheritdoc/>
         public IQueryProvider Provider
         {
             get { return provider; }

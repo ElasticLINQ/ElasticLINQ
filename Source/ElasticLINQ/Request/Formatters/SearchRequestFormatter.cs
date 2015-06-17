@@ -60,6 +60,10 @@ namespace ElasticLinq.Request.Formatters
             get { return uri; }
         }
 
+        /// <summary>
+        /// Create the Uri for this request given the search query and connection.
+        /// </summary>
+        /// <returns>Uri to be used to execute this query by Elasticsearch.</returns>
         private Uri CreateUri()
         {
             var builder = new UriBuilder(connection.Endpoint);
@@ -86,6 +90,10 @@ namespace ElasticLinq.Request.Formatters
             return builder.Uri;
         }
 
+        /// <summary>
+        /// Create the Json HTTP request body for this request given the search query and connection.
+        /// </summary>
+        /// <returns>Json to be used to execute this query by Elasticsearch.</returns>
         private JObject CreateBody()
         {
             var root = new JObject();
@@ -112,8 +120,6 @@ namespace ElasticLinq.Request.Formatters
 
             if (searchRequest.Highlight != null)
                 root.Add("highlight", Build(searchRequest.Highlight));
-
-
 
             long? size = searchRequest.Size ?? connection.Options.SearchSizeDefault;
             if (size.HasValue && !hasFacets)

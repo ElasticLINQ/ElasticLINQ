@@ -4,6 +4,9 @@ using System.Linq.Expressions;
 
 namespace ElasticLinq.Request.Expressions
 {
+    /// <summary>
+    /// List of expression type constant numeric values used by ElasticLINQ.
+    /// </summary>
     public static class ElasticExpressionType
     {
         public const ExpressionType Criteria = (ExpressionType)10000;

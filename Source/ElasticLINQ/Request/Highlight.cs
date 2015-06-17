@@ -6,7 +6,7 @@ using System.Collections.ObjectModel;
 namespace ElasticLinq.Request
 {
     /// <summary>
-    /// Allows highting of search results to be specified for one or more fields.
+    /// Specifies highlighting of search results for one or more fields.
     /// </summary>
     public class Highlight
     {

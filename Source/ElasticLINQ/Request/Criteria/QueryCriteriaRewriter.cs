@@ -7,15 +7,16 @@ namespace ElasticLinq.Request.Criteria
     /// <summary>
     /// Query DSL is slightly different from Filter DSL. In order to keep
     /// code paths simple we always build as if doing a filter. Here we
-    /// rewrite the ICriteria designed for a filter into a query.
+    /// rewrite the <see cref="ICriteria" /> designed for a filter into a query.
     /// </summary>
     internal static class QueryCriteriaRewriter
     {
         /// <summary>
-        /// Rewrite the 
+        /// Take an <see cref="ICriteria" /> for filtering and return an <see cref="ICriteria" />
+        /// with any necessary compensations for querying.
         /// </summary>
-        /// <param name="criteria"></param>
-        /// <returns></returns>
+        /// <param name="criteria"><see cref="ICriteria" /> built for filtering.</param>
+        /// <returns><see cref="ICriteria" /> built for querying.</returns>
         public static ICriteria Compensate(ICriteria criteria)
         {
             if (criteria is OrCriteria)
@@ -34,10 +35,10 @@ namespace ElasticLinq.Request.Criteria
         }
 
         /// <summary>
-        /// Rewrite a NotCriteria as a BoolCriteria.
+        /// Rewrite a <see cref="NotCriteria" /> as a <see cref="BoolCriteria" />.
         /// </summary>
         /// <param name="not">NotCriteria to rewrite.</param>
-        /// <returns>BoolCriteria with the criteria from Not mapped into MustNot.</returns>
+        /// <returns><see cref="BoolCriteria" /> with the criteria from Not mapped into MustNot.</returns>
         private static BoolCriteria Rewrite(NotCriteria not)
         {
             var mustNotCriteria = (not.Criteria is OrCriteria)
@@ -47,20 +48,20 @@ namespace ElasticLinq.Request.Criteria
         }
 
         /// <summary>
-        /// Rewrite an OrCriteria as a BoolCriteria.
+        /// Rewrite an <see cref="OrCriteria" /> as a <see cref="BoolCriteria" />.
         /// </summary>
-        /// <param name="or">OrCriteria to rewrite.</param>
-        /// <returns>BoolCriteria with the criteria from the Or mapped into Should.</returns>
+        /// <param name="or"><see cref="OrCriteria" /> to rewrite.</param>
+        /// <returns><see cref="BoolCriteria" /> with the criteria from the Or mapped into Should.</returns>
         private static BoolCriteria Rewrite(OrCriteria or)
         {
             return new BoolCriteria(null, or.Criteria.Select(Compensate), null);
         }
 
         /// <summary>
-        /// Rewrite an AndCriteria as a BoolCriteria.
+        /// Rewrite an <see cref="AndCriteria" /> as a <see cref="BoolCriteria" />.
         /// </summary>
-        /// <param name="and">AndCriteria to rewrite.</param>
-        /// <returns>BoolCriteria with the criteria from the And mapped into Must.</returns>
+        /// <param name="and"><see cref="AndCriteria" /> to rewrite.</param>
+        /// <returns><see cref="BoolCriteria" /> with the criteria from the And mapped into Must.</returns>
         private static BoolCriteria Rewrite(AndCriteria and)
         {
             var should = and.Criteria.OfType<OrCriteria>().ToList();
@@ -73,10 +74,14 @@ namespace ElasticLinq.Request.Criteria
         }
 
         /// <summary>
-        /// Rewrite an ConstantCriteria as either a MatchAllCriteria or NotCriteria depending on whether it is true or false respectively.
+        /// Rewrite a <see cref="ConstantCriteria" /> as a <see cref="MatchAllCriteria" /> that might be 
+        /// wrapped in a <see cref="NotCriteria" /> depending on whether it is true or false respectively.
         /// </summary>
-        /// <param name="constant">Constant crieteria to rewrite.</param>
-        /// <returns>MatchAllCriteria or NotCriteria wrapped MatchAllCriteria.</returns>
+        /// <param name="constant"><see cref="ConstantCriteria" /> to rewrite.</param>
+        /// <returns>
+        /// <see cref="MatchAllCriteria" /> if true; otherwise a <see cref="MatchAllCriteria" /> 
+        /// wrapped in a <see cref="NotCriteria" /> if false.
+        /// </returns>
         private static ICriteria Rewrite(ConstantCriteria constant)
         {
             return constant == ConstantCriteria.True ? MatchAllCriteria.Instance : NotCriteria.Create(MatchAllCriteria.Instance);

@@ -12,16 +12,29 @@ namespace ElasticLinq.Request.Criteria
     /// </summary>
     internal class AndCriteria : CompoundCriteria
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AndCriteria"/> class.
+        /// </summary>
+        /// <param name="criteria">Criteria to combine with 'and' semantics.</param>
+        /// <remarks>Consider using <see cref="AndCriteria.Combine(ICriteria[])"/> instead.</remarks>
         public AndCriteria(params ICriteria[] criteria)
             : base(criteria)
         {
         }
 
+        /// <inheritdoc/>
         public override string Name
         {
             get { return "and"; }
         }
 
+        /// <summary>
+        /// Combine a number of <see cref="ICriteria" /> with 'and' semantics.
+        /// </summary>
+        /// <param name="criteria">The <see cref="ICriteria" /> to be combined.</param>
+        /// <returns><see cref="ICriteria" /> representing the original passed <see cref="ICriteria" /> with 'and' semantics.</returns>
+        /// <remarks>This is usually an <see cref="AndCriteria" /> but might not be if the passed criteria can be collapsed into
+        /// a single criteria.</remarks>
         public static ICriteria Combine(params ICriteria[] criteria)
         {
             Argument.EnsureNotNull("criteria", criteria);
@@ -45,6 +58,10 @@ namespace ElasticLinq.Request.Criteria
                 : new AndCriteria(combinedCriteria.ToArray());
         }
 
+        /// <summary>
+        /// Combine range criteria for the same field into an upper-lower range for that criteria.
+        /// </summary>
+        /// <param name="criteria">Collection of <see cref="ICriteria"/> to have ranges combined.</param>
         private static void CombineRanges(ICollection<ICriteria> criteria)
         {
             var candidates = criteria.OfType<RangeCriteria>().GroupBy(r => r.Field).Where(g => g.Count() > 1).ToArray();
@@ -53,7 +70,7 @@ namespace ElasticLinq.Request.Criteria
             {
                 var specifications = range.SelectMany(r => r.Specifications).ToList();
 
-                if (RangeCriteria.SpecificationsCanBeCombined(specifications))  
+                if (RangeCriteria.SpecificationsCanBeCombined(specifications))
                 {
                     foreach (var rangeCriteria in range)
                         criteria.Remove(rangeCriteria);

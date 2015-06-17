@@ -3,7 +3,7 @@
 namespace ElasticLinq.Request.Criteria
 {
     /// <summary>
-    /// Interface that all Criteria must implement to be part of
+    /// Interface that all criteria must implement to be part of
     /// the query filter tree.
     /// </summary>
     public interface ICriteria
