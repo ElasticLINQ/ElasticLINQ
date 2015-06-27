@@ -41,9 +41,8 @@ namespace ElasticLinq.Request.Criteria
             return AndCriteria
                 .Combine(andCriteria
                     .Criteria
-                    .Where(c => c != ConstantCriteria.True)
                     .Select(Reduce)
-                .Where(r => r != null)
+                    .Where(c => c != ConstantCriteria.True && c != null)
                 .ToArray());
         }
 
@@ -63,9 +62,8 @@ namespace ElasticLinq.Request.Criteria
             return OrCriteria
                 .Combine(orCriteria
                     .Criteria
-                    .Where(c => c != ConstantCriteria.False)
                     .Select(Reduce)
-                .Where(r => r != null)
+                    .Where(c => c != ConstantCriteria.False && c != null)
                 .ToArray());
         }
     }

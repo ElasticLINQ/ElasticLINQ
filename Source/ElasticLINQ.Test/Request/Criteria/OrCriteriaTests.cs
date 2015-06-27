@@ -40,12 +40,20 @@ namespace ElasticLinq.Test.Request.Criteria
         }
 
         [Fact]
-        public void CombineWithEmptyListReturnsEmptyOr()
+        public void CombineWithEmptyListReturnsNull()
         {
             var criteria = OrCriteria.Combine(new ICriteria[] { });
 
-            Assert.IsType<OrCriteria>(criteria);
-            Assert.Empty(((OrCriteria)criteria).Criteria);
+            Assert.Null(criteria);
+        }
+
+        [Fact]
+        public void CombineWithSingleCriteriaReturnsThatCriteria()
+        {
+            var rangeCriteria = new RangeCriteria("field", memberInfo, RangeComparison.LessThan, 1);
+            var andCriteria = OrCriteria.Combine(rangeCriteria);
+
+            Assert.Same(rangeCriteria, andCriteria);
         }
 
         [Theory]

@@ -1069,5 +1069,26 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             Assert.Single(rangeCriteria.Specifications, s => s.Comparison == RangeComparison.LessThanOrEqual && Equals(s.Value, expectedConstant));
             Assert.Equal(1, rangeCriteria.Specifications.Count);
         }
+
+        [Fact]
+        public void ConstantTrueInsideAnOrInsideAnAndOptimizesOut()
+        {
+            var query = Robots.Where(r => r.Id == 11 && (true || r.EnergyUse > 2));
+
+            var searchRequest = ElasticQueryTranslator.Translate(Mapping, "", query.Expression).SearchRequest;
+
+            Assert.IsType<TermCriteria>(searchRequest.Filter);
+        }
+
+        [Fact]
+        public void ConstantFalseInsideAnAndInsideAnOrOptimizesOut()
+        {
+            var query = Robots.Where(r => r.Id == 11 || (false && r.EnergyUse > 2));
+
+            var searchRequest = ElasticQueryTranslator.Translate(Mapping, "", query.Expression).SearchRequest;
+
+            Assert.IsType<TermCriteria>(searchRequest.Filter);
+        }
+
     }
 }

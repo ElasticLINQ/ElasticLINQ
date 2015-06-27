@@ -76,5 +76,17 @@ namespace ElasticLinq.Test.Request.Criteria
 
             Assert.Same(ConstantCriteria.False, actual);
         }
+
+        [Fact]
+        public void OrWithOrWithTrueOptimizesToTrue()
+        {
+            var exists1 = new ExistsCriteria("1");
+            var exists2 = new ExistsCriteria("2");
+            var criteria = OrCriteria.Combine(exists1, OrCriteria.Combine(ConstantCriteria.True, exists2));
+
+            var actual = ConstantCriteriaFilterReducer.Reduce(criteria);
+
+            Assert.Same(ConstantCriteria.True, actual);
+        }
     }
 }

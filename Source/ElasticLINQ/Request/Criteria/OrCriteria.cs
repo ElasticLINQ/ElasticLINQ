@@ -39,7 +39,16 @@ namespace ElasticLinq.Request.Criteria
         {
             Argument.EnsureNotNull("criteria", criteria);
 
+            // Strip out null args and handle cases where no combination required
+            criteria = criteria.Where(c => c != null).ToArray();
+            if (criteria.Length == 0)
+                return null;
+            if (criteria.Length == 1)
+                return criteria[0];
+
+            // Combines ((a || b) || c) from expression tree into (a || b || c)
             criteria = FlattenOrCriteria(criteria).ToArray();
+
             return CombineTermsForSameField(criteria) ?? new OrCriteria(criteria);
         }
 
@@ -73,8 +82,6 @@ namespace ElasticLinq.Request.Criteria
         /// <returns><see cref="ITermsCriteria" /> containing all terms for that field or null if they can not be combined.</returns>
         private static ICriteria CombineTermsForSameField(ICollection<ICriteria> criteria)
         {
-            if (criteria.Count <= 1) return null;
-
             var termCriteria = criteria.OfType<ITermsCriteria>().ToArray();
             var areAllSameTerm = termCriteria.Length == criteria.Count
                                  && termCriteria.Select(f => f.Field).Distinct().Count() == 1
