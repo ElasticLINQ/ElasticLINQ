@@ -18,8 +18,6 @@
 
   <ItemGroup>
     <SolutionFile Include="$(SolutionDir)ElasticLINQ.sln"/>
-    <NuspecFiles Include="$(SolutionDir)**\*.nuspec"/>
-    <NuGetTargets Include="$(SolutionDir)ElasticLINQ\ElasticLINQ.csproj"/>
   </ItemGroup>
 
   <Target Name="Default" DependsOnTargets="Test"/>
@@ -49,7 +47,7 @@
   </Target>
 
   <Target Name="Packages">
-    <Exec Command="$(NugetExe) pack %(NuGetTargets.Identity) -NoPackageAnalysis -NonInteractive -Verbosity quiet -Symbols -Properties Configuration=$(Configuration)" WorkingDirectory="$(RootDir)"/>
+    <Exec Command="$(NugetExe) pack $(SolutionDir)ElasticLINQ.nuspec -NoPackageAnalysis -NonInteractive -Verbosity quiet -Symbols -Properties Configuration=$(Configuration)" WorkingDirectory="$(RootDir)"/>
   </Target>
 
   <Target Name="Test" DependsOnTargets="Build">
