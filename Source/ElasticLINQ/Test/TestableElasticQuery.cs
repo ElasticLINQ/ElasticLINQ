@@ -12,11 +12,16 @@ using System.Linq.Expressions;
 namespace ElasticLinq.Test
 {
     /// <summary>
-    /// Provides an IElasticQuery that can be used by unit tests.
+    /// Provides an <see cref="IElasticQuery{T}"/> that can be used by unit tests.
     /// </summary>
     /// <typeparam name="T">Element type this query is for.</typeparam>
     public class TestableElasticQuery<T> : IElasticQuery<T>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TestableElasticQuery{T}" /> class.
+        /// </summary>
+        /// <param name="context">The <see cref="TestableElasticContext"/> this query belongs to.</param>
+        /// <param name="expression">The <see cref="Expression"/> that represents the LINQ query.</param>
         public TestableElasticQuery(TestableElasticContext context, Expression expression = null)
         {
             Context = context;
@@ -24,26 +29,34 @@ namespace ElasticLinq.Test
             Expression = expression ?? Expression.Constant(context.Data<T>().AsQueryable());
         }
 
+        /// <summary>
+        /// The <see cref="TestableElasticContext"/> this query belongs to.
+        /// </summary>
         public TestableElasticContext Context { get; private set; }
 
+        /// <inheritdoc/>
         public Type ElementType { get; private set; }
 
+        /// <inheritdoc/>
         public Expression Expression { get; private set; }
 
+        /// <inheritdoc/>
         public IQueryProvider Provider { get { return Context.Provider; } }
 
+        /// <inheritdoc/>
         public IEnumerator<T> GetEnumerator()
         {
             Context.Requests.Add(ToQueryInfo());
-
             return ((IEnumerable<T>)Provider.Execute(Expression)).GetEnumerator();
         }
 
+        /// <inheritdoc/>
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
         }
 
+        /// <inheritdoc/>
         public QueryInfo ToQueryInfo()
         {
             var prefix = Context.Mapping.GetDocumentMappingPrefix(typeof(T));

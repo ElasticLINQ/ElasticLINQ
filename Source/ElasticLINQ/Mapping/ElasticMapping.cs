@@ -11,7 +11,21 @@ using System.Reflection;
 
 namespace ElasticLinq.Mapping
 {
-    public enum EnumFormat { Integer, String };
+    /// <summary>
+    /// How an enum should be formatted in the JSON payload.
+    /// </summary>
+    public enum EnumFormat
+    {
+        /// <summary>
+        /// Format enums as an integer using their ordinal.
+        /// </summary>
+        Integer, 
+
+        /// <summary>
+        /// Format enums as a string using their name.
+        /// </summary>
+        String
+    };
 
     /// <summary>
     /// A base class for mapping Elasticsearch values that can lower-case all field values
@@ -105,6 +119,9 @@ namespace ElasticLinq.Mapping
             }
         }
 
+        /// <summary>
+        /// Get the Elasticsearch field name for a given member.
+        /// </summary>
         /// <param name="prefix">The prefix to put in front of this field name, if the field is
         /// an ongoing part of the document search.</param>
         /// <param name="memberInfo">The member whose field name is required.</param>
@@ -118,6 +135,11 @@ namespace ElasticLinq.Mapping
             return String.Format("{0}.{1}", prefix, memberName).TrimStart('.');
         }
 
+        /// <summary>
+        /// Get the name of the member to be used as a field name.
+        /// </summary>
+        /// <param name="memberInfo">The member whose field name is required.</param>
+        /// <returns>Name of the member to be used as a field name.</returns>
         protected string GetMemberName(MemberInfo memberInfo)
         {
             var jsonPropertyAttribute = memberInfo.GetCustomAttribute<JsonPropertyAttribute>(inherit: true);

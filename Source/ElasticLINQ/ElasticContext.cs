@@ -36,7 +36,7 @@ namespace ElasticLinq
         public ElasticConnection Connection { get; private set; }
 
         /// <summary>
-        /// The logging mechanism for diagnostics information.
+        /// The logging mechanism for diagnostic information.
         /// </summary>
         public ILog Log { get; private set; }
 

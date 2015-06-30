@@ -2,10 +2,14 @@
 
 namespace ElasticLinq
 {
+    /// <summary>
+    /// Connection options that can be specified to control how <see cref="ElasticContext"/> communicates with
+    /// Elasticsearch.
+    /// </summary>
     public class ElasticConnectionOptions
     {
         /// <summary>
-        /// Whether the JSON should be prettified to make it more readable.
+        /// Whether the JSON should be prettified to make it more human-readable.
         /// </summary>
         /// <remarks>Defaults to false.</remarks>
         public bool Pretty { get; set; }

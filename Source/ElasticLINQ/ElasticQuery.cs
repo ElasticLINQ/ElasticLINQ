@@ -13,7 +13,7 @@ using System.Linq.Expressions;
 namespace ElasticLinq
 {
     /// <summary>
-    /// Represents a LINQ query object that will communicate with Elasticsearch.
+    /// Represents a LINQ query object to be used with Elasticsearch.
     /// </summary>
     /// <typeparam name="T">Element type being queried.</typeparam>
     public class ElasticQuery<T> : IElasticQuery<T>
@@ -21,6 +21,10 @@ namespace ElasticLinq
         private readonly ElasticQueryProvider provider;
         private readonly Expression expression;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ElasticQuery{T}"/> class.
+        /// </summary>
+        /// <param name="provider">The <see cref="ElasticQueryProvider"/> used to execute the queries.</param>
         public ElasticQuery(ElasticQueryProvider provider)
         {
             Argument.EnsureNotNull("provider", provider);
@@ -29,6 +33,11 @@ namespace ElasticLinq
             expression = Expression.Constant(this);
         }
 
+        /// <summary>
+        /// Initializes a new instance of this class.
+        /// </summary>
+        /// <param name="provider">The <see cref="ElasticQueryProvider"/> used to execute the queries.</param>
+        /// <param name="expression">The <see cref="Expression"/> that represents the LINQ query so far.</param>
         public ElasticQuery(ElasticQueryProvider provider, Expression expression)
         {
             Argument.EnsureNotNull("provider", provider);

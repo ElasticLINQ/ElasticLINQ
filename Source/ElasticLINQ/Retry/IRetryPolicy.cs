@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace ElasticLinq.Retry
 {
+    /// <summary>
+    /// A policy that can perform an operation one or more times.
+    /// </summary>
     public interface IRetryPolicy
     {
         /// <summary>

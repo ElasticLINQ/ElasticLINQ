@@ -17,9 +17,25 @@ namespace ElasticLinq.Request
             fields.AddRange(newFields);
         }
 
+        /// <summary>
+        /// The string to start the highlight of each word.
+        /// </summary>
+        /// <remarks>
+        /// This is typically set to an opening HTML tag, hence the name.
+        /// </remarks>
         public string PreTag { get; set; }
+
+        /// <summary>
+        /// The string to end the highlight of each word.
+        /// </summary>
+        /// <remarks>
+        /// This is typically set to an closing HTML tag, hence the name.
+        /// </remarks>
         public string PostTag { get; set; }
 
+        /// <summary>
+        /// The fields highlighted by this request.
+        /// </summary>
         public ReadOnlyCollection<string> Fields
         {
             get { return new ReadOnlyCollection<string>(fields); }

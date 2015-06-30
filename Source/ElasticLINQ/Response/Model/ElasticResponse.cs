@@ -12,12 +12,29 @@ namespace ElasticLinq.Response.Model
     [DebuggerDisplay("{hits.hits.Count} hits in {took} ms")]
     public class ElasticResponse
     {
+        /// <summary>
+        /// How long the request took in milliseconds.
+        /// </summary>
         public int took;
+
+        /// <summary>
+        /// Whether this request timed out or not.
+        /// </summary>
         public bool timed_out;
+
+        /// <summary>
+        /// The search hits delivered in this response.
+        /// </summary>
         public Hits hits;
 
+        /// <summary>
+        /// The error received from Elasticsearch.
+        /// </summary>
         public JValue error;
-        public HttpStatusCode status;
+
+        /// <summary>
+        /// The facets delivered in this response.
+        /// </summary>
         public JObject facets;
     }
 }
