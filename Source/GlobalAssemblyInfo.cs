@@ -5,5 +5,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCopyright("Copyright (C) 2013-2015 CenturyLink, Inc.")]
 
 [assembly: ComVisible(false)]
-[assembly: AssemblyVersion("1.3.1.0")]
-[assembly: AssemblyFileVersion("1.3.1.0")]
+[assembly: AssemblyVersion("1.3.4.0")]
+[assembly: AssemblyFileVersion("1.3.4.0")]
