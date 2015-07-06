@@ -19,7 +19,7 @@ namespace ElasticLinq.Mapping
         /// <summary>
         /// Format enums as an integer using their ordinal.
         /// </summary>
-        Integer, 
+        Integer,
 
         /// <summary>
         /// Format enums as a string using their name.
@@ -44,7 +44,7 @@ namespace ElasticLinq.Mapping
         /// <summary>
         /// Initializes a new instance of the <see cref="ElasticMapping"/> class.
         /// </summary>
-        /// <param name="camelCaseFieldNames">Pass <c>true</c> to automatically camel-case field names (for <see cref="GetFieldName(string, MemberInfo)"/>).</param>
+        /// <param name="camelCaseFieldNames">Pass <c>true</c> to automatically camel-case field names (for <see cref="GetFieldName(Type, MemberInfo)"/>).</param>
         /// <param name="camelCaseTypeNames">Pass <c>true</c> to automatically camel-case type names (for <see cref="GetDocumentType"/>).</param>
         /// <param name="pluralizeTypeNames">Pass <c>true</c> to automatically pluralize type names (for <see cref="GetDocumentType"/>).</param>
         /// <param name="lowerCaseAnalyzedFieldValues">Pass <c>true</c> to automatically convert field values to lower case (for <see cref="FormatValue"/>).</param>
@@ -102,17 +102,17 @@ namespace ElasticLinq.Mapping
         }
 
         /// <inheritdoc/>
-        public virtual string GetFieldName(string prefix, MemberExpression memberExpression)
+        public virtual string GetFieldName(Type type, MemberExpression memberExpression)
         {
             Argument.EnsureNotNull("memberExpression", memberExpression);
 
             switch (memberExpression.Expression.NodeType)
             {
                 case ExpressionType.MemberAccess:
-                    return GetFieldName(GetFieldName(prefix, (MemberExpression)memberExpression.Expression), memberExpression.Member);
+                    return GetFieldName(type, (MemberExpression)memberExpression.Expression) + "." + GetFieldName(type, memberExpression.Member);
 
                 case ExpressionType.Parameter:
-                    return GetFieldName(prefix, memberExpression.Member);
+                    return GetFieldName(type, memberExpression.Member);
 
                 default:
                     throw new NotSupportedException(String.Format("Unknown expression type {0} for left hand side of expression {1}", memberExpression.Expression.NodeType, memberExpression));
@@ -122,17 +122,16 @@ namespace ElasticLinq.Mapping
         /// <summary>
         /// Get the Elasticsearch field name for a given member.
         /// </summary>
-        /// <param name="prefix">The prefix to put in front of this field name, if the field is
+        /// <param name="type">The prefix to put in front of this field name, if the field is
         /// an ongoing part of the document search.</param>
         /// <param name="memberInfo">The member whose field name is required.</param>
         /// <returns>The Elasticsearch field name that matches the member.</returns>
-        public virtual string GetFieldName(string prefix, MemberInfo memberInfo)
+        public virtual string GetFieldName(Type type, MemberInfo memberInfo)
         {
+            Argument.EnsureNotNull("type", type);
             Argument.EnsureNotNull("memberInfo", memberInfo);
 
-            var memberName = GetMemberName(memberInfo);
-
-            return String.Format("{0}.{1}", prefix, memberName).TrimStart('.');
+            return GetMemberName(memberInfo);
         }
 
         /// <summary>
@@ -153,12 +152,6 @@ namespace ElasticLinq.Mapping
         }
 
         /// <inheritdoc/>
-        public virtual string GetDocumentMappingPrefix(Type type)
-        {
-            return null;
-        }
-
-        /// <inheritdoc/>
         public virtual string GetDocumentType(Type type)
         {
             Argument.EnsureNotNull("type", type);
@@ -173,9 +166,9 @@ namespace ElasticLinq.Mapping
         }
 
         /// <inheritdoc/>
-        public virtual ICriteria GetTypeSelectionCriteria(Type docType)
+        public virtual ICriteria GetTypeSelectionCriteria(Type type)
         {
-            Argument.EnsureNotNull("docType", docType);
+            Argument.EnsureNotNull("docType", type);
             return null;
         }
 

@@ -13,24 +13,25 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         public void SelectAnonymousProjectionTranslatesToFields()
         {
             var selected = Robots.Select(r => new { r.Id, r.Cost });
-            var fields = ElasticQueryTranslator.Translate(Mapping, "prefix", selected.Expression).SearchRequest.Fields;
+            var searchRequest = ElasticQueryTranslator.Translate(Mapping, selected.Expression).SearchRequest;
 
-            Assert.NotNull(fields);
-            Assert.Contains("prefix.id", fields);
-            Assert.Contains("prefix.cost", fields);
-            Assert.Equal(2, fields.Count);
+            Assert.Equal("robots", searchRequest.DocumentType);
+            Assert.NotNull(searchRequest.Fields);
+            Assert.Contains("id", searchRequest.Fields);
+            Assert.Contains("cost", searchRequest.Fields);
+            Assert.Equal(2, searchRequest.Fields.Count);
         }
 
         [Fact]
         public void SelectAnonymousProjectionWithSomeIdentifiersTranslatesToFields()
         {
             var selected = Robots.Select(r => new { First = r.Id, Second = r.Started, r.Cost });
-            var fields = ElasticQueryTranslator.Translate(Mapping, "prefix", selected.Expression).SearchRequest.Fields;
+            var fields = ElasticQueryTranslator.Translate(Mapping, selected.Expression).SearchRequest.Fields;
 
             Assert.NotNull(fields);
-            Assert.Contains("prefix.id", fields);
-            Assert.Contains("prefix.started", fields);
-            Assert.Contains("prefix.cost", fields);
+            Assert.Contains("id", fields);
+            Assert.Contains("started", fields);
+            Assert.Contains("cost", fields);
             Assert.Equal(3, fields.Count);
         }
 
@@ -38,11 +39,11 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         public void SelectTupleProjectionWithIdentifiersTranslatesToFields()
         {
             var selected = Robots.Select(r => Tuple.Create(r.Id, r.Name));
-            var fields = ElasticQueryTranslator.Translate(Mapping, "prefix", selected.Expression).SearchRequest.Fields;
+            var fields = ElasticQueryTranslator.Translate(Mapping, selected.Expression).SearchRequest.Fields;
 
             Assert.NotNull(fields);
-            Assert.Contains("prefix.id", fields);
-            Assert.Contains("prefix.name", fields);
+            Assert.Contains("id", fields);
+            Assert.Contains("name", fields);
             Assert.Equal(2, fields.Count);
         }
 
@@ -50,10 +51,10 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         public void SelectSingleFieldTranslatesToField()
         {
             var selected = Robots.Select(r => r.Id);
-            var fields = ElasticQueryTranslator.Translate(Mapping, "prefix", selected.Expression).SearchRequest.Fields;
+            var fields = ElasticQueryTranslator.Translate(Mapping, selected.Expression).SearchRequest.Fields;
 
             Assert.NotNull(fields);
-            Assert.Contains("prefix.id", fields);
+            Assert.Contains("id", fields);
             Assert.Equal(1, fields.Count);
         }
 
@@ -61,7 +62,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         public void SelectJustScoreTranslatesToField()
         {
             var selected = Robots.Select(r => ElasticFields.Score);
-            var fields = ElasticQueryTranslator.Translate(Mapping, "prefix", selected.Expression).SearchRequest.Fields;
+            var fields = ElasticQueryTranslator.Translate(Mapping, selected.Expression).SearchRequest.Fields;
 
             Assert.NotNull(fields);
             Assert.Contains("_score", fields);
@@ -72,7 +73,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         public void SelectAnonymousScoreAndIdTranslatesToFields()
         {
             var selected = Robots.Select(r => new { ElasticFields.Id, ElasticFields.Score });
-            var fields = ElasticQueryTranslator.Translate(Mapping, "prefix", selected.Expression).SearchRequest.Fields;
+            var fields = ElasticQueryTranslator.Translate(Mapping, selected.Expression).SearchRequest.Fields;
 
             Assert.NotNull(fields);
             Assert.Contains("_score", fields);
@@ -84,7 +85,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         public void SelectTupleScoreAndIdTranslatesToFields()
         {
             var selected = Robots.Select(r => Tuple.Create(ElasticFields.Id, ElasticFields.Score));
-            var fields = ElasticQueryTranslator.Translate(Mapping, "prefix", selected.Expression).SearchRequest.Fields;
+            var fields = ElasticQueryTranslator.Translate(Mapping, selected.Expression).SearchRequest.Fields;
 
             Assert.NotNull(fields);
             Assert.Contains("_score", fields);
@@ -96,7 +97,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         public void SelectAnonymousEntityDoesNotTranslateToFields()
         {
             var selected = Robots.Select(r => new { Robot = r, ElasticFields.Score });
-            var translation = ElasticQueryTranslator.Translate(Mapping, "prefix", selected.Expression);
+            var translation = ElasticQueryTranslator.Translate(Mapping, selected.Expression);
 
             Assert.Empty(translation.SearchRequest.Fields);
         }
@@ -105,7 +106,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         public void SelectTupleEntityDoesNotTranslateToFields()
         {
             var selected = Robots.Select(r => Tuple.Create(r, ElasticFields.Score));
-            var translation = ElasticQueryTranslator.Translate(Mapping, "prefix", selected.Expression);
+            var translation = ElasticQueryTranslator.Translate(Mapping, selected.Expression);
 
             Assert.Empty(translation.SearchRequest.Fields);
         }

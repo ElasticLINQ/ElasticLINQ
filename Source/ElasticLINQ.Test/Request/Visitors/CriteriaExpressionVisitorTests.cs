@@ -15,8 +15,8 @@ namespace ElasticLinq.Test.Request.Visitors
 
     class SimpleCriteriaExpressionVisitor : CriteriaExpressionVisitor
     {
-        public SimpleCriteriaExpressionVisitor(IElasticMapping mapping, string prefix)
-            : base(mapping, prefix)
+        public SimpleCriteriaExpressionVisitor(IElasticMapping mapping, Type sourceType)
+            : base(mapping, sourceType)
         {
         }
 
@@ -38,7 +38,9 @@ namespace ElasticLinq.Test.Request.Visitors
 
     public static class CriteriaExpressionVisitorTests
     {
-        private static readonly SimpleCriteriaExpressionVisitor visitor = new SimpleCriteriaExpressionVisitor(new TrivialElasticMapping(), "");
+        private class Sample { }
+
+        private static readonly SimpleCriteriaExpressionVisitor visitor = new SimpleCriteriaExpressionVisitor(new TrivialElasticMapping(), typeof(Sample));
 
         [Fact]
         public static void VisitElasticMethodsMethodCallThrowsNotSupportedForUnknownMethods()

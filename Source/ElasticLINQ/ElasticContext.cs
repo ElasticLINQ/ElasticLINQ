@@ -53,9 +53,7 @@ namespace ElasticLinq
         /// <inheritdoc/>
         public virtual IQueryable<T> Query<T>()
         {
-            var prefix = Mapping.GetDocumentMappingPrefix(typeof(T));
-            var provider = new ElasticQueryProvider(Connection, Mapping, Log, RetryPolicy, prefix);
-            return new ElasticQuery<T>(provider);
+            return new ElasticQuery<T>(new ElasticQueryProvider(Connection, Mapping, Log, RetryPolicy));
         }
     }
 }

@@ -24,17 +24,17 @@ namespace ElasticLinq.Test.Request.Visitors
         [Fact]
         public void Rebind_GuardClauses()
         {
-            Assert.Throws<ArgumentNullException>(() => MemberProjectionExpressionVisitor.Rebind("prefix", null, Expression.Constant(1)));
-            Assert.Throws<ArgumentNullException>(() => MemberProjectionExpressionVisitor.Rebind("prefix", validMapping, null));
+            Assert.Throws<ArgumentNullException>(() => MemberProjectionExpressionVisitor.Rebind(typeof(Sample), null, Expression.Constant(1)));
+            Assert.Throws<ArgumentNullException>(() => MemberProjectionExpressionVisitor.Rebind(typeof(Sample), validMapping, null));
         }
 
         [Fact]
         public void RebindCollectsSinglePropertyFieldName()
         {
             var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(s => s.Name);
-            var rebound = MemberProjectionExpressionVisitor.Rebind("prefix", validMapping, source.Expression);
+            var rebound = MemberProjectionExpressionVisitor.Rebind(typeof(Sample), validMapping, source.Expression);
 
-            Assert.Contains("prefix.name", rebound.Collected);
+            Assert.Contains("name", rebound.Collected);
             Assert.Equal(1, rebound.Collected.Count());
         }
 
@@ -42,10 +42,10 @@ namespace ElasticLinq.Test.Request.Visitors
         public void RebindCollectsAnonymousProjectionPropertiesFieldNames()
         {
             var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(s => new { s.Name, s.Id, score = ElasticFields.Score });
-            var rebound = MemberProjectionExpressionVisitor.Rebind("prefix", validMapping, source.Expression);
+            var rebound = MemberProjectionExpressionVisitor.Rebind(typeof(Sample), validMapping, source.Expression);
 
-            Assert.Contains("prefix.name", rebound.Collected);
-            Assert.Contains("prefix.id", rebound.Collected);
+            Assert.Contains("name", rebound.Collected);
+            Assert.Contains("id", rebound.Collected);
             Assert.Contains("_score", rebound.Collected);
             Assert.Equal(3, rebound.Collected.Count());
         }
@@ -54,10 +54,10 @@ namespace ElasticLinq.Test.Request.Visitors
         public void RebindCollectsTupleCreateProjectionPropertiesFieldNames()
         {
             var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(s => Tuple.Create(s.Name, s.Id, ElasticFields.Score));
-            var rebound = MemberProjectionExpressionVisitor.Rebind("prefix", validMapping, source.Expression);
+            var rebound = MemberProjectionExpressionVisitor.Rebind(typeof(Sample), validMapping, source.Expression);
 
-            Assert.Contains("prefix.name", rebound.Collected);
-            Assert.Contains("prefix.id", rebound.Collected);
+            Assert.Contains("name", rebound.Collected);
+            Assert.Contains("id", rebound.Collected);
             Assert.Contains("_score", rebound.Collected);
             Assert.Equal(3, rebound.Collected.Count());
         }

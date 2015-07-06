@@ -18,8 +18,7 @@ namespace ElasticLinq.Test
         private static readonly ILog log = NullLog.Instance;
         private static readonly IRetryPolicy retryPolicy = NullRetryPolicy.Instance;
 
-        private static readonly ElasticQueryProvider sharedProvider = new ElasticQueryProvider(connection, mapping, log,
-            retryPolicy, "prefix");
+        private static readonly ElasticQueryProvider sharedProvider = new ElasticQueryProvider(connection, mapping, log, retryPolicy);
 
         private static readonly Expression validExpression =
             Expression.Constant(new ElasticQuery<Sample>(sharedProvider));
@@ -30,7 +29,7 @@ namespace ElasticLinq.Test
         [Fact]
         public void CreateQueryTReturnsElasticQueryTWithProviderSet()
         {
-            var provider = new ElasticQueryProvider(connection, mapping, log, retryPolicy, "prefix");
+            var provider = new ElasticQueryProvider(connection, mapping, log, retryPolicy);
 
             var query = provider.CreateQuery<Sample>(validExpression);
 
@@ -41,7 +40,7 @@ namespace ElasticLinq.Test
         [Fact]
         public void CreateQueryReturnsElasticQueryWithProviderSet()
         {
-            var provider = new ElasticQueryProvider(connection, mapping, log, retryPolicy, "prefix");
+            var provider = new ElasticQueryProvider(connection, mapping, log, retryPolicy);
 
             var query = provider.CreateQuery(validExpression);
 
@@ -52,7 +51,7 @@ namespace ElasticLinq.Test
         [Fact]
         public void CreateQueryThrowsArgumentOutOfRangeIfExpressionTypeNotAssignableFromIQueryable()
         {
-            var provider = new ElasticQueryProvider(connection, mapping, log, retryPolicy, "prefix");
+            var provider = new ElasticQueryProvider(connection, mapping, log, retryPolicy);
 
             Assert.Throws<ArgumentOutOfRangeException>(
                 () => provider.CreateQuery<Sample>(Expression.Constant(new Sample())));

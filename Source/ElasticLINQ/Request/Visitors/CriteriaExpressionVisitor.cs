@@ -21,17 +21,17 @@ namespace ElasticLinq.Request.Visitors
     internal abstract class CriteriaExpressionVisitor : ExpressionVisitor
     {
         protected readonly IElasticMapping Mapping;
-        protected readonly string Prefix;
+        protected readonly Type SourceType;
 
         /// <summary>
         /// Creates a new CriteriaExpressionVisitor with a given mapping and prefix.
         /// </summary>
         /// <param name="mapping">The IElasticMapping used to translate properties to fields.</param>
-        /// <param name="prefix">The string prefix used to prepend fields</param>
-        protected CriteriaExpressionVisitor(IElasticMapping mapping, string prefix)
+        /// <param name="sourceType">The string prefix used to prepend fields</param>
+        protected CriteriaExpressionVisitor(IElasticMapping mapping, Type sourceType)
         {
             Mapping = new ElasticFieldsMappingWrapper(mapping);
-            Prefix = prefix;
+            SourceType = sourceType;
         }
 
         protected override Expression VisitMethodCall(MethodCallExpression m)
@@ -232,7 +232,7 @@ namespace ElasticLinq.Request.Visitors
             // Do not use ConstantMemberPair - these expressions are not reversible
             if (fieldExpression is MemberExpression && startsWithExpression is ConstantExpression)
             {
-                var fieldName = Mapping.GetFieldName(Prefix, (MemberExpression) fieldExpression);
+                var fieldName = Mapping.GetFieldName(SourceType, (MemberExpression) fieldExpression);
                 return new CriteriaExpression(new PrefixCriteria(fieldName, ((ConstantExpression)startsWithExpression).Value.ToString()));
             }
 
@@ -244,7 +244,7 @@ namespace ElasticLinq.Request.Visitors
             // Do not use ConstantMemberPair - these expressions are not reversible
             if (fieldExpression is MemberExpression && regexpExpression is ConstantExpression)
             {
-                var fieldName = Mapping.GetFieldName(Prefix, (MemberExpression)fieldExpression);
+                var fieldName = Mapping.GetFieldName(SourceType, (MemberExpression)fieldExpression);
                 return new CriteriaExpression(new RegexpCriteria(fieldName, ((ConstantExpression)regexpExpression).Value.ToString()));
             }
 
@@ -259,7 +259,7 @@ namespace ElasticLinq.Request.Visitors
             if (source is ConstantExpression && matched is MemberExpression)
             {
                 var memberExpression = (MemberExpression)matched;
-                var field = Mapping.GetFieldName(Prefix, memberExpression);
+                var field = Mapping.GetFieldName(SourceType, memberExpression);
                 var containsSource = ((IEnumerable)((ConstantExpression)source).Value);
 
                 // If criteria contains a null create an Or criteria with Terms on one
@@ -278,7 +278,7 @@ namespace ElasticLinq.Request.Visitors
             if (source is MemberExpression && matched is ConstantExpression)
             {
                 var memberExpression = (MemberExpression)source;
-                var field = Mapping.GetFieldName(Prefix, memberExpression);
+                var field = Mapping.GetFieldName(SourceType, memberExpression);
                 var value = ((ConstantExpression)matched).Value;
                 return new CriteriaExpression(TermsCriteria.Build(field, memberExpression.Member, value));
             }
@@ -294,7 +294,7 @@ namespace ElasticLinq.Request.Visitors
 
             if (source is MemberExpression && matched is ConstantExpression)
             {
-                var field = Mapping.GetFieldName(Prefix, (MemberExpression)source);
+                var field = Mapping.GetFieldName(SourceType, (MemberExpression)source);
                 var value = ((ConstantExpression)matched).Value;
                 return new CriteriaExpression(new QueryStringCriteria(String.Format(pattern, value), field));
             }
@@ -334,7 +334,7 @@ namespace ElasticLinq.Request.Visitors
             if (cm != null)
             {
                 var values = ((IEnumerable)cm.ConstantExpression.Value).Cast<object>().ToArray();
-                return new CriteriaExpression(TermsCriteria.Build(executionMode, Mapping.GetFieldName(Prefix, cm.MemberExpression), cm.MemberExpression.Member, values));
+                return new CriteriaExpression(TermsCriteria.Build(executionMode, Mapping.GetFieldName(SourceType, cm.MemberExpression), cm.MemberExpression.Member, values));
             }
 
             throw new NotSupportedException(methodName + " must be between a Member and a Constant");
@@ -342,7 +342,7 @@ namespace ElasticLinq.Request.Visitors
 
         private Expression CreateExists(ConstantMemberPair cm, bool positiveTest)
         {
-            var fieldName = Mapping.GetFieldName(Prefix, UnwrapNullableMethodExpression(cm.MemberExpression));
+            var fieldName = Mapping.GetFieldName(SourceType, UnwrapNullableMethodExpression(cm.MemberExpression));
 
             var value = cm.ConstantExpression.Value ?? false;
 
@@ -366,7 +366,7 @@ namespace ElasticLinq.Request.Visitors
             if (cm != null)
                 return cm.IsNullTest
                     ? CreateExists(cm, true)
-                    : new CriteriaExpression(new TermCriteria(Mapping.GetFieldName(Prefix, cm.MemberExpression), cm.MemberExpression.Member, cm.ConstantExpression.Value));
+                    : new CriteriaExpression(new TermCriteria(Mapping.GetFieldName(SourceType, cm.MemberExpression), cm.MemberExpression.Member, cm.ConstantExpression.Value));
 
             throw new NotSupportedException("Equality must be between a Member and a Constant");
         }
@@ -410,7 +410,7 @@ namespace ElasticLinq.Request.Visitors
 
             return cm.IsNullTest
                 ? CreateExists(cm, false)
-                : new CriteriaExpression(NotCriteria.Create(new TermCriteria(Mapping.GetFieldName(Prefix, cm.MemberExpression), cm.MemberExpression.Member, cm.ConstantExpression.Value)));
+                : new CriteriaExpression(NotCriteria.Create(new TermCriteria(Mapping.GetFieldName(SourceType, cm.MemberExpression), cm.MemberExpression.Member, cm.ConstantExpression.Value)));
         }
 
         private Expression VisitRange(RangeComparison rangeComparison, Expression left, Expression right)
@@ -424,7 +424,7 @@ namespace ElasticLinq.Request.Visitors
             if (inverted)
                 rangeComparison = invertedRangeComparison[(int)rangeComparison];
 
-            var field = Mapping.GetFieldName(Prefix, cm.MemberExpression);
+            var field = Mapping.GetFieldName(SourceType, cm.MemberExpression);
             return new CriteriaExpression(new RangeCriteria(field, cm.MemberExpression.Member, rangeComparison, cm.ConstantExpression.Value));
         }
 

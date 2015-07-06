@@ -199,7 +199,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             // TODO: Consider supporting these in conjunction with OrderBy/ThenBy by reversing all ordering
             var first = MakeQueryableExpression(method, Robots);
-            var ex = Assert.Throws<NotSupportedException>(() => ElasticQueryTranslator.Translate(Mapping, "prefix", first));
+            var ex = Assert.Throws<NotSupportedException>(() => ElasticQueryTranslator.Translate(Mapping, first));
             Assert.Contains("Queryable." + method + " method is not supported", ex.Message);
         }
 
@@ -214,7 +214,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
         private static ElasticTranslateResult Translate(IQueryable query)
         {
-            return ElasticQueryTranslator.Translate(Mapping, "", query.Expression);
+            return ElasticQueryTranslator.Translate(Mapping, query.Expression);
         }
     }
 }

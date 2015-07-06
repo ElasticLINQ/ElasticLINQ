@@ -17,7 +17,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             var actual = Mapping.GetDocumentType(typeof(Robot));
 
-            var translation = ElasticQueryTranslator.Translate(Mapping, "prefix", Robots.Expression);
+            var translation = ElasticQueryTranslator.Translate(Mapping, Robots.Expression);
 
             Assert.Equal(actual, translation.SearchRequest.DocumentType);
         }
@@ -25,7 +25,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         [Fact]
         public void TypeExistsCriteriaIsAddedWhenNoOtherCriteria()
         {
-            var translation = ElasticQueryTranslator.Translate(CouchMapping, "prefix", Robots.Expression);
+            var translation = ElasticQueryTranslator.Translate(CouchMapping, Robots.Expression);
 
             Assert.IsType<ExistsCriteria>(translation.SearchRequest.Filter);
         }
@@ -34,7 +34,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         public void TypeExistsCriteriaIsAppliedWhenFilterIsMissingCriteria()
         {
             var query = Robots.Where(r => r.Name == null);
-            var translation = ElasticQueryTranslator.Translate(CouchMapping, "prefix", query.Expression);
+            var translation = ElasticQueryTranslator.Translate(CouchMapping, query.Expression);
 
             var andCriteria = Assert.IsType<AndCriteria>(translation.SearchRequest.Filter);
             Assert.Equal(2, andCriteria.Criteria.Count);
@@ -46,7 +46,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         public void TypeExistsCriteriaIsAppliedWhenFilterIsAndCriteria()
         {
             var query = Robots.Where(r => r.Name == "a" && r.Cost > 1);
-            var translation = ElasticQueryTranslator.Translate(CouchMapping, "prefix", query.Expression);
+            var translation = ElasticQueryTranslator.Translate(CouchMapping, query.Expression);
 
             var andCriteria = Assert.IsType<AndCriteria>(translation.SearchRequest.Filter);
             Assert.Equal(3, andCriteria.Criteria.Count);
@@ -59,7 +59,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         public void TypeExistsCriteriaIsAppliedWhenFilterIsOrCriteria()
         {
             var query = Robots.Where(r => r.Name == "a" || r.Cost > 1);
-            var translation = ElasticQueryTranslator.Translate(CouchMapping, "prefix", query.Expression);
+            var translation = ElasticQueryTranslator.Translate(CouchMapping, query.Expression);
 
             var andCriteria = Assert.IsType<AndCriteria>(translation.SearchRequest.Filter);
             Assert.Equal(2, andCriteria.Criteria.Count);
@@ -71,7 +71,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         public void FilterIsWipedWhenConstantTrue()
         {
             var query = Robots.Where(r => true);
-            var translation = ElasticQueryTranslator.Translate(Mapping, "prefix", query.Expression);
+            var translation = ElasticQueryTranslator.Translate(Mapping, query.Expression);
 
             Assert.Null(translation.SearchRequest.Filter);
         }
@@ -80,7 +80,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         public void TypeExistsCriteriaIsAppliedWhenFilterIsConstantTrue()
         {
             var query = Robots.Where(r => true);
-            var translation = ElasticQueryTranslator.Translate(CouchMapping, "prefix", query.Expression);
+            var translation = ElasticQueryTranslator.Translate(CouchMapping, query.Expression);
 
             Assert.IsType<ExistsCriteria>(translation.SearchRequest.Filter);
         }
@@ -91,7 +91,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             const int actual = 325;
 
             var skipped = Robots.Skip(actual);
-            var translation = ElasticQueryTranslator.Translate(Mapping, "prefix", skipped.Expression);
+            var translation = ElasticQueryTranslator.Translate(Mapping, skipped.Expression);
 
             Assert.Equal(actual, translation.SearchRequest.From);
         }
@@ -102,7 +102,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             const int actual = 73;
 
             var taken = Robots.Take(actual);
-            var translation = ElasticQueryTranslator.Translate(Mapping, "prefix", taken.Expression);
+            var translation = ElasticQueryTranslator.Translate(Mapping, taken.Expression);
 
             Assert.Equal(actual, translation.SearchRequest.Size);
         }
@@ -115,7 +115,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var expectedSize = Math.Min(size1, size2);
 
             var taken = Robots.Take(size1).Take(size2);
-            var translation = ElasticQueryTranslator.Translate(Mapping, "prefix", taken.Expression);
+            var translation = ElasticQueryTranslator.Translate(Mapping, taken.Expression);
 
             Assert.Equal(expectedSize, translation.SearchRequest.Size);
         }
@@ -123,7 +123,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         [Fact]
         public void SimpleSelectProducesValidMaterializer()
         {
-            var translation = ElasticQueryTranslator.Translate(Mapping, "prefix", Robots.Expression);
+            var translation = ElasticQueryTranslator.Translate(Mapping, Robots.Expression);
             var response = new ElasticResponse { hits = new Hits { hits = new List<Hit>() } };
 
             Assert.NotNull(translation.Materializer);
@@ -139,7 +139,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
             var query = Robots.Query(q => q.Name.Contains("a")).MinScore(expectedScore);
 
-            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", query.Expression).SearchRequest;
+            var request = ElasticQueryTranslator.Translate(Mapping, query.Expression).SearchRequest;
 
             Assert.Null(request.Filter);
             Assert.NotNull(request.Query);

@@ -22,18 +22,6 @@ namespace ElasticLinq.Test.Mapping
         }
 
         [Fact]
-        public static void GetDocumentMappingPrefix_PassesThrough()
-        {
-            var innerMapping = Substitute.For<IElasticMapping>();
-            var mapping = new ElasticFieldsMappingWrapper(innerMapping);
-            var type = typeof(ElasticFieldsMappingWrapperTests);
-
-            mapping.GetDocumentMappingPrefix(type);
-
-            innerMapping.Received(1).GetDocumentMappingPrefix(type);
-        }
-
-        [Fact]
         public static void GetDocumentType_PassesThrough()
         {
             var innerMapping = Substitute.For<IElasticMapping>();
@@ -45,6 +33,8 @@ namespace ElasticLinq.Test.Mapping
             innerMapping.Received(1).GetDocumentType(type);
         }
 
+        private class Sample { }
+
         [Theory]
         [InlineData("Id", "_id")]
         [InlineData("Score", "_score")]
@@ -55,10 +45,10 @@ namespace ElasticLinq.Test.Mapping
             var member = typeof(ElasticFields).GetProperty(propertyName);
             var memberExpression = Expression.MakeMemberAccess(null, member);
 
-            var result = mapping.GetFieldName("a.b.c", memberExpression);
+            var result = mapping.GetFieldName(typeof(Sample), memberExpression);
 
             Assert.Equal(expectedValue, result);
-            innerMapping.Received(0).GetFieldName("a.b.c", memberExpression);
+            innerMapping.Received(0).GetFieldName(typeof(Sample), memberExpression);
         }
 
         [Fact]
@@ -70,9 +60,9 @@ namespace ElasticLinq.Test.Mapping
             var constantExpression = Expression.Constant("string value");
             var memberExpression = Expression.MakeMemberAccess(constantExpression, member);
 
-            mapping.GetFieldName("a.b.c", memberExpression);
+            mapping.GetFieldName(typeof(Sample), memberExpression);
 
-            innerMapping.Received(1).GetFieldName("a.b.c", memberExpression);
+            innerMapping.Received(1).GetFieldName(typeof(Sample), memberExpression);
         }
 
         [Fact]

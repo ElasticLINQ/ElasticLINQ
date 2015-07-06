@@ -22,26 +22,33 @@ namespace ElasticLinq.Request.Visitors
     {
         private readonly SearchRequest searchRequest = new SearchRequest();
 
-        private Type sourceType;
         private Type finalItemType;
         private Func<Hit, Object> itemProjector;
         private IElasticMaterializer materializer;
         private CriteriaWithin within = CriteriaWithin.Filter;
 
-        private ElasticQueryTranslator(IElasticMapping mapping, string prefix)
-            : base(mapping, prefix)
+        private ElasticQueryTranslator(IElasticMapping mapping, Type sourceType)
+            : base(mapping, sourceType)
         {
         }
 
-        internal static ElasticTranslateResult Translate(IElasticMapping mapping, string prefix, Expression e)
+        internal static ElasticTranslateResult Translate(IElasticMapping mapping, Expression e)
         {
-            return new ElasticQueryTranslator(mapping, prefix).Translate(e);
+            return new ElasticQueryTranslator(mapping, FindSourceType(e)).Translate(e);
+        }
+
+        private static Type FindSourceType(Expression e)
+        {
+            var sourceQuery = QuerySourceExpressionVisitor.FindSource(e);
+            if (sourceQuery == null)
+                throw new NotSupportedException("Unable to identify an IQueryable source for this query.");
+            return sourceQuery.ElementType;
         }
 
         private ElasticTranslateResult Translate(Expression e)
         {
             var evaluated = PartialEvaluator.Evaluate(e);
-            var aggregated = FacetExpressionVisitor.Rebind(Mapping, Prefix, evaluated);
+            var aggregated = FacetExpressionVisitor.Rebind(Mapping, SourceType, evaluated);
 
             if (aggregated.Collected.Count > 0)
                 CompleteFacetTranslation(aggregated);
@@ -57,7 +64,7 @@ namespace ElasticLinq.Request.Visitors
 
         private void ApplyTypeSelectionCriteria()
         {
-            var typeCriteria = Mapping.GetTypeSelectionCriteria(sourceType);
+            var typeCriteria = Mapping.GetTypeSelectionCriteria(SourceType);
 
             searchRequest.Filter = searchRequest.Filter == null || searchRequest.Filter == ConstantCriteria.True
                 ? typeCriteria
@@ -67,18 +74,18 @@ namespace ElasticLinq.Request.Visitors
         private void CompleteHitTranslation(Expression evaluated)
         {
             Visit(evaluated);
-            searchRequest.DocumentType = Mapping.GetDocumentType(sourceType);
+            searchRequest.DocumentType = Mapping.GetDocumentType(SourceType);
 
             if (materializer == null)
-                materializer = new ListHitsElasticMaterializer(itemProjector ?? DefaultItemProjector, finalItemType ?? sourceType);
+                materializer = new ListHitsElasticMaterializer(itemProjector ?? DefaultItemProjector, finalItemType ?? SourceType);
             else if (materializer is ChainMaterializer && ((ChainMaterializer)materializer).Next == null)
-                ((ChainMaterializer)materializer).Next = new ListHitsElasticMaterializer(itemProjector ?? DefaultItemProjector, finalItemType ?? sourceType);
+                ((ChainMaterializer)materializer).Next = new ListHitsElasticMaterializer(itemProjector ?? DefaultItemProjector, finalItemType ?? SourceType);
         }
 
         private void CompleteFacetTranslation(FacetRebindCollectionResult aggregated)
         {
             Visit(aggregated.Expression);
-            searchRequest.DocumentType = Mapping.GetDocumentType(sourceType);
+            searchRequest.DocumentType = Mapping.GetDocumentType(SourceType);
 
             searchRequest.Facets = aggregated.Collected.ToList();
             searchRequest.SearchType = "count"; // We only want facets, not hits
@@ -163,7 +170,7 @@ namespace ElasticLinq.Request.Visitors
                 materializer = new HighlightElasticMaterializer(materializer);
             }
 
-            searchRequest.Highlight.AddFields(Mapping.GetFieldName(Prefix, bodyExpression));
+            searchRequest.Highlight.AddFields(Mapping.GetFieldName(SourceType, bodyExpression));
 
             return Visit(source);
         }
@@ -294,14 +301,6 @@ namespace ElasticLinq.Request.Visitors
                 : Visit(source);
         }
 
-        protected override Expression VisitConstant(ConstantExpression c)
-        {
-            if (c.Value is IQueryable)
-                sourceType = ((IQueryable)c.Value).ElementType;
-
-            return c;
-        }
-
         protected override Expression VisitUnary(UnaryExpression node)
         {
             switch (node.NodeType)
@@ -358,7 +357,7 @@ namespace ElasticLinq.Request.Visitors
             var final = Visit(lambda.Body) as MemberExpression;
             if (final != null)
             {
-                var fieldName = Mapping.GetFieldName(Prefix, final);
+                var fieldName = Mapping.GetFieldName(SourceType, final);
                 var ignoreUnmapped = final.Type.IsNullable(); // Consider a config switch?
                 searchRequest.SortOptions.Insert(0, new SortOption(fieldName, ascending, ignoreUnmapped));
             }
@@ -412,7 +411,7 @@ namespace ElasticLinq.Request.Visitors
         /// <param name="entityParameter">Parameter that references the whole entity.</param>
         private void RebindElasticFieldsAndChainProjector(Expression selectExpression, ParameterExpression entityParameter)
         {
-            var projection = ElasticFieldsExpressionVisitor.Rebind(Prefix, Mapping, selectExpression);
+            var projection = ElasticFieldsExpressionVisitor.Rebind(SourceType, Mapping, selectExpression);
             var compiled = Expression.Lambda(projection.Item1, entityParameter, projection.Item2).Compile();
             itemProjector = h => compiled.DynamicInvoke(DefaultItemProjector(h), h);
         }
@@ -424,7 +423,7 @@ namespace ElasticLinq.Request.Visitors
         /// <param name="selectExpression">Select expression to re-bind.</param>
         private void RebindPropertiesAndElasticFields(Expression selectExpression)
         {
-            var projection = MemberProjectionExpressionVisitor.Rebind(Prefix, Mapping, selectExpression);
+            var projection = MemberProjectionExpressionVisitor.Rebind(SourceType, Mapping, selectExpression);
             var compiled = Expression.Lambda(projection.Expression, projection.Parameter).Compile();
             itemProjector = h => compiled.DynamicInvoke(h);
             searchRequest.Fields.AddRange(projection.Collected);
@@ -456,9 +455,7 @@ namespace ElasticLinq.Request.Visitors
         {
             get
             {
-                return hit => hit._source
-                                .SelectToken(Mapping.GetDocumentMappingPrefix(sourceType) ?? "")
-                                .ToObject(sourceType);
+                return hit => hit._source.ToObject(SourceType);
             }
         }
     }

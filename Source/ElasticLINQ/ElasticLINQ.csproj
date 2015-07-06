@@ -95,6 +95,7 @@
     <Compile Include="Request\Expressions\ElasticExpressionType.cs" />
     <Compile Include="Request\Visitors\FacetExpressionVisitor.cs" />
     <Compile Include="Request\Visitors\CriteriaExpressionVisitor.cs" />
+    <Compile Include="Request\Visitors\QuerySourceExpressionVisitor.cs" />
     <Compile Include="Response\Materializers\Aggregates.cs" />
     <Compile Include="Response\Materializers\HighlightElasticMaterializer.cs" />
     <Compile Include="Response\Materializers\ChainMaterializer.cs" />

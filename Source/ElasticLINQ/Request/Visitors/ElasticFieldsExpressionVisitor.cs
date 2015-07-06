@@ -16,22 +16,22 @@ namespace ElasticLinq.Request.Visitors
     {
         protected readonly ParameterExpression BindingParameter;
         protected readonly IElasticMapping Mapping;
-        protected readonly string Prefix;
+        protected readonly Type SourceType;
 
-        public ElasticFieldsExpressionVisitor(string prefix, ParameterExpression bindingParameter, IElasticMapping mapping)
+        public ElasticFieldsExpressionVisitor(Type sourcetype, ParameterExpression bindingParameter, IElasticMapping mapping)
         {
             Argument.EnsureNotNull("bindingParameter", bindingParameter);
             Argument.EnsureNotNull("mapping", mapping);
 
-            Prefix = prefix;
+            SourceType = sourcetype;
             BindingParameter = bindingParameter;
             Mapping = mapping;
         }
 
-        internal static Tuple<Expression, ParameterExpression> Rebind(string prefix, IElasticMapping mapping, Expression selector)
+        internal static Tuple<Expression, ParameterExpression> Rebind(Type sourceType, IElasticMapping mapping, Expression selector)
         {
             var parameter = Expression.Parameter(typeof(Hit), "h");
-            var visitor = new ElasticFieldsExpressionVisitor(prefix, parameter, mapping);
+            var visitor = new ElasticFieldsExpressionVisitor(sourceType, parameter, mapping);
             Argument.EnsureNotNull("selector", selector);
             return Tuple.Create(visitor.Visit(selector), parameter);
         }

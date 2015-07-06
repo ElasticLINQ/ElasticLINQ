@@ -18,16 +18,17 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             var query = Robots.GroupBy(r => 1).Select(g => g.Sum(r => r.Cost));
 
-            var translation = ElasticQueryTranslator.Translate(Mapping, "p", query.Expression);
+            var translation = ElasticQueryTranslator.Translate(Mapping, query.Expression);
 
             Assert.Equal(typeof(decimal), Assert.IsType<ListTermlessFacetsElasticMaterializer>(translation.Materializer).ElementType);
             Assert.Equal("count", translation.SearchRequest.SearchType);
+            Assert.Equal("robots", translation.SearchRequest.DocumentType);
             Assert.Equal(1, translation.SearchRequest.Facets.Count);
 
             var facet = Assert.IsType<StatisticalFacet>(translation.SearchRequest.Facets[0]);
             Assert.Null(facet.Filter);
             Assert.Equal(1, facet.Fields.Count);
-            Assert.Equal("p.cost", facet.Fields[0]);
+            Assert.Equal("cost", facet.Fields[0]);
         }
 
         [Fact]
@@ -35,7 +36,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             var query = Robots.GroupBy(r => 1).Select(g => g.Count());
 
-            var translation = ElasticQueryTranslator.Translate(Mapping, "", query.Expression);
+            var translation = ElasticQueryTranslator.Translate(Mapping, query.Expression);
 
             Assert.Equal(typeof(int), Assert.IsType<ListTermlessFacetsElasticMaterializer>(translation.Materializer).ElementType);
             Assert.Equal("count", translation.SearchRequest.SearchType);
@@ -50,7 +51,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             var query = Robots.GroupBy(r => 1).Select(g => g.Count(r => r.EnergyUse > 5.0));
 
-            var translation = ElasticQueryTranslator.Translate(Mapping, "e", query.Expression);
+            var translation = ElasticQueryTranslator.Translate(Mapping, query.Expression);
 
             Assert.Equal(typeof(int), Assert.IsType<ListTermlessFacetsElasticMaterializer>(translation.Materializer).ElementType);
             Assert.Equal("count", translation.SearchRequest.SearchType);
@@ -58,7 +59,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
             var facet = Assert.IsType<FilterFacet>(translation.SearchRequest.Facets[0]);
             var rangeCriteria = Assert.IsType<RangeCriteria>(facet.Filter);
-            Assert.Equal("e.energyUse", rangeCriteria.Field);
+            Assert.Equal("energyUse", rangeCriteria.Field);
             Assert.Equal(1, rangeCriteria.Specifications.Count);
             Assert.Equal(RangeComparison.GreaterThan, rangeCriteria.Specifications[0].Comparison);
             Assert.Equal(5.0, rangeCriteria.Specifications[0].Value);
@@ -69,7 +70,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             var query = Robots.GroupBy(r => 1).Select(g => g.LongCount());
 
-            var translation = ElasticQueryTranslator.Translate(Mapping, "", query.Expression);
+            var translation = ElasticQueryTranslator.Translate(Mapping, query.Expression);
 
             Assert.Equal(typeof(long), Assert.IsType<ListTermlessFacetsElasticMaterializer>(translation.Materializer).ElementType);
             Assert.Equal("count", translation.SearchRequest.SearchType);
@@ -84,7 +85,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             var grouped = Robots.Where(r => r.Zone == 1).GroupBy(r => 1).Select(g => g.LongCount(r => r.Cost == 2.0m));
 
-            var translation = ElasticQueryTranslator.Translate(Mapping, "", grouped.Expression);
+            var translation = ElasticQueryTranslator.Translate(Mapping, grouped.Expression);
 
             Assert.Equal(typeof(long), Assert.IsType<ListTermlessFacetsElasticMaterializer>(translation.Materializer).ElementType);
             Assert.Equal("count", translation.SearchRequest.SearchType);
@@ -114,7 +115,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
                     MinStarted = g.Min(a => a.Started)
                 });
 
-            var translation = ElasticQueryTranslator.Translate(Mapping, "", query.Expression);
+            var translation = ElasticQueryTranslator.Translate(Mapping, query.Expression);
 
             Assert.Contains("AnonymousType", Assert.IsType<ListTermlessFacetsElasticMaterializer>(translation.Materializer).ElementType.FullName);
             Assert.Equal("count", translation.SearchRequest.SearchType);
@@ -137,7 +138,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
                     MaxEnergy = g.Max(a => a.EnergyUse)
                 });
 
-            var translation = ElasticQueryTranslator.Translate(Mapping, "", query.Expression);
+            var translation = ElasticQueryTranslator.Translate(Mapping, query.Expression);
 
             Assert.Contains("AnonymousType", Assert.IsType<ListTermlessFacetsElasticMaterializer>(translation.Materializer).ElementType.FullName);
             Assert.Equal(1, translation.SearchRequest.Facets.Count);
@@ -157,7 +158,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
                     CountHighEnergy = g.Count(a => a.EnergyUse > 50.0)
                 });
 
-            var translation = ElasticQueryTranslator.Translate(Mapping, "", query.Expression);
+            var translation = ElasticQueryTranslator.Translate(Mapping, query.Expression);
 
             Assert.Contains("AnonymousType", Assert.IsType<ListTermlessFacetsElasticMaterializer>(translation.Materializer).ElementType.FullName);
             Assert.Equal("count", translation.SearchRequest.SearchType);
@@ -198,7 +199,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
         private static void TestProjectionWithKeyAndCount(Expression query)
         {
-            var searchRequest = ElasticQueryTranslator.Translate(CouchMapping, "", query).SearchRequest;
+            var searchRequest = ElasticQueryTranslator.Translate(CouchMapping, query).SearchRequest;
 
             var facet = Assert.Single(searchRequest.Facets);
             var filterFacet = Assert.IsType<FilterFacet>(facet);
@@ -227,7 +228,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
         private static void TestProjectionWithCountPredicate(Expression query)
         {
-            var searchRequest = ElasticQueryTranslator.Translate(Mapping, "", query).SearchRequest;
+            var searchRequest = ElasticQueryTranslator.Translate(Mapping, query).SearchRequest;
 
             Assert.All(searchRequest.Facets, f => Assert.IsType<FilterFacet>(f));
             var filterFacets = searchRequest.Facets.OfType<FilterFacet>().ToArray();

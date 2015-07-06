@@ -29,30 +29,24 @@ namespace ElasticLinq.Mapping
         }
 
         /// <inheritdoc/>
-        public string GetDocumentMappingPrefix(Type type)
-        {
-            return wrapped.GetDocumentMappingPrefix(type);
-        }
-
-        /// <inheritdoc/>
         public string GetDocumentType(Type type)
         {
             return wrapped.GetDocumentType(type);
         }
 
         /// <inheritdoc/>
-        public string GetFieldName(string prefix, MemberExpression memberExpression)
+        public string GetFieldName(Type type, MemberExpression memberExpression)
         {
             return
                 memberExpression.Member.DeclaringType == typeof(ElasticFields)
                     ? "_" + memberExpression.Member.Name.ToLowerInvariant()
-                    : wrapped.GetFieldName(prefix, memberExpression);
+                    : wrapped.GetFieldName(type, memberExpression);
         }
 
         /// <inheritdoc/>
-        public ICriteria GetTypeSelectionCriteria(Type docType)
+        public ICriteria GetTypeSelectionCriteria(Type type)
         {
-            return wrapped.GetTypeSelectionCriteria(docType);
+            return wrapped.GetTypeSelectionCriteria(type);
         }
     }
 }

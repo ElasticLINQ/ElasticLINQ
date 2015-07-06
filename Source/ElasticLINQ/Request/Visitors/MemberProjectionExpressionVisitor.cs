@@ -21,15 +21,15 @@ namespace ElasticLinq.Request.Visitors
 
         private readonly HashSet<string> fieldNames = new HashSet<string>();
 
-        private MemberProjectionExpressionVisitor(string prefix, ParameterExpression bindingParameter, IElasticMapping mapping)
-            : base(prefix, bindingParameter, mapping)
+        private MemberProjectionExpressionVisitor(Type sourceType, ParameterExpression bindingParameter, IElasticMapping mapping)
+            : base(sourceType, bindingParameter, mapping)
         {
         }
 
-        internal static new RebindCollectionResult<string> Rebind(string prefix, IElasticMapping mapping, Expression selector)
+        internal static new RebindCollectionResult<string> Rebind(Type sourceType, IElasticMapping mapping, Expression selector)
         {
             var parameter = Expression.Parameter(typeof(Hit), "h");
-            var visitor = new MemberProjectionExpressionVisitor(prefix, parameter, mapping);
+            var visitor = new MemberProjectionExpressionVisitor(sourceType, parameter, mapping);
             Argument.EnsureNotNull("selector", selector);
             var materializer = visitor.Visit(selector);
             return new RebindCollectionResult<string>(materializer, visitor.fieldNames, parameter);
@@ -52,7 +52,7 @@ namespace ElasticLinq.Request.Visitors
 
         private Expression VisitFieldSelection(MemberExpression m)
         {
-            var fieldName = Mapping.GetFieldName(Prefix, m);
+            var fieldName = Mapping.GetFieldName(SourceType, m);
             fieldNames.Add(fieldName);
             var getFieldExpression = Expression.Call(null, GetDictionaryValueMethod, Expression.PropertyOrField(BindingParameter, "fields"), Expression.Constant(fieldName), Expression.Constant(m.Type));
             return Expression.Convert(getFieldExpression, m.Type);

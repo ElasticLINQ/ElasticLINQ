@@ -5,6 +5,7 @@ using ElasticLinq.Test.TestSupport;
 using System;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using Xunit;
 
 namespace ElasticLinq.Test
@@ -13,9 +14,9 @@ namespace ElasticLinq.Test
     {
         class MyCustomMapping : ElasticMapping
         {
-            public override string GetDocumentMappingPrefix(Type type)
+            public override string GetFieldName(Type type, MemberInfo memberInfo)
             {
-                return String.Format("docWrapper.{0}", type.Name.ToCamelCase(CultureInfo.CurrentCulture));
+                return String.Format("docWrapper.{0}", type.Name.ToCamelCase(CultureInfo.CurrentCulture) + "." + base.GetFieldName(type, memberInfo));
             }
         }
 

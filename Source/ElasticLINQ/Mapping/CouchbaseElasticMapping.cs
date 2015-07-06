@@ -2,6 +2,7 @@
 
 using System;
 using System.Globalization;
+using System.Reflection;
 using ElasticLinq.Request.Criteria;
 
 namespace ElasticLinq.Mapping
@@ -17,7 +18,7 @@ namespace ElasticLinq.Mapping
         /// <summary>
         /// Initializes a new instance of the <see cref="CouchbaseElasticMapping"/> class.
         /// </summary>
-        /// <param name="camelCaseFieldNames">Pass <c>true</c> to automatically camel-case field names (for <see cref="ElasticMapping.GetFieldName(string, System.Reflection.MemberInfo)"/>).</param>
+        /// <param name="camelCaseFieldNames">Pass <c>true</c> to automatically camel-case field names (for <see cref="ElasticMapping.GetFieldName(Type, System.Reflection.MemberInfo)"/>).</param>
         /// <param name="lowerCaseAnalyzedFieldValues">Pass <c>true</c> to automatically convert field values to lower case (for <see cref="ElasticMapping.FormatValue"/>).</param>
         /// <param name="conversionCulture">The culture to use for the lower-casing, camel-casing, and pluralization operations. If <c>null</c>,
         /// uses <see cref="CultureInfo.CurrentCulture"/>.</param>
@@ -26,8 +27,18 @@ namespace ElasticLinq.Mapping
                                        CultureInfo conversionCulture = null)
             : base(camelCaseFieldNames, false, false, lowerCaseAnalyzedFieldValues, EnumFormat.String, conversionCulture) { }
 
-        /// <inheritdoc/>
-        public override string GetDocumentMappingPrefix(Type type)
+        /// <summary>
+        /// Gets the fully document prefix for a given CLR type. Extending this allows you to change
+        /// the mapping of types names into the prefix used when creating Elasticsearch queries against
+        /// fields. For example, using the Couchbase/Elasticsearch adapter yield documents with the
+        /// prefix "doc", since it wraps all documents into a "doc" object; similarly, developers may
+        /// with to "namespace" Elasticsearch documents when using its auto-schema system,
+        /// to prevent type collisions between field with the same name but different document type.
+        /// </summary>
+        /// <param name="type">The type whose prefix is required.</param>
+        /// <returns>Returns the document prefix; may return <c>null</c> or empty string to
+        /// indicate that no document prefix is required to search the documents.</returns>
+        public virtual string GetDocumentMappingPrefix(Type type)
         {
             return "doc";
         }
@@ -39,14 +50,22 @@ namespace ElasticLinq.Mapping
         }
 
         /// <inheritdoc/>
-        public override ICriteria GetTypeSelectionCriteria(Type docType)
+        public override string GetFieldName(Type type, MemberInfo memberInfo)
         {
-            var property = MappingHelpers.GetTypeSelectionProperty(docType);
-            if (property == null)
-                throw new InvalidOperationException(String.Format(TypeCriteriaMissingExceptionMessage, docType.Name));
+            var memberName = base.GetFieldName(type, memberInfo);
+            var prefix = GetDocumentMappingPrefix(type);
 
-            var prefix = GetDocumentMappingPrefix(docType);
-            return new ExistsCriteria(GetFieldName(prefix, property));
+            return String.Format("{0}.{1}", prefix, memberName).TrimStart('.');
+        } 
+
+        /// <inheritdoc/>
+        public override ICriteria GetTypeSelectionCriteria(Type type)
+        {
+            var property = MappingHelpers.GetTypeSelectionProperty(type);
+            if (property == null)
+                throw new InvalidOperationException(String.Format(TypeCriteriaMissingExceptionMessage, type.Name));
+
+            return new ExistsCriteria(GetFieldName(type, property));
         }
     }
 }

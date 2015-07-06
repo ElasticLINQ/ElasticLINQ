@@ -18,7 +18,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         protected static readonly IElasticMapping CouchMapping = new CouchbaseElasticMapping();
         protected static readonly ILog Log = NullLog.Instance;
         protected static readonly IRetryPolicy RetryPolicy = NullRetryPolicy.Instance;
-        protected static readonly ElasticQueryProvider SharedProvider = new ElasticQueryProvider(Connection, Mapping, Log, RetryPolicy, "prefix");
+        protected static readonly ElasticQueryProvider SharedProvider = new ElasticQueryProvider(Connection, Mapping, Log, RetryPolicy);
 
         protected static IQueryable<Robot> Robots
         {

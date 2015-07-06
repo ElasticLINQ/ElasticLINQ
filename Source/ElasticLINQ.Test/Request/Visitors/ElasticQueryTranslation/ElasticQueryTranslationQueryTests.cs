@@ -15,10 +15,10 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             const string expectedConstant = "Kryten";
             var where = Robots.Query(e => e.Name.Contains(expectedConstant));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Query;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Query;
 
             var queryStringCriteria = Assert.IsType<QueryStringCriteria>(criteria);
-            Assert.Equal("prefix.name", queryStringCriteria.Fields.Single());
+            Assert.Equal("name", queryStringCriteria.Fields.Single());
             Assert.Equal(String.Format("*{0}*", expectedConstant), queryStringCriteria.Value);
         }
 
@@ -27,10 +27,10 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             const string expectedConstant = "Kryten";
             var where = Robots.Query(e => e.Name.StartsWith(expectedConstant));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Query;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Query;
 
             var queryStringCriteria = Assert.IsType<QueryStringCriteria>(criteria);
-            Assert.Equal("prefix.name", queryStringCriteria.Fields.Single());
+            Assert.Equal("name", queryStringCriteria.Fields.Single());
             Assert.Equal(String.Format("{0}*", expectedConstant), queryStringCriteria.Value);
         }
 
@@ -39,10 +39,10 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             const string expectedConstant = "Kryten";
             var where = Robots.Query(e => e.Name.EndsWith(expectedConstant));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest.Query;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Query;
 
             var queryStringCriteria = Assert.IsType<QueryStringCriteria>(criteria);
-            Assert.Equal("prefix.name", queryStringCriteria.Fields.Single());
+            Assert.Equal("name", queryStringCriteria.Fields.Single());
             Assert.Equal(String.Format("*{0}", expectedConstant), queryStringCriteria.Value);
         }
 
@@ -51,7 +51,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             var query = Robots.Query(r => ElasticMethods.Regexp(r.Name, "r.*bot")).Where(r => r.Zone.HasValue);
 
-            var searchRequest = ElasticQueryTranslator.Translate(Mapping, "prefix", query.Expression).SearchRequest;
+            var searchRequest = ElasticQueryTranslator.Translate(Mapping, query.Expression).SearchRequest;
 
             Assert.IsType<RegexpCriteria>(searchRequest.Query);
             Assert.IsType<ExistsCriteria>(searchRequest.Filter);
@@ -61,7 +61,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         public void QueryGeneratesQueryCriteria()
         {
             var where = Robots.Query(r => r.Name == "IG-88" && r.Cost > 1);
-            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest;
+            var request = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest;
 
             var boolCriteria = Assert.IsType<BoolCriteria>(request.Query);
             Assert.Null(request.Filter);
@@ -75,7 +75,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             const string expectedQueryStringValue = "Data";
             var where = Robots.QueryString(expectedQueryStringValue);
-            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest;
 
             Assert.Null(criteria.Filter);
             Assert.NotNull(criteria.Query);
@@ -89,7 +89,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             const string expectedQueryStringValue = "Data";
             var expectedFields = new[] { "Green", "Brown" };
             var where = Robots.QueryString(expectedQueryStringValue, expectedFields);
-            var criteria = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest;
 
             Assert.Null(criteria.Filter);
             Assert.NotNull(criteria.Query);
@@ -103,7 +103,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             const string expectedQueryStringValue = "Data";
             var where = Robots.QueryString(expectedQueryStringValue).Query(q => q.Cost > 0);
-            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", where.Expression).SearchRequest;
+            var request = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest;
 
             Assert.Null(request.Filter);
             Assert.NotNull(request.Query);
@@ -118,7 +118,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             var query = Robots.Query(q => q.Cost > 0 && (q.EnergyUse > 0 || q.Started < DateTime.Now));
 
-            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", query.Expression).SearchRequest;
+            var request = ElasticQueryTranslator.Translate(Mapping, query.Expression).SearchRequest;
 
             Assert.Null(request.Filter);
             Assert.IsType<BoolCriteria>(request.Query);
@@ -129,7 +129,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             var query = Robots.Query(q => true);
 
-            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", query.Expression).SearchRequest;
+            var request = ElasticQueryTranslator.Translate(Mapping, query.Expression).SearchRequest;
 
             Assert.Null(request.Filter);
             Assert.IsType<MatchAllCriteria>(request.Query);
@@ -140,7 +140,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             var query = Robots.Query(q => 1 == 1);
 
-            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", query.Expression).SearchRequest;
+            var request = ElasticQueryTranslator.Translate(Mapping, query.Expression).SearchRequest;
 
             Assert.Null(request.Filter);
             Assert.IsType<MatchAllCriteria>(request.Query);
@@ -151,7 +151,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             var query = Robots.Query(q => false);
 
-            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", query.Expression).SearchRequest;
+            var request = ElasticQueryTranslator.Translate(Mapping, query.Expression).SearchRequest;
 
             Assert.Null(request.Filter);
             var notCriteria = Assert.IsType<NotCriteria>(request.Query);
@@ -163,7 +163,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             var query = Robots.Query(q => 1 > 1);
 
-            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", query.Expression).SearchRequest;
+            var request = ElasticQueryTranslator.Translate(Mapping, query.Expression).SearchRequest;
 
             Assert.Null(request.Filter);
             var notCriteria = Assert.IsType<NotCriteria>(request.Query);
@@ -175,7 +175,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             var query = Robots.Query(r => (r.Id > 1 && true) || (r.Id < 1 && false));
 
-            var request = ElasticQueryTranslator.Translate(Mapping, "prefix", query.Expression).SearchRequest;
+            var request = ElasticQueryTranslator.Translate(Mapping, query.Expression).SearchRequest;
 
             Assert.Null(request.Filter);
             var boolCriteria = Assert.IsType<BoolCriteria>(request.Query);
