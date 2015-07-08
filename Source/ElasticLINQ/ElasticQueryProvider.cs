@@ -13,6 +13,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ElasticLinq
 {
@@ -91,6 +93,11 @@ namespace ElasticLinq
         /// <inheritdoc/>
         public object Execute(Expression expression)
         {
+            return AsyncHelper.RunSync(() => ExecuteAsync(expression));
+        }
+
+        private async Task<object> ExecuteAsync(Expression expression, CancellationToken cancellationToken = default(CancellationToken))
+        {
             Argument.EnsureNotNull("expression", expression);
 
             var translation = ElasticQueryTranslator.Translate(Mapping, expression);
@@ -106,7 +113,7 @@ namespace ElasticLinq
                 }
                 else
                 {
-                    response = AsyncHelper.RunSync(() => requestProcessor.SearchAsync(translation.SearchRequest));
+                    response = await requestProcessor.SearchAsync(translation.SearchRequest, cancellationToken);
                     if (response == null)
                         throw new InvalidOperationException("No HTTP response received.");
                 }

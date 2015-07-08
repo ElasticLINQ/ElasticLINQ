@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ElasticLinq.Request
@@ -39,7 +40,7 @@ namespace ElasticLinq.Request
             this.retryPolicy = retryPolicy;
         }
 
-        public Task<ElasticResponse> SearchAsync(SearchRequest searchRequest)
+        public Task<ElasticResponse> SearchAsync(SearchRequest searchRequest, CancellationToken cancellationToken)
         {
             var formatter = new SearchRequestFormatter(connection, mapping, searchRequest);
             log.Debug(null, null, "Request: POST {0}", formatter.Uri);
@@ -49,7 +50,7 @@ namespace ElasticLinq.Request
                 async () =>
                 {
                     using (var requestMessage = new HttpRequestMessage(HttpMethod.Post, formatter.Uri) { Content = new StringContent(formatter.Body) })
-                    using (var response = await SendRequestAsync(connection.HttpClient, requestMessage))
+                    using (var response = await SendRequestAsync(connection.HttpClient, requestMessage, cancellationToken))
                     using (var responseStream = await response.Content.ReadAsStreamAsync())
                         return ParseResponse(responseStream, log);
                 },
@@ -61,10 +62,10 @@ namespace ElasticLinq.Request
                 });
         }
 
-        private async Task<HttpResponseMessage> SendRequestAsync(HttpClient httpClient, HttpRequestMessage requestMessage)
+        private async Task<HttpResponseMessage> SendRequestAsync(HttpClient httpClient, HttpRequestMessage requestMessage, CancellationToken cancellationToken)
         {
             var stopwatch = Stopwatch.StartNew();
-            var response = await httpClient.SendAsync(requestMessage);
+            var response = await httpClient.SendAsync(requestMessage, cancellationToken);
             stopwatch.Stop();
 
             log.Debug(null, null, "Response: {0} {1} (in {2}ms)", (int)response.StatusCode, response.StatusCode, stopwatch.ElapsedMilliseconds);

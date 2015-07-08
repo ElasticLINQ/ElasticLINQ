@@ -11,6 +11,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -40,7 +41,7 @@ namespace ElasticLinq.Test.Request
             var processor = new ElasticRequestProcessor(localConnection, mapping, log, retryPolicy);
             var request = new SearchRequest { DocumentType = "docType" };
 
-            await processor.SearchAsync(request);
+            await processor.SearchAsync(request, CancellationToken.None);
 
             Assert.Null(messageHandler.Request.Headers.Authorization);
         }
@@ -53,7 +54,7 @@ namespace ElasticLinq.Test.Request
             var processor = new ElasticRequestProcessor(localConnection, mapping, log, retryPolicy);
             var request = new SearchRequest { DocumentType = "docType" };
 
-            await processor.SearchAsync(request);
+            await processor.SearchAsync(request, CancellationToken.None);
 
             var auth = messageHandler.Request.Headers.Authorization;
             Assert.NotNull(auth);
@@ -64,13 +65,12 @@ namespace ElasticLinq.Test.Request
         [Fact]
         public static async void NonSuccessfulHttpRequestThrows()
         {
-            var messageHandler = new SpyMessageHandler();
-            messageHandler.Response.StatusCode = HttpStatusCode.NotFound;
+            var messageHandler = new SpyMessageHandler { Response = { StatusCode = HttpStatusCode.NotFound } };
             var localConnection = new ElasticConnection(messageHandler, new Uri("http://localhost"), "myUser", "myPass");
             var processor = new ElasticRequestProcessor(localConnection, mapping, log, retryPolicy);
             var request = new SearchRequest { DocumentType = "docType" };
 
-            var ex = await Record.ExceptionAsync(() => processor.SearchAsync(request));
+            var ex = await Record.ExceptionAsync(() => processor.SearchAsync(request, CancellationToken.None));
 
             Assert.IsType<HttpRequestException>(ex);
             Assert.Equal("Response status code does not indicate success: 404 (Not Found).", ex.Message);
@@ -110,19 +110,19 @@ namespace ElasticLinq.Test.Request
         {
             var responseString = BuildResponseString(2, 1, 1, 0.3141, "testIndex", "testType", "testId");
             var messageHandler = new SpyMessageHandler();
-            var log = new SpyLog();
+            var spyLog = new SpyLog();
             messageHandler.Response.Content = new StringContent(responseString);
             var localConnection = new ElasticConnection(messageHandler, new Uri("http://localhost"), "myUser", "myPass", index: "SearchIndex");
-            var processor = new ElasticRequestProcessor(localConnection, mapping, log, retryPolicy);
+            var processor = new ElasticRequestProcessor(localConnection, mapping, spyLog, retryPolicy);
             var request = new SearchRequest { DocumentType = "abc123", Size = 2112 };
 
-            await processor.SearchAsync(request);
+            await processor.SearchAsync(request, CancellationToken.None);
 
-            Assert.Equal(4, log.Messages.Count);
-            Assert.Equal(@"[VERBOSE] Request: POST http://localhost/SearchIndex/abc123/_search", log.Messages[0]);
-            Assert.Equal(@"[VERBOSE] Body:" +'\n' + @"{""size"":2112,""timeout"":""10s""}", log.Messages[1]);
-            Assert.True(new Regex(@"\[VERBOSE\] Response: 200 OK \(in \d+ms\)").Match(log.Messages[2]).Success);
-            Assert.True(new Regex(@"\[VERBOSE\] Deserialized \d+ bytes into 1 hits in \d+ms").Match(log.Messages[3]).Success);
+            Assert.Equal(4, spyLog.Messages.Count);
+            Assert.Equal(@"[VERBOSE] Request: POST http://localhost/SearchIndex/abc123/_search", spyLog.Messages[0]);
+            Assert.Equal(@"[VERBOSE] Body:" + '\n' + @"{""size"":2112,""timeout"":""10s""}", spyLog.Messages[1]);
+            Assert.True(new Regex(@"\[VERBOSE\] Response: 200 OK \(in \d+ms\)").Match(spyLog.Messages[2]).Success);
+            Assert.True(new Regex(@"\[VERBOSE\] Deserialized \d+ bytes into 1 hits in \d+ms").Match(spyLog.Messages[3]).Success);
         }
 
         private static string BuildResponseString(int took, int shards, int hits, double score, string index, string type, string id)
