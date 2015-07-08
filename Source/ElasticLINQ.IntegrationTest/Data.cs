@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using ElasticLinq;
+using ElasticLinq.IntegrationTest.Models;
 using ElasticLinq.Mapping;
-using ElasticLINQ.IntegrationTest.Models;
 
-namespace ElasticLINQ.IntegrationTest
+namespace ElasticLinq.IntegrationTest
 {
     class Data
     {

@@ -21,7 +21,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <DocumentationFile>bin\Debug\ElasticLinq.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\ElasticLinq.XML</DocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -45,6 +45,10 @@
     <Reference Include="System.Net.Http" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AsyncQueryable.cs" />
+    <Compile Include="AsyncQueryable.Average.cs" />
+    <Compile Include="AsyncQueryable.Sum.cs" />
+    <Compile Include="AsyncQueryable.Entity.cs" />
     <Compile Include="ElasticConnection.cs" />
     <Compile Include="ElasticConnectionOptions.cs" />
     <Compile Include="ElasticContext.cs" />

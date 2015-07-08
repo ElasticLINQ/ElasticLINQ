@@ -96,7 +96,7 @@ namespace ElasticLinq
             return AsyncHelper.RunSync(() => ExecuteAsync(expression));
         }
 
-        private async Task<object> ExecuteAsync(Expression expression, CancellationToken cancellationToken = default(CancellationToken))
+        internal async Task<object> ExecuteAsync(Expression expression, CancellationToken cancellationToken = default(CancellationToken))
         {
             Argument.EnsureNotNull("expression", expression);
 
