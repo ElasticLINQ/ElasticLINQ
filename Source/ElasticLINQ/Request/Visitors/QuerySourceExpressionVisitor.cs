@@ -5,11 +5,11 @@ using System.Linq.Expressions;
 
 namespace ElasticLinq.Request.Visitors
 {
-    internal class QuerySourceExpressionVisitor : ExpressionVisitor
+    class QuerySourceExpressionVisitor : ExpressionVisitor
     {
-        private IQueryable sourceQueryable;
+        IQueryable sourceQueryable;
 
-        private QuerySourceExpressionVisitor()
+        QuerySourceExpressionVisitor()
         {
         }
 
@@ -20,12 +20,12 @@ namespace ElasticLinq.Request.Visitors
             return visitor.sourceQueryable;
         }
 
-        protected override Expression VisitConstant(ConstantExpression c)
+        protected override Expression VisitConstant(ConstantExpression node)
         {
-            if (c.Value is IQueryable)
-                sourceQueryable = ((IQueryable)c.Value);
+            if (node.Value is IQueryable)
+                sourceQueryable = ((IQueryable)node.Value);
 
-            return c;
+            return node;
         }
     }
 }

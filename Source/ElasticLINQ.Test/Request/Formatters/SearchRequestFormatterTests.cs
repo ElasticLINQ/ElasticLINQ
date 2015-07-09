@@ -19,15 +19,15 @@ namespace ElasticLinq.Test.Request.Formatters
 {
     public class SearchRequestFormatterTests
     {
-        private static readonly ElasticConnection defaultConnection = new ElasticConnection(new Uri("http://a.b.com:9000/"));
-        private static readonly MemberInfo memberInfo = typeof(string).GetProperty("Length");
-        private static readonly ICriteria criteria = new ExistsCriteria("greenField");
-        private readonly IElasticMapping mapping = Substitute.For<IElasticMapping>();
+        static readonly ElasticConnection defaultConnection = new ElasticConnection(new Uri("http://a.b.com:9000/"));
+        static readonly MemberInfo memberInfo = typeof(string).GetProperty("Length");
+        static readonly ICriteria criteria = new ExistsCriteria("greenField");
+        readonly IElasticMapping mapping = Substitute.For<IElasticMapping>();
 
         public SearchRequestFormatterTests()
         {
             mapping.FormatValue(null, null)
-                   .ReturnsForAnyArgs(callInfo => new JValue(String.Format("!!! {0} !!!", callInfo.Arg<object>(1))));
+                   .ReturnsForAnyArgs(callInfo => new JValue(string.Format("!!! {0} !!!", callInfo.Arg<object>(1))));
         }
 
         [Theory]
@@ -351,7 +351,7 @@ namespace ElasticLinq.Test.Request.Formatters
 
             var parameters = formatter.Uri.GetComponents(UriComponents.Query, UriFormat.Unescaped).Split('&');
 
-            Assert.DoesNotContain(parameters, p => p.StartsWith("search_type="));
+            Assert.DoesNotContain(parameters, p => p.StartsWith("search_type=", StringComparison.Ordinal));
         }
     }
 }

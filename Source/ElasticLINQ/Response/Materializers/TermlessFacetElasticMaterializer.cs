@@ -12,13 +12,13 @@ namespace ElasticLinq.Response.Materializers
     /// Materializes a single termless facet from the ElasticResponse as the
     /// desired CLR object.
     /// </summary>
-    internal class TermlessFacetElasticMaterializer : IElasticMaterializer
+    class TermlessFacetElasticMaterializer : IElasticMaterializer
     {
-        private static readonly string[] termlessFacetTypes = { "statistical", "filter" };
+        static readonly string[] termlessFacetTypes = { "statistical", "filter" };
 
-        private readonly Func<AggregateRow, object> projector;
-        private readonly Type elementType;
-        private readonly object key;
+        readonly Func<AggregateRow, object> projector;
+        readonly Type elementType;
+        readonly object key;
 
         /// <summary>
         /// Create an instance of the TermlessFacetElasticMaterializer with the given parameters.

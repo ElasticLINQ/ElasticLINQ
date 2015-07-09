@@ -6,7 +6,7 @@ namespace ElasticLinq.IntegrationTest.WhereTests
 {
     public class IntWhereTests
     {
-        private const int Middle = 50;
+        const int Middle = 50;
 
         [Fact]
         public void LessThanConstant()

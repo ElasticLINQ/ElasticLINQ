@@ -213,7 +213,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             Assert.Contains("String.Contains can only be used within .Query()", ex.Message);
         }
 
-        private static ElasticTranslateResult Translate(IQueryable query)
+        static ElasticTranslateResult Translate(IQueryable query)
         {
             return ElasticQueryTranslator.Translate(Mapping, query.Expression);
         }

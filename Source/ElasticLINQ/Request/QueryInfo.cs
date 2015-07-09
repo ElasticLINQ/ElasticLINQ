@@ -7,8 +7,8 @@ namespace ElasticLinq.Request
     /// </summary>
     public class QueryInfo
     {
-        private readonly string query;
-        private readonly Uri uri;
+        readonly string query;
+        readonly Uri uri;
 
         /// <summary>
         /// Create a new instance of the QueryInfo class with a given query and Uri.

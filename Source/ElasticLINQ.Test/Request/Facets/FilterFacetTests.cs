@@ -9,8 +9,8 @@ namespace ElasticLinq.Test.Request.Facets
 {
     public class FilterFacetTests
     {
-        private const string ExpectedName = "name";
-        private readonly ICriteria expectedFilter = new TermCriteria("field", null, "value1");
+        const string ExpectedName = "name";
+        readonly ICriteria expectedFilter = new TermCriteria("field", null, "value1");
 
         [Fact]
         public void ConstructorSetsAllProperties()

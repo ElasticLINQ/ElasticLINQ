@@ -11,9 +11,9 @@ namespace ElasticLinq.Response.Materializers
     /// <summary>
     /// Materializes a list containing a single termless facet.
     /// </summary>
-    internal class ListTermlessFacetsElasticMaterializer : TermlessFacetElasticMaterializer
+    class ListTermlessFacetsElasticMaterializer : TermlessFacetElasticMaterializer
     {
-        private static readonly MethodInfo manyMethodInfo = typeof(ListTermlessFacetsElasticMaterializer).GetMethodInfo(f => f.Name == "Many" && f.IsStatic);
+        static readonly MethodInfo manyMethodInfo = typeof(ListTermlessFacetsElasticMaterializer).GetMethodInfo(f => f.Name == "Many" && f.IsStatic);
 
         /// <summary>
         /// Create an instance of the ListTermlessFacetsElasticMaterializer with the given parameters.

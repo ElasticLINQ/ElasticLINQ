@@ -16,11 +16,11 @@ namespace ElasticLinq.Test.Mapping
 {
     public class ElasticMappingTests
     {
-        private enum Day { Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday };
+        enum Day { Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday };
 
-        private class FieldClass { public string AField; }
+        class FieldClass { public string AField; }
 
-        private class FormatClass
+        class FormatClass
         {
             public string Analyzed { get; set; }
 
@@ -115,8 +115,8 @@ namespace ElasticLinq.Test.Mapping
             Assert.Throws<ArgumentNullException>(() => mapping.GetFieldName(null, TypeHelper.GetMemberInfo((FieldClass f) => f.AField)));
         }
 
-        private class SingularTypeName { }
-        private class PluralTypeNames { }
+        class SingularTypeName { }
+        class PluralTypeNames { }
 
         [Theory]
         [InlineData(false, false, typeof(SingularTypeName), "SingularTypeName")]

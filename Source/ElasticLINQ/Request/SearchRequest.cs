@@ -9,7 +9,7 @@ namespace ElasticLinq.Request
     /// <summary>
     /// Represents a search request to be sent to Elasticsearch.
     /// </summary>
-    internal class SearchRequest
+    class SearchRequest
     {
         /// <summary>
         /// Create a new SearchRequest.

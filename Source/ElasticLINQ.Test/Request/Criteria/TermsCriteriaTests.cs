@@ -8,7 +8,7 @@ namespace ElasticLinq.Test.Request.Criteria
 {
     public class TermsCriteriaTests
     {
-        private readonly static MemberInfo memberInfo = typeof(string).GetProperty("Length");
+        readonly static MemberInfo memberInfo = typeof(string).GetProperty("Length");
 
         [Fact]
         public static void OneValue_CreatesTermCriteria()

@@ -8,7 +8,7 @@ namespace ElasticLinq.Test.TestSupport
     [JsonConverter(typeof(IdentifierJsonConverter))]
     class Identifier
     {
-        private readonly string value;
+        readonly string value;
 
         public Identifier(string value)
         {

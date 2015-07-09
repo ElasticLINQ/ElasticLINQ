@@ -12,10 +12,10 @@ namespace ElasticLinq.Request.Visitors
     /// in a test or assignment.
     /// </summary>
     [DebuggerDisplay("{MemberExpression,nq}, {ConstantExpression.Value}")]
-    internal class ConstantMemberPair
+    class ConstantMemberPair
     {
-        private readonly ConstantExpression constantExpression;
-        private readonly MemberExpression memberExpression;
+        readonly ConstantExpression constantExpression;
+        readonly MemberExpression memberExpression;
 
         public static ConstantMemberPair Create(Expression a, Expression b)
         {

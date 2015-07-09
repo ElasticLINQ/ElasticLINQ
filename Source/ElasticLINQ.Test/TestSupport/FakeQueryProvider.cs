@@ -10,7 +10,7 @@ using System.Linq.Expressions;
 namespace ElasticLinq.Test.TestSupport
 {
     [ExcludeFromCodeCoverage] // Fake for tests
-    internal class FakeQueryProvider : IQueryProvider
+    class FakeQueryProvider : IQueryProvider
     {
         public IQueryable CreateQuery(Expression expression)
         {
@@ -39,7 +39,7 @@ namespace ElasticLinq.Test.TestSupport
             return ExecuteInternal(expression);
         }
 
-        private object ExecuteInternal(Expression expression)
+        object ExecuteInternal(Expression expression)
         {
             FinalExpression = expression;
             var elementType = TypeHelper.GetSequenceElementType(expression.Type);

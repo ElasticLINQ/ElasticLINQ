@@ -10,10 +10,10 @@ namespace ElasticLinq.Request.Visitors
     /// and the local <see cref="IElasticMaterializer"/> necessary to
     /// instantiate objects.
     /// </summary>
-    internal class ElasticTranslateResult
+    class ElasticTranslateResult
     {
-        private readonly SearchRequest searchRequest;
-        private readonly IElasticMaterializer materializer;
+        readonly SearchRequest searchRequest;
+        readonly IElasticMaterializer materializer;
 
         public ElasticTranslateResult(SearchRequest searchRequest, IElasticMaterializer materializer)
         {

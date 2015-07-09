@@ -18,7 +18,7 @@ namespace ElasticLinq.Request.Visitors
     /// Expression visitor to translate predicate expressions to criteria expressions.
     /// Used by Where, Query, Single, First, Count etc.
     /// </summary>
-    internal abstract class CriteriaExpressionVisitor : ExpressionVisitor
+    abstract class CriteriaExpressionVisitor : ExpressionVisitor
     {
         protected readonly IElasticMapping Mapping;
         protected readonly Type SourceType;
@@ -34,21 +34,21 @@ namespace ElasticLinq.Request.Visitors
             SourceType = sourceType;
         }
 
-        protected override Expression VisitMethodCall(MethodCallExpression m)
+        protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            if (m.Method.DeclaringType == typeof(string))
-                return VisitStringMethodCall(m);
+            if (node.Method.DeclaringType == typeof(string))
+                return VisitStringMethodCall(node);
 
-            if (m.Method.DeclaringType == typeof(Enumerable))
-                return VisitEnumerableMethodCall(m);
+            if (node.Method.DeclaringType == typeof(Enumerable))
+                return VisitEnumerableMethodCall(node);
 
-            if (m.Method.DeclaringType == typeof(ElasticMethods))
-                return VisitElasticMethodsMethodCall(m);
+            if (node.Method.DeclaringType == typeof(ElasticMethods))
+                return VisitElasticMethodsMethodCall(node);
 
-            return VisitDefaultMethodCall(m);
+            return VisitDefaultMethodCall(node);
         }
 
-        private Expression VisitDefaultMethodCall(MethodCallExpression m)
+        Expression VisitDefaultMethodCall(MethodCallExpression m)
         {
             switch (m.Method.Name)
             {
@@ -151,55 +151,55 @@ namespace ElasticLinq.Request.Visitors
             return base.VisitUnary(node);
         }
 
-        protected override Expression VisitMember(MemberExpression m)
+        protected override Expression VisitMember(MemberExpression node)
         {
-            if (m.Member.DeclaringType == typeof(ElasticFields))
-                return m;
+            if (node.Member.DeclaringType == typeof(ElasticFields))
+                return node;
 
-            switch (m.Expression.NodeType)
+            switch (node.Expression.NodeType)
             {
                 case ExpressionType.Parameter:
                 case ExpressionType.MemberAccess:
-                    return m;
+                    return node;
 
                 default:
-                    var memberName = m.Member.Name;
-                    if (m.Member.DeclaringType != null)
-                        memberName = m.Member.DeclaringType.Name + "." + m.Member.Name;
-                    throw new NotSupportedException(string.Format("{0} is of unsupported type {1}", memberName, m.Expression.NodeType));
+                    var memberName = node.Member.Name;
+                    if (node.Member.DeclaringType != null)
+                        memberName = node.Member.DeclaringType.Name + "." + node.Member.Name;
+                    throw new NotSupportedException(string.Format("{0} is of unsupported type {1}", memberName, node.Expression.NodeType));
             }
         }
 
-        protected override Expression VisitBinary(BinaryExpression b)
+        protected override Expression VisitBinary(BinaryExpression node)
         {
-            switch (b.NodeType)
+            switch (node.NodeType)
             {
                 case ExpressionType.OrElse:
-                    return VisitOrElse(b);
+                    return VisitOrElse(node);
 
                 case ExpressionType.AndAlso:
-                    return VisitAndAlso(b);
+                    return VisitAndAlso(node);
 
                 case ExpressionType.Equal:
-                    return VisitEquals(Visit(b.Left), Visit(b.Right));
+                    return VisitEquals(Visit(node.Left), Visit(node.Right));
 
                 case ExpressionType.NotEqual:
-                    return VisitNotEqual(Visit(b.Left), Visit(b.Right));
+                    return VisitNotEqual(Visit(node.Left), Visit(node.Right));
 
                 case ExpressionType.GreaterThan:
-                    return VisitRange(RangeComparison.GreaterThan, Visit(b.Left), Visit(b.Right));
+                    return VisitRange(RangeComparison.GreaterThan, Visit(node.Left), Visit(node.Right));
                 
                 case ExpressionType.GreaterThanOrEqual:
-                    return VisitRange(RangeComparison.GreaterThanOrEqual, Visit(b.Left), Visit(b.Right));
+                    return VisitRange(RangeComparison.GreaterThanOrEqual, Visit(node.Left), Visit(node.Right));
                 
                 case ExpressionType.LessThan:
-                    return VisitRange(RangeComparison.LessThan, Visit(b.Left), Visit(b.Right));
+                    return VisitRange(RangeComparison.LessThan, Visit(node.Left), Visit(node.Right));
 
                 case ExpressionType.LessThanOrEqual:
-                    return VisitRange(RangeComparison.LessThanOrEqual, Visit(b.Left), Visit(b.Right));
+                    return VisitRange(RangeComparison.LessThanOrEqual, Visit(node.Left), Visit(node.Right));
 
                 default:
-                    throw new NotSupportedException(string.Format("Binary expression '{0}' is not supported", b.NodeType));
+                    throw new NotSupportedException(string.Format("Binary expression '{0}' is not supported", node.NodeType));
             }
         }
 
@@ -227,7 +227,7 @@ namespace ElasticLinq.Request.Visitors
             return e;
         }
 
-        private Expression VisitPrefix(Expression fieldExpression, Expression startsWithExpression)
+        Expression VisitPrefix(Expression fieldExpression, Expression startsWithExpression)
         {
             // Do not use ConstantMemberPair - these expressions are not reversible
             if (fieldExpression is MemberExpression && startsWithExpression is ConstantExpression)
@@ -239,7 +239,7 @@ namespace ElasticLinq.Request.Visitors
             throw new NotSupportedException("ElasticMethods.Prefix must take a member for field and a constant for startsWith");
         }
 
-        private Expression VisitRegexp(Expression fieldExpression, Expression regexpExpression)
+        Expression VisitRegexp(Expression fieldExpression, Expression regexpExpression)
         {
             // Do not use ConstantMemberPair - these expressions are not reversible
             if (fieldExpression is MemberExpression && regexpExpression is ConstantExpression)
@@ -251,7 +251,7 @@ namespace ElasticLinq.Request.Visitors
             throw new NotSupportedException("ElasticMethods.Regexp must take a member for field and a constant for startsWith");
         }
 
-        private Expression VisitEnumerableContainsMethodCall(Expression source, Expression match)
+        Expression VisitEnumerableContainsMethodCall(Expression source, Expression match)
         {
             var matched = Visit(match);
 
@@ -296,7 +296,7 @@ namespace ElasticLinq.Request.Visitors
             {
                 var field = Mapping.GetFieldName(SourceType, (MemberExpression)source);
                 var value = ((ConstantExpression)matched).Value;
-                return new CriteriaExpression(new QueryStringCriteria(String.Format(pattern, value), field));
+                return new CriteriaExpression(new QueryStringCriteria(string.Format(pattern, value), field));
             }
 
             throw new NotSupportedException(source is MemberExpression
@@ -304,19 +304,19 @@ namespace ElasticLinq.Request.Visitors
                 : string.Format("Unknown source '{0}' for Contains operation", source));
         }
 
-        private Expression VisitAndAlso(BinaryExpression b)
+        Expression VisitAndAlso(BinaryExpression b)
         {
             return new CriteriaExpression(
                 AndCriteria.Combine(CombineExpressions<CriteriaExpression>(b.Left, b.Right).Select(f => f.Criteria).ToArray()));
         }
 
-        private Expression VisitOrElse(BinaryExpression b)
+        Expression VisitOrElse(BinaryExpression b)
         {
             return new CriteriaExpression(
                 OrCriteria.Combine(CombineExpressions<CriteriaExpression>(b.Left, b.Right).Select(f => f.Criteria).ToArray()));
         }
 
-        private IEnumerable<T> CombineExpressions<T>(params Expression[] expressions) where T : Expression
+        IEnumerable<T> CombineExpressions<T>(params Expression[] expressions) where T : Expression
         {
             foreach (var expression in expressions.Select(BooleanMemberAccessBecomesEquals))
             {
@@ -327,7 +327,7 @@ namespace ElasticLinq.Request.Visitors
             }
         }
 
-        private Expression VisitContains(string methodName, Expression left, Expression right, TermsExecutionMode executionMode)
+        Expression VisitContains(string methodName, Expression left, Expression right, TermsExecutionMode executionMode)
         {
             var cm = ConstantMemberPair.Create(left, right);
 
@@ -340,7 +340,7 @@ namespace ElasticLinq.Request.Visitors
             throw new NotSupportedException(methodName + " must be between a Member and a Constant");
         }
 
-        private Expression CreateExists(ConstantMemberPair cm, bool positiveTest)
+        Expression CreateExists(ConstantMemberPair cm, bool positiveTest)
         {
             var fieldName = Mapping.GetFieldName(SourceType, UnwrapNullableMethodExpression(cm.MemberExpression));
 
@@ -355,7 +355,7 @@ namespace ElasticLinq.Request.Visitors
             throw new NotSupportedException("A null test Expression must have a member being compared to a bool or null");
         }
 
-        private Expression VisitEquals(Expression left, Expression right)
+        Expression VisitEquals(Expression left, Expression right)
         {
             var booleanEquals = VisitCriteriaEquals(left, right, true);
             if (booleanEquals != null)
@@ -371,7 +371,7 @@ namespace ElasticLinq.Request.Visitors
             throw new NotSupportedException("Equality must be between a Member and a Constant");
         }
 
-        private static Expression VisitCriteriaEquals(Expression left, Expression right, bool positiveCondition)
+        static Expression VisitCriteriaEquals(Expression left, Expression right, bool positiveCondition)
         {
             var criteria = left as CriteriaExpression ?? right as CriteriaExpression;
             var constant = left as ConstantExpression ?? right as ConstantExpression;
@@ -388,7 +388,7 @@ namespace ElasticLinq.Request.Visitors
             return null;
         }
 
-        private static MemberExpression UnwrapNullableMethodExpression(MemberExpression m)
+        static MemberExpression UnwrapNullableMethodExpression(MemberExpression m)
         {
             var lhsMemberExpression = m.Expression as MemberExpression;
             if (lhsMemberExpression != null && m.Member.Name == "HasValue" && m.Member.DeclaringType.IsGenericOf(typeof(Nullable<>)))
@@ -397,7 +397,7 @@ namespace ElasticLinq.Request.Visitors
             return m;
         }
 
-        private Expression VisitNotEqual(Expression left, Expression right)
+        Expression VisitNotEqual(Expression left, Expression right)
         {
             var booleanEquals = VisitCriteriaEquals(left, right, false);
             if (booleanEquals != null)
@@ -413,7 +413,7 @@ namespace ElasticLinq.Request.Visitors
                 : new CriteriaExpression(NotCriteria.Create(new TermCriteria(Mapping.GetFieldName(SourceType, cm.MemberExpression), cm.MemberExpression.Member, cm.ConstantExpression.Value)));
         }
 
-        private Expression VisitRange(RangeComparison rangeComparison, Expression left, Expression right)
+        Expression VisitRange(RangeComparison rangeComparison, Expression left, Expression right)
         {
             var inverted = left is ConstantExpression;
             var cm = ConstantMemberPair.Create(left, right);
@@ -428,7 +428,7 @@ namespace ElasticLinq.Request.Visitors
             return new CriteriaExpression(new RangeCriteria(field, cm.MemberExpression.Member, rangeComparison, cm.ConstantExpression.Value));
         }
 
-        private readonly RangeComparison[] invertedRangeComparison =
+        static readonly RangeComparison[] invertedRangeComparison =
         {
             RangeComparison.LessThan,
             RangeComparison.LessThanOrEqual,

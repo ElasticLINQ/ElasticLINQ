@@ -13,13 +13,13 @@ namespace ElasticLinq.Request.Facets
     /// </summary>
     /// <remarks>Mapped to .GroupBy(a => a.Term).Select(a => a.Sum(b => b.Field))</remarks>
     [DebuggerDisplay("TermsStatsFacet \"{key,nq}.{value,nq}\"")]
-    internal class TermsStatsFacet : IOrderableFacet
+    class TermsStatsFacet : IOrderableFacet
     {
-        private readonly string name;
-        private readonly ICriteria criteria;
-        private readonly string key;
-        private readonly string value;
-        private readonly int? size;
+        readonly string name;
+        readonly ICriteria criteria;
+        readonly string key;
+        readonly string value;
+        readonly int? size;
 
         public TermsStatsFacet(string name, string key, string value, int? size)
             : this(name, null, key, value)

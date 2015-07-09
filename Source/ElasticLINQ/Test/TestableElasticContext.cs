@@ -15,7 +15,7 @@ namespace ElasticLinq.Test
     /// </summary>
     public class TestableElasticContext : IElasticContext
     {
-        private readonly Dictionary<Type, object> data = new Dictionary<Type, object>();
+        readonly Dictionary<Type, object> data = new Dictionary<Type, object>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestableElasticContext"/> class.

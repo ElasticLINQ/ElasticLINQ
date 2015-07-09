@@ -10,7 +10,7 @@ namespace ElasticLinq.Utility
     /// Argument validation static helpers to reduce noise in other methods.
     /// </summary>
     [DebuggerStepThrough]
-    internal static class Argument
+    static class Argument
     {
         /// <summary>
         /// Throw an ArgumentNullException if the object is null.
@@ -42,7 +42,7 @@ namespace ElasticLinq.Utility
         public static void EnsureNotBlank(string argumentName, string value)
         {
             EnsureNotNull(argumentName, value);
-            if (String.IsNullOrWhiteSpace(value))
+            if (string.IsNullOrWhiteSpace(value))
                 throw new ArgumentException("Cannot be a blank string.", argumentName);
         }
 

@@ -10,7 +10,7 @@ namespace ElasticLinq.Request.Criteria
     /// Criteria that requires one of the criteria to be
     /// satisfied in order to select the document.
     /// </summary>
-    internal class OrCriteria : CompoundCriteria
+    class OrCriteria : CompoundCriteria
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="OrCriteria"/> class.
@@ -61,7 +61,7 @@ namespace ElasticLinq.Request.Criteria
         /// This is necessary as the compiler-generated unary expression tree appears as ((a || b) || c).
         /// We we would like the simpler form that looks more like the original source of (a || b || c).
         /// </remarks>
-        private static IEnumerable<ICriteria> FlattenOrCriteria(IEnumerable<ICriteria> criteria)
+        static IEnumerable<ICriteria> FlattenOrCriteria(IEnumerable<ICriteria> criteria)
         {
             foreach (var criterion in criteria)
             {
@@ -80,7 +80,7 @@ namespace ElasticLinq.Request.Criteria
         /// </summary>
         /// <param name="criteria">collection of <see cref="ICriteria" /> that might be combined.</param>
         /// <returns><see cref="ITermsCriteria" /> containing all terms for that field or null if they can not be combined.</returns>
-        private static ICriteria CombineTermsForSameField(ICollection<ICriteria> criteria)
+        static ICriteria CombineTermsForSameField(ICollection<ICriteria> criteria)
         {
             var termCriteria = criteria.OfType<ITermsCriteria>().ToArray();
             var areAllSameTerm = termCriteria.Length == criteria.Count

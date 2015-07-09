@@ -12,9 +12,9 @@ namespace ElasticLinq.Mapping
     /// Wraps an elastic mapping with one that also handles the built-in
     /// ElasticFields class that contains properties for _score etc.
     /// </summary>
-    internal class ElasticFieldsMappingWrapper : IElasticMapping
+    class ElasticFieldsMappingWrapper : IElasticMapping
     {
-        private readonly IElasticMapping wrapped;
+        readonly IElasticMapping wrapped;
 
         /// <inheritdoc/>
         public ElasticFieldsMappingWrapper(IElasticMapping wrapped)

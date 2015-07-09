@@ -10,8 +10,8 @@ namespace ElasticLinq.Request.Criteria
     /// </summary>
     public class QueryStringCriteria : ICriteria
     {
-        private readonly string value;
-        private readonly ReadOnlyCollection<string> fields;
+        readonly string value;
+        readonly ReadOnlyCollection<string> fields;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="QueryStringCriteria"/> class.

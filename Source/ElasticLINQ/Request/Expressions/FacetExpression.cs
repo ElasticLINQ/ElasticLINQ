@@ -9,9 +9,9 @@ namespace ElasticLinq.Request.Expressions
     /// <summary>
     /// An expression tree node that represents an Elasticsearch facet.
     /// </summary>
-    internal class FacetExpression : Expression
+    class FacetExpression : Expression
     {
-        private readonly IFacet facet;
+        readonly IFacet facet;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FacetExpression"/> class.

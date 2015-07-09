@@ -11,14 +11,14 @@ namespace ElasticLinq.Test.Response.Materializers
 {
     public class AggregatesTests
     {
-        private const string ExpectedKey = "Wikkit";
-        private static readonly List<AggregateField> expectedFields = new List<AggregateField>
+        const string ExpectedKey = "Wikkit";
+        static readonly List<AggregateField> expectedFields = new List<AggregateField>
         {
             new AggregateField("Green", "Mow", JToken.Parse("\"mower\"")),
             new AggregateField("Brown", "Water", JToken.Parse("\"5\"")),
         };
 
-        private static readonly JObject expectedFacets = JObject.Parse(
+        static readonly JObject expectedFacets = JObject.Parse(
             "{ " +
                 " \"multi\": { \"string\": \"piece-of\", \"integer\": 19 }, " +
                 " \"single\": { \"double\": 5.01 } " +
@@ -186,8 +186,8 @@ namespace ElasticLinq.Test.Response.Materializers
         {
             var token = JToken.Parse("Infinity");
 
-            Assert.Equal(Double.PositiveInfinity, AggregateRow.ParseValue(token, typeof(Double)));
-            Assert.Equal(Single.PositiveInfinity, AggregateRow.ParseValue(token, typeof(Single)));
+            Assert.Equal(double.PositiveInfinity, AggregateRow.ParseValue(token, typeof(double)));
+            Assert.Equal(float.PositiveInfinity, AggregateRow.ParseValue(token, typeof(float)));
         }
 
         [Fact]
@@ -195,8 +195,8 @@ namespace ElasticLinq.Test.Response.Materializers
         {
             var token = JToken.Parse("-Infinity");
 
-            Assert.Equal(Double.NegativeInfinity, AggregateRow.ParseValue(token, typeof(Double)));
-            Assert.Equal(Single.NegativeInfinity, AggregateRow.ParseValue(token, typeof(Single)));
+            Assert.Equal(double.NegativeInfinity, AggregateRow.ParseValue(token, typeof(double)));
+            Assert.Equal(float.NegativeInfinity, AggregateRow.ParseValue(token, typeof(float)));
         }
 
         [Fact]
@@ -209,8 +209,8 @@ namespace ElasticLinq.Test.Response.Materializers
         [Fact]
         public void AggregateRowParseValueParsesStringInfinitiesAsStrings()
         {
-            Assert.Equal("Infinity", AggregateRow.ParseValue(JToken.Parse("Infinity"), typeof(String)));
-            Assert.Equal("-Infinity", AggregateRow.ParseValue(JToken.Parse("-Infinity"), typeof(String)));
+            Assert.Equal("Infinity", AggregateRow.ParseValue(JToken.Parse("Infinity"), typeof(string)));
+            Assert.Equal("-Infinity", AggregateRow.ParseValue(JToken.Parse("-Infinity"), typeof(string)));
         }
 
         [Fact]
@@ -238,12 +238,12 @@ namespace ElasticLinq.Test.Response.Materializers
         readonly DateTime epochDateTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         readonly DateTime epochDateTimeOffset = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-        private static DateTime WithoutFractionalMilliseconds(DateTime date)
+        static DateTime WithoutFractionalMilliseconds(DateTime date)
         {
             return new DateTime(date.Year, date.Month, date.Day, date.Hour, date.Minute, date.Second, date.Millisecond, date.Kind);
         }
 
-        private static DateTimeOffset WithoutFractionalMilliseconds(DateTimeOffset date)
+        static DateTimeOffset WithoutFractionalMilliseconds(DateTimeOffset date)
         {
             return new DateTimeOffset(date.Year, date.Month, date.Day, date.Hour, date.Minute, date.Second, date.Millisecond, date.Offset);
         }

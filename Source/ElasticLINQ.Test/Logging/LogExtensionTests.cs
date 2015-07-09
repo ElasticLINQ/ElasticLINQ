@@ -11,7 +11,7 @@ namespace ElasticLinq.Test.Logging
         {
             var spy = new SpyLog();
 
-            spy.Debug(new Exception("DebugLog"), new Dictionary<string, object> { { "DebugInfo", new Object() } }, "DebugMessage", 1, 2, 3);
+            spy.Debug(new Exception("DebugLog"), new Dictionary<string, object> { { "DebugInfo", new object() } }, "DebugMessage", 1, 2, 3);
 
             Assert.Equal(1, spy.Messages.Count);
             Assert.Contains("VERBOSE", spy.Messages[0]);
@@ -25,7 +25,7 @@ namespace ElasticLinq.Test.Logging
         {
             var spy = new SpyLog();
 
-            spy.Error(new Exception("ErrorLog"), new Dictionary<string, object> { { "ErrorInfo", new Object() } }, "ErrorMessage", 1, 2, 3);
+            spy.Error(new Exception("ErrorLog"), new Dictionary<string, object> { { "ErrorInfo", new object() } }, "ErrorMessage", 1, 2, 3);
 
             Assert.Equal(1, spy.Messages.Count);
             Assert.Contains("ERROR", spy.Messages[0]);
@@ -39,7 +39,7 @@ namespace ElasticLinq.Test.Logging
         {
             var spy = new SpyLog();
 
-            spy.Fatal(new Exception("FatalLog"), new Dictionary<string, object> { { "FatalInfo", new Object() } }, "FatalMessage", 1, 2, 3);
+            spy.Fatal(new Exception("FatalLog"), new Dictionary<string, object> { { "FatalInfo", new object() } }, "FatalMessage", 1, 2, 3);
 
             Assert.Equal(1, spy.Messages.Count);
             Assert.Contains("CRITICAL", spy.Messages[0]);
@@ -53,7 +53,7 @@ namespace ElasticLinq.Test.Logging
         {
             var spy = new SpyLog();
 
-            spy.Info(new Exception("InfoLog"), new Dictionary<string, object> { { "InfoInfo", new Object() } }, "InfoMessage", 1, 2, 3);
+            spy.Info(new Exception("InfoLog"), new Dictionary<string, object> { { "InfoInfo", new object() } }, "InfoMessage", 1, 2, 3);
 
             Assert.Equal(1, spy.Messages.Count);
             Assert.Contains("INFO", spy.Messages[0]);

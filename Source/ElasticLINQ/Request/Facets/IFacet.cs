@@ -4,14 +4,14 @@ using ElasticLinq.Request.Criteria;
 
 namespace ElasticLinq.Request.Facets
 {
-    internal interface IFacet
+    interface IFacet
     {
         string Name { get; }
         string Type { get; }
         ICriteria Filter { get; }
     }
 
-    internal interface IOrderableFacet : IFacet
+    interface IOrderableFacet : IFacet
     {
         int? Size { get; }
     }

@@ -13,7 +13,7 @@ namespace ElasticLinq.Request.Criteria
     /// </remarks>
     public class PrefixCriteria : SingleFieldCriteria
     {
-        private readonly string prefix;
+        readonly string prefix;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PrefixCriteria"/> class.
@@ -43,7 +43,7 @@ namespace ElasticLinq.Request.Criteria
         /// <inheritdoc/>
         public override string ToString()
         {
-            return String.Format("{0}\"{1}\"", base.ToString(), Prefix);
+            return string.Format("{0}\"{1}\"", base.ToString(), Prefix);
         }
     }
 }

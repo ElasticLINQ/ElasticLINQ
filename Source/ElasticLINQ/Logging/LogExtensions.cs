@@ -7,7 +7,7 @@ using System.Collections.Generic;
 /// <summary>
 /// Various extension methods to make logging to ILog more fluent.
 /// </summary>
-internal static class LogExtensions
+static class LogExtensions
 {
     /// <summary>
     /// Logs a debug message to the logging system.

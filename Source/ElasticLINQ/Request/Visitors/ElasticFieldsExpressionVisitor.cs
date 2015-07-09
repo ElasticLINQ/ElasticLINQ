@@ -12,7 +12,7 @@ namespace ElasticLinq.Request.Visitors
     /// Expression visitor that substitutes references to <see cref="ElasticFields"/>
     /// with the desired underlying special reserved name.
     /// </summary>
-    internal class ElasticFieldsExpressionVisitor : ExpressionVisitor
+    class ElasticFieldsExpressionVisitor : ExpressionVisitor
     {
         protected readonly ParameterExpression BindingParameter;
         protected readonly IElasticMapping Mapping;
@@ -36,11 +36,11 @@ namespace ElasticLinq.Request.Visitors
             return Tuple.Create(visitor.Visit(selector), parameter);
         }
 
-        protected override Expression VisitMember(MemberExpression m)
+        protected override Expression VisitMember(MemberExpression node)
         {
-            return m.Member.DeclaringType == typeof(ElasticFields)
-                ? VisitElasticField(m)
-                : base.VisitMember(m);
+            return node.Member.DeclaringType == typeof(ElasticFields)
+                ? VisitElasticField(node)
+                : base.VisitMember(node);
         }
 
         protected virtual Expression VisitElasticField(MemberExpression m)

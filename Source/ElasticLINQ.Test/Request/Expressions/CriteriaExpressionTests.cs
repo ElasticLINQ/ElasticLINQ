@@ -12,8 +12,8 @@ namespace ElasticLinq.Test.Request.Expressions
 {
     public class CriteriaExpressionTests
     {
-        private readonly static MemberInfo memberInfo = typeof(string).GetProperty("Length");
-        private readonly ITermsCriteria criteria = TermsCriteria.Build("field", memberInfo, "value");
+        readonly static MemberInfo memberInfo = typeof(string).GetProperty("Length");
+        readonly ITermsCriteria criteria = TermsCriteria.Build("field", memberInfo, "value");
 
         [Fact]
         public void ConstructorSetsCriteria()

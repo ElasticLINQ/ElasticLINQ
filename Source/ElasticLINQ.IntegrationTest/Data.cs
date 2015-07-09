@@ -9,13 +9,13 @@ namespace ElasticLinq.IntegrationTest
 {
     class Data
     {
-        private const string Index = "integrationtest";
-        private static readonly Uri elasticsearchEndpoint = new Uri("http://elasticlinq.cloudapp.net:9200");
-        private static readonly ElasticConnectionOptions options = new ElasticConnectionOptions { SearchSizeDefault = 1000 };
-        private static readonly ElasticConnection connection = new ElasticConnection(elasticsearchEndpoint, index:Index, options:options);
+        const string Index = "integrationtest";
+        static readonly Uri elasticsearchEndpoint = new Uri("http://elasticlinq.cloudapp.net:9200");
+        static readonly ElasticConnectionOptions options = new ElasticConnectionOptions { SearchSizeDefault = 1000 };
+        static readonly ElasticConnection connection = new ElasticConnection(elasticsearchEndpoint, index:Index, options:options);
 
-        private readonly ElasticContext elasticContext = new ElasticContext(connection, new TrivialElasticMapping());
-        private readonly List<object> memory = new List<object>();
+        readonly ElasticContext elasticContext = new ElasticContext(connection, new TrivialElasticMapping());
+        readonly List<object> memory = new List<object>();
 
         public IQueryable<T> Elastic<T>()
         {
@@ -36,7 +36,7 @@ namespace ElasticLinq.IntegrationTest
             const int expectedDataCount = 200;
             if (memory.Count != expectedDataCount)
                 throw new InvalidOperationException(
-                    String.Format("Tests expect {0} entries but {1} loaded from Elasticsearch index '{2}' at {3}",
+                    string.Format("Tests expect {0} entries but {1} loaded from Elasticsearch index '{2}' at {3}",
                         expectedDataCount, memory.Count,
                         elasticContext.Connection.Index, elasticContext.Connection.Endpoint));
         }

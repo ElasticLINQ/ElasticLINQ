@@ -42,7 +42,7 @@ namespace ElasticLinq.IntegrationTest
             Assert.Equal(expect.Count, actual.Count);
         }
 
-        private static IEnumerable<T> Difference<T>(IEnumerable<T> left, IEnumerable<T> right)
+        static IEnumerable<T> Difference<T>(IEnumerable<T> left, IEnumerable<T> right)
         {
             var rightCache = new HashSet<T>(right);
             rightCache.SymmetricExceptWith(left);

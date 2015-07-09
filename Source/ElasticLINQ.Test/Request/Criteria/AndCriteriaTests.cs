@@ -10,9 +10,9 @@ namespace ElasticLinq.Test.Request.Criteria
 {
     public class AndCriteriaTests
     {
-        private readonly static MemberInfo memberInfo = typeof(string).GetProperty("Length");
-        private readonly ICriteria sampleCriteria1 = TermsCriteria.Build("first", memberInfo, "1st");
-        private readonly ICriteria sampleCriteria2 = TermsCriteria.Build("second", memberInfo, "2nd");
+        readonly static MemberInfo memberInfo = typeof(string).GetProperty("Length");
+        readonly ICriteria sampleCriteria1 = TermsCriteria.Build("first", memberInfo, "1st");
+        readonly ICriteria sampleCriteria2 = TermsCriteria.Build("second", memberInfo, "2nd");
 
         [Fact]
         public void NamePropertyIsAnd()

@@ -9,14 +9,14 @@ namespace ElasticLinq.Test.Request.Visitors
 {
     public class ConstantMemberPairTests
     {
-        private class Sample
+        class Sample
         {
             public bool SomeProperty { get; set; }
         }
 
-        private static readonly MemberInfo sampleMember = typeof(Sample).GetProperty("SomeProperty", BindingFlags.Instance | BindingFlags.Public);
-        private readonly ConstantExpression constantExpression = Expression.Constant(true);
-        private readonly MemberExpression memberExpression = Expression.MakeMemberAccess(Expression.Constant(new Sample()), sampleMember);
+        static readonly MemberInfo sampleMember = typeof(Sample).GetProperty("SomeProperty", BindingFlags.Instance | BindingFlags.Public);
+        readonly ConstantExpression constantExpression = Expression.Constant(true);
+        readonly MemberExpression memberExpression = Expression.MakeMemberAccess(Expression.Constant(new Sample()), sampleMember);
 
         [Fact]
         public void CreateReturnsNullIfParametersAreNull()

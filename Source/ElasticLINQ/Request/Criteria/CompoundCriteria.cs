@@ -1,7 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using ElasticLinq.Utility;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -12,9 +11,9 @@ namespace ElasticLinq.Request.Criteria
     /// Base class for any criteria wanting to have criteria of its
     /// own such as AndCriteria and OrCriteria.
     /// </summary>
-    internal abstract class CompoundCriteria : ICriteria
+    abstract class CompoundCriteria : ICriteria
     {
-        private readonly ReadOnlyCollection<ICriteria> criteria;
+        readonly ReadOnlyCollection<ICriteria> criteria;
 
         /// <summary>
         /// Create a criteria that has subcriteria. The exact semantics of
@@ -41,7 +40,7 @@ namespace ElasticLinq.Request.Criteria
         /// <inheritdoc/>
         public override string ToString()
         {
-            return string.Format("{0} ({1})", Name, String.Join(", ", Criteria.Select(f => f.ToString()).ToArray()));
+            return string.Format("{0} ({1})", Name, string.Join(", ", Criteria.Select(f => f.ToString()).ToArray()));
         }
     }
 }

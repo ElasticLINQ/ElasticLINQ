@@ -5,7 +5,7 @@ using ElasticLinq.Utility;
 
 namespace ElasticLinq.Response.Materializers
 {
-    internal class HighlightElasticMaterializer : ChainMaterializer
+    class HighlightElasticMaterializer : ChainMaterializer
     {
         public HighlightElasticMaterializer(IElasticMaterializer previous):base(previous)
         {
@@ -23,7 +23,7 @@ namespace ElasticLinq.Response.Materializers
                 if (hit.highlight==null) continue;
                 foreach (var prop in hit.highlight.Properties())
                 {
-                    hit._source.Add(String.Format("{0}_highlight",prop.Name),prop.Value);
+                    hit._source.Add(string.Format("{0}_highlight",prop.Name),prop.Value);
                 }
             }
             

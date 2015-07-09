@@ -12,13 +12,13 @@ namespace ElasticLinq.Test.Request.Visitors
 {
     public class ElasticFieldsExpressionVisitorTests
     {
-        private class Sample
+        class Sample
         {
             public string Name { get; set; }
             public string Id { get; set; }
         }
 
-        private readonly IElasticMapping validMapping = new ElasticFieldsMappingWrapper(new TrivialElasticMapping());
+        readonly IElasticMapping validMapping = new ElasticFieldsMappingWrapper(new TrivialElasticMapping());
 
         [Fact]
         public void Rebind_GuardClauses()

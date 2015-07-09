@@ -7,7 +7,7 @@ namespace ElasticLinq.IntegrationTest.WhereTests
 {
     public class DateWhereTests
     {
-        private readonly DateTime joinDate = new DateTime(2015, 2, 4);
+        readonly DateTime joinDate = new DateTime(2015, 2, 4);
 
         [Fact]
         public void LessThanConstant()

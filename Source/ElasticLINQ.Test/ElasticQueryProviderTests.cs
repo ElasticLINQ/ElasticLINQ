@@ -13,18 +13,16 @@ namespace ElasticLinq.Test
 {
     public class ElasticQueryProviderTests
     {
-        private static readonly ElasticConnection connection = new ElasticConnection(new Uri("http://localhost"));
-        private static readonly IElasticMapping mapping = new TrivialElasticMapping();
-        private static readonly ILog log = NullLog.Instance;
-        private static readonly IRetryPolicy retryPolicy = NullRetryPolicy.Instance;
+        static readonly ElasticConnection connection = new ElasticConnection(new Uri("http://localhost"));
+        static readonly IElasticMapping mapping = new TrivialElasticMapping();
+        static readonly ILog log = NullLog.Instance;
+        static readonly IRetryPolicy retryPolicy = NullRetryPolicy.Instance;
+        static readonly ElasticQueryProvider sharedProvider = new ElasticQueryProvider(connection, mapping, log, retryPolicy);
 
-        private static readonly ElasticQueryProvider sharedProvider = new ElasticQueryProvider(connection, mapping, log, retryPolicy);
+        static readonly Expression validExpression = Expression.Constant(new ElasticQuery<Sample>(sharedProvider));
 
-        private static readonly Expression validExpression =
-            Expression.Constant(new ElasticQuery<Sample>(sharedProvider));
-
-        private class Sample { };
-        private class Sample2 { public int ID { get; set; }}
+        class Sample { };
+        class Sample2 { public int ID { get; set; }}
 
         [Fact]
         public void CreateQueryTReturnsElasticQueryTWithProviderSet()
@@ -83,7 +81,7 @@ namespace ElasticLinq.Test
             Assert.Throws<NotImplementedException>(() => query.Provider.Execute(query.Expression));
         }
 
-        private class ThrowsRetryPolicy : IRetryPolicy
+        class ThrowsRetryPolicy : IRetryPolicy
         {
             public Task<TResult> ExecuteAsync<TResult>(Func<Task<TResult>> operationFunc, Func<TResult, Exception, bool> shouldRetryFunc, Action<TResult, Dictionary<string, object>> appendLogInfoFunc = null)
             {

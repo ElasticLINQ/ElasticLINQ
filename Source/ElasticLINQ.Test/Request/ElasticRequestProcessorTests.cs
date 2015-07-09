@@ -19,10 +19,10 @@ namespace ElasticLinq.Test.Request
 {
     public class ElasticRequestProcessorTests
     {
-        private static readonly ElasticConnection connection = new ElasticConnection(new Uri("http://localhost"), index: "SearchIndex");
-        private static readonly IElasticMapping mapping = new TrivialElasticMapping();
-        private static readonly ILog log = NullLog.Instance;
-        private static readonly IRetryPolicy retryPolicy = NullRetryPolicy.Instance;
+        static readonly ElasticConnection connection = new ElasticConnection(new Uri("http://localhost"), index: "SearchIndex");
+        static readonly IElasticMapping mapping = new TrivialElasticMapping();
+        static readonly ILog log = NullLog.Instance;
+        static readonly IRetryPolicy retryPolicy = NullRetryPolicy.Instance;
 
         [Fact]
         public static void Constructor_GuardClauses()
@@ -112,7 +112,7 @@ namespace ElasticLinq.Test.Request
             var messageHandler = new SpyMessageHandler();
             var spyLog = new SpyLog();
             messageHandler.Response.Content = new StringContent(responseString);
-            var localConnection = new ElasticConnection(messageHandler, new Uri("http://localhost"), "myUser", "myPass", index: "SearchIndex");
+            var localConnection = new ElasticConnection(messageHandler, new Uri("http://localhost"), "myUser", "myPass", "SearchIndex");
             var processor = new ElasticRequestProcessor(localConnection, mapping, spyLog, retryPolicy);
             var request = new SearchRequest { DocumentType = "abc123", Size = 2112 };
 
@@ -125,7 +125,7 @@ namespace ElasticLinq.Test.Request
             Assert.True(new Regex(@"\[VERBOSE\] Deserialized \d+ bytes into 1 hits in \d+ms").Match(spyLog.Messages[3]).Success);
         }
 
-        private static string BuildResponseString(int took, int shards, int hits, double score, string index, string type, string id)
+        static string BuildResponseString(int took, int shards, int hits, double score, string index, string type, string id)
         {
             return "{\"took\":" + took + "," +
                                  "\"timed_out\":false," +

@@ -126,7 +126,7 @@ namespace ElasticLinq.Test.Retry
             await delay.For((int)delayTime.TotalMilliseconds, CancellationToken.None);
             stopwatch.Stop();
 
-            Assert.True(stopwatch.ElapsedMilliseconds + timingFudge >= delayTime.TotalMilliseconds, String.Format("Requested {0}ms delay but only took {1}ms", delayTime.TotalMilliseconds, stopwatch.ElapsedMilliseconds));
+            Assert.True(stopwatch.ElapsedMilliseconds + timingFudge >= delayTime.TotalMilliseconds, string.Format("Requested {0}ms delay but only took {1}ms", delayTime.TotalMilliseconds, stopwatch.ElapsedMilliseconds));
         }
 
         [Fact]
@@ -154,7 +154,7 @@ namespace ElasticLinq.Test.Retry
             Assert.Equal("The operation did not succeed after the maximum number of retries (2).", ex.Message);
         }
 
-        private static Dictionary<string, object> AssertInfoLog(ILog logger, int callInstance, int operationRetryDelayMs, int operationAttempt)
+        static Dictionary<string, object> AssertInfoLog(ILog logger, int callInstance, int operationRetryDelayMs, int operationAttempt)
         {
             var logCapture = logger.Captured(callInstance, x => x.Log(Arg.Any<TraceEventType>(), null, null, null));
             Assert.Equal(TraceEventType.Information, logCapture.Arg<TraceEventType>());

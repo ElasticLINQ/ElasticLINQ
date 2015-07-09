@@ -8,7 +8,7 @@ namespace ElasticLinq.Response.Materializers
     /// Interface for all materializers responsible for turning the ElasticResponse into desired
     /// CLR objects.
     /// </summary>
-    internal interface IElasticMaterializer
+    interface IElasticMaterializer
     {
         /// <summary>
         /// Materialize the ElasticResponse into the desired CLR objects.

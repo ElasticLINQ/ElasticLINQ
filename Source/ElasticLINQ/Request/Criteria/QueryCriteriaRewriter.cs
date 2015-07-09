@@ -9,7 +9,7 @@ namespace ElasticLinq.Request.Criteria
     /// code paths simple we always build as if doing a filter. Here we
     /// rewrite the <see cref="ICriteria" /> designed for a filter into a query.
     /// </summary>
-    internal static class QueryCriteriaRewriter
+    static class QueryCriteriaRewriter
     {
         /// <summary>
         /// Take an <see cref="ICriteria" /> for filtering and return an <see cref="ICriteria" />
@@ -39,7 +39,7 @@ namespace ElasticLinq.Request.Criteria
         /// </summary>
         /// <param name="not">NotCriteria to rewrite.</param>
         /// <returns><see cref="BoolCriteria" /> with the criteria from Not mapped into MustNot.</returns>
-        private static BoolCriteria Rewrite(NotCriteria not)
+        static BoolCriteria Rewrite(NotCriteria not)
         {
             var mustNotCriteria = (not.Criteria is OrCriteria)
                 ? ((OrCriteria) not.Criteria).Criteria
@@ -52,7 +52,7 @@ namespace ElasticLinq.Request.Criteria
         /// </summary>
         /// <param name="or"><see cref="OrCriteria" /> to rewrite.</param>
         /// <returns><see cref="BoolCriteria" /> with the criteria from the Or mapped into Should.</returns>
-        private static BoolCriteria Rewrite(OrCriteria or)
+        static BoolCriteria Rewrite(OrCriteria or)
         {
             return new BoolCriteria(null, or.Criteria.Select(Compensate), null);
         }
@@ -62,7 +62,7 @@ namespace ElasticLinq.Request.Criteria
         /// </summary>
         /// <param name="and"><see cref="AndCriteria" /> to rewrite.</param>
         /// <returns><see cref="BoolCriteria" /> with the criteria from the And mapped into Must.</returns>
-        private static BoolCriteria Rewrite(AndCriteria and)
+        static BoolCriteria Rewrite(AndCriteria and)
         {
             var should = and.Criteria.OfType<OrCriteria>().ToList();
             var mustNot = and.Criteria.OfType<NotCriteria>().ToList();
@@ -82,7 +82,7 @@ namespace ElasticLinq.Request.Criteria
         /// <see cref="MatchAllCriteria" /> if true; otherwise a <see cref="MatchAllCriteria" /> 
         /// wrapped in a <see cref="NotCriteria" /> if false.
         /// </returns>
-        private static ICriteria Rewrite(ConstantCriteria constant)
+        static ICriteria Rewrite(ConstantCriteria constant)
         {
             return constant == ConstantCriteria.True ? MatchAllCriteria.Instance : NotCriteria.Create(MatchAllCriteria.Instance);
         }

@@ -11,7 +11,7 @@ namespace ElasticLinq.Test.Request.Visitors
 {
     public class PartialEvaluatorTests
     {
-        private readonly FakeQuery<Sample> sampleQuery = new FakeQuery<Sample>(new FakeQueryProvider());
+        readonly FakeQuery<Sample> sampleQuery = new FakeQuery<Sample>(new FakeQueryProvider());
 
         [Fact]
         public void ShouldNotEvaluateParameters()
@@ -55,6 +55,6 @@ namespace ElasticLinq.Test.Request.Visitors
             Assert.False(result);
         }
 
-        private class Sample { }
+        class Sample { }
     }
 }

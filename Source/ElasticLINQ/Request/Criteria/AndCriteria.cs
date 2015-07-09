@@ -10,7 +10,7 @@ namespace ElasticLinq.Request.Criteria
     /// <summary>
     /// Specifies that all subcriteria must be satisfied.
     /// </summary>
-    internal class AndCriteria : CompoundCriteria
+    class AndCriteria : CompoundCriteria
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AndCriteria"/> class.
@@ -62,7 +62,7 @@ namespace ElasticLinq.Request.Criteria
         /// Combine range criteria for the same field into an upper-lower range for that criteria.
         /// </summary>
         /// <param name="criteria">Collection of <see cref="ICriteria"/> to have ranges combined.</param>
-        private static void CombineRanges(ICollection<ICriteria> criteria)
+        static void CombineRanges(ICollection<ICriteria> criteria)
         {
             var candidates = criteria.OfType<RangeCriteria>().GroupBy(r => r.Field).Where(g => g.Count() > 1).ToArray();
 

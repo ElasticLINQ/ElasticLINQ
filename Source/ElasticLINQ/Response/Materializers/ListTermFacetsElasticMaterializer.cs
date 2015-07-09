@@ -13,14 +13,14 @@ namespace ElasticLinq.Response.Materializers
     /// <summary>
     /// Materializes facets with their terms from the ElasticResponse.
     /// </summary>
-    internal class ListTermFacetsElasticMaterializer : IElasticMaterializer
+    class ListTermFacetsElasticMaterializer : IElasticMaterializer
     {
-        private static readonly MethodInfo manyMethodInfo = typeof(ListTermFacetsElasticMaterializer).GetMethodInfo(f => f.Name == "Many" && !f.IsStatic);
-        private static readonly string[] termsFacetTypes = { "terms_stats", "terms" };
+        static readonly MethodInfo manyMethodInfo = typeof(ListTermFacetsElasticMaterializer).GetMethodInfo(f => f.Name == "Many" && !f.IsStatic);
+        static readonly string[] termsFacetTypes = { "terms_stats", "terms" };
 
-        private readonly Func<AggregateRow, object> projector;
-        private readonly Type elementType;
-        private readonly Type groupKeyType;
+        readonly Func<AggregateRow, object> projector;
+        readonly Type elementType;
+        readonly Type groupKeyType;
 
         /// <summary>
         /// Create an instance of the ListTermFacetsElasticMaterializer with the given parameters.
@@ -92,7 +92,7 @@ namespace ElasticLinq.Response.Materializers
                 .Select(g => new AggregateTermRow(AggregateRow.ParseValue(g.Key, groupKeyType), g.SelectMany(CreateAggregateFields)));
         }
 
-        private static IEnumerable<AggregateField> CreateAggregateFields(JToken termFields)
+        static IEnumerable<AggregateField> CreateAggregateFields(JToken termFields)
         {
             var name = ((JProperty)termFields.Parent.Parent.Parent.Parent).Name;
 

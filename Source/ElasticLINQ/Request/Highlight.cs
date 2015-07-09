@@ -10,7 +10,7 @@ namespace ElasticLinq.Request
     /// </summary>
     public class Highlight
     {
-        private readonly List<string> fields = new List<string>();
+        readonly List<string> fields = new List<string>();
 
         internal void AddFields(params string[] newFields)
         {

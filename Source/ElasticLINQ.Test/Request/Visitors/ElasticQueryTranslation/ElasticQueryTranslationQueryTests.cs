@@ -19,7 +19,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
             var queryStringCriteria = Assert.IsType<QueryStringCriteria>(criteria);
             Assert.Equal("name", queryStringCriteria.Fields.Single());
-            Assert.Equal(String.Format("*{0}*", expectedConstant), queryStringCriteria.Value);
+            Assert.Equal(string.Format("*{0}*", expectedConstant), queryStringCriteria.Value);
         }
 
         [Fact]
@@ -31,7 +31,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
             var queryStringCriteria = Assert.IsType<QueryStringCriteria>(criteria);
             Assert.Equal("name", queryStringCriteria.Fields.Single());
-            Assert.Equal(String.Format("{0}*", expectedConstant), queryStringCriteria.Value);
+            Assert.Equal(string.Format("{0}*", expectedConstant), queryStringCriteria.Value);
         }
 
         [Fact]
@@ -43,7 +43,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
             var queryStringCriteria = Assert.IsType<QueryStringCriteria>(criteria);
             Assert.Equal("name", queryStringCriteria.Fields.Single());
-            Assert.Equal(String.Format("*{0}", expectedConstant), queryStringCriteria.Value);
+            Assert.Equal(string.Format("*{0}", expectedConstant), queryStringCriteria.Value);
         }
 
         [Fact]

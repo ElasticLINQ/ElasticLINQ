@@ -18,8 +18,8 @@ namespace ElasticLinq
     /// <typeparam name="T">Element type being queried.</typeparam>
     public class ElasticQuery<T> : IElasticQuery<T>
     {
-        private readonly ElasticQueryProvider provider;
-        private readonly Expression expression;
+        readonly ElasticQueryProvider provider;
+        readonly Expression expression;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ElasticQuery{T}"/> class.

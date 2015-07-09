@@ -34,7 +34,7 @@ namespace ElasticLinq.Test.Utility
         [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void EnsureNotBlankThrowsArgumentExceptionWhenValueIsEmptyString()
         {
-            Assert.Throws<ArgumentException>(() => Argument.EnsureNotBlank("a", String.Empty));
+            Assert.Throws<ArgumentException>(() => Argument.EnsureNotBlank("a", string.Empty));
         }
 
         [Fact]
@@ -83,7 +83,7 @@ namespace ElasticLinq.Test.Utility
             Assert.Throws<ArgumentOutOfRangeException>(() => Argument.EnsureNotEmpty("a", null));
         }
 
-        private enum TestEnum
+        enum TestEnum
         {
             Two = 2,
         }

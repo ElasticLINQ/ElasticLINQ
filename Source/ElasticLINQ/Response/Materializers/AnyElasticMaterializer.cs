@@ -3,7 +3,7 @@ using ElasticLinq.Response.Model;
 
 namespace ElasticLinq.Response.Materializers
 {
-    internal class AnyElasticMaterializer : IElasticMaterializer
+    class AnyElasticMaterializer : IElasticMaterializer
     {
         /// <summary>
         /// Materialize whether at least one result exists for a given ElasticResponse.

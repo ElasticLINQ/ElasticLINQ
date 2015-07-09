@@ -13,12 +13,12 @@ namespace ElasticLinq.Request.Facets
     /// </summary>
     /// <remarks>Mapped to .GroupBy(a => a.Something).Select(a => a.Count())</remarks>
     [DebuggerDisplay("TermsFacet {Fields} {Filter}")]
-    internal class TermsFacet : IOrderableFacet
+    class TermsFacet : IOrderableFacet
     {
-        private readonly string name;
-        private readonly ICriteria criteria;
-        private readonly ReadOnlyCollection<string> fields;
-        private readonly int? size;
+        readonly string name;
+        readonly ICriteria criteria;
+        readonly ReadOnlyCollection<string> fields;
+        readonly int? size;
 
         public TermsFacet(string name, int? size, params string[] fields)
             : this(name, null, size, fields)

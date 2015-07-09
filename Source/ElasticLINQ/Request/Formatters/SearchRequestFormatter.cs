@@ -17,16 +17,16 @@ namespace ElasticLinq.Request.Formatters
     /// <summary>
     /// Formats a SearchRequest into a JSON POST to be sent to Elasticsearch.
     /// </summary>
-    internal class SearchRequestFormatter
+    class SearchRequestFormatter
     {
-        private static readonly CultureInfo transportCulture = CultureInfo.InvariantCulture;
-        private readonly string[] parameterSeparator = { "&" };
+        static readonly CultureInfo transportCulture = CultureInfo.InvariantCulture;
+        static readonly string[] parameterSeparator = { "&" };
 
-        private readonly Lazy<string> body;
-        private readonly ElasticConnection connection;
-        private readonly IElasticMapping mapping;
-        private readonly SearchRequest searchRequest;
-        private readonly Uri uri;
+        readonly Lazy<string> body;
+        readonly ElasticConnection connection;
+        readonly IElasticMapping mapping;
+        readonly SearchRequest searchRequest;
+        readonly Uri uri;
 
         /// <summary>
         /// Create a new SearchRequestFormatter for the given connection, mapping and search request.
@@ -64,12 +64,12 @@ namespace ElasticLinq.Request.Formatters
         /// Create the Uri for this request given the search query and connection.
         /// </summary>
         /// <returns>Uri to be used to execute this query by Elasticsearch.</returns>
-        private Uri CreateUri()
+        Uri CreateUri()
         {
             var builder = new UriBuilder(connection.Endpoint);
             builder.Path += (connection.Index ?? "_all") + "/";
 
-            if (!String.IsNullOrEmpty(searchRequest.DocumentType))
+            if (!string.IsNullOrEmpty(searchRequest.DocumentType))
                 builder.Path += searchRequest.DocumentType + "/";
 
             builder.Path += "_search";
@@ -79,13 +79,13 @@ namespace ElasticLinq.Request.Formatters
                 .Select(p => p.Split('='))
                 .ToDictionary(k => k[0], v => v.Length > 1 ? v[1] : null);
 
-            if (!String.IsNullOrEmpty(searchRequest.SearchType))
+            if (!string.IsNullOrEmpty(searchRequest.SearchType))
                 parameters["search_type"] = searchRequest.SearchType;
 
             if (connection.Options.Pretty)
                 parameters["pretty"] = "true";
 
-            builder.Query = String.Join("&", parameters.Select(p => p.Value == null ? p.Key : p.Key + "=" + p.Value));
+            builder.Query = string.Join("&", parameters.Select(p => p.Value == null ? p.Key : p.Key + "=" + p.Value));
 
             return builder.Uri;
         }
@@ -94,7 +94,7 @@ namespace ElasticLinq.Request.Formatters
         /// Create the Json HTTP request body for this request given the search query and connection.
         /// </summary>
         /// <returns>Json to be used to execute this query by Elasticsearch.</returns>
-        private JObject CreateBody()
+        JObject CreateBody()
         {
             var root = new JObject();
 
@@ -134,12 +134,12 @@ namespace ElasticLinq.Request.Formatters
             return root;
         }
 
-        private JToken Build(IEnumerable<IFacet> facets, ICriteria primaryFilter, long? defaultSize)
+        JToken Build(IEnumerable<IFacet> facets, ICriteria primaryFilter, long? defaultSize)
         {
             return new JObject(facets.Select(facet => Build(facet, primaryFilter, defaultSize)));
         }
 
-        private JProperty Build(IFacet facet, ICriteria primaryFilter, long? defaultSize)
+        JProperty Build(IFacet facet, ICriteria primaryFilter, long? defaultSize)
         {
             Argument.EnsureNotNull("facet", facet);
 
@@ -160,7 +160,7 @@ namespace ElasticLinq.Request.Formatters
             return new JProperty(facet.Name, namedBody);
         }
 
-        private static JToken Build(IFacet facet)
+        static JToken Build(IFacet facet)
         {
             if (facet is StatisticalFacet)
                 return Build((StatisticalFacet)facet);
@@ -177,14 +177,14 @@ namespace ElasticLinq.Request.Formatters
             throw new InvalidOperationException(string.Format("Unknown implementation of IFacet {0} can not be formatted", facet.GetType().Name));
         }
 
-        private static JToken Build(StatisticalFacet statisticalFacet)
+        static JToken Build(StatisticalFacet statisticalFacet)
         {
             return new JObject(
                 BuildFieldProperty(statisticalFacet.Fields)
             );
         }
 
-        private static JToken Build(TermsStatsFacet termStatsFacet)
+        static JToken Build(TermsStatsFacet termStatsFacet)
         {
             return new JObject(
                 new JProperty("key_field", termStatsFacet.Key),
@@ -192,24 +192,24 @@ namespace ElasticLinq.Request.Formatters
             );
         }
 
-        private static JToken Build(TermsFacet termsFacet)
+        static JToken Build(TermsFacet termsFacet)
         {
             return new JObject(BuildFieldProperty(termsFacet.Fields));
         }
 
-        private static JToken BuildFieldProperty(ReadOnlyCollection<string> fields)
+        static JToken BuildFieldProperty(ReadOnlyCollection<string> fields)
         {
             return fields.Count == 1
                 ? new JProperty("field", fields.First())
                 : new JProperty("fields", new JArray(fields));
         }
 
-        private static JArray Build(IEnumerable<SortOption> sortOptions)
+        static JArray Build(IEnumerable<SortOption> sortOptions)
         {
             return new JArray(sortOptions.Select(Build));
         }
 
-        private static object Build(SortOption sortOption)
+        static object Build(SortOption sortOption)
         {
             if (!sortOption.IgnoreUnmapped)
                 return sortOption.Ascending
@@ -223,7 +223,7 @@ namespace ElasticLinq.Request.Formatters
             return new JObject(new JProperty(sortOption.Name, new JObject(properties)));
         }
 
-        private JObject Build(ICriteria criteria)
+        JObject Build(ICriteria criteria)
         {
             if (criteria is RangeCriteria)
                 return Build((RangeCriteria)criteria);
@@ -260,10 +260,10 @@ namespace ElasticLinq.Request.Formatters
             if (criteria is CompoundCriteria)
                 return Build((CompoundCriteria)criteria);
 
-            throw new InvalidOperationException(String.Format("Unknown criteria type {0}", criteria.GetType()));
+            throw new InvalidOperationException(string.Format("Unknown criteria type {0}", criteria.GetType()));
         }
 
-        private static JObject Build(Highlight highlight)
+        static JObject Build(Highlight highlight)
         {
             var fields = new JObject();
 
@@ -272,15 +272,15 @@ namespace ElasticLinq.Request.Formatters
 
             var queryStringCriteria = new JObject(new JProperty("fields", fields));
 
-            if (!String.IsNullOrWhiteSpace(highlight.PostTag))
+            if (!string.IsNullOrWhiteSpace(highlight.PostTag))
                 queryStringCriteria.Add(new JProperty("post_tags", new JArray(highlight.PostTag)));
-            if (!String.IsNullOrWhiteSpace(highlight.PreTag))
+            if (!string.IsNullOrWhiteSpace(highlight.PreTag))
                 queryStringCriteria.Add(new JProperty("pre_tags", new JArray(highlight.PreTag)));
             
             return queryStringCriteria;
         }
 
-        private static JObject Build(QueryStringCriteria criteria)
+        static JObject Build(QueryStringCriteria criteria)
         {
             var unformattedValue = criteria.Value; // We do not reformat query_string
 
@@ -292,7 +292,7 @@ namespace ElasticLinq.Request.Formatters
             return new JObject(new JProperty(criteria.Name, queryStringCriteria));
         }
 
-        private JObject Build(RangeCriteria criteria)
+        JObject Build(RangeCriteria criteria)
         {
             // Range filters can be combined by field
             return new JObject(
@@ -302,28 +302,28 @@ namespace ElasticLinq.Request.Formatters
                             new JProperty(s.Name, mapping.FormatValue(criteria.Member, s.Value))).ToList())))));
         }
 
-        private static JObject Build(RegexpCriteria criteria)
+        static JObject Build(RegexpCriteria criteria)
         {
             return new JObject(new JProperty(criteria.Name, new JObject(new JProperty(criteria.Field, criteria.Regexp))));
         }
 
-        private static JObject Build(PrefixCriteria criteria)
+        static JObject Build(PrefixCriteria criteria)
         {
             return new JObject(new JProperty(criteria.Name, new JObject(new JProperty(criteria.Field, criteria.Prefix))));
         }
 
-        private JObject Build(TermCriteria criteria)
+        JObject Build(TermCriteria criteria)
         {
             return new JObject(
                 new JProperty(criteria.Name, new JObject(
                     new JProperty(criteria.Field, mapping.FormatValue(criteria.Member, criteria.Value)))));
         }
 
-        private JObject Build(TermsCriteria criteria)
+        JObject Build(TermsCriteria criteria)
         {
             var termsCriteria = new JObject(
                 new JProperty(criteria.Field,
-                    new JArray(criteria.Values.Select(x => mapping.FormatValue(criteria.Member, x)).Cast<Object>().ToArray())));
+                    new JArray(criteria.Values.Select(x => mapping.FormatValue(criteria.Member, x)).Cast<object>().ToArray())));
 
             if (criteria.ExecutionMode.HasValue)
                 termsCriteria.Add(new JProperty("execution", criteria.ExecutionMode.GetValueOrDefault().ToString()));
@@ -331,22 +331,22 @@ namespace ElasticLinq.Request.Formatters
             return new JObject(new JProperty(criteria.Name, termsCriteria));
         }
 
-        private static JObject Build(SingleFieldCriteria criteria)
+        static JObject Build(SingleFieldCriteria criteria)
         {
             return new JObject(new JProperty(criteria.Name, new JObject(new JProperty("field", criteria.Field))));
         }
 
-        private JObject Build(NotCriteria criteria)
+        JObject Build(NotCriteria criteria)
         {
             return new JObject(new JProperty(criteria.Name, Build(criteria.Criteria)));
         }
 
-        private static JObject Build(MatchAllCriteria criteria)
+        static JObject Build(MatchAllCriteria criteria)
         {
             return new JObject(new JProperty(criteria.Name));
         }
 
-        private JObject Build(CompoundCriteria criteria)
+        JObject Build(CompoundCriteria criteria)
         {
             // A compound filter with one item can be collapsed
             return criteria.Criteria.Count == 1
@@ -354,12 +354,12 @@ namespace ElasticLinq.Request.Formatters
                 : new JObject(new JProperty(criteria.Name, new JArray(criteria.Criteria.Select(Build).ToList())));
         }
 
-        private JObject Build(BoolCriteria criteria)
+        JObject Build(BoolCriteria criteria)
         {
             return new JObject(new JProperty(criteria.Name, new JObject(BuildProperties(criteria))));
         }
 
-        private IEnumerable<JProperty> BuildProperties(BoolCriteria criteria)
+        IEnumerable<JProperty> BuildProperties(BoolCriteria criteria)
         {
             if (criteria.Must.Any())
                 yield return new JProperty("must", new JArray(criteria.Must.Select(Build)));

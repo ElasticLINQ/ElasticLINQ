@@ -7,11 +7,11 @@ using System.Linq.Expressions;
 
 namespace ElasticLinq.Request.Visitors
 {
-    internal class RebindCollectionResult<T>
+    class RebindCollectionResult<T>
     {
-        private readonly Expression expression;
-        private readonly ReadOnlyCollection<T> collected;
-        private readonly ParameterExpression parameter;
+        readonly Expression expression;
+        readonly ReadOnlyCollection<T> collected;
+        readonly ParameterExpression parameter;
 
         public RebindCollectionResult(Expression expression, IEnumerable<T> collected, ParameterExpression parameter)
         {

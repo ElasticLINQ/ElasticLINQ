@@ -12,7 +12,7 @@ namespace ElasticLinq.Utility
     /// Various methods to make reflection and type handling a little
     /// easier.
     /// </summary>
-    internal static class TypeHelper
+    static class TypeHelper
     {
         /// <summary>
         /// Get the return type of a method, property or field.
@@ -28,7 +28,7 @@ namespace ElasticLinq.Utility
                 return ((PropertyInfo)memberInfo).PropertyType;
 
             var declaredName = memberInfo.DeclaringType != null ? memberInfo.DeclaringType.FullName : "unknown";
-            throw new NotSupportedException(String.Format("Member '{0}' on type {1} is of unsupported type '{2}'", memberInfo.Name, declaredName, memberInfo.GetType().FullName));
+            throw new NotSupportedException(string.Format("Member '{0}' on type {1} is of unsupported type '{2}'", memberInfo.Name, declaredName, memberInfo.GetType().FullName));
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace ElasticLinq.Utility
                     return ((MemberExpression)lambdaExpression.Body).Member;
 
                 default:
-                    throw new NotSupportedException(String.Format("Selector node type of '{0}' not supported.", lambdaExpression.Body.NodeType));
+                    throw new NotSupportedException(string.Format("Selector node type of '{0}' not supported.", lambdaExpression.Body.NodeType));
             }
         }
 

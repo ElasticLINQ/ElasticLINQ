@@ -10,7 +10,7 @@ namespace ElasticLinq.Test.Response.Materializers
 {
     public class TermlessFacetsElasticMaterializerTests
     {
-        private static readonly Func<AggregateRow, object> defaultMaterializer = a => a;
+        static readonly Func<AggregateRow, object> defaultMaterializer = a => a;
 
         [Fact]
         public static void ConstructorSetsElementType()

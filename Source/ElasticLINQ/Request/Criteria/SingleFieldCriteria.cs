@@ -1,7 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using ElasticLinq.Utility;
-using System;
 
 namespace ElasticLinq.Request.Criteria
 {
@@ -10,7 +9,7 @@ namespace ElasticLinq.Request.Criteria
     /// </summary>
     public abstract class SingleFieldCriteria : ICriteria
     {
-        private readonly string field;
+        readonly string field;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SingleFieldCriteria"/> class.
@@ -39,7 +38,7 @@ namespace ElasticLinq.Request.Criteria
         /// <inheritdoc/>
         public override string ToString()
         {
-            return String.Format("{0} [{1}]", Name, Field);
+            return string.Format("{0} [{1}]", Name, Field);
         }
     }
 }

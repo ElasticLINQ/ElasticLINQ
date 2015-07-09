@@ -9,9 +9,9 @@ namespace ElasticLinq.Request.Expressions
     /// <summary>
     /// An expression tree node that represents criteria.
     /// </summary>
-    internal class CriteriaExpression : Expression
+    class CriteriaExpression : Expression
     {
-        private readonly ICriteria criteria;
+        readonly ICriteria criteria;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CriteriaExpression"/> class.

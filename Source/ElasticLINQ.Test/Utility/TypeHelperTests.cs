@@ -12,19 +12,19 @@ namespace ElasticLinq.Test.Utility
 {
     public class TypeHelperTests
     {
-        private class DirectObjectSubclass : object { }
-        private class IndirectObjectSubclass : DirectObjectSubclass { }
-        private class SubclassOfList : List<Decimal> { }
+        class DirectObjectSubclass : object { }
+        class IndirectObjectSubclass : DirectObjectSubclass { }
+        class SubclassOfList : List<Decimal> { }
         
         [ExcludeFromCodeCoverage]
-        private class ClassWithMemberInfo
+        class ClassWithMemberInfo
         {
             public DirectObjectSubclass AField = null;
             public IndirectObjectSubclass AProperty { get; set; }
         }
 
         [ExcludeFromCodeCoverage]
-        private class ClassWithMethodInfo : ClassWithMemberInfo
+        class ClassWithMethodInfo : ClassWithMemberInfo
         {
             public int SomeMember() {  return 0; }
         }
@@ -78,7 +78,7 @@ namespace ElasticLinq.Test.Utility
         [Fact]
         public void GetSequenceElementTypeIdentifiesListElementType()
         {
-            var type = typeof(List<String>);
+            var type = typeof(List<string>);
 
             var elementType = TypeHelper.GetSequenceElementType(type);
 
@@ -196,15 +196,15 @@ namespace ElasticLinq.Test.Utility
         [Fact]
         public void IsAssignableFromIsTrueForValidAssignment()
         {
-            var actual = TypeHelper.IsAssignableFrom(typeof(int?), typeof(int));
+            var actual = typeof(int?).IsAssignableFrom(typeof(int));
 
             Assert.True(actual);
         }
 
         [Fact]
-        public void IsAssignableFromIsFalseTrueForInvalidAssignment()
+        public void IsAssignableFromIsFalseForInvalidAssignment()
         {
-            var actual = TypeHelper.IsAssignableFrom(typeof(int), typeof(int?));
+            var actual = typeof(int).IsAssignableFrom(typeof(int?));
 
             Assert.False(actual);
         }
@@ -212,7 +212,7 @@ namespace ElasticLinq.Test.Utility
         [Fact]
         public void GetMethodInfoReturnsSignatureWithArguments()
         {
-            var method = typeof(String).GetMethodInfo(s => s.Name == "Replace" && 
+            var method = typeof(string).GetMethodInfo(s => s.Name == "Replace" && 
                 s.GetParameters().Count() == 2 && s.GetParameters()[0].ParameterType == typeof(string));
             
             var actual = method.GetSimpleSignature();

@@ -1,7 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using ElasticLinq.Utility;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -15,11 +14,11 @@ namespace ElasticLinq.Request.Criteria
     /// field that need to be satisfied to select a document.
     /// </summary>
     [DebuggerDisplay("{Field}")]
-    internal class RangeCriteria : ICriteria
+    class RangeCriteria : ICriteria
     {
-        private readonly string field;
-        private readonly MemberInfo member;
-        private readonly ReadOnlyCollection<RangeSpecificationCriteria> specifications;
+        readonly string field;
+        readonly MemberInfo member;
+        readonly ReadOnlyCollection<RangeSpecificationCriteria> specifications;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RangeCriteria"/> class.
@@ -74,7 +73,7 @@ namespace ElasticLinq.Request.Criteria
         /// <inheritdoc/>
         public override string ToString()
         {
-            return String.Format("range: {0}({1})", field, String.Join(",", specifications.Select(s => s.ToString())));
+            return string.Format("range: {0}({1})", field, string.Join(",", specifications.Select(s => s.ToString())));
         }
 
         /// <summary>
@@ -92,7 +91,7 @@ namespace ElasticLinq.Request.Criteria
     /// <summary>
     /// Type of RangeComparison operations.
     /// </summary>
-    internal enum RangeComparison
+    enum RangeComparison
     {
         GreaterThan,
         GreaterThanOrEqual,
@@ -101,9 +100,9 @@ namespace ElasticLinq.Request.Criteria
     }
 
     [DebuggerDisplay("{Name,nq} {Value}")]
-    internal class RangeSpecificationCriteria : ICriteria
+    class RangeSpecificationCriteria : ICriteria
     {
-        private readonly Dictionary<RangeComparison, string> rangeComparisonValues = new Dictionary<RangeComparison, string>
+        static readonly Dictionary<RangeComparison, string> rangeComparisonValues = new Dictionary<RangeComparison, string>
         {
             { RangeComparison.GreaterThan, "gt" },
             { RangeComparison.GreaterThanOrEqual, "gte" },
@@ -111,8 +110,8 @@ namespace ElasticLinq.Request.Criteria
             { RangeComparison.LessThanOrEqual, "lte" },
         };
 
-        private readonly RangeComparison comparison;
-        private readonly object value;
+        readonly RangeComparison comparison;
+        readonly object value;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RangeSpecificationCriteria"/> class.
@@ -153,7 +152,7 @@ namespace ElasticLinq.Request.Criteria
         /// <inheritdoc/>
         public override string ToString()
         {
-            return String.Format("{0} {1}", comparison, value);
+            return string.Format("{0} {1}", comparison, value);
         }
     }
 }

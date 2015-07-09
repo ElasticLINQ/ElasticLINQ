@@ -282,7 +282,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             TestProjectionWithKeyAndCount(query.Expression);
         }
 
-        private static void TestProjectionWithKeyAndCount(Expression query)
+        static void TestProjectionWithKeyAndCount(Expression query)
         {
             var searchRequest = ElasticQueryTranslator.Translate(CouchMapping, query).SearchRequest;
 
@@ -310,7 +310,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             TestProjectionWithCountPredicate(query.Expression);
         }
 
-        private static void TestProjectionWithCountPredicate(Expression query)
+        static void TestProjectionWithCountPredicate(Expression query)
         {
             var searchRequest = ElasticQueryTranslator.Translate(Mapping, query).SearchRequest;
 

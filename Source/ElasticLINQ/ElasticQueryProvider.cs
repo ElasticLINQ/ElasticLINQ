@@ -24,7 +24,7 @@ namespace ElasticLinq
     /// </summary>
     public sealed class ElasticQueryProvider : IQueryProvider, IAsyncQueryExecutor
     {
-        private readonly ElasticRequestProcessor requestProcessor;
+        readonly ElasticRequestProcessor requestProcessor;
 
         /// <summary>
         /// Create a new ElasticQueryProvider for a given connection, mapping, log, retry policy and field prefix.

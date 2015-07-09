@@ -9,12 +9,12 @@ namespace ElasticLinq.Response.Materializers
     /// <summary>
     /// Materializes one hit into a CLR object throwing necessary exceptions as required to ensure First/Single semantics.
     /// </summary>
-    internal class OneHitElasticMaterializer : IElasticMaterializer
+    class OneHitElasticMaterializer : IElasticMaterializer
     {
-        private readonly Func<Hit, object> projector;
-        private readonly Type elementType;
-        private readonly bool throwIfMoreThanOne;
-        private readonly bool defaultIfNone;
+        readonly Func<Hit, object> projector;
+        readonly Type elementType;
+        readonly bool throwIfMoreThanOne;
+        readonly bool defaultIfNone;
 
         /// <summary>
         /// Create an instance of the OneHitElasticMaterializer with the given parameters.
