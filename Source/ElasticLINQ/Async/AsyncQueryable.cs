@@ -1,6 +1,5 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
-using ElasticLinq.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,21 +8,21 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ElasticLinq
+namespace ElasticLinq.Async
 {
     /// <summary>
     /// Provides a set of static methods for querying data structures that implement <see cref="T:System.Linq.IQueryable`1"/> in an asynchronous manner.
     /// </summary>
     public static partial class AsyncQueryable
     {
-        private static readonly Lazy<MethodInfo> countMethodInfo = GetLazyQueryableMethod("Count", 1);
-        private static readonly Lazy<MethodInfo> countPredicateMethodInfo = GetLazyQueryableMethod("Count", 2);
-        private static readonly Lazy<MethodInfo> longCountMethodInfo = GetLazyQueryableMethod("LongCount", 1);
-        private static readonly Lazy<MethodInfo> longCountPredicateMethodInfo = GetLazyQueryableMethod("LongCount", 2);
-        private static readonly Lazy<MethodInfo> minMethodInfo = GetLazyQueryableMethod("Min", 1);
-        private static readonly Lazy<MethodInfo> minSelectorMethodInfo = GetLazyQueryableMethod("Min", 2);
-        private static readonly Lazy<MethodInfo> maxMethodInfo = GetLazyQueryableMethod("Max", 1);
-        private static readonly Lazy<MethodInfo> maxSelectorMethodInfo = GetLazyQueryableMethod("Max", 2);
+        private static readonly Lazy<MethodInfo> countMethodInfo = QueryableMethodByArgs("Count", 1);
+        private static readonly Lazy<MethodInfo> countPredicateMethodInfo = QueryableMethodByArgs("Count", 2);
+        private static readonly Lazy<MethodInfo> longCountMethodInfo = QueryableMethodByArgs("LongCount", 1);
+        private static readonly Lazy<MethodInfo> longCountPredicateMethodInfo = QueryableMethodByArgs("LongCount", 2);
+        private static readonly Lazy<MethodInfo> minMethodInfo = QueryableMethodByArgs("Min", 1);
+        private static readonly Lazy<MethodInfo> minSelectorMethodInfo = QueryableMethodByArgs("Min", 2);
+        private static readonly Lazy<MethodInfo> maxMethodInfo = QueryableMethodByArgs("Max", 1);
+        private static readonly Lazy<MethodInfo> maxSelectorMethodInfo = QueryableMethodByArgs("Max", 2);
 
         /// <summary>
         /// Asynchronously returns the number of elements in a sequence.
@@ -126,7 +125,7 @@ namespace ElasticLinq
         /// <paramref name="source"/> or <paramref name="selector"/> is null.</exception>
         public static async Task<TResult> MinAsync<TSource, TResult>(this IQueryable<TSource> source, Expression<Func<TSource, TResult>> selector, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (TResult)await ExecuteAsync(source.Provider, FinalExpression(source, minSelectorMethodInfo.Value, selector), cancellationToken);
+            return (TResult)await ExecuteAsync(source.Provider, FinalExpression<TSource, TResult>(source, minSelectorMethodInfo.Value, selector), cancellationToken);
         }
 
         /// <summary>
@@ -160,7 +159,7 @@ namespace ElasticLinq
         /// <paramref name="source"/> or <paramref name="selector"/> is null.</exception>
         public static async Task<TResult> MaxAsync<TSource, TResult>(this IQueryable<TSource> source, Expression<Func<TSource, TResult>> selector, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (TResult)await ExecuteAsync(source.Provider, FinalExpression(source, maxSelectorMethodInfo.Value, selector), cancellationToken);
+            return (TResult)await ExecuteAsync(source.Provider, FinalExpression<TSource, TResult>(source, maxSelectorMethodInfo.Value, selector), cancellationToken);
         }
 
         /// <summary>
@@ -233,12 +232,42 @@ namespace ElasticLinq
             return ((IEnumerable<TSource>)await ExecuteAsync(source.Provider, source.Expression, cancellationToken)).ToDictionary(keySelector, elementSelector);
         }
 
-        private static Lazy<MethodInfo> GetLazyQueryableMethod(string Name, int parameterCount, Type secondParameterType = null)
+        private static Lazy<MethodInfo> QueryableMethodByArgs(string name, int parameterCount, Type secondParameterType = null)
         {
-            return new Lazy<MethodInfo>(() => typeof(Queryable).GetMethodInfo(m =>
-                m.Name == Name &&
-                m.GetParameters().Length == parameterCount &&
-                (secondParameterType == null || m.GetParameters()[1].ParameterType == secondParameterType)));
+            return new Lazy<MethodInfo>(() => typeof(Queryable).GetTypeInfo().DeclaredMethods
+                .Single(m => m.Name == name && m.GetParameters().Length == parameterCount &&
+                    (secondParameterType == null || m.GetParameters()[1].ParameterType == secondParameterType)));
+        }
+
+        private static Lazy<MethodInfo> QueryableMethodByReturnType(string name, int parameterCount, Type returnType)
+        {
+            return new Lazy<MethodInfo>(() => typeof(Queryable).GetTypeInfo().DeclaredMethods
+                .Single(m => m.Name == name && m.ReturnType == returnType && m.GetParameters().Length == parameterCount));
+        }
+
+        private static Lazy<MethodInfo> QueryableMethodBySelectorParameterType(string name, int parameterCount, Type selectorParameterType)
+        {
+            return new Lazy<MethodInfo>(() =>
+            {
+                return typeof(Queryable).GetTypeInfo().DeclaredMethods
+                    .Where(m => m.Name == name && m.IsGenericMethod)
+                    .Select(m => Tuple.Create(m, m.GetParameters()))
+                    .Where(m => m.Item2.Length == parameterCount)
+                    .Single(m => m.Item2[1].ParameterType.GenericTypeArguments[0].GenericTypeArguments[1] == selectorParameterType).Item1;
+            });
+        }
+
+        private static Lazy<MethodInfo> QueryableMethodByQueryableParameterType(string name, int parameterCount,
+    Type sourceParameterType)
+        {
+            return new Lazy<MethodInfo>(() =>
+            {
+                var parameterType = typeof(IQueryable<>).MakeGenericType(sourceParameterType);
+
+                return typeof(Queryable).GetTypeInfo().DeclaredMethods
+                    .Single(m => m.Name == name && m.GetParameters().Length == parameterCount &&
+                            m.GetParameters()[1].ParameterType == parameterType);
+            });
         }
 
         private static Expression FinalExpression<TSource>(IQueryable<TSource> source, MethodInfo method, params Expression[] arguments)
@@ -246,9 +275,14 @@ namespace ElasticLinq
             return Expression.Call(null, method.MakeGenericMethod(typeof(TSource)), new[] { source.Expression }.Concat(arguments));
         }
 
+        private static Expression FinalExpression<TSource, TResult>(IQueryable<TSource> source, MethodInfo method, params Expression[] arguments)
+        {
+            return Expression.Call(null, method.MakeGenericMethod(typeof(TSource), typeof(TResult)), new[] { source.Expression }.Concat(arguments));
+        }
+
         private static Task<object> ExecuteAsync(IQueryProvider provider, Expression expression, CancellationToken cancellationToken)
         {
-            return ((ElasticQueryProvider)provider).ExecuteAsync(expression, cancellationToken);
+            return ((IAsyncQueryExecutor)provider).ExecuteAsync(expression, cancellationToken);
         }
     }
 }

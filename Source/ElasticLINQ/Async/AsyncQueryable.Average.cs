@@ -7,31 +7,36 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ElasticLinq
+namespace ElasticLinq.Async
 {
     public static partial class AsyncQueryable
     {
-        private static readonly Lazy<MethodInfo> averageIntMethodInfo = GetLazyQueryableMethod("Average", 2, typeof(int));
-        private static readonly Lazy<MethodInfo> averageIntNullableMethodInfo = GetLazyQueryableMethod("Average", 2, typeof(int?));
-        private static readonly Lazy<MethodInfo> averageLongMethodInfo = GetLazyQueryableMethod("Average", 2, typeof(long));
-        private static readonly Lazy<MethodInfo> averageLongNullableMethodInfo = GetLazyQueryableMethod("Average", 2, typeof(long?));
-        private static readonly Lazy<MethodInfo> averageFloatMethodInfo = GetLazyQueryableMethod("Average", 2, typeof(float));
-        private static readonly Lazy<MethodInfo> averageFloatNullableMethodInfo = GetLazyQueryableMethod("Average", 2, typeof(float?));
-        private static readonly Lazy<MethodInfo> averageDoubleMethodInfo = GetLazyQueryableMethod("Average", 2, typeof(double));
-        private static readonly Lazy<MethodInfo> averageDoubleNullableMethodInfo = GetLazyQueryableMethod("Average", 2, typeof(double?));
-        private static readonly Lazy<MethodInfo> averageDecimalMethodInfo = GetLazyQueryableMethod("Average", 2, typeof(decimal));
-        private static readonly Lazy<MethodInfo> averageDecimalNullableMethodInfo = GetLazyQueryableMethod("Average", 2, typeof(decimal));
+        static MethodInfo Create<TSource, TResult>(Expression<Func<TSource, TResult>> e) where TSource:IQueryable
+        {
+            return ((MethodCallExpression) e.Body).Method;
+        }
 
-        private static readonly Lazy<MethodInfo> averageIntSelectorMethodInfo = GetLazyQueryableMethod("Average", 3, typeof(int));
-        private static readonly Lazy<MethodInfo> averageIntNullableSelectorMethodInfo = GetLazyQueryableMethod("Average", 3, typeof(int?));
-        private static readonly Lazy<MethodInfo> averageLongSelectorMethodInfo = GetLazyQueryableMethod("Average", 3, typeof(long));
-        private static readonly Lazy<MethodInfo> averageLongNullableSelectorMethodInfo = GetLazyQueryableMethod("Average", 3, typeof(long?));
-        private static readonly Lazy<MethodInfo> averageFloatSelectorMethodInfo = GetLazyQueryableMethod("Average", 3, typeof(float));
-        private static readonly Lazy<MethodInfo> averageFloatNullableSelectorMethodInfo = GetLazyQueryableMethod("Average", 3, typeof(float?));
-        private static readonly Lazy<MethodInfo> averageDoubleSelectorMethodInfo = GetLazyQueryableMethod("Average", 3, typeof(double));
-        private static readonly Lazy<MethodInfo> averageDoubleNullableSelectorMethodInfo = GetLazyQueryableMethod("Average", 3, typeof(double?));
-        private static readonly Lazy<MethodInfo> averageDecimalSelectorMethodInfo = GetLazyQueryableMethod("Average", 3, typeof(decimal));
-        private static readonly Lazy<MethodInfo> averageDecimalNullableSelectorMethodInfo = GetLazyQueryableMethod("Average", 3, typeof(decimal));
+        private static readonly MethodInfo averageIntMethodInfo = Create((IQueryable<int> q) => q.Average());
+        private static readonly Lazy<MethodInfo> averageIntNullableMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(int?));
+        private static readonly Lazy<MethodInfo> averageLongMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(long));
+        private static readonly Lazy<MethodInfo> averageLongNullableMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(long?));
+        private static readonly Lazy<MethodInfo> averageFloatMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(float));
+        private static readonly Lazy<MethodInfo> averageFloatNullableMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(float?));
+        private static readonly Lazy<MethodInfo> averageDoubleMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(double));
+        private static readonly Lazy<MethodInfo> averageDoubleNullableMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(double?));
+        private static readonly Lazy<MethodInfo> averageDecimalMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(decimal));
+        private static readonly Lazy<MethodInfo> averageDecimalNullableMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(decimal));
+
+        private static readonly Lazy<MethodInfo> averageIntSelectorMethodInfo = QueryableMethodBySelectorParameterType("Average", 2, typeof(int));
+        private static readonly Lazy<MethodInfo> averageIntNullableSelectorMethodInfo = QueryableMethodBySelectorParameterType("Average", 2, typeof(int?));
+        private static readonly Lazy<MethodInfo> averageLongSelectorMethodInfo = QueryableMethodBySelectorParameterType("Average", 2, typeof(long));
+        private static readonly Lazy<MethodInfo> averageLongNullableSelectorMethodInfo = QueryableMethodBySelectorParameterType("Average", 2, typeof(long?));
+        private static readonly Lazy<MethodInfo> averageFloatSelectorMethodInfo = QueryableMethodBySelectorParameterType("Average", 2, typeof(float));
+        private static readonly Lazy<MethodInfo> averageFloatNullableSelectorMethodInfo = QueryableMethodBySelectorParameterType("Average", 2, typeof(float?));
+        private static readonly Lazy<MethodInfo> averageDoubleSelectorMethodInfo = QueryableMethodBySelectorParameterType("Average", 2, typeof(double));
+        private static readonly Lazy<MethodInfo> averageDoubleNullableSelectorMethodInfo = QueryableMethodBySelectorParameterType("Average", 2, typeof(double?));
+        private static readonly Lazy<MethodInfo> averageDecimalSelectorMethodInfo = QueryableMethodBySelectorParameterType("Average", 2, typeof(decimal));
+        private static readonly Lazy<MethodInfo> averageDecimalNullableSelectorMethodInfo = QueryableMethodBySelectorParameterType("Average", 2, typeof(decimal?));
 
         /// <summary>
         /// Asynchronously computes the average of a sequence of <see cref="T:System.Int32"/> values.
@@ -47,7 +52,7 @@ namespace ElasticLinq
         /// <paramref name="source"/> contains no elements.</exception>
         public static async Task<double> AverageAsync(this IQueryable<int> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (double)await ExecuteAsync(source.Provider, FinalExpression(source, averageIntMethodInfo.Value), cancellationToken);
+            return (double)await ExecuteAsync(source.Provider, FinalExpression(source, averageIntMethodInfo), cancellationToken);
         }
 
         /// <summary>

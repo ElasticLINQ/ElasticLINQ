@@ -1,5 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using ElasticLinq.Async;
 using ElasticLinq.Logging;
 using ElasticLinq.Mapping;
 using ElasticLinq.Request;
@@ -21,7 +22,7 @@ namespace ElasticLinq
     /// <summary>
     /// Query provider implementation for Elasticsearch.
     /// </summary>
-    public sealed class ElasticQueryProvider : IQueryProvider
+    public sealed class ElasticQueryProvider : IQueryProvider, IAsyncQueryExecutor
     {
         private readonly ElasticRequestProcessor requestProcessor;
 
@@ -48,11 +49,8 @@ namespace ElasticLinq
         }
 
         internal ElasticConnection Connection { get; private set; }
-
         internal ILog Log { get; private set; }
-
         internal IElasticMapping Mapping { get; private set; }
-
         internal IRetryPolicy RetryPolicy { get; private set; }
 
         /// <inheritdoc/>
@@ -96,7 +94,14 @@ namespace ElasticLinq
             return AsyncHelper.RunSync(() => ExecuteAsync(expression));
         }
 
-        internal async Task<object> ExecuteAsync(Expression expression, CancellationToken cancellationToken = default(CancellationToken))
+        /// <inheritdoc/>
+        public async Task<TResult> ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return (TResult)await ExecuteAsync(expression, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public async Task<object> ExecuteAsync(Expression expression, CancellationToken cancellationToken = default(CancellationToken))
         {
             Argument.EnsureNotNull("expression", expression);
 

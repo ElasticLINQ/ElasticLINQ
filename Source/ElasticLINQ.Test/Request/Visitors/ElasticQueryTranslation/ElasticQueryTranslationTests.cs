@@ -3,6 +3,7 @@
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Visitors;
 using ElasticLinq.Response.Model;
+using ElasticLinq.Test.TestSupport;
 using System;
 using System.Collections.Generic;
 using System.Linq;

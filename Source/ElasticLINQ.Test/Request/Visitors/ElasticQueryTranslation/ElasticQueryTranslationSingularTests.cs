@@ -3,6 +3,7 @@
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Facets;
 using ElasticLinq.Request.Visitors;
+using ElasticLinq.Test.TestSupport;
 using System;
 using System.Linq;
 using System.Linq.Expressions;

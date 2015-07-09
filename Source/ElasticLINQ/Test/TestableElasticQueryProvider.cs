@@ -1,14 +1,17 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using ElasticLinq.Async;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ElasticLinq.Test
 {
     /// <summary>
     /// Provides an <see cref="IQueryProvider"/> that can be used for unit tests.
     /// </summary>
-    public class TestableElasticQueryProvider : IQueryProvider
+    public class TestableElasticQueryProvider : IQueryProvider, IAsyncQueryExecutor
     {
         private readonly TestableElasticContext context;
 
@@ -43,6 +46,18 @@ namespace ElasticLinq.Test
         public object Execute(Expression expression)
         {
             return Expression.Lambda(expression).Compile().DynamicInvoke();
+        }
+
+        /// <inheritdoc/>
+        public async Task<TResult> ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken = new CancellationToken())
+        {
+            return (TResult) await ExecuteAsync(expression, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public async Task<object> ExecuteAsync(Expression expression, CancellationToken cancellationToken = new CancellationToken())
+        {
+            return await Task.Run(() => Execute(expression), cancellationToken);
         }
     }
 }

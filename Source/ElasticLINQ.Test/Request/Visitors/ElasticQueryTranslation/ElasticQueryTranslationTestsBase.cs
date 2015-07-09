@@ -4,10 +4,10 @@ using ElasticLinq.Logging;
 using ElasticLinq.Mapping;
 using ElasticLinq.Retry;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using ElasticLinq.Test.TestSupport;
 
 namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 {
@@ -23,34 +23,6 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         protected static IQueryable<Robot> Robots
         {
             get { return new ElasticQuery<Robot>(SharedProvider); }
-        }
-
-        protected class Robot
-        {
-            public Int32 Id { get; set; }
-            public string Name { get; set; }
-            public DateTime Started { get; set; }
-            public decimal Cost { get; set; }
-            public double EnergyUse { get; set; }
-            public int? Zone { get; set; }
-            public List<string> Aliases { get; set; }
-            public RobotStats Stats { get; set; }
-        }
-
-        protected class RobotStats
-        {
-            public RobotLimbs Limbs { get; set; }
-            public RobotPricing Pricing { get; set; }
-        }
-
-        public class RobotLimbs
-        {
-            public Int32 HandCount { get; set; }
-        }
-
-        public class RobotPricing
-        {
-            public decimal InvoicePrice { get; set; }
         }
 
         protected static Expression MakeQueryableExpression<TSource>(string name, IQueryable<TSource> source, params Expression[] parameters)

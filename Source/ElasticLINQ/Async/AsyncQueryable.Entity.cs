@@ -7,19 +7,19 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ElasticLinq
+namespace ElasticLinq.Async
 {
     public static partial class AsyncQueryable
     {
-        private static readonly Lazy<MethodInfo> firstMethodInfo = GetLazyQueryableMethod("First", 1);
-        private static readonly Lazy<MethodInfo> firstPredicateMethodInfo = GetLazyQueryableMethod("First", 2);
-        private static readonly Lazy<MethodInfo> firstOrDefaultMethodInfo = GetLazyQueryableMethod("FirstOrDefault", 1);
-        private static readonly Lazy<MethodInfo> firstOrDefaultPredicateMethodInfo = GetLazyQueryableMethod("FirstOrDefault", 2);
+        private static readonly Lazy<MethodInfo> firstMethodInfo = QueryableMethodByArgs("First", 1);
+        private static readonly Lazy<MethodInfo> firstPredicateMethodInfo = QueryableMethodByArgs("First", 2);
+        private static readonly Lazy<MethodInfo> firstOrDefaultMethodInfo = QueryableMethodByArgs("FirstOrDefault", 1);
+        private static readonly Lazy<MethodInfo> firstOrDefaultPredicateMethodInfo = QueryableMethodByArgs("FirstOrDefault", 2);
         
-        private static readonly Lazy<MethodInfo> singleMethodInfo = GetLazyQueryableMethod("Single", 1);
-        private static readonly Lazy<MethodInfo> singlePredicateMethodInfo = GetLazyQueryableMethod("Single", 2);
-        private static readonly Lazy<MethodInfo> singleOrDefaultMethodInfo = GetLazyQueryableMethod("SingleOrDefault", 1);
-        private static readonly Lazy<MethodInfo> singleOrDefaultPredicateMethodInfo = GetLazyQueryableMethod("SingleOrDefault", 2);
+        private static readonly Lazy<MethodInfo> singleMethodInfo = QueryableMethodByArgs("Single", 1);
+        private static readonly Lazy<MethodInfo> singlePredicateMethodInfo = QueryableMethodByArgs("Single", 2);
+        private static readonly Lazy<MethodInfo> singleOrDefaultMethodInfo = QueryableMethodByArgs("SingleOrDefault", 1);
+        private static readonly Lazy<MethodInfo> singleOrDefaultPredicateMethodInfo = QueryableMethodByArgs("SingleOrDefault", 2);
 
         /// <summary>
         /// Asynchronously returns the first element of a sequence.

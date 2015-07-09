@@ -45,10 +45,11 @@
     <Reference Include="System.Net.Http" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AsyncQueryable.cs" />
-    <Compile Include="AsyncQueryable.Average.cs" />
-    <Compile Include="AsyncQueryable.Sum.cs" />
-    <Compile Include="AsyncQueryable.Entity.cs" />
+    <Compile Include="Async\AsyncQueryable.cs" />
+    <Compile Include="Async\AsyncQueryable.Average.cs" />
+    <Compile Include="Async\AsyncQueryable.Sum.cs" />
+    <Compile Include="Async\AsyncQueryable.Entity.cs" />
+    <Compile Include="Async\IAsyncQueryExecutor.cs" />
     <Compile Include="ElasticConnection.cs" />
     <Compile Include="ElasticConnectionOptions.cs" />
     <Compile Include="ElasticContext.cs" />
