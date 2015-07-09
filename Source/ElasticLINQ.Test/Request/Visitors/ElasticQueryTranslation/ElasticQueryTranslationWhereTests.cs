@@ -199,7 +199,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         public void StringStaticEqualsMethodGeneratesTermCriteria()
         {
             const string expectedConstant = "Kryten";
-            var where = Robots.Where(e => String.Equals(e.Name, expectedConstant));
+            var where = Robots.Where(e => string.Equals(e.Name, expectedConstant));
             var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
             var termCriteria = Assert.IsType<TermCriteria>(criteria);
@@ -211,7 +211,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         public void StringStaticEqualsMethodReversedArgumentsGeneratesTermCriteria()
         {
             const string expectedConstant = "IG-88";
-            var where = Robots.Where(e => String.Equals(expectedConstant, e.Name));
+            var where = Robots.Where(e => string.Equals(expectedConstant, e.Name));
             var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
             var termCriteria = Assert.IsType<TermCriteria>(criteria);
@@ -661,7 +661,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         [Fact]
         public void StringStaticEqualsNullMethodGeneratesMissingCriteria()
         {
-            var where = Robots.Where(e => String.Equals(e.Name, null));
+            var where = Robots.Where(e => string.Equals(e.Name, null));
             var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
             var missingCriteria = Assert.IsType<MissingCriteria>(criteria);
@@ -695,7 +695,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         [Fact]
         public void StringStaticNotEqualsNullMethodGeneratesMissingCriteria()
         {
-            var where = Robots.Where(e => !String.Equals(e.Name, null));
+            var where = Robots.Where(e => !string.Equals(e.Name, null));
             var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
             var existsCriteria = Assert.IsType<ExistsCriteria>(criteria);

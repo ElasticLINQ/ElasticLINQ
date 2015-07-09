@@ -15,9 +15,9 @@ namespace ElasticLinq.Request.Criteria
     /// </summary>
     public class TermsCriteria : SingleFieldCriteria, ITermsCriteria
     {
-        private readonly TermsExecutionMode? executionMode;
-        private readonly MemberInfo member;
-        private readonly ReadOnlyCollection<object> values;
+        readonly TermsExecutionMode? executionMode;
+        readonly MemberInfo member;
+        readonly ReadOnlyCollection<object> values;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TermsCriteria"/> class.
@@ -26,7 +26,7 @@ namespace ElasticLinq.Request.Criteria
         /// <param name="field">Field to be checked for this term.</param>
         /// <param name="member">Property or field being checked for this term.</param>
         /// <param name="values">Constant values being searched for.</param>
-        private TermsCriteria(TermsExecutionMode? executionMode, string field, MemberInfo member, IEnumerable<object> values)
+        TermsCriteria(TermsExecutionMode? executionMode, string field, MemberInfo member, IEnumerable<object> values)
             : base(field)
         {
             this.executionMode = executionMode;
@@ -72,7 +72,7 @@ namespace ElasticLinq.Request.Criteria
         /// <summary>
         /// Constant values being searched for.
         /// </summary>
-        public ReadOnlyCollection<Object> Values
+        public ReadOnlyCollection<object> Values
         {
             get { return values; }
         }
@@ -80,9 +80,9 @@ namespace ElasticLinq.Request.Criteria
         /// <inheritdoc/>
         public override string ToString()
         {
-            var result = String.Format("terms {0} [{1}]", Field, String.Join(", ", Values));
+            var result = string.Format("terms {0} [{1}]", Field, string.Join(", ", Values));
             if (ExecutionMode.HasValue)
-                result += String.Format(" (execution: {0})", ExecutionMode);
+                result += string.Format(" (execution: {0})", ExecutionMode);
 
             return result;
         }

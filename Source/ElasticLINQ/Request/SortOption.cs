@@ -7,11 +7,11 @@ namespace ElasticLinq.Request
     /// <summary>
     /// Specifies the options desired for sorting by an individual field.
     /// </summary>
-    internal class SortOption
+    class SortOption
     {
-        private readonly string name;
-        private readonly bool ascending;
-        private readonly bool ignoreUnmapped;
+        readonly string name;
+        readonly bool ascending;
+        readonly bool ignoreUnmapped;
 
         /// <summary>
         /// Create a new SortOption for the given name, order and ignore.

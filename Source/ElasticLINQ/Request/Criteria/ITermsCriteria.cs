@@ -10,7 +10,7 @@ namespace ElasticLinq.Request.Criteria
     /// Interface implemented by <see cref="TermCriteria"/> and <see cref="TermsCriteria"/> so that they can be
     /// treated homogeneously.
     /// </summary>
-    internal interface ITermsCriteria : ICriteria
+    interface ITermsCriteria : ICriteria
     {
         /// <summary>
         /// Gets the field to be searched.
@@ -30,6 +30,6 @@ namespace ElasticLinq.Request.Criteria
         /// <summary>
         /// Gets the list of values to be searched for.
         /// </summary>
-        ReadOnlyCollection<Object> Values { get; }
+        ReadOnlyCollection<object> Values { get; }
     }
 }

@@ -46,6 +46,6 @@ namespace ElasticLinq.Response.Model
         /// <summary>
         /// The list of fields for this hit extracted from the document (if fields requested).
         /// </summary>
-        public Dictionary<String, JToken> fields = new Dictionary<string, JToken>();
+        public Dictionary<string, JToken> fields = new Dictionary<string, JToken>();
     }
 }

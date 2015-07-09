@@ -166,15 +166,15 @@ namespace ElasticLinq
             return elasticQuery.ToQueryInfo();
         }
 
-        private static readonly MethodInfo queryMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "Query");
-        private static readonly MethodInfo queryStringMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "QueryString" && m.GetParameters().Count() == 2);
-        private static readonly MethodInfo queryStringWithFieldsMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "QueryString" && m.GetParameters().Count() > 2);
-        private static readonly MethodInfo orderByScoreMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "OrderByScore");
-        private static readonly MethodInfo orderByScoreDescendingMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "OrderByScoreDescending");
-        private static readonly MethodInfo thenByScoreMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "ThenByScore");
-        private static readonly MethodInfo thenByScoreDescendingMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "ThenByScoreDescending");
-        private static readonly MethodInfo minimumScoreMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "MinScore");
-        private static readonly MethodInfo highlightScoreMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "Highlight");
+        static readonly MethodInfo queryMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "Query");
+        static readonly MethodInfo queryStringMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "QueryString" && m.GetParameters().Count() == 2);
+        static readonly MethodInfo queryStringWithFieldsMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "QueryString" && m.GetParameters().Count() > 2);
+        static readonly MethodInfo orderByScoreMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "OrderByScore");
+        static readonly MethodInfo orderByScoreDescendingMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "OrderByScoreDescending");
+        static readonly MethodInfo thenByScoreMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "ThenByScore");
+        static readonly MethodInfo thenByScoreDescendingMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "ThenByScoreDescending");
+        static readonly MethodInfo minimumScoreMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "MinScore");
+        static readonly MethodInfo highlightScoreMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "Highlight");
 
         /// <summary>
         /// Creates an expression to call a generic version of the given method with the source and arguments as parameters..
@@ -184,7 +184,7 @@ namespace ElasticLinq
         /// <param name="method">MethodInfo of the method to call.</param>
         /// <param name="arguments">Expressions that should be passed to the method as arguments.</param>
         /// <returns>IQueryable that contains the query with the method call inserted into the query chain.</returns>
-        private static IQueryable<TSource> CreateQueryMethodCall<TSource>(IQueryable<TSource> source, MethodInfo method, params Expression[] arguments)
+        static IQueryable<TSource> CreateQueryMethodCall<TSource>(IQueryable<TSource> source, MethodInfo method, params Expression[] arguments)
         {
             Argument.EnsureNotNull("source", source);
             Argument.EnsureNotNull("method", source);
@@ -193,7 +193,7 @@ namespace ElasticLinq
             return source.Provider.CreateQuery<TSource>(callExpression);
         }
 
-        private static IQueryable<TSource> CreateQueryMethodCall<TSource, TKey>(IQueryable<TSource> source, MethodInfo method, params Expression[] arguments)
+        static IQueryable<TSource> CreateQueryMethodCall<TSource, TKey>(IQueryable<TSource> source, MethodInfo method, params Expression[] arguments)
         {
             Argument.EnsureNotNull("source", source);
             Argument.EnsureNotNull("method", source);

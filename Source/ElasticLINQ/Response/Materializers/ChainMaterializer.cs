@@ -4,7 +4,7 @@ using ElasticLinq.Utility;
 
 namespace ElasticLinq.Response.Materializers
 {
-    internal abstract class ChainMaterializer : IElasticMaterializer
+    abstract class ChainMaterializer : IElasticMaterializer
     {
         protected ChainMaterializer(IElasticMaterializer next)
         {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ElasticLinq.Utility
 {
-    internal static class AsyncHelper
+    static class AsyncHelper
     {
         public static T RunSync<T>(Func<Task<T>> action)
         {

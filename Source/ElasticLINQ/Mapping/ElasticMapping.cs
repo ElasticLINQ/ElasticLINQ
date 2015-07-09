@@ -34,12 +34,12 @@ namespace ElasticLinq.Mapping
     /// </summary>
     public class ElasticMapping : IElasticMapping
     {
-        private readonly bool camelCaseFieldNames;
-        private readonly bool camelCaseTypeNames;
-        private readonly CultureInfo conversionCulture;
-        private readonly bool lowerCaseAnalyzedFieldValues;
-        private readonly bool pluralizeTypeNames;
-        private readonly EnumFormat enumFormat;
+        readonly bool camelCaseFieldNames;
+        readonly bool camelCaseTypeNames;
+        readonly CultureInfo conversionCulture;
+        readonly bool lowerCaseAnalyzedFieldValues;
+        readonly bool pluralizeTypeNames;
+        readonly EnumFormat enumFormat;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ElasticMapping"/> class.
@@ -88,7 +88,7 @@ namespace ElasticLinq.Mapping
             return result;
         }
 
-        private static object ReformatValueIfEnum(MemberInfo member, object value)
+        static object ReformatValueIfEnum(MemberInfo member, object value)
         {
             var returnType = TypeHelper.GetReturnType(member);
             if (!returnType.GetTypeInfo().IsEnum) return value;
@@ -96,7 +96,7 @@ namespace ElasticLinq.Mapping
             var nameValue = Enum.GetName(returnType, value);
             if (nameValue == null)
                 throw new ArgumentOutOfRangeException("value",
-                    String.Format("Value '{0}' is not defined for enum type '{1}'.", value, returnType.FullName));
+                    string.Format("Value '{0}' is not defined for enum type '{1}'.", value, returnType.FullName));
 
             return nameValue;
         }
@@ -115,7 +115,7 @@ namespace ElasticLinq.Mapping
                     return GetFieldName(type, memberExpression.Member);
 
                 default:
-                    throw new NotSupportedException(String.Format("Unknown expression type {0} for left hand side of expression {1}", memberExpression.Expression.NodeType, memberExpression));
+                    throw new NotSupportedException(string.Format("Unknown expression type {0} for left hand side of expression {1}", memberExpression.Expression.NodeType, memberExpression));
             }
         }
 

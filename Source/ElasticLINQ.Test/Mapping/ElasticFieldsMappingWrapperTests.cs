@@ -33,7 +33,7 @@ namespace ElasticLinq.Test.Mapping
             innerMapping.Received(1).GetDocumentType(type);
         }
 
-        private class Sample { }
+        class Sample { }
 
         [Theory]
         [InlineData("Id", "_id")]

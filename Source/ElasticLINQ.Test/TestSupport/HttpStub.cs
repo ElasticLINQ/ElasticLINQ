@@ -13,18 +13,18 @@ namespace ElasticLinq.Test.TestSupport
 {
     public class HttpStub : IDisposable
     {
-        private const int MaximumBindAttempts = 5;
-        private static readonly Random random = new Random();
+        const int MaximumBindAttempts = 5;
+        static readonly Random random = new Random();
 
-        private readonly List<HttpListenerRequest> requests = new List<HttpListenerRequest>();
-        private readonly List<HttpListenerResponse> responses = new List<HttpListenerResponse>();
-        private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-        private readonly TaskCompletionSource<bool> responseCompletion = new TaskCompletionSource<bool>();
-        private readonly Action<HttpListenerContext> responder;
-        private readonly HttpListener listener;
-        private readonly int completeRequestCount;
+        readonly List<HttpListenerRequest> requests = new List<HttpListenerRequest>();
+        readonly List<HttpListenerResponse> responses = new List<HttpListenerResponse>();
+        readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+        readonly TaskCompletionSource<bool> responseCompletion = new TaskCompletionSource<bool>();
+        readonly Action<HttpListenerContext> responder;
+        readonly HttpListener listener;
+        readonly int completeRequestCount;
 
-        private bool disposed;
+        bool disposed;
 
         public Uri Uri { get { return new Uri(listener.Prefixes.Single()); } }
 
@@ -39,7 +39,7 @@ namespace ElasticLinq.Test.TestSupport
                 var randomPort = random.Next(49152, 65535);
                 listener = new HttpListener();
                 listener.Prefixes.Clear();
-                listener.Prefixes.Add(String.Format("http://localhost:{0}/", randomPort));
+                listener.Prefixes.Add(string.Format("http://localhost:{0}/", randomPort));
                 try
                 {
                     listener.Start();
@@ -87,7 +87,7 @@ namespace ElasticLinq.Test.TestSupport
             disposed = true;
         }
 
-        private void BackgroundLoop()
+        void BackgroundLoop()
         {
             while (listener.IsListening && !cancellationTokenSource.IsCancellationRequested)
             {

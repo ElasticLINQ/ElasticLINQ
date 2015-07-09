@@ -9,10 +9,10 @@ namespace ElasticLinq.Test.Request.Facets
 {
     public class TermsFacetTests
     {
-        private const string ExpectedName = "name";
-        private readonly string[] expectedFields = { "field1", "field2", "field3" };
-        private readonly ICriteria expectedFilter = new TermCriteria("field", null, "value1");
-        private readonly int? expectedSize = 123;
+        const string ExpectedName = "name";
+        readonly string[] expectedFields = { "field1", "field2", "field3" };
+        readonly ICriteria expectedFilter = new TermCriteria("field", null, "value1");
+        readonly int? expectedSize = 123;
 
         [Fact]
         public void ConstructorSetsAllProperties()

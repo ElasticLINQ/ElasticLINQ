@@ -10,13 +10,13 @@ namespace ElasticLinq.Request.Visitors
     /// Tests expressions to find interesting branches of the tree.
     /// Can be used for things like finding candidates for partial evaluation.
     /// </summary>
-    internal class BranchSelectExpressionVisitor : ExpressionVisitor
+    class BranchSelectExpressionVisitor : ExpressionVisitor
     {
-        private readonly HashSet<Expression> matches = new HashSet<Expression>();
-        private readonly Func<Expression, bool> predicate;
-        private bool decision;
+        readonly HashSet<Expression> matches = new HashSet<Expression>();
+        readonly Func<Expression, bool> predicate;
+        bool decision;
 
-        private BranchSelectExpressionVisitor(Func<Expression, bool> predicate)
+        BranchSelectExpressionVisitor(Func<Expression, bool> predicate)
         {
             this.predicate = predicate;
         }
@@ -28,25 +28,25 @@ namespace ElasticLinq.Request.Visitors
             return visitor.matches;
         }
 
-        public override Expression Visit(Expression e)
+        public override Expression Visit(Expression node)
         {
-            if (e == null)
+            if (node == null)
                 return null;
 
             var priorDecision = decision;
             decision = false;
-            base.Visit(e);
+            base.Visit(node);
 
             if (!decision)
             {
-                if (predicate(e))
-                    matches.Add(e);
+                if (predicate(node))
+                    matches.Add(node);
                 else
                     decision = true;
             }
 
             decision |= priorDecision;
-            return e;
+            return node;
         }
     }
 }

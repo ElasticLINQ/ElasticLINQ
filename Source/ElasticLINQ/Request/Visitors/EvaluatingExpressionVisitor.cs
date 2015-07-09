@@ -10,11 +10,11 @@ namespace ElasticLinq.Request.Visitors
     /// replaces that expression with a constant expression
     /// that resulted from its compilation and invocation.
     /// </summary>
-    internal class EvaluatingExpressionVisitor : ExpressionVisitor
+    class EvaluatingExpressionVisitor : ExpressionVisitor
     {
-        private readonly HashSet<Expression> chosenForEvaluation;
+        readonly HashSet<Expression> chosenForEvaluation;
 
-        private EvaluatingExpressionVisitor(HashSet<Expression> chosenForEvaluation)
+        EvaluatingExpressionVisitor(HashSet<Expression> chosenForEvaluation)
         {
             this.chosenForEvaluation = chosenForEvaluation;
         }
@@ -24,14 +24,14 @@ namespace ElasticLinq.Request.Visitors
             return new EvaluatingExpressionVisitor(chosenForEvaluation).Visit(e);
         }
 
-        public override Expression Visit(Expression e)
+        public override Expression Visit(Expression node)
         {
-            if (e == null || e.NodeType == ExpressionType.Constant)
-                return e;
+            if (node == null || node.NodeType == ExpressionType.Constant)
+                return node;
 
-            return chosenForEvaluation.Contains(e)
-                ? Expression.Constant(Expression.Lambda(e).Compile().DynamicInvoke(null), e.Type)
-                : base.Visit(e);
+            return chosenForEvaluation.Contains(node)
+                ? Expression.Constant(Expression.Lambda(node).Compile().DynamicInvoke(null), node.Type)
+                : base.Visit(node);
         }
     }
 }

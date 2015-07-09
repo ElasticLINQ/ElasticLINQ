@@ -10,7 +10,7 @@ namespace ElasticLinq.Test.Request.Criteria
 {
     public class RangeCriteriaTests
     {
-        private readonly static MemberInfo memberInfo = typeof(string).GetProperty("Length");
+        readonly static MemberInfo memberInfo = typeof(string).GetProperty("Length");
 
         [Fact]
         public void SetsNameAndMember()

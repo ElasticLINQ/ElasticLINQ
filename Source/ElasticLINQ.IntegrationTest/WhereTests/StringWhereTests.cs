@@ -6,7 +6,7 @@ namespace ElasticLINQ.IntegrationTest.WhereTests
 {
     public class StringWhereTests
     {
-        private const string Surname = "Morales";
+        const string Surname = "Morales";
 
         [Fact]
         public void EqualToConstant()

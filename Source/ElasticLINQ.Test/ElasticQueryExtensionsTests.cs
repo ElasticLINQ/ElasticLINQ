@@ -11,10 +11,10 @@ namespace ElasticLinq.Test
 {
     public class ElasticQueryExtensionsTests
     {
-        private static readonly IQueryable<Sample> testableSample = new TestableElasticContext().Query<Sample>();
-        private static readonly IQueryable<Sample> fakeSample = new FakeQueryProvider().CreateQuery<Sample>();
+        static readonly IQueryable<Sample> testableSample = new TestableElasticContext().Query<Sample>();
+        static readonly IQueryable<Sample> fakeSample = new FakeQueryProvider().CreateQuery<Sample>();
 
-        private class Sample
+        class Sample
         {
             public string Property { get; set; }
         }
@@ -141,15 +141,15 @@ namespace ElasticLinq.Test
             var query = new[] { 42, 2112 }.AsQueryable();
 
             var ex = Assert.Throws<ArgumentException>(() => query.ToQueryInfo());
-            Assert.True(ex.Message.StartsWith("Query must be of type IElasticQuery<> to call ToQueryInfo()"));
+            Assert.Contains("Query must be of type IElasticQuery<> to call ToQueryInfo()", ex.Message);
             Assert.Equal("source", ex.ParamName);
         }
 
         [Fact]
         public static void HighlightQuery_Throws()
         {
-            Assert.Throws<ArgumentNullException>(() => ElasticQueryExtensions.Highlight<Sample, String>(null, null));
-            Assert.Throws<ArgumentNullException>(() => ElasticQueryExtensions.Highlight<Sample, String>(null, e => e.Property));
+            Assert.Throws<ArgumentNullException>(() => ElasticQueryExtensions.Highlight<Sample, string>(null, null));
+            Assert.Throws<ArgumentNullException>(() => ElasticQueryExtensions.Highlight<Sample, string>(null, e => e.Property));
             Assert.Throws<NotSupportedException>(() => testableSample.Highlight(e => e.Property.Equals("").ToString()).ToList());
         }
 
@@ -174,8 +174,8 @@ namespace ElasticLinq.Test
 
         public class MultiPropertySample
         {
-            public String Property1 { get; set; }
-            public String Property2 { get; set; }
+            public string Property1 { get; set; }
+            public string Property2 { get; set; }
         }
 
         [Fact]
@@ -202,7 +202,7 @@ namespace ElasticLinq.Test
             Assert.DoesNotContain("\"pre_tags\":[\"<a>\"]", body);
         }
 
-        private static void AssertIsAddedToExpressionTree<TSequence, TElement>(TSequence source, Func<TSequence, TSequence> method, string methodName)
+        static void AssertIsAddedToExpressionTree<TSequence, TElement>(TSequence source, Func<TSequence, TSequence> method, string methodName)
             where TSequence : IQueryable<TElement>
         {
             var afterMethod = method(source);

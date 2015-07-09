@@ -8,10 +8,10 @@ using System.Linq.Expressions;
 
 namespace ElasticLinq.Test.TestSupport
 {
-    internal class FakeQuery<T> : IOrderedQueryable<T>
+    class FakeQuery<T> : IOrderedQueryable<T>
     {
-        private readonly FakeQueryProvider provider;
-        private readonly Expression expression;
+        readonly FakeQueryProvider provider;
+        readonly Expression expression;
 
         public FakeQuery(FakeQueryProvider provider)
         {

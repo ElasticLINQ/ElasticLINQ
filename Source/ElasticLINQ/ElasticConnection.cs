@@ -14,13 +14,13 @@ namespace ElasticLinq
     [DebuggerDisplay("{Endpoint.ToString(),nq}{Index,nq}")]
     public class ElasticConnection : IDisposable
     {
-        private static readonly TimeSpan defaultTimeout = TimeSpan.FromSeconds(10);
+        static readonly TimeSpan defaultTimeout = TimeSpan.FromSeconds(10);
 
-        private readonly Uri endpoint;
-        private readonly string index;
-        private readonly TimeSpan timeout;
-        private readonly ElasticConnectionOptions options;
-        private HttpClient httpClient;
+        readonly Uri endpoint;
+        readonly string index;
+        readonly TimeSpan timeout;
+        readonly ElasticConnectionOptions options;
+        HttpClient httpClient;
 
         /// <summary>
         /// Create a new ElasticConnection with the given parameters defining its properties.

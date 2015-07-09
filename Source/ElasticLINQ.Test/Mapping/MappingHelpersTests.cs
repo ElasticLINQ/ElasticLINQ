@@ -12,7 +12,7 @@ namespace ElasticLinq.Test.Mapping
 {
     public class MappingHelpersTests
     {
-        private readonly static CultureInfo usCulture = new CultureInfo(0x0409);
+        readonly static CultureInfo usCulture = new CultureInfo(0x0409);
 
         [Fact]
         public static void ToCamelCaseWithAllCapsLowersAllText()
@@ -150,13 +150,13 @@ namespace ElasticLinq.Test.Mapping
         [ExcludeFromCodeCoverage]
         class ClassWithNoValidSelectionProperties
         {
-            private int backing;
+            int backing;
 
             public int? Nullable { get; set; }
             public int WriteOnly { set { backing = value; } }
             public int ReadOnly { get { return backing; } }
             public string NotValueType { get; set; }
-            private int NonPublic { get; set; }
+            int NonPublic { get; set; }
             public static bool IsStatic { get; set; }
             public List<string> IsGeneric { get; set; }
             public int Field = 1;

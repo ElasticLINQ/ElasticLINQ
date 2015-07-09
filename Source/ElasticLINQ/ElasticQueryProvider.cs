@@ -23,7 +23,7 @@ namespace ElasticLinq
     /// </summary>
     public sealed class ElasticQueryProvider : IQueryProvider
     {
-        private readonly ElasticRequestProcessor requestProcessor;
+        readonly ElasticRequestProcessor requestProcessor;
 
         /// <summary>
         /// Create a new ElasticQueryProvider for a given connection, mapping, log, retry policy and field prefix.
@@ -96,7 +96,7 @@ namespace ElasticLinq
             return AsyncHelper.RunSync(() => ExecuteAsync(expression));
         }
 
-        private async Task<object> ExecuteAsync(Expression expression, CancellationToken cancellationToken = default(CancellationToken))
+        async Task<object> ExecuteAsync(Expression expression, CancellationToken cancellationToken = default(CancellationToken))
         {
             Argument.EnsureNotNull("expression", expression);
 

@@ -15,11 +15,11 @@ namespace ElasticLinq.Request.Facets
     /// </summary>
     /// <remarks>Mapped to .GroupBy(a => 1).Select(a => a.Count(b => b.SomeField))</remarks>
     [DebuggerDisplay("StatisticalFacet {Fields} {Filter}")]
-    internal class StatisticalFacet : IFacet
+    class StatisticalFacet : IFacet
     {
-        private readonly string name;
-        private readonly ICriteria criteria;
-        private readonly ReadOnlyCollection<string> fields;
+        readonly string name;
+        readonly ICriteria criteria;
+        readonly ReadOnlyCollection<string> fields;
 
         public StatisticalFacet(string name, params string[] fields)
             : this(name, null, fields)

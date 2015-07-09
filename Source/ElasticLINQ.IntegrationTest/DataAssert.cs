@@ -33,7 +33,7 @@ namespace ElasticLINQ.IntegrationTest
                 AssertSameSequence(expect, actual);
         }
 
-        private static void AssertSameSequence<TTarget>(List<TTarget> expect, List<TTarget> actual)
+        static void AssertSameSequence<TTarget>(List<TTarget> expect, List<TTarget> actual)
         {
             var upperBound = Math.Min(expect.Count, actual.Count);
             for (var i = 0; i < upperBound; i++)
@@ -42,7 +42,7 @@ namespace ElasticLINQ.IntegrationTest
             Assert.Equal(expect.Count, actual.Count);
         }
 
-        private static IEnumerable<T> Difference<T>(IEnumerable<T> left, IEnumerable<T> right)
+        static IEnumerable<T> Difference<T>(IEnumerable<T> left, IEnumerable<T> right)
         {
             var rightCache = new HashSet<T>(right);
             rightCache.SymmetricExceptWith(left);

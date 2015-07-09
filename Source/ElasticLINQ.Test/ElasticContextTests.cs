@@ -11,9 +11,9 @@ namespace ElasticLinq.Test
 {
     public class ElasticContextTests
     {
-        private static readonly ElasticConnection connection = new ElasticConnection(new Uri("http://localhost"));
+        static readonly ElasticConnection connection = new ElasticConnection(new Uri("http://localhost"));
 
-        private class Sample { };
+        class Sample { };
 
         [Fact]
         public void ConstructorSetsPropertiesFromParameters()

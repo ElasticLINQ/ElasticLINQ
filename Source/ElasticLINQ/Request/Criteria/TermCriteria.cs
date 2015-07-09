@@ -1,6 +1,5 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
-using System;
 using System.Collections.ObjectModel;
 using System.Reflection;
 
@@ -10,10 +9,10 @@ namespace ElasticLinq.Request.Criteria
     /// Criteria that specifies one possible value that a
     /// field must match in order to select a document.
     /// </summary>
-    internal class TermCriteria : SingleFieldCriteria, ITermsCriteria
+    class TermCriteria : SingleFieldCriteria, ITermsCriteria
     {
-        private readonly MemberInfo member;
-        private readonly ReadOnlyCollection<object> values;
+        readonly MemberInfo member;
+        readonly ReadOnlyCollection<object> values;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TermCriteria"/> class.
@@ -67,7 +66,7 @@ namespace ElasticLinq.Request.Criteria
         /// <inheritdoc/>
         public override string ToString()
         {
-            return String.Format("term {0} {1}", Field, Value);
+            return string.Format("term {0} {1}", Field, Value);
         }
     }
 }

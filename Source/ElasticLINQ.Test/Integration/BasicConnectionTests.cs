@@ -17,9 +17,9 @@ namespace ElasticLinq.Test.Integration
 {
     public class BasicConnectionTests
     {
-        private static readonly IElasticMapping mapping = new TrivialElasticMapping();
-        private static readonly ILog log = NullLog.Instance;
-        private static readonly IRetryPolicy retryPolicy = NullRetryPolicy.Instance;
+        static readonly IElasticMapping mapping = new TrivialElasticMapping();
+        static readonly ILog log = NullLog.Instance;
+        static readonly IRetryPolicy retryPolicy = NullRetryPolicy.Instance;
 
         class Robot
         {
@@ -162,12 +162,12 @@ namespace ElasticLinq.Test.Integration
             }
         }
 
-        private static ElasticContext MakeElasticContext(Uri uri)
+        static ElasticContext MakeElasticContext(Uri uri)
         {
             return new ElasticContext(new ElasticConnection(uri), mapping, log, retryPolicy);
         }
 
-        private static void ZeroHits(HttpListenerContext context)
+        static void ZeroHits(HttpListenerContext context)
         {
             var response = new
             {

@@ -18,16 +18,16 @@ namespace ElasticLinq.Request.Visitors
     /// Expression visitor to translate a LINQ query into a <see cref="ElasticTranslateResult"/>
     /// that captures remote and local semantics.
     /// </summary>
-    internal class ElasticQueryTranslator : CriteriaExpressionVisitor
+    class ElasticQueryTranslator : CriteriaExpressionVisitor
     {
-        private readonly SearchRequest searchRequest = new SearchRequest();
+        readonly SearchRequest searchRequest = new SearchRequest();
+        
+        Type finalItemType;
+        Func<Hit, object> itemProjector;
+        IElasticMaterializer materializer;
+        CriteriaWithin within = CriteriaWithin.Filter;
 
-        private Type finalItemType;
-        private Func<Hit, Object> itemProjector;
-        private IElasticMaterializer materializer;
-        private CriteriaWithin within = CriteriaWithin.Filter;
-
-        private ElasticQueryTranslator(IElasticMapping mapping, Type sourceType)
+        ElasticQueryTranslator(IElasticMapping mapping, Type sourceType)
             : base(mapping, sourceType)
         {
         }
@@ -37,7 +37,7 @@ namespace ElasticLinq.Request.Visitors
             return new ElasticQueryTranslator(mapping, FindSourceType(e)).Translate(e);
         }
 
-        private static Type FindSourceType(Expression e)
+        static Type FindSourceType(Expression e)
         {
             var sourceQuery = QuerySourceExpressionVisitor.FindSource(e);
             if (sourceQuery == null)
@@ -45,7 +45,7 @@ namespace ElasticLinq.Request.Visitors
             return sourceQuery.ElementType;
         }
 
-        private ElasticTranslateResult Translate(Expression e)
+        ElasticTranslateResult Translate(Expression e)
         {
             var evaluated = PartialEvaluator.Evaluate(e);
             var aggregated = FacetExpressionVisitor.Rebind(Mapping, SourceType, evaluated);
@@ -62,7 +62,7 @@ namespace ElasticLinq.Request.Visitors
             return new ElasticTranslateResult(searchRequest, materializer);
         }
 
-        private void ApplyTypeSelectionCriteria()
+        void ApplyTypeSelectionCriteria()
         {
             var typeCriteria = Mapping.GetTypeSelectionCriteria(SourceType);
 
@@ -71,7 +71,7 @@ namespace ElasticLinq.Request.Visitors
                 : AndCriteria.Combine(typeCriteria, searchRequest.Filter);
         }
 
-        private void CompleteHitTranslation(Expression evaluated)
+        void CompleteHitTranslation(Expression evaluated)
         {
             Visit(evaluated);
             searchRequest.DocumentType = Mapping.GetDocumentType(SourceType);
@@ -82,7 +82,7 @@ namespace ElasticLinq.Request.Visitors
                 ((ChainMaterializer)materializer).Next = new ListHitsElasticMaterializer(itemProjector ?? DefaultItemProjector, finalItemType ?? SourceType);
         }
 
-        private void CompleteFacetTranslation(FacetRebindCollectionResult aggregated)
+        void CompleteFacetTranslation(FacetRebindCollectionResult aggregated)
         {
             Visit(aggregated.Expression);
             searchRequest.DocumentType = Mapping.GetDocumentType(SourceType);
@@ -93,18 +93,18 @@ namespace ElasticLinq.Request.Visitors
             materializer = aggregated.Materializer;
         }
 
-        protected override Expression VisitMethodCall(MethodCallExpression m)
+        protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            if (m.Method.DeclaringType == typeof(Queryable))
-                return VisitQueryableMethodCall(m);
+            if (node.Method.DeclaringType == typeof(Queryable))
+                return VisitQueryableMethodCall(node);
 
-            if (m.Method.DeclaringType == typeof(ElasticQueryExtensions))
-                return VisitElasticQueryExtensionsMethodCall(m);
+            if (node.Method.DeclaringType == typeof(ElasticQueryExtensions))
+                return VisitElasticQueryExtensionsMethodCall(node);
 
-            if (m.Method.DeclaringType == typeof(ElasticMethods))
-                return VisitElasticMethodsMethodCall(m);
+            if (node.Method.DeclaringType == typeof(ElasticMethods))
+                return VisitElasticMethodsMethodCall(node);
 
-            return base.VisitMethodCall(m);
+            return base.VisitMethodCall(node);
         }
 
         protected override Expression VisitStringPatternCheckMethodCall(Expression source, Expression match, string pattern, string methodName)
@@ -136,7 +136,7 @@ namespace ElasticLinq.Request.Visitors
                 case "ThenByScore":
                 case "ThenByScoreDescending":
                     if (m.Arguments.Count == 1)
-                        return VisitOrderByScore(m.Arguments[0], !m.Method.Name.EndsWith("Descending"));
+                        return VisitOrderByScore(m.Arguments[0], !m.Method.Name.EndsWith("Descending", StringComparison.Ordinal));
                     break;
 
                 case "MinScore":
@@ -152,7 +152,7 @@ namespace ElasticLinq.Request.Visitors
             throw new NotSupportedException(string.Format("ElasticQuery.{0} method is not supported", m.Method.Name));
         }
 
-        private Expression VisitHighlight(Expression source, Expression highlightExpression, Expression configExpression)
+        Expression VisitHighlight(Expression source, Expression highlightExpression, Expression configExpression)
         {
             var unaryExpression = highlightExpression as UnaryExpression;
             if (unaryExpression == null) throw new NotSupportedException("Highlight expression specify only one property");
@@ -175,7 +175,7 @@ namespace ElasticLinq.Request.Visitors
             return Visit(source);
         }
 
-        private Expression VisitMinimumScore(Expression source, Expression minScoreExpression)
+        Expression VisitMinimumScore(Expression source, Expression minScoreExpression)
         {
             if (minScoreExpression is ConstantExpression)
             {
@@ -186,7 +186,7 @@ namespace ElasticLinq.Request.Visitors
             throw new NotSupportedException(string.Format("Score must be a constant expression, not a {0}.", minScoreExpression.NodeType));
         }
 
-        private Expression VisitQueryString(Expression source, Expression queryExpression, Expression fieldsExpression = null)
+        Expression VisitQueryString(Expression source, Expression queryExpression, Expression fieldsExpression = null)
         {
             var constantQueryExpression = (ConstantExpression)queryExpression;
             var constantFieldExpression = fieldsExpression as ConstantExpression;
@@ -262,12 +262,12 @@ namespace ElasticLinq.Request.Visitors
             throw new NotSupportedException(string.Format("Queryable.{0} method is not supported", m.Method.Name));
         }
 
-        private static NotSupportedException GetOverloadUnsupportedException(MethodInfo methodInfo)
+        static NotSupportedException GetOverloadUnsupportedException(MethodInfo methodInfo)
         {
             return new NotSupportedException(string.Format("Queryable.{0} method overload is not supported", methodInfo.GetSimpleSignature()));
         }
 
-        private Expression VisitAny(Expression source, Expression predicate)
+        Expression VisitAny(Expression source, Expression predicate)
         {
             materializer = new AnyElasticMaterializer();
             searchRequest.SearchType = "count";
@@ -278,7 +278,7 @@ namespace ElasticLinq.Request.Visitors
                 : Visit(source);
         }
 
-        private Expression VisitCount(Expression source, Expression predicate)
+        Expression VisitCount(Expression source, Expression predicate)
         {
             materializer = new CountElasticMaterializer();
             searchRequest.SearchType = "count";
@@ -287,10 +287,10 @@ namespace ElasticLinq.Request.Visitors
                 : Visit(source);
         }
 
-        private Expression VisitFirstOrSingle(Expression source, Expression predicate, string methodName)
+        Expression VisitFirstOrSingle(Expression source, Expression predicate, string methodName)
         {
-            var single = methodName.StartsWith("Single");
-            var orDefault = methodName.EndsWith("OrDefault");
+            var single = methodName.StartsWith("Single", StringComparison.Ordinal);
+            var orDefault = methodName.EndsWith("OrDefault", StringComparison.Ordinal);
 
             searchRequest.Size = single ? 2 : 1;
             finalItemType = source.Type;
@@ -320,7 +320,7 @@ namespace ElasticLinq.Request.Visitors
             return base.VisitUnary(node);
         }
 
-        private Expression VisitQuery(Expression source, Expression predicate)
+        Expression VisitQuery(Expression source, Expression predicate)
         {
             var lambda = predicate.GetLambda();
             var wasWithin = within;
@@ -337,21 +337,21 @@ namespace ElasticLinq.Request.Visitors
             return Visit(source);
         }
 
-        private Expression VisitWhere(Expression source, Expression lambdaPredicate)
+        Expression VisitWhere(Expression source, Expression lambdaPredicate)
         {
             var lambda = lambdaPredicate.GetLambda();
 
             var criteriaExpression = lambda.Body as CriteriaExpression ?? BooleanMemberAccessBecomesEquals(lambda.Body) as CriteriaExpression;
 
             if (criteriaExpression == null)
-                throw new NotSupportedException(String.Format("Where expression '{0}' could not be translated", lambda.Body));
+                throw new NotSupportedException(string.Format("Where expression '{0}' could not be translated", lambda.Body));
 
             searchRequest.Filter = AndCriteria.Combine(searchRequest.Filter, criteriaExpression.Criteria);
 
             return Visit(source);
         }
 
-        private Expression VisitOrderBy(Expression source, Expression orderByExpression, bool ascending)
+        Expression VisitOrderBy(Expression source, Expression orderByExpression, bool ascending)
         {
             var lambda = orderByExpression.GetLambda();
             var final = Visit(lambda.Body) as MemberExpression;
@@ -365,13 +365,13 @@ namespace ElasticLinq.Request.Visitors
             return Visit(source);
         }
 
-        private Expression VisitOrderByScore(Expression source, bool ascending)
+        Expression VisitOrderByScore(Expression source, bool ascending)
         {
             searchRequest.SortOptions.Insert(0, new SortOption("_score", ascending));
             return Visit(source);
         }
 
-        private Expression VisitSelect(Expression source, Expression selectExpression)
+        Expression VisitSelect(Expression source, Expression selectExpression)
         {
             var lambda = selectExpression.GetLambda();
 
@@ -394,7 +394,7 @@ namespace ElasticLinq.Request.Visitors
             return Visit(source);
         }
 
-        private void RebindSelectBody(Expression selectExpression, IEnumerable<Expression> arguments, IEnumerable<ParameterExpression> parameters)
+        void RebindSelectBody(Expression selectExpression, IEnumerable<Expression> arguments, IEnumerable<ParameterExpression> parameters)
         {
             var entityParameter = arguments.SingleOrDefault(parameters.Contains) as ParameterExpression;
             if (entityParameter == null)
@@ -409,7 +409,7 @@ namespace ElasticLinq.Request.Visitors
         /// </summary>
         /// <param name="selectExpression">Select expression to re-bind.</param>
         /// <param name="entityParameter">Parameter that references the whole entity.</param>
-        private void RebindElasticFieldsAndChainProjector(Expression selectExpression, ParameterExpression entityParameter)
+        void RebindElasticFieldsAndChainProjector(Expression selectExpression, ParameterExpression entityParameter)
         {
             var projection = ElasticFieldsExpressionVisitor.Rebind(SourceType, Mapping, selectExpression);
             var compiled = Expression.Lambda(projection.Item1, entityParameter, projection.Item2).Compile();
@@ -421,7 +421,7 @@ namespace ElasticLinq.Request.Visitors
         /// record all the field names used to ensure we only select those.
         /// </summary>
         /// <param name="selectExpression">Select expression to re-bind.</param>
-        private void RebindPropertiesAndElasticFields(Expression selectExpression)
+        void RebindPropertiesAndElasticFields(Expression selectExpression)
         {
             var projection = MemberProjectionExpressionVisitor.Rebind(SourceType, Mapping, selectExpression);
             var compiled = Expression.Lambda(projection.Expression, projection.Parameter).Compile();
@@ -429,7 +429,7 @@ namespace ElasticLinq.Request.Visitors
             searchRequest.Fields.AddRange(projection.Collected);
         }
 
-        private Expression VisitSkip(Expression source, Expression skipExpression)
+        Expression VisitSkip(Expression source, Expression skipExpression)
         {
             var skipConstant = Visit(skipExpression) as ConstantExpression;
             if (skipConstant != null)
@@ -437,7 +437,7 @@ namespace ElasticLinq.Request.Visitors
             return Visit(source);
         }
 
-        private Expression VisitTake(Expression source, Expression takeExpression)
+        Expression VisitTake(Expression source, Expression takeExpression)
         {
             var takeConstant = Visit(takeExpression) as ConstantExpression;
             if (takeConstant != null)
@@ -451,7 +451,7 @@ namespace ElasticLinq.Request.Visitors
             return Visit(source);
         }
 
-        private Func<Hit, Object> DefaultItemProjector
+        Func<Hit, object> DefaultItemProjector
         {
             get
             {

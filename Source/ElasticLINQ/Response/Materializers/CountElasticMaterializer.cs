@@ -6,7 +6,7 @@ namespace ElasticLinq.Response.Materializers
     /// <summary>
     /// Materializes a count operation by obtaining the total hits.
     /// </summary>
-    internal class CountElasticMaterializer : IElasticMaterializer
+    class CountElasticMaterializer : IElasticMaterializer
     {
         /// <summary>
         /// Materialize the hit count for a given ElasticResponse.

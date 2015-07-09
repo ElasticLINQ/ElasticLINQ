@@ -9,9 +9,9 @@ namespace ElasticLinq.Test.Request.Facets
 {
     public class StatisticalFacetTests
     {
-        private const string ExpectedName = "name";
-        private readonly string[] expectedFields = { "field1", "field2", "field3" };
-        private readonly ICriteria expectedFilter = new TermCriteria("field", null, "value1");
+        const string ExpectedName = "name";
+        readonly string[] expectedFields = { "field1", "field2", "field3" };
+        readonly ICriteria expectedFilter = new TermCriteria("field", null, "value1");
 
         [Fact]
         public void ConstructorSetsAllProperties()

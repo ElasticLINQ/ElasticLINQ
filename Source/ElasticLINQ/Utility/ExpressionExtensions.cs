@@ -7,7 +7,7 @@ namespace ElasticLinq.Utility
     /// <summary>
     /// Extension methods for Expression objects.
     /// </summary>
-    internal static class ExpressionExtensions
+    static class ExpressionExtensions
     {
         /// <summary>
         /// Remove all the outer quotes from an expression.

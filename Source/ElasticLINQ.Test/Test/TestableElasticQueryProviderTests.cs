@@ -1,6 +1,5 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
-using System;
 using System.Linq.Expressions;
 using Xunit;
 
@@ -8,7 +7,7 @@ namespace ElasticLinq.Test.Test
 {
     public class TestableElasticQueryProviderTests
     {
-        private class Sample { public string Text { get; set; } }
+        class Sample { public string Text { get; set; } }
 
         [Fact]
         public void CreateQueryCreatesTestableElasticQueryOfObjectWithGivenExpression()

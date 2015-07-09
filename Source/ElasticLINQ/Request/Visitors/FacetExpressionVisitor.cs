@@ -14,9 +14,9 @@ using System.Reflection;
 
 namespace ElasticLinq.Request.Visitors
 {
-    internal class FacetRebindCollectionResult : RebindCollectionResult<IFacet>
+    class FacetRebindCollectionResult : RebindCollectionResult<IFacet>
     {
-        private readonly IElasticMaterializer materializer;
+        readonly IElasticMaterializer materializer;
 
         public FacetRebindCollectionResult(Expression expression, IEnumerable<IFacet> collected, ParameterExpression parameter, IElasticMaterializer materializer)
             : base(expression, collected, parameter)
@@ -30,13 +30,13 @@ namespace ElasticLinq.Request.Visitors
     /// <summary>
     /// Gathers and rebinds aggregate operations into facets.
     /// </summary>
-    internal class FacetExpressionVisitor : CriteriaExpressionVisitor
+    class FacetExpressionVisitor : CriteriaExpressionVisitor
     {
-        private const string GroupKeyFacet = "GroupKey";
-        private static readonly MethodInfo getValue = typeof(AggregateRow).GetMethodInfo(m => m.IsStatic && m.Name == "GetValue");
-        private static readonly MethodInfo getKey = typeof(AggregateRow).GetMethodInfo(m => m.Name == "GetKey");
+        const string GroupKeyFacet = "GroupKey";
+        static readonly MethodInfo getValue = typeof(AggregateRow).GetMethodInfo(m => m.IsStatic && m.Name == "GetValue");
+        static readonly MethodInfo getKey = typeof(AggregateRow).GetMethodInfo(m => m.Name == "GetKey");
 
-        private static readonly Dictionary<string, string> aggregateMemberOperations = new Dictionary<string, string>
+        static readonly Dictionary<string, string> aggregateMemberOperations = new Dictionary<string, string>
         {
             { "Min", "min" },
             { "Max", "max" },
@@ -44,22 +44,22 @@ namespace ElasticLinq.Request.Visitors
             { "Average", "mean" },
         };
 
-        private static readonly Dictionary<string, string> aggregateOperations = new Dictionary<string, string>
+        static readonly Dictionary<string, string> aggregateOperations = new Dictionary<string, string>
         {
             { "Count", "count" },
             { "LongCount", "count" }
         };
 
-        private bool aggregateWithoutMember;
-        private readonly HashSet<MemberExpression> aggregateMembers = new HashSet<MemberExpression>();
-        private readonly Dictionary<string, ICriteria> aggregateCriteria = new Dictionary<string, ICriteria>();
-        private readonly ParameterExpression bindingParameter = Expression.Parameter(typeof(AggregateRow), "r");
+        bool aggregateWithoutMember;
+        readonly HashSet<MemberExpression> aggregateMembers = new HashSet<MemberExpression>();
+        readonly Dictionary<string, ICriteria> aggregateCriteria = new Dictionary<string, ICriteria>();
+        readonly ParameterExpression bindingParameter = Expression.Parameter(typeof(AggregateRow), "r");
 
-        private Expression groupBy;
-        private int? size;
-        private LambdaExpression selectProjection;
+        Expression groupBy;
+        int? size;
+        LambdaExpression selectProjection;
 
-        private FacetExpressionVisitor(IElasticMapping mapping, Type sourceType)
+        FacetExpressionVisitor(IElasticMapping mapping, Type sourceType)
             : base(mapping, sourceType)
         {
         }
@@ -77,7 +77,7 @@ namespace ElasticLinq.Request.Visitors
             return new FacetRebindCollectionResult(visitedExpression, facets, visitor.bindingParameter, materializer);
         }
 
-        private static IElasticMaterializer GetFacetMaterializer(LambdaExpression projection, Expression groupBy)
+        static IElasticMaterializer GetFacetMaterializer(LambdaExpression projection, Expression groupBy)
         {
             if (projection == null)
                 return null;
@@ -96,7 +96,7 @@ namespace ElasticLinq.Request.Visitors
             return new ListTermFacetsElasticMaterializer(projector, projection.ReturnType, groupBy.Type);
         }
 
-        private IEnumerable<IFacet> GetFacets()
+        IEnumerable<IFacet> GetFacets()
         {
             if (groupBy == null || groupBy.NodeType == ExpressionType.Constant)
                 return GetTermlessFacets();
@@ -104,10 +104,10 @@ namespace ElasticLinq.Request.Visitors
             if (groupBy.NodeType == ExpressionType.MemberAccess)
                 return GetTermFacets();
 
-            throw new NotSupportedException(String.Format("GroupBy must be either a Member or a Constant not {0}", groupBy.NodeType));
+            throw new NotSupportedException(string.Format("GroupBy must be either a Member or a Constant not {0}", groupBy.NodeType));
         }
 
-        private IEnumerable<IFacet> GetTermlessFacets()
+        IEnumerable<IFacet> GetTermlessFacets()
         {
             if (groupBy != null) // Top level counts and count predicates will be left to main translator
             {
@@ -122,7 +122,7 @@ namespace ElasticLinq.Request.Visitors
                 yield return new StatisticalFacet(valueField, valueField);
         }
 
-        private IEnumerable<IFacet> GetTermFacets()
+        IEnumerable<IFacet> GetTermFacets()
         {
             var groupByField = Mapping.GetFieldName(SourceType, (MemberExpression)groupBy);
             if (aggregateWithoutMember)
@@ -135,37 +135,37 @@ namespace ElasticLinq.Request.Visitors
                 yield return new TermsFacet(criteria.Key, criteria.Value, size, groupByField);
         }
 
-        protected override Expression VisitMember(MemberExpression m)
+        protected override Expression VisitMember(MemberExpression node)
         {
-            if (m.Member.Name == "Key" && m.Member.DeclaringType.IsGenericOf(typeof(IGrouping<,>)))
-                return VisitGroupKeyAccess(m.Type);
+            if (node.Member.Name == "Key" && node.Member.DeclaringType.IsGenericOf(typeof(IGrouping<,>)))
+                return VisitGroupKeyAccess(node.Type);
 
-            return base.VisitMember(m);
+            return base.VisitMember(node);
         }
 
-        protected override Expression VisitMethodCall(MethodCallExpression m)
+        protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            if (m.Method.DeclaringType == typeof(Enumerable) || m.Method.DeclaringType == typeof(Queryable))
+            if (node.Method.DeclaringType == typeof(Enumerable) || node.Method.DeclaringType == typeof(Queryable))
             {
-                var source = m.Arguments[0];
+                var source = node.Arguments[0];
 
-                if (m.Method.Name == "GroupBy" && m.Arguments.Count == 2)
+                if (node.Method.Name == "GroupBy" && node.Arguments.Count == 2)
                 {
-                    groupBy = m.Arguments[1].GetLambda().Body;
+                    groupBy = node.Arguments[1].GetLambda().Body;
                     return Visit(source);
                 }
 
-                if (m.Method.Name == "Select" && m.Arguments.Count == 2)
+                if (node.Method.Name == "Select" && node.Arguments.Count == 2)
                 {
-                    var y = Visit(m.Arguments[1]).GetLambda();
+                    var y = Visit(node.Arguments[1]).GetLambda();
                     selectProjection = Expression.Lambda(y.Body, bindingParameter);
                     return Visit(source);
                 }
 
-                if (m.Method.Name == "Take" && m.Arguments.Count == 2)
-                    return VisitTake(source, m.Arguments[1]);
+                if (node.Method.Name == "Take" && node.Arguments.Count == 2)
+                    return VisitTake(source, node.Arguments[1]);
 
-                var reboundExpression = RebindAggregateOperation(m);
+                var reboundExpression = RebindAggregateOperation(node);
 
                 // Rebinding the root, need to fake the source
                 if (source is ConstantExpression && reboundExpression != null)
@@ -182,10 +182,10 @@ namespace ElasticLinq.Request.Visitors
                 }
             }
 
-            return base.VisitMethodCall(m);
+            return base.VisitMethodCall(node);
         }
 
-        private Expression RebindAggregateOperation(MethodCallExpression m)
+        Expression RebindAggregateOperation(MethodCallExpression m)
         {
             string operation;
             if (aggregateOperations.TryGetValue(m.Method.Name, out operation))
@@ -203,7 +203,7 @@ namespace ElasticLinq.Request.Visitors
             return null;
         }
 
-        private Expression VisitTake(Expression source, Expression takeExpression)
+        Expression VisitTake(Expression source, Expression takeExpression)
         {
             var takeConstant = Visit(takeExpression) as ConstantExpression;
             if (takeConstant != null)
@@ -214,7 +214,7 @@ namespace ElasticLinq.Request.Visitors
             return Visit(source);
         }
 
-        private Expression VisitAggregateGroupPredicateOperation(Expression predicate, string operation, Type returnType)
+        Expression VisitAggregateGroupPredicateOperation(Expression predicate, string operation, Type returnType)
         {
             var lambda = predicate.GetLambda();
             var body = BooleanMemberAccessBecomesEquals(lambda.Body);
@@ -223,46 +223,46 @@ namespace ElasticLinq.Request.Visitors
             if (criteriaExpression == null)
                 throw new NotSupportedException(string.Format("Unknown Aggregate predicate '{0}'", body));
 
-            var facetName = String.Format(GroupKeyFacet + "." + (aggregateCriteria.Count + 1));
+            var facetName = string.Format(GroupKeyFacet + "." + (aggregateCriteria.Count + 1));
             aggregateCriteria.Add(facetName, criteriaExpression.Criteria);
             return RebindValue(facetName, operation, returnType);
         }
 
-        private Expression VisitGroupKeyAccess(Type returnType)
+        Expression VisitGroupKeyAccess(Type returnType)
         {
-            var getKeyExpression = Expression.Call(null, getKey, new Expression[] { bindingParameter });
+            var getKeyExpression = Expression.Call(null, getKey, bindingParameter);
             return Expression.Convert(getKeyExpression, returnType);
         }
 
-        private Expression VisitAggregateGroupKeyOperation(string operation, Type returnType)
+        Expression VisitAggregateGroupKeyOperation(string operation, Type returnType)
         {
             aggregateWithoutMember = true;
             return RebindValue(GroupKeyFacet, operation, returnType);
         }
 
-        private Expression VisitAggregateMemberOperation(Expression property, string operation, Type returnType)
+        Expression VisitAggregateMemberOperation(Expression property, string operation, Type returnType)
         {
             var memberExpression = GetMemberExpressionFromLambda(property);
             aggregateMembers.Add(memberExpression);
             return RebindValue(Mapping.GetFieldName(SourceType, memberExpression), operation, returnType);
         }
 
-        private Expression RebindValue(string valueField, string operation, Type returnType)
+        Expression RebindValue(string valueField, string operation, Type returnType)
         {
             var getValueExpression = Expression.Call(null, getValue, bindingParameter,
                 Expression.Constant(valueField), Expression.Constant(operation), Expression.Constant(returnType));
             return Expression.Convert(getValueExpression, returnType);
         }
 
-        private static MemberExpression GetMemberExpressionFromLambda(Expression expression)
+        static MemberExpression GetMemberExpressionFromLambda(Expression expression)
         {
             var lambda = expression.StripQuotes() as LambdaExpression;
             if (lambda == null)
-                throw new NotSupportedException(String.Format("Aggregate required Lambda expression, {0} expression encountered.", expression.NodeType));
+                throw new NotSupportedException(string.Format("Aggregate required Lambda expression, {0} expression encountered.", expression.NodeType));
 
             var memberExpressionBody = lambda.Body as MemberExpression;
             if (memberExpressionBody == null)
-                throw new NotSupportedException(String.Format("Aggregates must be specified against a member of the entity not {0}", lambda.Body.Type));
+                throw new NotSupportedException(string.Format("Aggregates must be specified against a member of the entity not {0}", lambda.Body.Type));
 
             return memberExpressionBody;
         }

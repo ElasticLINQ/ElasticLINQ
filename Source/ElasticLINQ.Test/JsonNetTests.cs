@@ -16,7 +16,7 @@ namespace ElasticLinq.Test
         {
             public override string GetFieldName(Type type, MemberInfo memberInfo)
             {
-                return String.Format("docWrapper.{0}", type.Name.ToCamelCase(CultureInfo.CurrentCulture) + "." + base.GetFieldName(type, memberInfo));
+                return string.Format("docWrapper.{0}", type.Name.ToCamelCase(CultureInfo.CurrentCulture) + "." + base.GetFieldName(type, memberInfo));
             }
         }
 

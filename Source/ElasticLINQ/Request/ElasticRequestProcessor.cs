@@ -20,12 +20,12 @@ namespace ElasticLinq.Request
     /// <summary>
     /// Sends Elasticsearch requests via HTTP and ensures materialization of the response.
     /// </summary>
-    internal class ElasticRequestProcessor
+    class ElasticRequestProcessor
     {
-        private readonly ElasticConnection connection;
-        private readonly ILog log;
-        private readonly IElasticMapping mapping;
-        private readonly IRetryPolicy retryPolicy;
+        readonly ElasticConnection connection;
+        readonly ILog log;
+        readonly IElasticMapping mapping;
+        readonly IRetryPolicy retryPolicy;
 
         public ElasticRequestProcessor(ElasticConnection connection, IElasticMapping mapping, ILog log, IRetryPolicy retryPolicy)
         {
@@ -62,7 +62,7 @@ namespace ElasticLinq.Request
                 });
         }
 
-        private async Task<HttpResponseMessage> SendRequestAsync(HttpClient httpClient, HttpRequestMessage requestMessage, CancellationToken cancellationToken)
+        async Task<HttpResponseMessage> SendRequestAsync(HttpClient httpClient, HttpRequestMessage requestMessage, CancellationToken cancellationToken)
         {
             var stopwatch = Stopwatch.StartNew();
             var response = await httpClient.SendAsync(requestMessage, cancellationToken);
@@ -83,14 +83,14 @@ namespace ElasticLinq.Request
                 var results = new JsonSerializer().Deserialize<ElasticResponse>(textReader);
                 stopwatch.Stop();
 
-                var resultSummary = String.Join(", ", GetResultSummary(results));
+                var resultSummary = string.Join(", ", GetResultSummary(results));
                 log.Debug(null, null, "Deserialized {0} bytes into {1} in {2}ms", responseStream.Length, resultSummary, stopwatch.ElapsedMilliseconds);
 
                 return results;
             }
         }
 
-        private static IEnumerable<string> GetResultSummary(ElasticResponse results)
+        static IEnumerable<string> GetResultSummary(ElasticResponse results)
         {
             if (results == null)
             {

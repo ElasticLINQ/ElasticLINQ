@@ -9,11 +9,11 @@ namespace ElasticLinq.Request.Criteria
     /// <summary>
     /// Specifies subcriteria to be satisfied as must (and), should (or) and must_not (none).
     /// </summary>
-    internal class BoolCriteria : ICriteria
+    class BoolCriteria : ICriteria
     {
-        private readonly ReadOnlyCollection<ICriteria> must;
-        private readonly ReadOnlyCollection<ICriteria> should;
-        private readonly ReadOnlyCollection<ICriteria> mustNot;
+        readonly ReadOnlyCollection<ICriteria> must;
+        readonly ReadOnlyCollection<ICriteria> should;
+        readonly ReadOnlyCollection<ICriteria> mustNot;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BoolCriteria"/> class.

@@ -7,7 +7,7 @@ namespace ElasticLinq.Request.Criteria
     /// </summary>
     public class RegexpCriteria : SingleFieldCriteria
     {
-        private readonly string regexp;
+        readonly string regexp;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RegexpCriteria"/> class.

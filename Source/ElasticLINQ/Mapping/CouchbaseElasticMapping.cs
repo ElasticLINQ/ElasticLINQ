@@ -12,7 +12,7 @@ namespace ElasticLinq.Mapping
     /// </summary>
     public class CouchbaseElasticMapping : ElasticMapping
     {
-        private const string TypeCriteriaMissingExceptionMessage = "Unable to determine document type selection criteria for type '{0}'. " +
+        const string TypeCriteriaMissingExceptionMessage = "Unable to determine document type selection criteria for type '{0}'. " +
                                                                    "Ensure the type has a public read/write property that is non-nullable or marked with the Required attribute.";
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace ElasticLinq.Mapping
             var memberName = base.GetFieldName(type, memberInfo);
             var prefix = GetDocumentMappingPrefix(type);
 
-            return String.Format("{0}.{1}", prefix, memberName).TrimStart('.');
+            return string.Format("{0}.{1}", prefix, memberName).TrimStart('.');
         } 
 
         /// <inheritdoc/>
@@ -63,7 +63,7 @@ namespace ElasticLinq.Mapping
         {
             var property = MappingHelpers.GetTypeSelectionProperty(type);
             if (property == null)
-                throw new InvalidOperationException(String.Format(TypeCriteriaMissingExceptionMessage, type.Name));
+                throw new InvalidOperationException(string.Format(TypeCriteriaMissingExceptionMessage, type.Name));
 
             return new ExistsCriteria(GetFieldName(type, property));
         }

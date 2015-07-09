@@ -15,13 +15,13 @@ namespace ElasticLinq.Request.Visitors
     /// Rebinds select projection entity member accesses to JObject fields
     /// recording the specific field names required for selection.
     /// </summary>
-    internal class MemberProjectionExpressionVisitor : ElasticFieldsExpressionVisitor
+    class MemberProjectionExpressionVisitor : ElasticFieldsExpressionVisitor
     {
         protected static readonly MethodInfo GetDictionaryValueMethod = typeof(MemberProjectionExpressionVisitor).GetMethodInfo(m => m.Name == "GetDictionaryValueOrDefault");
 
-        private readonly HashSet<string> fieldNames = new HashSet<string>();
+        readonly HashSet<string> fieldNames = new HashSet<string>();
 
-        private MemberProjectionExpressionVisitor(Type sourceType, ParameterExpression bindingParameter, IElasticMapping mapping)
+        MemberProjectionExpressionVisitor(Type sourceType, ParameterExpression bindingParameter, IElasticMapping mapping)
             : base(sourceType, bindingParameter, mapping)
         {
         }
@@ -35,12 +35,12 @@ namespace ElasticLinq.Request.Visitors
             return new RebindCollectionResult<string>(materializer, visitor.fieldNames, parameter);
         }
 
-        protected override Expression VisitMember(MemberExpression m)
+        protected override Expression VisitMember(MemberExpression node)
         {
-            if (m.Expression != null && m.Expression.NodeType == ExpressionType.Parameter)
-                return VisitFieldSelection(m);
+            if (node.Expression != null && node.Expression.NodeType == ExpressionType.Parameter)
+                return VisitFieldSelection(node);
 
-            return base.VisitMember(m);
+            return base.VisitMember(node);
         }
 
         protected override Expression VisitElasticField(MemberExpression m)
@@ -50,7 +50,7 @@ namespace ElasticLinq.Request.Visitors
             return member;
         }
 
-        private Expression VisitFieldSelection(MemberExpression m)
+        Expression VisitFieldSelection(MemberExpression m)
         {
             var fieldName = Mapping.GetFieldName(SourceType, m);
             fieldNames.Add(fieldName);

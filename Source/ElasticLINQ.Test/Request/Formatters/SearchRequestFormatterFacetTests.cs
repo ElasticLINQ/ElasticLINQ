@@ -18,8 +18,8 @@ namespace ElasticLinq.Test.Request.Formatters
 {
     public class SearchRequestFormatterFacetTests
     {
-        private static readonly ElasticConnection defaultConnection = new ElasticConnection(new Uri("http://a.b.com:9000/"));
-        private readonly IElasticMapping mapping = Substitute.For<IElasticMapping>();
+        static readonly ElasticConnection defaultConnection = new ElasticConnection(new Uri("http://a.b.com:9000/"));
+        readonly IElasticMapping mapping = Substitute.For<IElasticMapping>();
 
         [Fact]
         public void BodyContainsStatisticalFacet()

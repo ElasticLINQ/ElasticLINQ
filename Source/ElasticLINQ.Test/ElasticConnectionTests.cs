@@ -8,9 +8,9 @@ namespace ElasticLinq.Test
 {
     public class ElasticConnectionTests
     {
-        private readonly Uri endpoint = new Uri("http://localhost:1234/abc");
-        private const string Password = "thePassword";
-        private const string UserName = "theUser";
+        readonly Uri endpoint = new Uri("http://localhost:1234/abc");
+        const string Password = "thePassword";
+        const string UserName = "theUser";
 
         [Fact]
         public static void GuardClauses_Constructor()

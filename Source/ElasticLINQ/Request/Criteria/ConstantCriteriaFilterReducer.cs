@@ -7,7 +7,7 @@ namespace ElasticLinq.Request.Criteria
     /// <summary>
     /// Reduces <see cref="ConstantCriteria" /> within criteria recursively.
     /// </summary>
-    internal static class ConstantCriteriaFilterReducer
+    static class ConstantCriteriaFilterReducer
     {
         /// <summary>
         /// Reduce a <see cref="ICriteria" /> that might contain a <see cref="ConstantCriteria" />.
@@ -33,7 +33,7 @@ namespace ElasticLinq.Request.Criteria
         /// <remarks>
         /// Trues will be removed, falses will replace the entire And with a false.
         /// </remarks>
-        private static ICriteria Reduce(AndCriteria andCriteria)
+        static ICriteria Reduce(AndCriteria andCriteria)
         {
             if (andCriteria.Criteria.Contains(ConstantCriteria.False))
                 return ConstantCriteria.False;
@@ -54,7 +54,7 @@ namespace ElasticLinq.Request.Criteria
         /// <remarks>
         /// Falses will be removed, trues will replace the entire Or with a true.
         /// </remarks>
-        private static ICriteria Reduce(OrCriteria orCriteria)
+        static ICriteria Reduce(OrCriteria orCriteria)
         {
             if (orCriteria.Criteria.Any(c => c == ConstantCriteria.True))
                 return ConstantCriteria.True;

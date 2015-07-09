@@ -9,8 +9,8 @@ namespace ElasticLinq.Test.Request.Criteria
 {
     public class NotCriteriaTests
     {
-        private readonly static MemberInfo memberInfo = typeof(string).GetProperty("Length");
-        private readonly ICriteria sampleTerm = TermsCriteria.Build("field", memberInfo, "value");
+        readonly static MemberInfo memberInfo = typeof(string).GetProperty("Length");
+        readonly ICriteria sampleTerm = TermsCriteria.Build("field", memberInfo, "value");
 
         [Fact]
         public void NamePropertyIsNot()

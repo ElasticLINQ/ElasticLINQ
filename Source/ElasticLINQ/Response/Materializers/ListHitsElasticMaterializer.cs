@@ -12,12 +12,12 @@ namespace ElasticLinq.Response.Materializers
     /// <summary>
     /// Materializes multiple hits into a list of CLR objects.
     /// </summary>
-    internal class ListHitsElasticMaterializer : IElasticMaterializer
+    class ListHitsElasticMaterializer : IElasticMaterializer
     {
-        private static readonly MethodInfo manyMethodInfo = typeof(ListHitsElasticMaterializer).GetMethodInfo(f => f.Name == "Many" && f.IsStatic);
+        static readonly MethodInfo manyMethodInfo = typeof(ListHitsElasticMaterializer).GetMethodInfo(f => f.Name == "Many" && f.IsStatic);
 
-        private readonly Func<Hit, object> projector;
-        private readonly Type elementType;
+        readonly Func<Hit, object> projector;
+        readonly Type elementType;
 
         /// <summary>
         /// Create an instance of the ListHitsElasticMaterializer with the given parameters.

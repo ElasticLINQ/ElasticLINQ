@@ -6,7 +6,7 @@ namespace ElasticLinq.Request.Criteria
     /// Criteria to select documents if they do not have a value
     /// in the specified field.
     /// </summary>
-    internal class MissingCriteria : SingleFieldCriteria, INegatableCriteria
+    class MissingCriteria : SingleFieldCriteria, INegatableCriteria
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="MissingCriteria"/> class.

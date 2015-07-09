@@ -7,9 +7,9 @@ namespace ElasticLinq.Request.Criteria
     /// <summary>
     /// Criteria that inverts the logic of criteria it contains.
     /// </summary>
-    internal class NotCriteria : ICriteria, INegatableCriteria
+    class NotCriteria : ICriteria, INegatableCriteria
     {
-        private readonly ICriteria criteria;
+        readonly ICriteria criteria;
 
         /// <summary>
         /// Create a negated version of the criteria supplied.
@@ -39,7 +39,7 @@ namespace ElasticLinq.Request.Criteria
         /// Consider using <see cref="NotCriteria.Create"/> instead as there may be a simpler
         /// representation of the criteria if it supports negation.
         /// </remarks>
-        private NotCriteria(ICriteria criteria)
+        NotCriteria(ICriteria criteria)
         {
             this.criteria = criteria;
         }

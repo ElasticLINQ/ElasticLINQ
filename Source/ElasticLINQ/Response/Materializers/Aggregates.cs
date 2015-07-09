@@ -1,21 +1,21 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
-using System.Collections.ObjectModel;
 using ElasticLinq.Utility;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 
 namespace ElasticLinq.Response.Materializers
 {
     [DebuggerDisplay("Field {Name,nq}.{Operation,nq} = {Token}")]
-    internal class AggregateField
+    class AggregateField
     {
-        private readonly string name;
-        private readonly string operation;
-        private readonly JToken token;
+        readonly string name;
+        readonly string operation;
+        readonly JToken token;
 
         public AggregateField(string name, string operation, JToken token)
         {
@@ -29,10 +29,10 @@ namespace ElasticLinq.Response.Materializers
         public JToken Token { get { return token; } }
     }
 
-    internal abstract class AggregateRow
+    abstract class AggregateRow
     {
-        private static DateTime epocStartDateTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-        private static DateTimeOffset epocStartDateTimeOffset = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
+        static readonly DateTime epocStartDateTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        static readonly DateTimeOffset epocStartDateTimeOffset = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
         internal static object GetValue(AggregateRow row, string name, string operation, Type valueType)
         {
@@ -59,11 +59,11 @@ namespace ElasticLinq.Response.Materializers
                 case "Infinity":
                 case "∞":
                     {
-                        if (valueType == typeof(Double))
-                            return Double.PositiveInfinity;
+                        if (valueType == typeof(double))
+                            return double.PositiveInfinity;
 
-                        if (valueType == typeof(Single))
-                            return Single.PositiveInfinity;
+                        if (valueType == typeof(float))
+                            return float.PositiveInfinity;
 
                         if (valueType == typeof(decimal?))
                             return null;
@@ -74,11 +74,11 @@ namespace ElasticLinq.Response.Materializers
                 case "-Infinity":
                 case "-∞":
                     {
-                        if (valueType == typeof(Double))
-                            return Double.NegativeInfinity;
+                        if (valueType == typeof(double))
+                            return double.NegativeInfinity;
 
-                        if (valueType == typeof(Single))
-                            return Single.NegativeInfinity;
+                        if (valueType == typeof(float))
+                            return float.NegativeInfinity;
 
                         if (valueType == typeof(decimal?))
                             return null;
@@ -101,10 +101,10 @@ namespace ElasticLinq.Response.Materializers
     }
 
     [DebuggerDisplay("Statistical Row")]
-    internal class AggregateStatisticalRow : AggregateRow
+    class AggregateStatisticalRow : AggregateRow
     {
-        private readonly object key;
-        private readonly JObject facets;
+        readonly object key;
+        readonly JObject facets;
 
         public AggregateStatisticalRow(object key, JObject facets)
         {
@@ -126,10 +126,10 @@ namespace ElasticLinq.Response.Materializers
     }
 
     [DebuggerDisplay("Term Row {Key} Fields({Fields.Count})")]
-    internal class AggregateTermRow : AggregateRow
+    class AggregateTermRow : AggregateRow
     {
-        private readonly object key;
-        private readonly ReadOnlyCollection<AggregateField> fields;
+        readonly object key;
+        readonly ReadOnlyCollection<AggregateField> fields;
 
         public AggregateTermRow(object key, IEnumerable<AggregateField> fields)
         {

@@ -14,12 +14,12 @@ namespace ElasticLinq.Test.Request.Visitors
 {
     public class MemberProjectionExpressionVisitorTests
     {
-        private class Sample
+        class Sample
         {
             public string Name { get; set; }
             public string Id { get; set; }
         }
-        private readonly IElasticMapping validMapping = new TrivialElasticMapping();
+        readonly IElasticMapping validMapping = new TrivialElasticMapping();
 
         [Fact]
         public void Rebind_GuardClauses()

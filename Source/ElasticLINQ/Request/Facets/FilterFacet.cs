@@ -12,10 +12,10 @@ namespace ElasticLinq.Request.Facets
     /// </summary>
     /// <remarks>Mapped to .GroupBy(a => 1).Select(a => a.Sum(b => b.Field))</remarks>
     [DebuggerDisplay("FilterFacet {Filter}")]
-    internal class FilterFacet : IFacet
+    class FilterFacet : IFacet
     {
-        private readonly string name;
-        private readonly ICriteria filter;
+        readonly string name;
+        readonly ICriteria filter;
 
         public FilterFacet(string name, ICriteria filter)
         {

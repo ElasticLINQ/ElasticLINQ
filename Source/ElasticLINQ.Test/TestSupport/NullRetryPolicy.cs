@@ -12,7 +12,7 @@ namespace ElasticLinq.Test
     {
         public static readonly IRetryPolicy Instance = CreateNullRetryPolicy();
 
-        private static IRetryPolicy CreateNullRetryPolicy()
+        static IRetryPolicy CreateNullRetryPolicy()
         {
             var result = Substitute.For<IRetryPolicy>();
             result

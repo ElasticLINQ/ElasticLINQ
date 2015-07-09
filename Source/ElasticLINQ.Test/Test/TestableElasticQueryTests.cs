@@ -55,7 +55,7 @@ namespace ElasticLinq.Test.Test
             Assert.Equal(1, context.Requests.Count);
         }
 
-        private class FakeClass
+        class FakeClass
         {
             public string Name { get; set; }
         }

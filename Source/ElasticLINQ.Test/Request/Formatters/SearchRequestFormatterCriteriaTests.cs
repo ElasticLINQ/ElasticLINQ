@@ -16,14 +16,14 @@ namespace ElasticLinq.Test.Request.Formatters
 {
     public class SearchRequestFormatterCriteriaTests
     {
-        private static readonly ElasticConnection defaultConnection = new ElasticConnection(new Uri("http://a.b.com:9000/"));
-        private static readonly MemberInfo memberInfo = typeof(string).GetProperty("Length");
-        private readonly IElasticMapping mapping = Substitute.For<IElasticMapping>();
+        static readonly ElasticConnection defaultConnection = new ElasticConnection(new Uri("http://a.b.com:9000/"));
+        static readonly MemberInfo memberInfo = typeof(string).GetProperty("Length");
+        readonly IElasticMapping mapping = Substitute.For<IElasticMapping>();
 
         public SearchRequestFormatterCriteriaTests()
         {
             mapping.FormatValue(null, null)
-                   .ReturnsForAnyArgs(callInfo => new JValue(String.Format("!!! {0} !!!", callInfo.Arg<object>(1))));
+                   .ReturnsForAnyArgs(callInfo => new JValue(string.Format("!!! {0} !!!", callInfo.Arg<object>(1))));
         }
 
         [Fact]

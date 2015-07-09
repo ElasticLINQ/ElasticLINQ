@@ -10,10 +10,10 @@ namespace ElasticLinq.Test.Request.Criteria
 {
     public class OrCriteriaTests
     {
-        private readonly static MemberInfo memberInfo = typeof(string).GetProperty("Length");
-        private readonly ITermsCriteria salutationMr = TermsCriteria.Build("salutation", memberInfo, "Mr");
-        private readonly ITermsCriteria salutationMrs = TermsCriteria.Build("salutation", memberInfo, "Mrs");
-        private readonly ITermsCriteria area408 = TermsCriteria.Build("area", memberInfo, "408");
+        readonly static MemberInfo memberInfo = typeof(string).GetProperty("Length");
+        readonly ITermsCriteria salutationMr = TermsCriteria.Build("salutation", memberInfo, "Mr");
+        readonly ITermsCriteria salutationMrs = TermsCriteria.Build("salutation", memberInfo, "Mrs");
+        readonly ITermsCriteria area408 = TermsCriteria.Build("area", memberInfo, "408");
 
         [Fact]
         public void NamePropertyIsOr()

@@ -9,11 +9,11 @@ namespace ElasticLinq.Test.TestSupport
     /// Flattens an expression tree into a list of expressions for
     /// debugging and testing.
     /// </summary>
-    internal class FlatteningExpressionVisitor : ExpressionVisitor
+    class FlatteningExpressionVisitor : ExpressionVisitor
     {
-        private readonly List<Expression> flattened = new List<Expression>();
+        readonly List<Expression> flattened = new List<Expression>();
 
-        private FlatteningExpressionVisitor()
+        FlatteningExpressionVisitor()
         {            
         }
 

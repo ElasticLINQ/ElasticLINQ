@@ -11,10 +11,10 @@ namespace ElasticLinq.Request.Visitors
     /// evaluated before execution and substitutes those parts
     /// with constant values obtained from local execution of that part.
     /// </summary>
-    internal static class PartialEvaluator
+    static class PartialEvaluator
     {
-        private static readonly Type[] doNotEvaluateMembersDeclaredOn = { typeof(ElasticFields) };
-        private static readonly Type[] doNotEvaluateMethodsDeclaredOn = { typeof(Enumerable), typeof(Queryable), typeof(ElasticQueryExtensions), typeof(ElasticMethods) };
+        static readonly Type[] doNotEvaluateMembersDeclaredOn = { typeof(ElasticFields) };
+        static readonly Type[] doNotEvaluateMethodsDeclaredOn = { typeof(Enumerable), typeof(Queryable), typeof(ElasticQueryExtensions), typeof(ElasticMethods) };
 
         public static Expression Evaluate(Expression e)
         {

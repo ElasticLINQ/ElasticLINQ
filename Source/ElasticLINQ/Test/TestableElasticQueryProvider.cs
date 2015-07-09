@@ -10,7 +10,7 @@ namespace ElasticLinq.Test
     /// </summary>
     public class TestableElasticQueryProvider : IQueryProvider
     {
-        private readonly TestableElasticContext context;
+        readonly TestableElasticContext context;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestableElasticQueryProvider"/> class.

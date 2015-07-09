@@ -26,7 +26,7 @@ namespace ElasticLINQ.IntegrationTest.Models
         {
             var hash = 17;
             hash = hash * When.GetHashCode();
-            if (!String.IsNullOrEmpty(Ip))
+            if (!string.IsNullOrEmpty(Ip))
                 hash = hash & Ip.GetHashCode();
             return hash;
         }
