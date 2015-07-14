@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.ExceptionServices;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ElasticLinq.Retry
@@ -36,9 +37,10 @@ namespace ElasticLinq.Retry
 
         /// <inheritdoc/>
         public async Task<TOperation> ExecuteAsync<TOperation>(
-            Func<Task<TOperation>> operationFunc,
+            Func<CancellationToken, Task<TOperation>> operationFunc,
             Func<TOperation, Exception, bool> shouldRetryFunc,
-            Action<TOperation, Dictionary<string, object>> appendLogInfoFunc = null)
+            Action<TOperation, Dictionary<string, object>> appendLogInfoFunc = null,
+            CancellationToken cancellationToken = new CancellationToken())
         {
             var retryDelay = InitialRetryMilliseconds;
             var attempt = 0;
@@ -50,7 +52,7 @@ namespace ElasticLinq.Retry
                 var operationResult = default(TOperation);
                 try
                 {
-                    operationResult = await operationFunc();
+                    operationResult = await operationFunc(cancellationToken);
                 }
                 catch (Exception ex)
                 {
@@ -86,7 +88,7 @@ namespace ElasticLinq.Retry
 
                 Log.Info(operationException, loggerInfo, "The operation failed (attempt #{0}) and will be retried.", attempt);
 
-                await Delay.For(retryDelay);
+                await Delay.For(retryDelay, cancellationToken);
                 retryDelay = retryDelay * 2;
             }
         }

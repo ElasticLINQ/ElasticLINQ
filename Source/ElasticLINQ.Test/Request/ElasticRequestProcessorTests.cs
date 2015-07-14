@@ -77,6 +77,29 @@ namespace ElasticLinq.Test.Request
         }
 
         [Fact]
+        public static async void SearchAsyncThrowsTaskCancelledExceptionWithAlreadyCancelledCancellationToken()
+        {
+            var request = new SearchRequest { DocumentType = "docType" };
+            var processor = new ElasticRequestProcessor(connection, mapping, log, retryPolicy);
+
+            var ex = await Record.ExceptionAsync(() => processor.SearchAsync(request, new CancellationToken(true)));
+
+            Assert.IsType<TaskCanceledException>(ex);
+        }
+
+        [Fact]
+        public static async void SearchAsyncThrowsTaskCancelledExceptionWithSubsequentlyCancelledCancellationToken()
+        {
+            var request = new SearchRequest { DocumentType = "docType" };
+            var processor = new ElasticRequestProcessor(connection, mapping, log, retryPolicy);
+
+            var cts = new CancellationTokenSource(1000);
+            var ex = await Record.ExceptionAsync(() => processor.SearchAsync(request, cts.Token));
+
+            Assert.IsType<TaskCanceledException>(ex);
+        }
+
+        [Fact]
         public static void ParseResponseReturnsParsedResponseGivenValidStream()
         {
             const int took = 2;

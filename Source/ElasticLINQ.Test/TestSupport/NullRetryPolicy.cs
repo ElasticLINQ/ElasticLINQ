@@ -4,6 +4,7 @@ using ElasticLinq.Response.Model;
 using ElasticLinq.Retry;
 using NSubstitute;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ElasticLinq.Test
@@ -12,12 +13,12 @@ namespace ElasticLinq.Test
     {
         public static readonly IRetryPolicy Instance = CreateNullRetryPolicy();
 
-        static IRetryPolicy CreateNullRetryPolicy()
+        private static IRetryPolicy CreateNullRetryPolicy()
         {
             var result = Substitute.For<IRetryPolicy>();
             result
                 .ExecuteAsync<ElasticResponse>(null, null)
-                .ReturnsForAnyArgs(callInfo => callInfo.Arg<Func<Task<ElasticResponse>>>()());
+                .ReturnsForAnyArgs(async r => await r.Arg<Func<CancellationToken, Task<ElasticResponse>>>().Invoke(r.Arg<CancellationToken>()));
             return result;
         }
     }

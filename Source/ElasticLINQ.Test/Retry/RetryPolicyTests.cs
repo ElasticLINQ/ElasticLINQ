@@ -17,7 +17,7 @@ namespace ElasticLinq.Test.Retry
     {
         public interface IFake
         {
-            Task<int> DoSomething();
+            Task<int> DoSomething(CancellationToken cancellationToken);
             bool IsRetryable(int result, Exception ex);
         }
 
@@ -25,7 +25,7 @@ namespace ElasticLinq.Test.Retry
         public static async Task DoesNotRetry()
         {
             var fake = Substitute.For<IFake>();
-            fake.DoSomething().ReturnsTask(0);
+            fake.DoSomething(CancellationToken.None).ReturnsTask(0);
             fake.IsRetryable(1337, null).Returns(true);
             fake.IsRetryable(0, null).Returns(false);
             var logger = Substitute.For<ILog>();
@@ -35,14 +35,14 @@ namespace ElasticLinq.Test.Retry
             var result = await retryHandler.ExecuteAsync(fake.DoSomething, fake.IsRetryable);
 
             Assert.Equal(0, result);
-            fake.Received(1, x => x.DoSomething());
+            fake.Received(1, x => x.DoSomething(CancellationToken.None));
         }
 
         [Fact]
         public static async Task Retries_WhenShouldRetry()
         {
             var fake = Substitute.For<IFake>();
-            fake.DoSomething().ReturnsTask(1337, 1337, 1337, 0);
+            fake.DoSomething(CancellationToken.None).ReturnsTask(1337, 1337, 1337, 0);
             fake.IsRetryable(1337, null).Returns(true);
             fake.IsRetryable(0, null).Returns(false);
             var logger = Substitute.For<ILog>();
@@ -51,7 +51,7 @@ namespace ElasticLinq.Test.Retry
 
             await retryHandler.ExecuteAsync(fake.DoSomething, fake.IsRetryable);
 
-            fake.Received(4, x => x.DoSomething());
+            fake.Received(4, x => x.DoSomething(CancellationToken.None));
             delay.Received(1, x => x.Received(100));
             delay.Received(1, x => x.Received(200));
             delay.Received(1, x => x.Received(400));
@@ -67,7 +67,7 @@ namespace ElasticLinq.Test.Retry
         {
             var fake = Substitute.For<IFake>();
             var ex = new Exception();
-            fake.DoSomething().ThrowsTask(ex);
+            fake.DoSomething(CancellationToken.None).ThrowsTask(ex);
             fake.IsRetryable(Arg.Any<int>(), ex).Returns(false);
             var logger = Substitute.For<ILog>();
             var delay = Substitute.For<Delay>();
@@ -79,10 +79,33 @@ namespace ElasticLinq.Test.Retry
         }
 
         [Fact]
+        public static async void Throws_WhenCancellationTokenIsAlreadyCancelled()
+        {
+            var logger = Substitute.For<ILog>();
+            var retryHandler = new RetryPolicy(logger);
+
+            var ex = await Assert.ThrowsAsync<TaskCanceledException>(() => retryHandler.ExecuteAsync(async c => { await Task.Delay(5000, c); return true; }, (b, e) => true,  cancellationToken: new CancellationToken(true)));
+            Assert.True(ex.Task.IsCanceled);
+        }
+
+        [Fact]
+        public static async void Throws_WhenCancellationTokenIsSubsequentlyCancelled()
+        {
+            var logger = Substitute.For<ILog>();
+            var retryHandler = new RetryPolicy(logger);
+
+            var cts = new CancellationTokenSource(500);
+            var result = retryHandler.ExecuteAsync(async c => { await Task.Delay(4000, c); return true; }, (b, e) => true, cancellationToken: cts.Token);
+
+            await Assert.ThrowsAsync<TaskCanceledException>(async () => await result);
+            Assert.True(result.IsCanceled);
+        }
+
+        [Fact]
         public static async Task MergesLogInfo()
         {
             var fake = Substitute.For<IFake>();
-            fake.DoSomething().ReturnsTask(1337, 0);
+            fake.DoSomething(CancellationToken.None).ReturnsTask(1337, 0);
             fake.IsRetryable(1337, null).Returns(true);
             fake.IsRetryable(0, null).Returns(false);
             var logger = Substitute.For<ILog>();
@@ -117,7 +140,7 @@ namespace ElasticLinq.Test.Retry
         [Fact]
         public static async void DelayDoesDelay()
         {
-            const int timingFudge = 10; // Task.Delay sometimes returns a milli too soon...
+            const int timingFudge = 50; // Task.Delay sometimes returns too soon...
             var delayTime = TimeSpan.FromSeconds(2);
             var delay = new Delay();
             var stopwatch = new Stopwatch();
@@ -143,7 +166,7 @@ namespace ElasticLinq.Test.Retry
         public static async void Throws_IfRetriesAreExhausted()
         {
             var fake = Substitute.For<IFake>();
-            fake.DoSomething().ReturnsTask(1337, 1337);
+            fake.DoSomething(CancellationToken.None).ReturnsTask(1337, 1337);
             fake.IsRetryable(1337, null).Returns(true);
             fake.IsRetryable(0, null).Returns(false);
             var logger = Substitute.For<ILog>();

@@ -7,6 +7,7 @@ using ElasticLinq.Mapping;
 using ElasticLinq.Retry;
 using System;
 using System.Linq.Expressions;
+using System.Threading;
 using Xunit;
 
 namespace ElasticLinq.Test
@@ -67,6 +68,19 @@ namespace ElasticLinq.Test
             Assert.Throws<ArgumentNullException>(() => sharedProvider.Execute<Sample>(null));
         }
 
+
+        [Fact]
+        public void ExecuteAsyncThrowsArgumentNullExceptionIfNull()
+        {
+            Assert.ThrowsAsync<ArgumentNullException>(() => sharedProvider.ExecuteAsync(null));
+        }
+
+        [Fact]
+        public void ExecuteAsyncTThrowsArgumentNullExceptionIfNull()
+        {
+            Assert.ThrowsAsync<ArgumentNullException>(() => sharedProvider.ExecuteAsync<Sample>(null));
+        }
+
         [Fact]
         public void CreateQueryRethrowsTargetException()
         {
@@ -83,7 +97,11 @@ namespace ElasticLinq.Test
 
         class ThrowsRetryPolicy : IRetryPolicy
         {
-            public Task<TResult> ExecuteAsync<TResult>(Func<Task<TResult>> operationFunc, Func<TResult, Exception, bool> shouldRetryFunc, Action<TResult, Dictionary<string, object>> appendLogInfoFunc = null)
+            public Task<TResult> ExecuteAsync<TResult>(
+                Func<CancellationToken, Task<TResult>> operationFunc, 
+                Func<TResult, Exception, bool> shouldRetryFunc, 
+                Action<TResult, Dictionary<string, object>> appendLogInfoFunc = null,
+                CancellationToken cancellationToken = new CancellationToken())
             {
                 throw new AggregateException(new NotImplementedException("Rethrowing exception for testing"));
             }
