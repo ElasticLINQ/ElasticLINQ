@@ -27,7 +27,7 @@ namespace ElasticLinq.Test.Async
             var expected = source.Sum(r => r.Int);
             var actual = await source.SumAsync(r => r.Int);
 
-            Assert.Equal<object>(expected, actual);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -36,7 +36,7 @@ namespace ElasticLinq.Test.Async
             var expected = source.Sum(r => r.IntNullable);
             var actual = await source.SumAsync(r => r.IntNullable);
 
-            Assert.Equal<object>(expected, actual);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -45,7 +45,7 @@ namespace ElasticLinq.Test.Async
             var expected = source.Sum(r => r.Long);
             var actual = await source.SumAsync(r => r.Long);
 
-            Assert.Equal<object>(expected, actual);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -54,7 +54,7 @@ namespace ElasticLinq.Test.Async
             var expected = source.Sum(r => r.LongNullable);
             var actual = await source.SumAsync(r => r.LongNullable);
 
-            Assert.Equal<object>(expected, actual);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -63,7 +63,7 @@ namespace ElasticLinq.Test.Async
             var expected = source.Sum(r => r.Float);
             var actual = await source.SumAsync(r => r.Float);
 
-            Assert.Equal<object>(expected, actual);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -72,7 +72,7 @@ namespace ElasticLinq.Test.Async
             var expected = source.Sum(r => r.FloatNullable);
             var actual = await source.SumAsync(r => r.FloatNullable);
 
-            Assert.Equal<object>(expected, actual);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -81,7 +81,7 @@ namespace ElasticLinq.Test.Async
             var expected = source.Sum(r => r.Double);
             var actual = await source.SumAsync(r => r.Double);
 
-            Assert.Equal<object>(expected, actual);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -90,7 +90,7 @@ namespace ElasticLinq.Test.Async
             var expected = source.Sum(r => r.DoubleNullable);
             var actual = await source.SumAsync(r => r.DoubleNullable);
 
-            Assert.Equal<object>(expected, actual);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -99,7 +99,7 @@ namespace ElasticLinq.Test.Async
             var expected = source.Sum(r => r.Decimal);
             var actual = await source.SumAsync(r => r.Decimal);
 
-            Assert.Equal<object>(expected, actual);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -108,7 +108,97 @@ namespace ElasticLinq.Test.Async
             var expected = source.Sum(r => r.DecimalNullable);
             var actual = await source.SumAsync(r => r.DecimalNullable);
 
-            Assert.Equal<object>(expected, actual);
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public static async void SumSelectIntAsyncReturnsSameResultAsSumInt()
+        {
+            var expected = source.Select(r => r.Int).Sum();
+            var actual = await source.Select(r => r.Int).SumAsync();
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public static async void SumSelectIntNullableAsyncReturnsSameResultAsSumIntNullable()
+        {
+            var expected = source.Select(r => r.IntNullable).Sum();
+            var actual = await source.Select(r => r.IntNullable).SumAsync();
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public static async void SumSelectLongAsyncReturnsSameResultAsSumLong()
+        {
+            var expected = source.Select(r => r.Long).Sum();
+            var actual = await source.Select(r => r.Long).SumAsync();
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public static async void SumSelectLongNullableAsyncReturnsSameResultAsSumLongNullable()
+        {
+            var expected = source.Select(r => r.LongNullable).Sum();
+            var actual = await source.Select(r => r.LongNullable).SumAsync();
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public static async void SumSelectFloatAsyncReturnsSameResultAsSumFloat()
+        {
+            var expected = source.Select(r => r.Float).Sum();
+            var actual = await source.Select(r => r.Float).SumAsync();
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public static async void SumSelectFloatNullableAsyncReturnsSameResultAsSumFloatNullable()
+        {
+            var expected = source.Select(r => r.FloatNullable).Sum();
+            var actual = await source.Select(r => r.FloatNullable).SumAsync();
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public static async void SumSelectDoubleAsyncReturnsSameResultAsSumDouble()
+        {
+            var expected = source.Select(r => r.Double).Sum();
+            var actual = await source.Select(r => r.Double).SumAsync();
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public static async void SumSelectDoubleNullableAsyncReturnsSameResultAsSumDoubleNullable()
+        {
+            var expected = source.Select(r => r.DoubleNullable).Sum();
+            var actual = await source.Select(r => r.DoubleNullable).SumAsync();
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public static async void SumSelectDecimalAsyncReturnsSameResultAsSumDecimal()
+        {
+            var expected = source.Select(r => r.Decimal).Sum();
+            var actual = await source.Select(r => r.Decimal).SumAsync();
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public static async void SumSelectDecimalNullableAsyncReturnsSameResultAsSumDecimalNullable()
+        {
+            var expected = source.Select(r => r.DecimalNullable).Sum();
+            var actual = await source.Select(r => r.DecimalNullable).SumAsync();
+
+            Assert.Equal(expected, actual);
         }
     }
 }

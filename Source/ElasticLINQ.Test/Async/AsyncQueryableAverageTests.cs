@@ -110,5 +110,96 @@ namespace ElasticLinq.Test.Async
 
             Assert.Equal<object>(expected, actual);
         }
+
+        [Fact]
+        public static async void AverageSelectIntAsyncReturnsSameResultAsAverageInt()
+        {
+            var expected = source.Select(r => r.Int).Average();
+            var actual = await source.Select(r => r.Int).AverageAsync();
+
+            Assert.Equal<object>(expected, actual);
+        }
+
+        [Fact]
+        public static async void AverageSelectIntNullableAsyncReturnsSameResultAsAverageIntNullable()
+        {
+            var expected = source.Select(r => r.IntNullable).Average();
+            var actual = await source.Select(r => r.IntNullable).AverageAsync();
+
+            Assert.Equal<object>(expected, actual);
+        }
+
+        [Fact]
+        public static async void AverageSelectLongAsyncReturnsSameResultAsAverageLong()
+        {
+            var expected = source.Select(r => r.Long).Average();
+            var actual = await source.Select(r => r.Long).AverageAsync();
+
+            Assert.Equal<object>(expected, actual);
+        }
+
+        [Fact]
+        public static async void AverageSelectLongNullableAsyncReturnsSameResultAsAverageLongNullable()
+        {
+            var expected = source.Select(r => r.LongNullable).Average();
+            var actual = await source.Select(r => r.LongNullable).AverageAsync();
+
+            Assert.Equal<object>(expected, actual);
+        }
+
+        [Fact]
+        public static async void AverageSelectFloatAsyncReturnsSameResultAsAverageFloat()
+        {
+            var expected = source.Select(r => r.Float).Average();
+            var actual = await source.Select(r => r.Float).AverageAsync();
+
+            Assert.Equal<object>(expected, actual);
+        }
+
+        [Fact]
+        public static async void AverageSelectFloatNullableAsyncReturnsSameResultAsAverageFloatNullable()
+        {
+            var expected = source.Select(r => r.FloatNullable).Average();
+            var actual = await source.Select(r => r.FloatNullable).AverageAsync();
+
+            Assert.Equal<object>(expected, actual);
+        }
+
+        [Fact]
+        public static async void AverageSelectDoubleAsyncReturnsSameResultAsAverageDouble()
+        {
+            var expected = source.Select(r => r.Double).Average();
+            var actual = await source.Select(r => r.Double).AverageAsync();
+
+            Assert.Equal<object>(expected, actual);
+        }
+
+        [Fact]
+        public static async void AverageSelectDoubleNullableAsyncReturnsSameResultAsAverageDoubleNullable()
+        {
+            var expected = source.Select(r => r.DoubleNullable).Average();
+            var actual = await source.Select(r => r.DoubleNullable).AverageAsync();
+
+            Assert.Equal<object>(expected, actual);
+        }
+
+        [Fact]
+        public static async void AverageSelectDecimalAsyncReturnsSameResultAsAverageDecimal()
+        {
+            var expected = source.Select(r => r.Decimal).Average();
+            var actual = await source.Select(r => r.Decimal).AverageAsync();
+
+            Assert.Equal<object>(expected, actual);
+        }
+
+        [Fact]
+        public static async void AverageSelectDecimalNullableAsyncReturnsSameResultAsAverageDecimalNullable()
+        {
+            var expected = source.Select(r => r.DecimalNullable).Average();
+            var actual = await source.Select(r => r.DecimalNullable).AverageAsync();
+
+            Assert.Equal<object>(expected, actual);
+        }
+
     }
 }

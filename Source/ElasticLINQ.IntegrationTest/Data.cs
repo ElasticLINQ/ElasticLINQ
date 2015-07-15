@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ElasticLinq;
 using ElasticLinq.IntegrationTest.Models;
 using ElasticLinq.Mapping;
 

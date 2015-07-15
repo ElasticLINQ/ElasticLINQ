@@ -18,7 +18,7 @@ namespace ElasticLinq.Test
             var result = Substitute.For<IRetryPolicy>();
             result
                 .ExecuteAsync<ElasticResponse>(null, null)
-                .ReturnsForAnyArgs(async r => await r.Arg<Func<CancellationToken, Task<ElasticResponse>>>().Invoke(r.Arg<CancellationToken>()));
+                .ReturnsForAnyArgs(callInfo => callInfo.Arg<Func<CancellationToken, Task<ElasticResponse>>>()(callInfo.Arg<CancellationToken>()));
             return result;
         }
     }

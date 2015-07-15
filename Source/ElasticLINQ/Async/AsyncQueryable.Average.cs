@@ -11,12 +11,7 @@ namespace ElasticLinq.Async
 {
     public static partial class AsyncQueryable
     {
-        static MethodInfo Create<TSource, TResult>(Expression<Func<TSource, TResult>> e) where TSource:IQueryable
-        {
-            return ((MethodCallExpression) e.Body).Method;
-        }
-
-        private static readonly MethodInfo averageIntMethodInfo = Create((IQueryable<int> q) => q.Average());
+        private static readonly Lazy<MethodInfo> averageIntMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(int));
         private static readonly Lazy<MethodInfo> averageIntNullableMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(int?));
         private static readonly Lazy<MethodInfo> averageLongMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(long));
         private static readonly Lazy<MethodInfo> averageLongNullableMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(long?));
@@ -25,7 +20,7 @@ namespace ElasticLinq.Async
         private static readonly Lazy<MethodInfo> averageDoubleMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(double));
         private static readonly Lazy<MethodInfo> averageDoubleNullableMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(double?));
         private static readonly Lazy<MethodInfo> averageDecimalMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(decimal));
-        private static readonly Lazy<MethodInfo> averageDecimalNullableMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(decimal));
+        private static readonly Lazy<MethodInfo> averageDecimalNullableMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(decimal?));
 
         private static readonly Lazy<MethodInfo> averageIntSelectorMethodInfo = QueryableMethodBySelectorParameterType("Average", 2, typeof(int));
         private static readonly Lazy<MethodInfo> averageIntNullableSelectorMethodInfo = QueryableMethodBySelectorParameterType("Average", 2, typeof(int?));
@@ -52,7 +47,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> contains no elements.</exception>
         public static async Task<double> AverageAsync(this IQueryable<int> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (double)await ExecuteAsync(source.Provider, FinalExpression(source, averageIntMethodInfo), cancellationToken);
+            return (double)await ExecuteAsync(source.Provider, FinalExpression(source, averageIntMethodInfo.Value), cancellationToken);
         }
 
         /// <summary>

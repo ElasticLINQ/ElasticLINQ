@@ -20,7 +20,7 @@ namespace ElasticLinq.Async
         private static readonly Lazy<MethodInfo> sumDoubleMethodInfo = QueryableMethodByReturnType("Sum", 1, typeof(double));
         private static readonly Lazy<MethodInfo> sumDoubleNullableMethodInfo = QueryableMethodByReturnType("Sum", 1, typeof(double?));
         private static readonly Lazy<MethodInfo> sumDecimalMethodInfo = QueryableMethodByReturnType("Sum", 1, typeof(decimal));
-        private static readonly Lazy<MethodInfo> sumDecimalNullableMethodInfo = QueryableMethodByReturnType("Sum", 1, typeof(decimal));
+        private static readonly Lazy<MethodInfo> sumDecimalNullableMethodInfo = QueryableMethodByReturnType("Sum", 1, typeof(decimal?));
 
         private static readonly Lazy<MethodInfo> sumIntSelectorMethodInfo = QueryableMethodByReturnType("Sum", 2, typeof(int));
         private static readonly Lazy<MethodInfo> sumIntNullableSelectorMethodInfo = QueryableMethodByReturnType("Sum", 2, typeof(int?));
