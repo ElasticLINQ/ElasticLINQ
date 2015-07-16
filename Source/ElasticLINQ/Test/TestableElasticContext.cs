@@ -88,7 +88,7 @@ namespace ElasticLinq.Test
         /// <param name="values">The objects to use when testing queries against this type.</param>
         public void SetData<T>(IEnumerable<T> values)
         {
-            data[typeof(T)] = values;
+            data[typeof(T)] = values.ToList();
         }
 
         /// <summary>

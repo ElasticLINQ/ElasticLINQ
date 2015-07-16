@@ -3,26 +3,34 @@
 using ElasticLinq.Logging;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace ElasticLinq.Test
 {
+    public struct LogEntry
+    {
+        public TraceEventType Type;
+        public Exception Exception;
+        public IDictionary<string, object> AdditionalInfo;
+        public string MessageFormat;
+        public object[] Args;
+        public string Message;
+    }
+
     public class SpyLog : ILog
     {
-        public readonly List<string> Messages = new List<string>();
+        public readonly List<LogEntry> Entries = new List<LogEntry>();
 
         public void Log(TraceEventType type, Exception ex, IDictionary<string, object> additionalInfo, string messageFormat, params object[] args)
         {
-            string messageText = args == null || args.Length == 0 ? messageFormat : string.Format(messageFormat, args);
-            string spiedMessage = string.Format("[{0}] {1}", type.ToString().ToUpperInvariant(), messageText);
-
-            for (; ex != null; ex = ex.InnerException)
-                spiedMessage += string.Format("\r\nEXCEPTION:\r\n{0}", ex);
-
-            if (additionalInfo != null && additionalInfo.Count != 0)
-                spiedMessage += string.Format("\r\nADDITIONAL INFO: {0}", string.Join(", ", additionalInfo.Select(kvp => string.Format("{0} = {1}", kvp.Key, kvp.Value))));
-
-            Messages.Add(spiedMessage);
+            Entries.Add(new LogEntry
+            {
+                Type = type,
+                Exception = ex,
+                AdditionalInfo = additionalInfo ?? new Dictionary<string, object>(),
+                MessageFormat = messageFormat,
+                Args = args,
+                Message = args == null || args.Length == 0 ? messageFormat : string.Format(messageFormat, args)
+            });
         }
     }
 }

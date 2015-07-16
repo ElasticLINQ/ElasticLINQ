@@ -7,7 +7,6 @@ using ElasticLinq.Response.Model;
 using ElasticLinq.Retry;
 using ElasticLinq.Utility;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -47,19 +46,20 @@ namespace ElasticLinq.Request
             log.Debug(null, null, "Body:\n{0}", formatter.Body);
 
             return retryPolicy.ExecuteAsync(
-                async () =>
+                async token =>
                 {
                     using (var requestMessage = new HttpRequestMessage(HttpMethod.Post, formatter.Uri) { Content = new StringContent(formatter.Body) })
-                    using (var response = await SendRequestAsync(connection.HttpClient, requestMessage, cancellationToken))
+                    using (var response = await SendRequestAsync(connection.HttpClient, requestMessage, token))
                     using (var responseStream = await response.Content.ReadAsStreamAsync())
                         return ParseResponse(responseStream, log);
                 },
-                (response, exception) => exception is TaskCanceledException,
+                (response, exception) => !cancellationToken.IsCancellationRequested && exception != null,
                 (response, additionalInfo) =>
                 {
                     additionalInfo["index"] = connection.Index;
+                    additionalInfo["uri"] = formatter.Uri;
                     additionalInfo["query"] = formatter.Body;
-                });
+                }, cancellationToken);
         }
 
         async Task<HttpResponseMessage> SendRequestAsync(HttpClient httpClient, HttpRequestMessage requestMessage, CancellationToken cancellationToken)

@@ -3,6 +3,7 @@
 using ElasticLinq.Logging;
 using ElasticLinq.Mapping;
 using ElasticLinq.Request;
+using ElasticLinq.Request.Formatters;
 using ElasticLinq.Retry;
 using ElasticLinq.Test.Utility;
 using System;
@@ -77,6 +78,46 @@ namespace ElasticLinq.Test.Request
         }
 
         [Fact]
+        public static async void SearchAsyncThrowsTaskCancelledExceptionWithAlreadyCancelledCancellationToken()
+        {
+            var request = new SearchRequest { DocumentType = "docType" };
+            var processor = new ElasticRequestProcessor(connection, mapping, log, retryPolicy);
+
+            var ex = await Record.ExceptionAsync(() => processor.SearchAsync(request, new CancellationToken(true)));
+
+            Assert.IsType<TaskCanceledException>(ex);
+        }
+
+        [Fact]
+        public static async void SearchAsyncThrowsTaskCancelledExceptionWithSubsequentlyCancelledCancellationToken()
+        {
+            var request = new SearchRequest { DocumentType = "docType" };
+            var processor = new ElasticRequestProcessor(connection, mapping, log, retryPolicy);
+
+            var ex = await Record.ExceptionAsync(() => processor.SearchAsync(request, new CancellationTokenSource(500).Token));
+
+            Assert.IsType<TaskCanceledException>(ex);
+        }
+
+        [Fact]
+        public static async void SearchAsyncCapturesRequestInfoOnFailure()
+        {
+            var spyLog = new SpyLog();
+            var brokenConnection = new ElasticConnection(new Uri("http://localhost:12"), index: "MyIndex");
+            var processor = new ElasticRequestProcessor(brokenConnection, mapping, spyLog, new RetryPolicy(spyLog, 100, 1));
+            var searchRequest = new SearchRequest { DocumentType = "docType" };
+            var formatter = new SearchRequestFormatter(brokenConnection, mapping, searchRequest);
+
+            var ex = await Record.ExceptionAsync(() => processor.SearchAsync(searchRequest, CancellationToken.None));
+
+            Assert.IsType<RetryFailedException>(ex);
+            var retryLogEntry = Assert.Single(spyLog.Entries, s => s.AdditionalInfo.ContainsKey("category") && s.AdditionalInfo["category"].Equals("retry"));
+            Assert.Equal("MyIndex", retryLogEntry.AdditionalInfo["index"]);
+            Assert.Equal(formatter.Uri, retryLogEntry.AdditionalInfo["uri"]);
+            Assert.Equal(formatter.Body, retryLogEntry.AdditionalInfo["query"]);
+        }
+
+        [Fact]
         public static void ParseResponseReturnsParsedResponseGivenValidStream()
         {
             const int took = 2;
@@ -118,11 +159,11 @@ namespace ElasticLinq.Test.Request
 
             await processor.SearchAsync(request, CancellationToken.None);
 
-            Assert.Equal(4, spyLog.Messages.Count);
-            Assert.Equal(@"[VERBOSE] Request: POST http://localhost/SearchIndex/abc123/_search", spyLog.Messages[0]);
-            Assert.Equal(@"[VERBOSE] Body:" + '\n' + @"{""size"":2112,""timeout"":""10s""}", spyLog.Messages[1]);
-            Assert.True(new Regex(@"\[VERBOSE\] Response: 200 OK \(in \d+ms\)").Match(spyLog.Messages[2]).Success);
-            Assert.True(new Regex(@"\[VERBOSE\] Deserialized \d+ bytes into 1 hits in \d+ms").Match(spyLog.Messages[3]).Success);
+            Assert.Equal(4, spyLog.Entries.Count);
+            Assert.Equal(@"Request: POST http://localhost/SearchIndex/abc123/_search", spyLog.Entries[0].Message);
+            Assert.Equal(@"Body:" + '\n' + @"{""size"":2112,""timeout"":""10s""}", spyLog.Entries[1].Message);
+            Assert.True(new Regex(@"Response: 200 OK \(in \d+ms\)").Match(spyLog.Entries[2].Message).Success);
+            Assert.True(new Regex(@"Deserialized \d+ bytes into 1 hits in \d+ms").Match(spyLog.Entries[3].Message).Success);
         }
 
         static string BuildResponseString(int took, int shards, int hits, double score, string index, string type, string id)

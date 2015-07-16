@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
-using ElasticLINQ.IntegrationTest.Models;
+using ElasticLinq.IntegrationTest.Models;
 using Xunit;
 
-namespace ElasticLINQ.IntegrationTest.WhereTests
+namespace ElasticLinq.IntegrationTest.WhereTests
 {
     public class DateWhereTests
     {

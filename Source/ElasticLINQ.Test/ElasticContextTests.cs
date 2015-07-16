@@ -9,14 +9,14 @@ using Xunit;
 
 namespace ElasticLinq.Test
 {
-    public class ElasticContextTests
+    public static class ElasticContextTests
     {
         static readonly ElasticConnection connection = new ElasticConnection(new Uri("http://localhost"));
 
         class Sample { };
 
         [Fact]
-        public void ConstructorSetsPropertiesFromParameters()
+        public static void ConstructorSetsPropertiesFromParameters()
         {
             var mapping = Substitute.For<IElasticMapping>();
             var log = Substitute.For<ILog>();
@@ -31,7 +31,7 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
-        public void DefaultValuesFromConstructorAreProvided()
+        public static void DefaultValuesFromConstructorAreProvided()
         {
             var context = new ElasticContext(connection);
 
@@ -45,13 +45,13 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
-        public void ConstructorThrowsArgumentNullExceptionWhenConnectionIsNull()
+        public static void ConstructorThrowsArgumentNullExceptionWhenConnectionIsNull()
         {
             Assert.Throws<ArgumentNullException>(() => new ElasticContext(null));
         }
 
         [Fact]
-        public void QueryPropertyReturnsElasticQueryWithConnectionAndMapping()
+        public static void QueryPropertyReturnsElasticQueryWithConnectionAndMapping()
         {
             var context = new ElasticContext(connection);
 

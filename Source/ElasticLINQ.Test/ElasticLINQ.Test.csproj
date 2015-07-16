@@ -59,6 +59,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Async\AsyncQueryableEntityTests.cs" />
+    <Compile Include="Async\AsyncQueryableAverageTests.cs" />
+    <Compile Include="Async\AsyncQueryableSumTests.cs" />
+    <Compile Include="Async\AsyncQueryableTests.cs" />
     <Compile Include="ElasticConnectionOptionsTests.cs" />
     <Compile Include="ElasticContextTests.cs" />
     <Compile Include="ElasticFieldsTests.cs" />
@@ -132,6 +136,7 @@
     <Compile Include="Response\Materializers\OneHitElasticMaterializerTests.cs" />
     <Compile Include="Response\Materializers\ManyHitsElasticMaterializerTests.cs" />
     <Compile Include="Retry\RetryPolicyTests.cs" />
+    <Compile Include="TestSupport\WithAllTypesModel.cs" />
     <Compile Include="TestSupport\Assertions.cs" />
     <Compile Include="TestSupport\FlatteningExpressionVisitor.cs" />
     <Compile Include="TestSupport\HttpStub.cs" />
@@ -140,6 +145,7 @@
     <Compile Include="TestSupport\Identifier.cs" />
     <Compile Include="TestSupport\NSubstituteExtensions.cs" />
     <Compile Include="TestSupport\NullRetryPolicy.cs" />
+    <Compile Include="TestSupport\RobotModels.cs" />
     <Compile Include="TestSupport\SpyLog.cs" />
     <Compile Include="Test\TestableElasticQueryProviderTests.cs" />
     <Compile Include="Test\TestableElasticQueryTests.cs" />

@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ElasticLinq.Retry
@@ -18,10 +19,12 @@ namespace ElasticLinq.Retry
         /// <param name="operationFunc">The lambda which performs the operation once.</param>
         /// <param name="shouldRetryFunc">The lambda which inspects a result and/or exception and decides whether it should retry the result.</param>
         /// <param name="appendLogInfoFunc">The lambda which can supplement info logging for failed searches.</param>
-        /// <returns></returns>
+        /// <param name="cancellationToken">The optional token to monitor for cancellation requests.</param>
+        /// <returns>A task with the completed result.</returns>
         Task<TResult> ExecuteAsync<TResult>(
-            Func<Task<TResult>> operationFunc,
+            Func<CancellationToken, Task<TResult>> operationFunc,
             Func<TResult, Exception, bool> shouldRetryFunc,
-            Action<TResult, Dictionary<string, object>> appendLogInfoFunc = null);
+            Action<TResult, Dictionary<string, object>> appendLogInfoFunc = null,
+            CancellationToken cancellationToken = new CancellationToken());
     }
 }

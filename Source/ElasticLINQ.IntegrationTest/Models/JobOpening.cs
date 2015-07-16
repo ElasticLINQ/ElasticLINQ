@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ElasticLINQ.IntegrationTest.Models
+namespace ElasticLinq.IntegrationTest.Models
 {
     class JobOpening : IEquatable<JobOpening>
     {

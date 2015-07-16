@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
-namespace ElasticLINQ.IntegrationTest
+namespace ElasticLinq.IntegrationTest
 {
     static class DataAssert
     {
@@ -30,10 +30,10 @@ namespace ElasticLINQ.IntegrationTest
                 Assert.Empty(difference);
             }
             else
-                AssertSameSequence(expect, actual);
+                SameSequence(expect, actual);
         }
 
-        static void AssertSameSequence<TTarget>(List<TTarget> expect, List<TTarget> actual)
+        public static void SameSequence<TTarget>(List<TTarget> expect, List<TTarget> actual)
         {
             var upperBound = Math.Min(expect.Count, actual.Count);
             for (var i = 0; i < upperBound; i++)

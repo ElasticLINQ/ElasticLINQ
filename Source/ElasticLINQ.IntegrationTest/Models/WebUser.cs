@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace ElasticLINQ.IntegrationTest.Models
+namespace ElasticLinq.IntegrationTest.Models
 {
     class WebUser : IEquatable<WebUser>
     {

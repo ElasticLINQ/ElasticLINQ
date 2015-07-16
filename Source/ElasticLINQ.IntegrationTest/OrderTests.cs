@@ -1,8 +1,8 @@
 ﻿using System.Linq;
-using ElasticLINQ.IntegrationTest.Models;
+using ElasticLinq.IntegrationTest.Models;
 using Xunit;
 
-namespace ElasticLINQ.IntegrationTest
+namespace ElasticLinq.IntegrationTest
 {
     public class OrderTests
     {
