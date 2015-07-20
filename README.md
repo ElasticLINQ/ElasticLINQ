@@ -7,9 +7,6 @@ var p = db.Query<People>().Where(p => p.Tags.Contains("tech") && p.State == "WA"
 
 ElasticLINQ supports .NET 4.5 and PCL and Elasticsearch 0.9.0 and greater.
 
-## Installation &amp; getting started
-Binary releases are available via [NuGet](http://www.nuget.org/packages/ElasticLinq/).
-
-For information on getting started, [see the Wiki](https://github.com/CenturyLinkCloud/ElasticLINQ/wiki/Getting-Started).
+Binary releases are available via [NuGet](http://www.nuget.org/packages/ElasticLinq/). For information on getting started, [see the Wiki](https://github.com/CenturyLinkCloud/ElasticLINQ/wiki/Getting-Started).
 
 ![Build status](https://img.shields.io/teamcity/http/teamcity.tier3.com/s/elasticlinq.svg) ![NuGet version](https://img.shields.io/nuget/v/elasticlinq.svg?style=flat)
