@@ -20,7 +20,7 @@ namespace ElasticLinq.Test.Request
 {
     public class ElasticRequestProcessorTests
     {
-        static readonly ElasticConnection connection = new ElasticConnection(new Uri("http://localhost"), index: "SearchIndex");
+        static readonly ElasticConnection connection = new ElasticConnection(new Uri("http://localhost:9912"), index: "SearchIndex");
         static readonly IElasticMapping mapping = new TrivialElasticMapping();
         static readonly ILog log = NullLog.Instance;
         static readonly IRetryPolicy retryPolicy = NullRetryPolicy.Instance;
