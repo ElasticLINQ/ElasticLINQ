@@ -5,7 +5,7 @@ var db = new ElasticContext(new ElasticConnection(new Uri("http://myserver:9200"
 var p = db.Query<People>().Where(p => p.Tags.Contains("tech") && p.State == "WA");
 ```
 
-ElasticLINQ supports .NET 4.5 and PCL and Elasticsearch 0.9.0 and greater.
+ElasticLINQ supports .NET 4.5 & PCL with Elasticsearch 0.9.0 or greater.
 
 Binary releases are available via [NuGet](http://www.nuget.org/packages/ElasticLinq/). For information on getting started, [see the Wiki](https://github.com/CenturyLinkCloud/ElasticLINQ/wiki/Getting-Started).
 
