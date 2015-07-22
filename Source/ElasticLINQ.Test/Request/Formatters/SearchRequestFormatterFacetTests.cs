@@ -149,7 +149,7 @@ namespace ElasticLinq.Test.Request.Formatters
         }
 
         [Fact]
-        public void BodyContainsFilterFacetAndedWithRequestFilter()
+        public void BodyContainsFilterFacetWithQueryFilteredFilter()
         {
             var expectedFacet = new FilterFacet("LocalSales", new ExistsCriteria("IsLocal"));
             var searchRequest = new SearchRequest
@@ -162,8 +162,8 @@ namespace ElasticLinq.Test.Request.Formatters
             var formatter = new SearchRequestFormatter(defaultConnection, mapping, searchRequest);
             var body = JObject.Parse(formatter.Body);
 
-            var andFilter = body.TraverseWithAssert("facets", expectedFacet.Name, expectedFacet.Type, "and");
-            Assert.Equal(2, andFilter.Count());
+            body.TraverseWithAssert("query", "filtered", "filter", "missing");
+            body.TraverseWithAssert("facets", expectedFacet.Name, expectedFacet.Type, "exists");
         }
 
         [Fact]

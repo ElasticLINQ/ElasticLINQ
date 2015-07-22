@@ -132,7 +132,7 @@ namespace ElasticLinq.Test
         {
             var queryInfo = testableSample.Where(x => x.Property == "2112").ToQueryInfo();
 
-            Assert.Equal(@"{""filter"":{""term"":{""property"":""2112""}}}", queryInfo.Query);
+            Assert.Equal(@"{""query"":{""filtered"":{""filter"":{""term"":{""property"":""2112""}}}}}", queryInfo.Query);
         }
 
         [Fact]

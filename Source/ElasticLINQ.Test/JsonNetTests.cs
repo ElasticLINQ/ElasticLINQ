@@ -29,7 +29,7 @@ namespace ElasticLinq.Test
             var queryInfo = context.Query<ClassWithIdentifier>().Where(x => x.id == helloIdentifier).ToQueryInfo();
 
             // Also verifies that any value which gets JSON converted into a string gets lower-cased
-            Assert.Equal(@"{""filter"":{""term"":{""docWrapper.classWithIdentifier.id"":""hello!!""}}}", queryInfo.Query);
+            Assert.Equal(@"{""query"":{""filtered"":{""filter"":{""term"":{""docWrapper.classWithIdentifier.id"":""hello!!""}}}}}", queryInfo.Query);
         }
 
         [Fact]
@@ -41,7 +41,7 @@ namespace ElasticLinq.Test
             var queryInfo = context.Query<ClassWithIdentifier>().Where(x => identifiers.Contains(x.id)).ToQueryInfo();
 
             // Also verifies that any value which gets JSON converted into a string gets lower-cased
-            Assert.Equal(@"{""filter"":{""terms"":{""id"":[""value1!!"",""value2!!""]}}}", queryInfo.Query);
+            Assert.Equal(@"{""query"":{""filtered"":{""filter"":{""terms"":{""id"":[""value1!!"",""value2!!""]}}}}}", queryInfo.Query);
         }
 
         class ClassWithIdentifier

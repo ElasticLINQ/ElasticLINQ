@@ -104,42 +104,17 @@ namespace ElasticLinq.Request.Formatters
             if (searchRequest.MinScore.HasValue)
                 root.Add("min_score", searchRequest.MinScore.Value);
 
-            // If there is a filter, then create a filtered query wrapper
-            if (searchRequest.Filter ! null)
-            {
-                var filteredWrapper = new JObject();
-                
-                // add the filter to the container
-                filteredWrapper.Add("filter", Build(searchRequest.Filter));
+            var queryRoot = root;
 
-                // If a scored query was supplied, then add that too
-                if (searchRequest.Query != null)
-                {
-                    filteredWrapper.Add("query", Build(searchRequest.Query));
-                }
-
-                // At the end, this will look like:
-                // {
-                //   "query" : {
-                //     "filtered" : {
-                //       "filter" : { /* ... user filter ... */ },
-                //       "query" : { /* ... user query ... */ }
-                //     }
-                //   }
-                // }
-                root.Add("query", new JObject(new JProperty("filtered", filteredWrapper)));
-            }
-            // Without a filter, then there may just be a query
-            else if (searchRequest.Query != null)
+            // Filters cause a filtered query to be created
+            if (searchRequest.Filter != null)
             {
-                // This will end up looking like:
-                // {
-                //   "query" : {
-                //     /* ... user query ... */
-                //   }
-                // }
-                root.Add("query", Build(searchRequest.Query));
+                queryRoot = new JObject(new JProperty("filter", Build(searchRequest.Filter)));
+                root.Add("query", new JObject(new JProperty("filtered", queryRoot)));
             }
+
+            if (searchRequest.Query != null)
+                queryRoot.Add("query", Build(searchRequest.Query));
 
             if (searchRequest.SortOptions.Any())
                 root.Add("sort", Build(searchRequest.SortOptions));
@@ -151,7 +126,7 @@ namespace ElasticLinq.Request.Formatters
                 root.Add("highlight", Build(searchRequest.Highlight));
 
             long? size = searchRequest.Size ?? connection.Options.SearchSizeDefault;
-            if (size.HasValue && !hasFacets)
+            if (size.HasValue && !searchRequest.Facets.Any())
                 root.Add("size", size.Value);
 
             if (searchRequest.Facets.Any())
@@ -253,6 +228,9 @@ namespace ElasticLinq.Request.Formatters
 
         JObject Build(ICriteria criteria)
         {
+            if (criteria == null)
+                return null;
+
             if (criteria is RangeCriteria)
                 return Build((RangeCriteria)criteria);
 
@@ -304,7 +282,7 @@ namespace ElasticLinq.Request.Formatters
                 queryStringCriteria.Add(new JProperty("post_tags", new JArray(highlight.PostTag)));
             if (!string.IsNullOrWhiteSpace(highlight.PreTag))
                 queryStringCriteria.Add(new JProperty("pre_tags", new JArray(highlight.PreTag)));
-            
+
             return queryStringCriteria;
         }
 
