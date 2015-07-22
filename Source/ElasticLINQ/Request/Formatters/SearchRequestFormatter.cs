@@ -104,13 +104,42 @@ namespace ElasticLinq.Request.Formatters
             if (searchRequest.MinScore.HasValue)
                 root.Add("min_score", searchRequest.MinScore.Value);
 
-            if (searchRequest.Query != null)
-                root.Add("query", Build(searchRequest.Query));
+            // If there is a filter, then create a filtered query wrapper
+            if (searchRequest.Filter ! null)
+            {
+                var filteredWrapper = new JObject();
+                
+                // add the filter to the container
+                filteredWrapper.Add("filter", Build(searchRequest.Filter));
 
-            // Filters are pushed down to the facets for aggregate queries
-            var hasFacets = searchRequest.Facets.Any();
-            if (searchRequest.Filter != null && !hasFacets)
-                root.Add("filter", Build(searchRequest.Filter));
+                // If a scored query was supplied, then add that too
+                if (searchRequest.Query != null)
+                {
+                    filteredWrapper.Add("query", Build(searchRequest.Query));
+                }
+
+                // At the end, this will look like:
+                // {
+                //   "query" : {
+                //     "filtered" : {
+                //       "filter" : { /* ... user filter ... */ },
+                //       "query" : { /* ... user query ... */ }
+                //     }
+                //   }
+                // }
+                root.Add("query", new JObject(new JProperty("filtered", filteredWrapper)));
+            }
+            // Without a filter, then there may just be a query
+            else if (searchRequest.Query != null)
+            {
+                // This will end up looking like:
+                // {
+                //   "query" : {
+                //     /* ... user query ... */
+                //   }
+                // }
+                root.Add("query", Build(searchRequest.Query));
+            }
 
             if (searchRequest.SortOptions.Any())
                 root.Add("sort", Build(searchRequest.SortOptions));
@@ -126,7 +155,7 @@ namespace ElasticLinq.Request.Formatters
                 root.Add("size", size.Value);
 
             if (searchRequest.Facets.Any())
-                root.Add("facets", Build(searchRequest.Facets, searchRequest.Filter, size));
+                root.Add("facets", Build(searchRequest.Facets, size));
 
             if (connection.Timeout != TimeSpan.Zero)
                 root.Add("timeout", Format(connection.Timeout));
@@ -134,12 +163,12 @@ namespace ElasticLinq.Request.Formatters
             return root;
         }
 
-        JToken Build(IEnumerable<IFacet> facets, ICriteria primaryFilter, long? defaultSize)
+        JToken Build(IEnumerable<IFacet> facets, long? defaultSize)
         {
-            return new JObject(facets.Select(facet => Build(facet, primaryFilter, defaultSize)));
+            return new JObject(facets.Select(facet => Build(facet, defaultSize)));
         }
 
-        JProperty Build(IFacet facet, ICriteria primaryFilter, long? defaultSize)
+        JProperty Build(IFacet facet, long? defaultSize)
         {
             Argument.EnsureNotNull("facet", facet);
 
@@ -153,9 +182,8 @@ namespace ElasticLinq.Request.Formatters
 
             var namedBody = new JObject(new JProperty(facet.Type, specificBody));
 
-            var combinedFilter = AndCriteria.Combine(primaryFilter, facet.Filter);
-            if (combinedFilter != null)
-                namedBody[facet is FilterFacet ? "filter" : "facet_filter"] = Build(combinedFilter);
+            if (facet.Filter != null)
+                namedBody["filter"] = Build(facet.Filter);
 
             return new JProperty(facet.Name, namedBody);
         }
