@@ -98,6 +98,27 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         }
 
         [Fact]
+        public static void PrefixArrayMustBeBetweenMemberAndConstant()
+        {
+            const string expectedMessageFragment = "Prefix must take a member";
+
+            {
+                var ex = Assert.Throws<NotSupportedException>(() => Translate(Robots.Where(r => ElasticMethods.Prefix(r.Aliases, r.Name))));
+                Assert.Contains(expectedMessageFragment, ex.Message);
+            }
+
+            {
+                var ex = Assert.Throws<NotSupportedException>(() => Translate(Robots.Where(r => ElasticMethods.Prefix(new[] { "", "a" }, r.Name))));
+                Assert.Contains(expectedMessageFragment, ex.Message);
+            }
+
+            {
+                var ex = Assert.Throws<NotSupportedException>(() => Translate(Robots.Where(r => ElasticMethods.Prefix(new[] { "", "a" }, ""))));
+                Assert.Contains(expectedMessageFragment, ex.Message);
+            }
+        }
+
+        [Fact]
         public static void RegexpMustBeBetweenMemberAndConstant()
         {
             const string expectedMessageFragment = "Regexp must take a member";
