@@ -47,12 +47,23 @@ namespace ElasticLinq
         }
 
         /// <summary>
-        /// Specifies a regular expression term query for a field.
+        /// Specifies a prefix term query for a field.
         /// </summary>
         /// <param name="field">Field name to be matched.</param>
         /// <param name="startsWith">String the field must start with to match.</param>
         /// <returns>true if the field starts with the startsWith; otherwise, false.</returns>
         public static bool Prefix(string field, string startsWith)
+        {
+            throw BuildException();
+        }
+
+        /// <summary>
+        /// Specifies a prefix term query for a field.
+        /// </summary>
+        /// <param name="field">Field name to be matched.</param>
+        /// <param name="startsWith">String the field must start with to match.</param>
+        /// <returns>true if the field starts with the startsWith; otherwise, false.</returns>
+        public static bool Prefix(IEnumerable<string> field, string startsWith)
         {
             throw BuildException();
         }

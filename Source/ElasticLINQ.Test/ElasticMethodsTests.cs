@@ -31,6 +31,13 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
+        public void PrefixArrayThrowsIfAccessed()
+        {
+            var ex = Assert.Throws<InvalidOperationException>(() => ElasticMethods.Prefix(new[] { "a1", "a2" }, "b"));
+            Assert.Contains("ElasticMethods.Prefix", ex.Message);
+        }
+
+        [Fact]
         public void RegexpThrowsIfAccessed()
         {
             var ex = Assert.Throws<InvalidOperationException>(() => ElasticMethods.Regexp("a", "b"));
