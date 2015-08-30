@@ -7,6 +7,9 @@ namespace ElasticLinq.Retry
     /// <summary>
     /// The exception that is thrown when an operation does not succeed within a specified number of attempts.
     /// </summary>
+#if !PCL
+    [Serializable]
+#endif
     public class RetryFailedException : Exception
     {
         /// <summary>
