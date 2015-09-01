@@ -1,7 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using ElasticLinq.Mapping;
-using ElasticLinq.Request.Criteria;
 using ElasticLinq.Test.TestSupport;
 using ElasticLinq.Utility;
 using Newtonsoft.Json;

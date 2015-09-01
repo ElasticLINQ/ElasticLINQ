@@ -72,7 +72,7 @@ namespace ElasticLinq.Test.Test
 
             Assert.Equal(expected.Count, actual.Count);
 
-            foreach (var item in actual)
+            foreach (var item in expected)
                 Assert.Contains(item, actual);
         }
 
@@ -84,6 +84,22 @@ namespace ElasticLinq.Test.Test
             var query = context.Query<FakeClass>();
 
             Assert.IsType<TestableElasticQuery<FakeClass>>(query);
+        }
+
+        [Fact]
+        public void ExecuteDefaultsElasticFieldsInsteadOfThrowing()
+        {
+            var expected = new List<string> { "A", "B", "C" };
+            var context = new TestableElasticContext();
+
+            context.SetData(expected.ToArray());
+
+            var actual = context.Query<string>().Select(d => Tuple.Create(ElasticFields.Id, ElasticFields.Score, d)).ToList();
+
+            Assert.Equal(expected.Count, actual.Count);
+
+            foreach (var item in expected)
+                Assert.Single(actual, a => a.Item3 == item && a.Item2 == default(double) && a.Item1 == default(string));
         }
 
         class FakeClass

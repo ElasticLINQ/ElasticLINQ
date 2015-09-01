@@ -1,10 +1,10 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using ElasticLinq.Request.Criteria;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Globalization;
 using System.Reflection;
-using ElasticLinq.Request.Criteria;
-using Newtonsoft.Json.Linq;
 
 namespace ElasticLinq.Mapping
 {
@@ -19,7 +19,7 @@ namespace ElasticLinq.Mapping
         /// <summary>
         /// Initializes a new instance of the <see cref="CouchbaseElasticMapping"/> class.
         /// </summary>
-        /// <param name="camelCaseFieldNames">Pass <c>true</c> to automatically camel-case field names (for <see cref="ElasticMapping.GetFieldName(Type, System.Reflection.MemberInfo)"/>).</param>
+        /// <param name="camelCaseFieldNames">Pass <c>true</c> to automatically camel-case field names (for <see cref="ElasticMapping.GetFieldName(Type, MemberInfo)"/>).</param>
         /// <param name="lowerCaseAnalyzedFieldValues">Pass <c>true</c> to automatically convert field values to lower case (for <see cref="ElasticMapping.FormatValue"/>).</param>
         /// <param name="conversionCulture">The culture to use for the lower-casing, camel-casing, and pluralization operations. If <c>null</c>,
         /// uses <see cref="CultureInfo.CurrentCulture"/>.</param>
