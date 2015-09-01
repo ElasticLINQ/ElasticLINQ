@@ -78,7 +78,7 @@ namespace ElasticLinq.Test.Mapping
         {
             public string StringProperty { get; set; }
 
-            public int IntegerField;
+            public int IntegerField = 5;
         }
 
         [Theory]
