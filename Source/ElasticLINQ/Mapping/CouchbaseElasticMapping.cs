@@ -4,6 +4,7 @@ using System;
 using System.Globalization;
 using System.Reflection;
 using ElasticLinq.Request.Criteria;
+using Newtonsoft.Json.Linq;
 
 namespace ElasticLinq.Mapping
 {
@@ -66,6 +67,12 @@ namespace ElasticLinq.Mapping
                 throw new InvalidOperationException(string.Format(TypeCriteriaMissingExceptionMessage, type.Name));
 
             return new ExistsCriteria(GetFieldName(type, property));
+        }
+
+        /// <inheritdoc/>
+        public override object Materialize(JToken sourceDocument, Type sourceType)
+        {
+            return base.Materialize(sourceDocument.SelectToken(GetDocumentMappingPrefix(sourceType)), sourceType);
         }
     }
 }

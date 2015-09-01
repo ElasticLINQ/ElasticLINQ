@@ -182,5 +182,11 @@ namespace ElasticLinq.Mapping
         {
             return member.GetCustomAttribute<NotAnalyzedAttribute>(inherit: true) != null;
         }
+
+        /// <inheritedDoc />
+        public virtual object Materialize(JToken sourceDocument, Type sourceType)
+        {
+            return sourceDocument.ToObject(sourceType);
+        }
     }
 }

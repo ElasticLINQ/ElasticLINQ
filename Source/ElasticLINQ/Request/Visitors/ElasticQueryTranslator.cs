@@ -453,10 +453,7 @@ namespace ElasticLinq.Request.Visitors
 
         Func<Hit, object> DefaultItemProjector
         {
-            get
-            {
-                return hit => hit._source.ToObject(SourceType);
-            }
+            get { return hit => Mapping.Materialize(hit._source, SourceType); }
         }
     }
 }

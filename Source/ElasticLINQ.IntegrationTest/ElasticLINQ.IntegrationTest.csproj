@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="DataAssert.cs" />
     <Compile Include="Data.cs" />
+    <Compile Include="FieldMappingTests.cs" />
     <Compile Include="Models\JobLocation.cs" />
     <Compile Include="Models\JobOpening.cs" />
     <Compile Include="Models\LastAccess.cs" />

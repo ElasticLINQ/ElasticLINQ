@@ -3,6 +3,7 @@
 using ElasticLinq.Mapping;
 using ElasticLinq.Request.Criteria;
 using System;
+using System.Linq.Expressions;
 using Xunit;
 
 namespace ElasticLinq.Test.Mapping
@@ -53,6 +54,19 @@ namespace ElasticLinq.Test.Mapping
         public static void GetTypeExistsCriteriaThrowsInvalidOperationIfClassHasNoRequiredProperties()
         {
             Assert.Throws<InvalidOperationException>(() => mapping.GetTypeSelectionCriteria(typeof(ClassWithNoRequiredProperties)));
+        }
+
+        [Theory]
+        [InlineData(false, "doc.Candidate")]
+        [InlineData(true, "doc.candidate")]
+        public static void GetFieldName_Correctly_Cases_And_Prefixes_Property_Name(bool camelCaseFieldNames, string expected)
+        {
+            Expression<Func<ClassWithValueType, Guid>> stringAccess = (ClassWithValueType s) => s.Candidate;
+
+            var mapping = new CouchbaseElasticMapping(camelCaseFieldNames: camelCaseFieldNames);
+            var actual = mapping.GetFieldName(typeof(ClassWithValueType), (MemberExpression)stringAccess.Body);
+
+            Assert.Equal(expected, actual);
         }
     }
 }

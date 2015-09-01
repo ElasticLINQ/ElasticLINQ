@@ -1,5 +1,4 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
-
 using ElasticLinq.Request.Criteria;
 using Newtonsoft.Json.Linq;
 using System;
@@ -53,5 +52,13 @@ namespace ElasticLinq.Mapping
         /// <param name="type">The type that's being searched.</param>
         /// <returns>The criteria for selecting documents of this type.</returns>
         ICriteria GetTypeSelectionCriteria(Type type);
+
+        /// <summary>
+        /// Materialize the JObject hit object from Elasticsearch to a CLR object.
+        /// </summary>
+        /// <param name="sourceDocument">JSON source document.</param>
+        /// <param name="sourceType">Type of CLR object to materialize to.</param>
+        /// <returns>Freshly materialized CLR object version of the source document.</returns>
+        object Materialize(JToken sourceDocument, Type sourceType);
     }
 }

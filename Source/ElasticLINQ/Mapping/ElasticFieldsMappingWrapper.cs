@@ -48,5 +48,11 @@ namespace ElasticLinq.Mapping
         {
             return wrapped.GetTypeSelectionCriteria(type);
         }
+
+        /// <inheritdoc/>
+        public object Materialize(JToken sourceDocument, Type objectType)
+        {
+            return wrapped.Materialize(sourceDocument, objectType);
+        }
     }
 }

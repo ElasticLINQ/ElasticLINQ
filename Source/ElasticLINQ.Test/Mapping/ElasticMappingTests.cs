@@ -74,24 +74,38 @@ namespace ElasticLinq.Test.Mapping
             Assert.Throws<ArgumentNullException>(() => mapping.FormatValue(null, "value"));
         }
 
-        class Sample { }
+        class Sample
+        {
+            public string StringProperty { get; set; }
 
-        //[Theory]
-        //[InlineData(false, typeof(Sample), "a.B.c.GetFieldName")]
-        //[InlineData(false, "", "GetFieldName")]
-        //[InlineData(false, null, "GetFieldName")]
-        //[InlineData(true, "a.B.c", "a.B.c.getFieldName")]
-        //[InlineData(true, "", "getFieldName")]
-        //[InlineData(true, null, "getFieldName")]
-        //public static void GetFieldName(bool camelCaseFieldNames, string prefix, string expected)
-        //{
-        //    var memberInfo = MethodBase.GetCurrentMethod();
-        //    var mapping = new ElasticMapping(camelCaseFieldNames: camelCaseFieldNames);
+            public int IntegerField;
+        }
 
-        //    var actual = mapping.GetFieldName(prefix, memberInfo);
+        [Theory]
+        [InlineData(false, "StringProperty")]
+        [InlineData(true, "stringProperty")]
+        public static void GetFieldName_Correctly_Cases_Property_Name(bool camelCaseFieldNames, string expected)
+        {
+            Expression<Func<Sample, string>> stringAccess = (Sample s) => s.StringProperty;
+            var mapping = new ElasticMapping(camelCaseFieldNames: camelCaseFieldNames);
 
-        //    Assert.Equal(expected, actual);
-        //}
+            var actual = mapping.GetFieldName(typeof(Sample), (MemberExpression) stringAccess.Body);
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Theory]
+        [InlineData(false, "IntegerField")]
+        [InlineData(true, "integerField")]
+        public static void GetFieldName_Correctly_Cases_Field_Name(bool camelCaseFieldNames, string expected)
+        {
+            Expression<Func<Sample, int>> stringAccess = (Sample s) => s.IntegerField;
+            var mapping = new ElasticMapping(camelCaseFieldNames: camelCaseFieldNames);
+
+            var actual = mapping.GetFieldName(typeof(Sample), (MemberExpression)stringAccess.Body);
+
+            Assert.Equal(expected, actual);
+        }
 
         [Fact]
         public static void GetFieldName_HonorsJsonPropertyName()
