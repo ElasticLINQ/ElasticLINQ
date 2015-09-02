@@ -23,7 +23,7 @@ namespace ElasticLinq.Request.Formatters
         private readonly string[] parameterSeparator = { "&" };
 
         private readonly Lazy<string> body;
-        private readonly ElasticConnection connection;
+		private readonly IElasticConnection connection;
         private readonly IElasticMapping mapping;
         private readonly SearchRequest searchRequest;
         private readonly Uri uri;
@@ -34,7 +34,7 @@ namespace ElasticLinq.Request.Formatters
         /// <param name="connection">The ElasticConnection to prepare the SearchRequest for.</param>
         /// <param name="mapping">The IElasticMapping used to format the SearchRequest.</param>
         /// <param name="searchRequest">The SearchRequest to be formatted.</param>
-        public SearchRequestFormatter(ElasticConnection connection, IElasticMapping mapping, SearchRequest searchRequest)
+		public SearchRequestFormatter(IElasticConnection connection, IElasticMapping mapping, SearchRequest searchRequest)
         {
             this.connection = connection;
             this.mapping = mapping;

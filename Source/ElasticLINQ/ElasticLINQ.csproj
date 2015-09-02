@@ -45,6 +45,7 @@
     <Reference Include="System.Net.Http" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseElasticConnection.cs" />
     <Compile Include="ElasticConnection.cs" />
     <Compile Include="ElasticConnectionOptions.cs" />
     <Compile Include="ElasticContext.cs" />
@@ -55,6 +56,7 @@
     <Compile Include="ElasticQueryProvider.cs" />
     <Compile Include="IElasticContext.cs" />
     <Compile Include="IElasticQuery.cs" />
+    <Compile Include="IElasticConnection.cs" />
     <Compile Include="Logging\ILog.cs" />
     <Compile Include="Logging\LogExtensions.cs" />
     <Compile Include="Logging\NullLog.cs" />

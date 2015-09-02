@@ -23,15 +23,15 @@ namespace ElasticLinq
     {
         private readonly ElasticRequestProcessor requestProcessor;
 
-        /// <summary>
-        /// Create a new ElasticQueryProvider for a given connection, mapping, log, retry policy and field prefix.
-        /// </summary>
-        /// <param name="connection">Connection to use to connect to Elasticsearch.</param>
-        /// <param name="mapping">A mapping to specify how queries and results are translated.</param>
-        /// <param name="log">A log to receive any information or debugging messages.</param>
-        /// <param name="retryPolicy">A policy to describe how to handle network issues.</param>
-        /// <param name="prefix">A string to use to prefix all Elasticsearch fields with.</param>
-        public ElasticQueryProvider(ElasticConnection connection, IElasticMapping mapping, ILog log, IRetryPolicy retryPolicy, string prefix)
+	    /// <summary>
+	    /// Create a new ElasticQueryProvider for a given connection, mapping, log, retry policy and field prefix.
+	    /// </summary>
+	    /// <param name="connection">Connection to use to connect to Elasticsearch.</param>
+	    /// <param name="mapping">A mapping to specify how queries and results are translated.</param>
+	    /// <param name="log">A log to receive any information or debugging messages.</param>
+	    /// <param name="retryPolicy">A policy to describe how to handle network issues.</param>
+	    /// <param name="prefix">A string to use to prefix all Elasticsearch fields with.</param>
+		public ElasticQueryProvider(IElasticConnection connection, IElasticMapping mapping, ILog log, IRetryPolicy retryPolicy, string prefix)
         {
             Argument.EnsureNotNull("connection", connection);
             Argument.EnsureNotNull("mapping", mapping);
@@ -47,7 +47,7 @@ namespace ElasticLinq
             requestProcessor = new ElasticRequestProcessor(connection, mapping, log, retryPolicy);
         }
 
-        internal ElasticConnection Connection { get; private set; }
+		internal IElasticConnection Connection { get; private set; }
 
         internal ILog Log { get; private set; }
 
