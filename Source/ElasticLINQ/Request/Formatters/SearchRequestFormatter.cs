@@ -20,13 +20,11 @@ namespace ElasticLinq.Request.Formatters
     internal class SearchRequestFormatter
     {
         private static readonly CultureInfo transportCulture = CultureInfo.InvariantCulture;
-        private readonly string[] parameterSeparator = { "&" };
 
         private readonly Lazy<string> body;
 		private readonly IElasticConnection connection;
         private readonly IElasticMapping mapping;
         private readonly SearchRequest searchRequest;
-        private readonly Uri uri;
 
         /// <summary>
         /// Create a new SearchRequestFormatter for the given connection, mapping and search request.
@@ -41,7 +39,6 @@ namespace ElasticLinq.Request.Formatters
             this.searchRequest = searchRequest;
 
             body = new Lazy<string>(() => CreateBody().ToString(connection.Options.Pretty ? Formatting.Indented : Formatting.None));
-            uri = CreateUri();
         }
 
         /// <summary>
@@ -50,44 +47,6 @@ namespace ElasticLinq.Request.Formatters
         public string Body
         {
             get { return body.Value; }
-        }
-
-        /// <summary>
-        /// The Uri that the body should be posted to in order to execute the SearchRequest.
-        /// </summary>
-        public Uri Uri
-        {
-            get { return uri; }
-        }
-
-        /// <summary>
-        /// Create the Uri for this request given the search query and connection.
-        /// </summary>
-        /// <returns>Uri to be used to execute this query by Elasticsearch.</returns>
-        private Uri CreateUri()
-        {
-            var builder = new UriBuilder(connection.Endpoint);
-            builder.Path += (connection.Index ?? "_all") + "/";
-
-            if (!String.IsNullOrEmpty(searchRequest.DocumentType))
-                builder.Path += searchRequest.DocumentType + "/";
-
-            builder.Path += "_search";
-
-            var parameters = builder.Uri.GetComponents(UriComponents.Query, UriFormat.Unescaped)
-                .Split(parameterSeparator, StringSplitOptions.RemoveEmptyEntries)
-                .Select(p => p.Split('='))
-                .ToDictionary(k => k[0], v => v.Length > 1 ? v[1] : null);
-
-            if (!String.IsNullOrEmpty(searchRequest.SearchType))
-                parameters["search_type"] = searchRequest.SearchType;
-
-            if (connection.Options.Pretty)
-                parameters["pretty"] = "true";
-
-            builder.Query = String.Join("&", parameters.Select(p => p.Value == null ? p.Key : p.Key + "=" + p.Value));
-
-            return builder.Uri;
         }
 
         /// <summary>

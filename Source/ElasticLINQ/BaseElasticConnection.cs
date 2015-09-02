@@ -14,7 +14,6 @@ namespace ElasticLinq
 	{
 		private static readonly TimeSpan defaultTimeout = TimeSpan.FromSeconds(10);
 
-		private readonly Uri endpoint;
 		private readonly string index;
 		private readonly TimeSpan timeout;
 		private readonly ElasticConnectionOptions options;
@@ -22,33 +21,20 @@ namespace ElasticLinq
 		/// <summary>
 		/// Create a new BaseElasticConnection with the given parameters for internal testing.
 		/// </summary>
-		/// <param name="endpoint">The URL endpoint of the Elasticsearch server.</param>
 		/// <param name="timeout">TimeSpan to wait for network responses before failing (optional, defaults to 10 seconds).</param>
 		/// <param name="index">Name of the index to use on the server (optional).</param>
 		/// <param name="options">Additional options that specify how this connection should behave.</param>
-		protected BaseElasticConnection(Uri endpoint, string index = null, TimeSpan? timeout = null, ElasticConnectionOptions options = null)
+		protected BaseElasticConnection(string index = null, TimeSpan? timeout = null, ElasticConnectionOptions options = null)
         {
-            Argument.EnsureNotNull("endpoint", endpoint);
-
             if (timeout.HasValue)
                 Argument.EnsurePositive("value", timeout.Value);
             if (index != null)
                 Argument.EnsureNotBlank("index", index);
 
-            this.endpoint = endpoint;
             this.index = index;
             this.options = options ?? new ElasticConnectionOptions();
             this.timeout = timeout ?? defaultTimeout;
         }
-
-		/// <summary>
-		/// The Uri that specifies the public endpoint for the server.
-		/// </summary>
-		/// <example>http://myserver.example.com:9200</example>
-		public Uri Endpoint
-		{
-			get { return endpoint; }
-		}
 
 		/// <summary>
 		/// The name of the index on the Elasticsearch server.
@@ -79,12 +65,17 @@ namespace ElasticLinq
 		/// <summary>
 		/// Issues search requests to elastic search
 		/// </summary>
-		/// <param name="searchIndex">The elastic search index</param>
-		/// <param name="document">The elastic search document</param>
 		/// <param name="body">The request body</param>
 		/// <param name="searchRequest">The search request settings</param>
 		/// <param name="log">The logging mechanism for diagnostic information.</param>
 		/// <returns>An elastic response</returns>
-		public abstract Task<ElasticResponse> Search(string searchIndex, string document, string body, SearchRequest searchRequest, ILog log);
+		public abstract Task<ElasticResponse> Search(string body, SearchRequest searchRequest, ILog log);
+
+		/// <summary>
+		/// Gets the uri of the search
+		/// </summary>
+		/// <param name="searchRequest">The search request settings</param>
+		/// <returns>The uri of the search</returns>
+		public abstract Uri GetSearchUri(SearchRequest searchRequest);
 	}
 }

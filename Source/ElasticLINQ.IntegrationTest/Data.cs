@@ -38,7 +38,7 @@ namespace ElasticLINQ.IntegrationTest
                 throw new InvalidOperationException(
                     String.Format("Tests expect {0} entries but {1} loaded from Elasticsearch index '{2}' at {3}",
                         expectedDataCount, memory.Count,
-                        elasticContext.Connection.Index, elasticContext.Connection.Endpoint));
+						elasticContext.Connection.Index, ((ElasticConnection)elasticContext.Connection).Endpoint));
         }
     }
 }

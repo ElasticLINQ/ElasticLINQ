@@ -39,8 +39,6 @@ namespace ElasticLinq.Request
 
             return retryPolicy.ExecuteAsync(
 				async () => await connection.Search(
-					connection.Index ?? "_all",
-					searchRequest.DocumentType,
 					formatter.Body,
 					searchRequest,
 					log),

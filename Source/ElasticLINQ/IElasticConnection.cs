@@ -28,25 +28,22 @@ namespace ElasticLinq
 		TimeSpan Timeout { get; }
 
 		/// <summary>
-		/// The Uri that specifies the public endpoint for the server.
-		/// </summary>
-		/// <example>http://myserver.example.com:9200</example>
-		Uri Endpoint { get; }
-
-		/// <summary>
 		/// Issues search requests to elastic search
 		/// </summary>
-		/// <param name="searchIndex">The elastic search index</param>
-		/// <param name="document">The elastic search document</param>
 		/// <param name="body">The request body</param>
 		/// <param name="searchRequest">The search request settings</param>
 		/// <param name="log">The logging mechanism for diagnostic information.</param>
 		/// <returns>An elastic response</returns>
 		Task<ElasticResponse> Search(
-			string searchIndex,
-			string document,
 			string body,
 			SearchRequest searchRequest,
 			ILog log);
+
+		/// <summary>
+		/// Gets the uri of the search
+		/// </summary>
+		/// <param name="searchRequest">The search request settings</param>
+		/// <returns>The uri of the search</returns>
+		Uri GetSearchUri(SearchRequest searchRequest);
 	}
 }

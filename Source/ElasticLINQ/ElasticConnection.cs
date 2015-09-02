@@ -23,6 +23,7 @@ namespace ElasticLinq
 	public class ElasticConnection : BaseElasticConnection, IDisposable
     {
 		private readonly string[] parameterSeparator = { "&" };
+		private readonly Uri endpoint;
 
         private HttpClient httpClient;
 
@@ -50,8 +51,12 @@ namespace ElasticLinq
         /// <param name="index">Name of the index to use on the server (optional).</param>
         /// <param name="options">Additional options that specify how this connection should behave.</param>
         internal ElasticConnection(HttpMessageHandler innerMessageHandler, Uri endpoint, string userName = null, string password = null, string index = null, TimeSpan? timeout = null, ElasticConnectionOptions options = null)
-			: base(endpoint, index, timeout, options)
+			: base(index, timeout, options)
         {
+			Argument.EnsureNotNull("endpoint", endpoint);
+
+			this.endpoint = endpoint;
+
             var httpClientHandler = innerMessageHandler as HttpClientHandler;
             if (httpClientHandler != null && httpClientHandler.SupportsAutomaticDecompression)
                 httpClientHandler.AutomaticDecompression = DecompressionMethods.GZip;
@@ -66,6 +71,15 @@ namespace ElasticLinq
         {
             get { return httpClient; }
         }
+
+		/// <summary>
+		/// The Uri that specifies the public endpoint for the server.
+		/// </summary>
+		/// <example>http://myserver.example.com:9200</example>
+		public Uri Endpoint
+		{
+			get { return endpoint; }
+		}
 
         /// <summary>
         /// Dispose of this ElasticConnection and any associated resources.
@@ -92,20 +106,16 @@ namespace ElasticLinq
 	    /// <summary>
 	    /// Issues search requests to elastic search
 	    /// </summary>
-	    /// <param name="searchIndex">The elastic search index</param>
-	    /// <param name="document">The elastic search document</param>
 	    /// <param name="body">The request body</param>
 	    /// <param name="searchRequest">The search request settings</param>
 	    /// <param name="log">The logging mechanism for diagnostic information.</param>
 	    /// <returns>An elastic response</returns>
 	    public override async Task<ElasticResponse> Search(
-			string searchIndex,
-			string document,
 			string body,
 			SearchRequest searchRequest,
 			ILog log)
 	    {
-			var uri = CreateUri(searchIndex, document, searchRequest);
+			var uri = GetSearchUri(searchRequest);
 
 			log.Debug(null, null, "Request: POST {0}", uri);
 			log.Debug(null, null, "Body:\n{0}", body);
@@ -116,7 +126,38 @@ namespace ElasticLinq
 				return ParseResponse(responseStream, log);
 	    }
 
-		private async Task<HttpResponseMessage> SendRequestAsync(HttpRequestMessage requestMessage, ILog log)
+		/// <summary>
+		/// Gets the uri of the search
+		/// </summary>
+		/// <param name="searchRequest">The search request settings</param>
+		/// <returns>The uri of the search</returns>
+	    public override Uri GetSearchUri(SearchRequest searchRequest)
+	    {
+		    var builder = new UriBuilder(endpoint);
+			builder.Path += (Index ?? "_all") + "/";
+
+			if (!String.IsNullOrEmpty(searchRequest.DocumentType))
+				builder.Path += searchRequest.DocumentType + "/";
+
+			builder.Path += "_search";
+
+			var parameters = builder.Uri.GetComponents(UriComponents.Query, UriFormat.Unescaped)
+				.Split(parameterSeparator, StringSplitOptions.RemoveEmptyEntries)
+				.Select(p => p.Split('='))
+				.ToDictionary(k => k[0], v => v.Length > 1 ? v[1] : null);
+
+			if (!String.IsNullOrEmpty(searchRequest.SearchType))
+				parameters["search_type"] = searchRequest.SearchType;
+
+			if (Options.Pretty)
+				parameters["pretty"] = "true";
+
+			builder.Query = String.Join("&", parameters.Select(p => p.Value == null ? p.Key : p.Key + "=" + p.Value));
+
+			return builder.Uri;
+	    }
+
+	    private async Task<HttpResponseMessage> SendRequestAsync(HttpRequestMessage requestMessage, ILog log)
 		{
 			var stopwatch = Stopwatch.StartNew();
 			var response = await httpClient.SendAsync(requestMessage);
@@ -158,32 +199,6 @@ namespace ElasticLinq
 				if (results.facets != null && results.facets.Count > 0)
 					yield return results.facets.Count + " facets";
 			}
-		}
-
-		private Uri CreateUri(
-			string searchIndex,
-			string document,
-			SearchRequest searchRequest)
-		{
-			var builder = new UriBuilder(Endpoint);
-			builder.Path += (searchIndex ?? "_all") + "/";
-
-			if (!String.IsNullOrEmpty(document))
-				builder.Path += document + "/";
-
-			builder.Path += "_search";
-
-			var parameters = builder.Uri.GetComponents(UriComponents.Query, UriFormat.Unescaped)
-				.Split(parameterSeparator, StringSplitOptions.RemoveEmptyEntries)
-				.Select(p => p.Split('='))
-				.ToDictionary(k => k[0], v => v.Length > 1 ? v[1] : null);
-
-			if (!String.IsNullOrEmpty(searchRequest.SearchType))
-				parameters["search_type"] = searchRequest.SearchType;
-
-			builder.Query = String.Join("&", parameters.Select(p => p.Value == null ? p.Key : p.Key + "=" + p.Value));
-
-			return builder.Uri;
 		}
     }
 }

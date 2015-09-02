@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using ElasticLinq.Logging;
 using ElasticLinq.Mapping;
 using ElasticLinq.Request;
+using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Formatters;
 using ElasticLinq.Test.Utility;
 using Xunit;
@@ -18,6 +19,9 @@ namespace ElasticLinq.Test
 {
     public class ElasticConnectionTests
     {
+		private static readonly ElasticConnection defaultConnection = new ElasticConnection(new Uri("http://a.b.com:9000/"));
+		private static readonly ICriteria criteria = new ExistsCriteria("greenField");
+
 		private static readonly IElasticMapping mapping = new TrivialElasticMapping();
 		private static readonly ILog log = NullLog.Instance;
         private readonly Uri endpoint = new Uri("http://localhost:1234/abc");
@@ -137,8 +141,6 @@ namespace ElasticLinq.Test
 			var formatter = new SearchRequestFormatter(localConnection, mapping, request);
 
 			await localConnection.Search(
-				localConnection.Index ?? "_all",
-				request.DocumentType,
 				formatter.Body,
 				request,
 				log);
@@ -155,8 +157,6 @@ namespace ElasticLinq.Test
 			var formatter = new SearchRequestFormatter(localConnection, mapping, request);
 
 			await localConnection.Search(
-				localConnection.Index ?? "_all",
-				request.DocumentType,
 				formatter.Body,
 				request,
 				log);
@@ -177,8 +177,6 @@ namespace ElasticLinq.Test
 			var formatter = new SearchRequestFormatter(localConnection, mapping, request);
 
 			var ex = await Record.ExceptionAsync(() => localConnection.Search(
-				localConnection.Index ?? "_all",
-				request.DocumentType,
 				formatter.Body,
 				request,
 				log));
@@ -199,8 +197,6 @@ namespace ElasticLinq.Test
 			var formatter = new SearchRequestFormatter(localConnection, mapping, request);
 
 			await localConnection.Search(
-				localConnection.Index ?? "_all",
-				request.DocumentType,
 				formatter.Body,
 				request,
 				log);
@@ -239,6 +235,74 @@ namespace ElasticLinq.Test
 				Assert.Equal(type, response.hits.hits[0]._type);
 				Assert.Equal(id, response.hits.hits[0]._id);
 			}
+		}
+
+		[Theory]
+		[InlineData(null, null, "http://a.b.com:9000/_all/_search")]
+		[InlineData("index1,index2", null, "http://a.b.com:9000/index1,index2/_search")]
+		[InlineData(null, "docType1,docType2", "http://a.b.com:9000/_all/docType1,docType2/_search")]
+		[InlineData("index1,index2", "docType1,docType2", "http://a.b.com:9000/index1,index2/docType1,docType2/_search")]
+		public void UriFormatting(string index, string documentType, string expectedUri)
+		{
+			var connection = new ElasticConnection(new Uri("http://a.b.com:9000/"), index: index);
+
+			Assert.Equal(expectedUri, connection.GetSearchUri(new SearchRequest { DocumentType = documentType }).ToString());
+		}
+
+		[Fact]
+		public void PrettySetsUriQueryWhenNoOtherQueryUriParameters()
+		{
+			var connection = new ElasticConnection(new Uri("http://coruscant.gov/some"), options: new ElasticConnectionOptions { Pretty = true });
+			var prettyUri = connection.GetSearchUri(new SearchRequest { DocumentType = "type1", Filter = criteria });
+
+			Assert.Equal("pretty=true", prettyUri.GetComponents(UriComponents.Query, UriFormat.Unescaped));
+		}
+
+		[Fact]
+		public void PrettyAppendsUriQueryParameterWhenOtherQueryUriParameters()
+		{
+			var connection = new ElasticConnection(new Uri("http://coruscant.gov/some?human=false"),
+				options: new ElasticConnectionOptions { Pretty = true });
+			var prettyUri = connection.GetSearchUri(new SearchRequest { DocumentType = "type1", Filter = criteria });
+
+			var parameters = prettyUri.GetComponents(UriComponents.Query, UriFormat.Unescaped).Split('&');
+			Assert.Equal(2, parameters.Length);
+			Assert.Contains("human=false", parameters);
+			Assert.Contains("pretty=true", parameters);
+		}
+
+
+		[Fact]
+		public void PrettyChangesUriQueryParameterWhenDifferentValueAlreadyExists()
+		{
+			var connection = new ElasticConnection(new Uri("http://coruscant.gov/some?pretty=false&human=true"),
+				options: new ElasticConnectionOptions { Pretty = true });
+			var prettyUri = connection.GetSearchUri(new SearchRequest { DocumentType = "type1", Filter = criteria });
+
+			var parameters = prettyUri.GetComponents(UriComponents.Query, UriFormat.Unescaped).Split('&');
+			Assert.Equal(2, parameters.Length);
+			Assert.Contains("human=true", parameters);
+			Assert.Contains("pretty=true", parameters);
+		}
+
+		[Fact]
+		public void SearchTypeAppearsOnUriWhenSpecified()
+		{
+			var uri = defaultConnection.GetSearchUri(new SearchRequest { SearchType = "count" });
+
+			var parameters = uri.GetComponents(UriComponents.Query, UriFormat.Unescaped).Split('&');
+
+			Assert.Single(parameters, p => p == "search_type=count");
+		}
+
+		[Fact]
+		public void SearchTypeDoesNotAppearOnUriWhenNotSpecified()
+		{
+			var uri = defaultConnection.GetSearchUri(new SearchRequest { SearchType = "" });
+
+			var parameters = uri.GetComponents(UriComponents.Query, UriFormat.Unescaped).Split('&');
+
+			Assert.DoesNotContain(parameters, p => p.StartsWith("search_type="));
 		}
 
 		private static string BuildResponseString(int took, int shards, int hits, double score, string index, string type, string id)

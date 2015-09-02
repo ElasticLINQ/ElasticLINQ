@@ -86,7 +86,7 @@ namespace ElasticLinq
             var request = ElasticQueryTranslator.Translate(provider.Mapping, provider.Prefix, Expression);
             var formatter = new SearchRequestFormatter(provider.Connection, provider.Mapping, request.SearchRequest);
 
-            return new QueryInfo(formatter.Body, formatter.Uri);
+			return new QueryInfo(formatter.Body, provider.Connection.GetSearchUri(request.SearchRequest));
         }
     }
 }

@@ -34,7 +34,6 @@ namespace ElasticLinq.Test.Request
 
 		    var connection = Substitute.For<IElasticConnection>();
 
-		    connection.Endpoint.Returns(new Uri("http://localhost"));
 			connection.Index.Returns("SearchIndex");
 			connection.Options.Returns(new ElasticConnectionOptions());
 			connection.Timeout.Returns(TimeSpan.FromSeconds(10));
@@ -46,8 +45,6 @@ namespace ElasticLinq.Test.Request
 			await processor.SearchAsync(request);
 
 			connection.Received(1).Search(
-			   "SearchIndex",
-			   "abc123",
 			   @"{""size"":2112,""timeout"":""10s""}",
 			   request,
 			   log
