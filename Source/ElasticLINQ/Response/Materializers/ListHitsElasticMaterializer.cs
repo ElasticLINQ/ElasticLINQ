@@ -30,6 +30,11 @@ namespace ElasticLinq.Response.Materializers
             this.elementType = elementType;
         }
 
+        /// <summary>
+        /// Materialize the hits from the response into desired CLR objects.
+        /// </summary>
+        /// <param name="response">The <see cref="ElasticResponse"/> containing the hits to materialize.</param>
+        /// <returns>List of <see cref="elementType"/> objects as constructed by the <see cref="projector"/>.</returns>
         public object Materialize(ElasticResponse response)
         {
             Argument.EnsureNotNull("response", response);

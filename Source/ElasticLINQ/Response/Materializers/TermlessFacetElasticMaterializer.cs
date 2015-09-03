@@ -9,8 +9,7 @@ using System.Linq;
 namespace ElasticLinq.Response.Materializers
 {
     /// <summary>
-    /// Materializes a single termless facet from the ElasticResponse as the
-    /// desired CLR object.
+    /// Materializes a single termless facet from the response.
     /// </summary>
     class TermlessFacetElasticMaterializer : IElasticMaterializer
     {
@@ -21,10 +20,10 @@ namespace ElasticLinq.Response.Materializers
         readonly object key;
 
         /// <summary>
-        /// Create an instance of the TermlessFacetElasticMaterializer with the given parameters.
+        /// Create an instance of the <see cref="TermlessFacetElasticMaterializer"/> with the given parameters.
         /// </summary>
-        /// <param name="projector">A function to turn a hit into a desired CLR object.</param>
-        /// <param name="elementType">The type of CLR object being materialized.</param>
+        /// <param name="projector">A function to turn a hit into a desired object.</param>
+        /// <param name="elementType">The type of object being materialized.</param>
         /// <param name="key">The constant value for any key references during materialization.</param>
         public TermlessFacetElasticMaterializer(Func<AggregateRow, object> projector, Type elementType, object key = null)
         {
@@ -37,11 +36,11 @@ namespace ElasticLinq.Response.Materializers
         }
 
         /// <summary>
-        /// Materialize a single CLR object from the ElasticResponse using the projector or
-        /// return a default value based on the element type.
+        /// Materialize a single object from the response using the <see cref="projector"/>
+       ///  or return a default value based on the element type.
         /// </summary>
-        /// <param name="response">ElasticResponse received from Elasticsearch.</param>
-        /// <returns>CLR object materialized from the response using the projector or default if no corresponding facets.</returns>
+        /// <param name="response">The <see cref="ElasticResponse"/> to materialize facets from.</param>
+        /// <returns>Object materialized from the response using the projector or default if no corresponding facets.</returns>
         public virtual object Materialize(ElasticResponse response)
         {
             Argument.EnsureNotNull("response", response);
@@ -50,11 +49,11 @@ namespace ElasticLinq.Response.Materializers
         }
 
         /// <summary>
-        /// Materialize a single CLR object from the ElasticResponse using the projector
+        /// Materialize a single object from the response using the <see cref="projector"/>
         /// or return null if there are no applicable facets.
         /// </summary>
-        /// <param name="response">ElasticResponse received from Elasticsearch.</param>
-        /// <returns>CLR object materialized from the response using the projector or null if no corresponding facets.</returns>
+        /// <param name="response">The <see cref="ElasticResponse"/> to materialize facets from.</param>
+        /// <returns>Object materialized from the response using the projector or null if no corresponding facets.</returns>
         public object MaterializeSingle(ElasticResponse response)
         {
             Argument.EnsureNotNull("response", response);

@@ -13,7 +13,7 @@ namespace ElasticLinq.Response.Materializers
         /// <summary>
         /// Materialize the ElasticResponse into the desired CLR objects.
         /// </summary>
-        /// <param name="response">ElasticResponse object received from Elasticsearch.</param>
+        /// <param name="response">The <see cref="ElasticResponse"/> received from Elasticsearch.</param>
         /// <returns>List or a single CLR object as requested.</returns>
         object Materialize(ElasticResponse response);
     }

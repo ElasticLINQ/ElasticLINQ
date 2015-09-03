@@ -18,8 +18,8 @@ namespace ElasticLinq.Response.Materializers
         /// <summary>
         /// Create an instance of the ListTermlessFacetsElasticMaterializer with the given parameters.
         /// </summary>
-        /// <param name="projector">A function to turn a hit into a desired CLR object.</param>
-        /// <param name="elementType">The type of CLR object being materialized.</param>
+        /// <param name="projector">A function to turn a hit into a desired object.</param>
+        /// <param name="elementType">The type of object being materialized.</param>
         /// <param name="key">The constant value for any key references during materialization.</param>
         public ListTermlessFacetsElasticMaterializer(Func<AggregateRow, object> projector, Type elementType, object key)
             : base(projector, elementType, key)
@@ -27,11 +27,11 @@ namespace ElasticLinq.Response.Materializers
         }
 
         /// <summary>
-        /// Materialize the facets from an ElasticResponse into a List with a single CLR object as determined
+        /// Materialize the facets from an response into a List with a single object as determined
         /// by the projector.
         /// </summary>
-        /// <param name="response">ElasticResponse to obtain the facets from.</param>
-        /// <returns>List containing a single CLR object with these facets projected onto them.</returns>
+        /// <param name="response">The <see cref="ElasticResponse"/> to obtain the facets from.</param>
+        /// <returns>List containing a single object with these facets projected onto them.</returns>
         public override object Materialize(ElasticResponse response)
         {
             Argument.EnsureNotNull("response", response);

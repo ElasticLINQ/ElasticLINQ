@@ -11,7 +11,7 @@ using System.Reflection;
 namespace ElasticLinq.Response.Materializers
 {
     /// <summary>
-    /// Materializes facets with their terms from the ElasticResponse.
+    /// Materializes facets with their terms from the response.
     /// </summary>
     class ListTermFacetsElasticMaterializer : IElasticMaterializer
     {
@@ -23,10 +23,10 @@ namespace ElasticLinq.Response.Materializers
         readonly Type groupKeyType;
 
         /// <summary>
-        /// Create an instance of the ListTermFacetsElasticMaterializer with the given parameters.
+        /// Create an instance of the <see cref="ListTermFacetsElasticMaterializer"/> with the given parameters.
         /// </summary>
-        /// <param name="projector">A function to turn a hit into a desired CLR object.</param>
-        /// <param name="elementType">The type of CLR object being materialized.</param>
+        /// <param name="projector">A function to turn a hit into a desired object.</param>
+        /// <param name="elementType">The type of object being materialized.</param>
         /// <param name="groupKeyType">The type of the term/group key field.</param>
         public ListTermFacetsElasticMaterializer(Func<AggregateRow, object> projector, Type elementType, Type groupKeyType)
         {
@@ -40,11 +40,10 @@ namespace ElasticLinq.Response.Materializers
         }
 
         /// <summary>
-        /// Materialize the facets from an ElasticResponse into a List of CLR objects as determined
-        /// by the projector.
+        /// Materialize the facets from an response into a list of objects.
         /// </summary>
-        /// <param name="response">ElasticResponse to obtain the facets from.</param>
-        /// <returns>List of CLR objects with these facets projected onto them.</returns>
+        /// <param name="response">The <see cref="ElasticResponse"/> containing the facets to materialize.</param>
+        /// <returns>List of <see cref="elementType"/> objects with these facets projected onto them.</returns>
         public object Materialize(ElasticResponse response)
         {
             Argument.EnsureNotNull("response", response);
@@ -59,12 +58,12 @@ namespace ElasticLinq.Response.Materializers
         }
 
         /// <summary>
-        /// Given a JObject of facets in an Elasticsearch structure materialize them as the
-        /// desired CLR objects determined by the projector.
+        /// Given a JObject of facets in an Elasticsearch structure materialize them as
+        /// objects of type <typeparamref name="T"/> as created by the <see cref="projector"/>.
         /// </summary>
-        /// <typeparam name="T">Type of CLR objects to be materialized.</typeparam>
+        /// <typeparam name="T">Type of objects to be materialized.</typeparam>
         /// <param name="facets">Elasticsearch formatted list of facets.</param>
-        /// <returns>List of materialized CLR objects using the projector.</returns>
+        /// <returns>List of materialized <typeparamref name="T"/> objects.</returns>
         internal List<T> Many<T>(JObject facets)
         {
             var termFacetsValues = facets.Values()
@@ -83,7 +82,8 @@ namespace ElasticLinq.Response.Materializers
         /// an SQL-style row with one term per row containing each aggregate field and operation combination.
         /// </summary>
         /// <param name="termsStats">Facets of type terms or terms_stats.</param>
-        /// <returns>An enumeration of AggregateRows containing appropriate keys and fields.</returns>
+        /// <returns>An <see cref="IEnumerable{AggregateRow}"/> containing keys and fields representing 
+        /// the terms and statistics.</returns>
         internal IEnumerable<AggregateTermRow> FlattenTermsToAggregateRows(IEnumerable<JToken> termsStats)
         {
             return termsStats

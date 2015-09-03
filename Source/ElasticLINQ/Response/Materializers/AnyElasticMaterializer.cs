@@ -1,15 +1,20 @@
-﻿using System;
+﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
+
 using ElasticLinq.Response.Model;
+using System;
 
 namespace ElasticLinq.Response.Materializers
 {
+    /// <summary>
+    /// Materializes true or false depending on whether any results matched the query or not.
+    /// </summary>
     class AnyElasticMaterializer : IElasticMaterializer
     {
         /// <summary>
-        /// Materialize whether at least one result exists for a given ElasticResponse.
+        /// Determine whether at a given query response contains any hits.
         /// </summary>
-        /// <param name="response">ElasticResponse to obtain the existence of a result.</param>
-        /// <returns>The existence expressed as a boolean.  If count is 0, false.  Otherwise true</returns>
+        /// <param name="response">The <see cref="ElasticResponse"/> to check for emptiness.</param>
+        /// <returns>true if the source sequence contains any elements; otherwise, false.</returns>
         public object Materialize(ElasticResponse response)
         {
             if (response.hits.total < 0)
