@@ -34,7 +34,7 @@ namespace ElasticLinq
 		/// <param name="searchRequest">The search request settings</param>
 		/// <param name="log">The logging mechanism for diagnostic information.</param>
 		/// <returns>An elastic response</returns>
-		Task<ElasticResponse> Search(
+		Task<ElasticResponse> SearchAsync(
 			string body,
 			SearchRequest searchRequest,
 			ILog log);

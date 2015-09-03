@@ -38,7 +38,7 @@ namespace ElasticLinq.Request
             var formatter = new SearchRequestFormatter(connection, mapping, searchRequest);
 
             return retryPolicy.ExecuteAsync(
-				async () => await connection.Search(
+				async () => await connection.SearchAsync(
 					formatter.Body,
 					searchRequest,
 					log),

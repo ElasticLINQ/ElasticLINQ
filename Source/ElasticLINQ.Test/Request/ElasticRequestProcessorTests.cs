@@ -30,24 +30,24 @@ namespace ElasticLinq.Test.Request
 	    [Fact]
 	    public static async Task ShouldCallElasticSearchClient()
 	    {
-			var log = new SpyLog();
+			var spyLog = new SpyLog();
 
-		    var connection = Substitute.For<IElasticConnection>();
+		    var mockConnection = Substitute.For<IElasticConnection>();
 
-			connection.Index.Returns("SearchIndex");
-			connection.Options.Returns(new ElasticConnectionOptions());
-			connection.Timeout.Returns(TimeSpan.FromSeconds(10));
+			mockConnection.Index.Returns("SearchIndex");
+			mockConnection.Options.Returns(new ElasticConnectionOptions());
+			mockConnection.Timeout.Returns(TimeSpan.FromSeconds(10));
 
 			var request = new SearchRequest { DocumentType = "abc123", Size = 2112 };
 
-			var processor = new ElasticRequestProcessor(connection, mapping, log, retryPolicy);
+			var processor = new ElasticRequestProcessor(mockConnection, mapping, spyLog, retryPolicy);
 			
 			await processor.SearchAsync(request);
 
-			connection.Received(1).Search(
+			mockConnection.Received(1).SearchAsync(
 			   @"{""size"":2112,""timeout"":""10s""}",
 			   request,
-			   log
+			   spyLog
 			   );
 	    }
     }

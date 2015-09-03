@@ -140,7 +140,7 @@ namespace ElasticLinq.Test
 			var request = new SearchRequest { DocumentType = "docType" };
 			var formatter = new SearchRequestFormatter(localConnection, mapping, request);
 
-			await localConnection.Search(
+			await localConnection.SearchAsync(
 				formatter.Body,
 				request,
 				log);
@@ -156,7 +156,7 @@ namespace ElasticLinq.Test
 			var request = new SearchRequest { DocumentType = "docType" };
 			var formatter = new SearchRequestFormatter(localConnection, mapping, request);
 
-			await localConnection.Search(
+			await localConnection.SearchAsync(
 				formatter.Body,
 				request,
 				log);
@@ -176,7 +176,7 @@ namespace ElasticLinq.Test
 			var request = new SearchRequest { DocumentType = "docType" };
 			var formatter = new SearchRequestFormatter(localConnection, mapping, request);
 
-			var ex = await Record.ExceptionAsync(() => localConnection.Search(
+			var ex = await Record.ExceptionAsync(() => localConnection.SearchAsync(
 				formatter.Body,
 				request,
 				log));
@@ -196,7 +196,7 @@ namespace ElasticLinq.Test
 			var request = new SearchRequest { DocumentType = "abc123", Size = 2112 };
 			var formatter = new SearchRequestFormatter(localConnection, mapping, request);
 
-			await localConnection.Search(
+			await localConnection.SearchAsync(
 				formatter.Body,
 				request,
 				log);

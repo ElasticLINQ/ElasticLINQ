@@ -69,7 +69,7 @@ namespace ElasticLinq
 		/// <param name="searchRequest">The search request settings</param>
 		/// <param name="log">The logging mechanism for diagnostic information.</param>
 		/// <returns>An elastic response</returns>
-		public abstract Task<ElasticResponse> Search(string body, SearchRequest searchRequest, ILog log);
+		public abstract Task<ElasticResponse> SearchAsync(string body, SearchRequest searchRequest, ILog log);
 
 		/// <summary>
 		/// Gets the uri of the search
