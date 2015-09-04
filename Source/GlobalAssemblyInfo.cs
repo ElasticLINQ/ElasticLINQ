@@ -1,7 +1,7 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyProduct("ElasticLINQ")]
+[assembly: AssemblyProduct("ElasticLINQ.ElasticsearchNet")]
 [assembly: AssemblyCopyright("Copyright (C) 2013-2015 CenturyLink, Inc.")]
 
 [assembly: ComVisible(false)]

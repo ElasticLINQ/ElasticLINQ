@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>ElasticLinq.ElasticsearchNet</id>
+    <version>1.4.0</version>
+    <title>ElasticLINQ.ElasticsearchNet</title>
+    <authors>CenturyLink Cloud</authors>
+    <owners>CenturyLink Cloud</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>ElasticLINQ connection provider for ElasticsearchNet</description>
+    <copyright>Copyright (c) 2013-2015 CenturyLink, Inc.</copyright>
+    <licenseUrl>https://github.com/CenturyLinkCloud/ElasticLINQ/blob/dev/LICENCE.txt</licenseUrl>
+    <projectUrl>https://github.com/CenturyLinkCloud/ElasticLINQ</projectUrl>
+    <tags>Elasticsearch LINQ</tags>
+  </metadata>
+  <files>
+    <file src="**\*.cs" target="src" />
+    <file src="ElasticLINQ\bin\$configuration$\ElasticLinq.ElasticsearchNet.dll" target="lib\net45" />
+    <file src="ElasticLINQ\bin\$configuration$\ElasticLinq.ElasticsearchNet.pdb" target="lib\net45" />
+  </files>
+  <dependencies>
+  <dependency id="ElasticLINQ" version="1.4.0" />
+  <dependency id="Elasticsearch.Net" version="1.7.0" />
+  <dependency id="Newtonsoft.Json" version="6.0.8" />
+</dependencies>
+</package>

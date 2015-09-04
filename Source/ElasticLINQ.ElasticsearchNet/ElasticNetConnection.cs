@@ -1,0 +1,117 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Net;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
+using ElasticLinq.Logging;
+using ElasticLinq.Request;
+using ElasticLinq.Response.Model;
+using Elasticsearch.Net;
+using Newtonsoft.Json;
+using TraceEventType = ElasticLinq.Logging.TraceEventType;
+
+namespace ElasticLinq.ElasticsearchNet
+{
+    public class ElasticNetConnection : BaseElasticConnection
+    {
+        private readonly IElasticsearchClient client;
+
+        public ElasticNetConnection(
+            IElasticsearchClient client,
+            string index = null,
+            TimeSpan? timeout = null,
+            ElasticConnectionOptions options = null)
+            : base(index, timeout, options)
+        {
+            if (client == null)
+                throw new ArgumentNullException("client");
+
+            this.client = client;
+        }
+
+        public override async Task<ElasticResponse> SearchAsync(
+            string body,
+            SearchRequest searchRequest,
+            CancellationToken token,
+            ILog log)
+        {
+            var stopwatch = Stopwatch.StartNew();
+
+            var response = await Task.Run(() => client.SearchAsync<string>(
+                                Index ?? "_all",
+                                searchRequest.DocumentType,
+                                body,
+                                searchParams => SetRequestParameters(searchParams, searchRequest)),
+                            token);
+
+            stopwatch.Stop();
+
+            log.Log(TraceEventType.Verbose, null, null, "Request: POST {0}", response.RequestUrl);
+            log.Log(TraceEventType.Verbose, null, null, "Body:\n{0}", body);
+            log.Log(TraceEventType.Verbose, null, null, "Response: {0} {1} (in {2}ms)", response.HttpStatusCode, response.HttpStatusCode.HasValue ? ((HttpStatusCode)response.HttpStatusCode).ToString() : "", stopwatch.ElapsedMilliseconds);
+
+            if (!response.Success)
+                throw new HttpRequestException("Response status code does not indicate success: 404 (Not Found).");
+
+            return ParseResponse(response.Response, log);
+        }
+
+        public override Uri GetSearchUri(SearchRequest searchRequest)
+        {
+            return new Uri("");
+        }
+
+        SearchRequestParameters SetRequestParameters(
+            SearchRequestParameters searchRequestParameters,
+            SearchRequest searchRequest)
+        {
+            if (string.Equals(searchRequest.SearchType, "count", StringComparison.OrdinalIgnoreCase))
+                searchRequestParameters.SearchType(SearchType.Count);
+
+            return searchRequestParameters;
+        }
+
+        internal static ElasticResponse ParseResponse(string response, ILog log)
+        {
+            var stopwatch = Stopwatch.StartNew();
+
+            using (var textReader = new JsonTextReader(new StringReader(response)))
+            {
+                var results = new JsonSerializer().Deserialize<ElasticResponse>(textReader);
+                stopwatch.Stop();
+
+                var resultSummary = string.Join(", ", GetResultSummary(results));
+
+                log.Log(
+                    TraceEventType.Verbose,
+                    null,
+                    null,
+                    "Deserialized {0} characters into {1} in {2}ms",
+                    response.Length,
+                    resultSummary,
+                    stopwatch.ElapsedMilliseconds);
+
+                return results;
+            }
+        }
+
+        static IEnumerable<string> GetResultSummary(ElasticResponse results)
+        {
+            if (results == null)
+            {
+                yield return "nothing";
+            }
+            else
+            {
+                if (results.hits != null && results.hits.hits != null && results.hits.hits.Count > 0)
+                    yield return results.hits.hits.Count + " hits";
+
+                if (results.facets != null && results.facets.Count > 0)
+                    yield return results.facets.Count + " facets";
+            }
+        }
+    }
+}
