@@ -15,10 +15,20 @@ using TraceEventType = ElasticLinq.Logging.TraceEventType;
 
 namespace ElasticLinq.ElasticsearchNet
 {
+    /// <summary>
+    /// Specifies connection parameters for Elasticsearch.
+    /// </summary>
     public class ElasticNetConnection : BaseElasticConnection
     {
         private readonly IElasticsearchClient client;
 
+        /// <summary>
+        /// Create a new ElasticNetConnection with the given parameters defining its properties.
+        /// </summary>
+        /// <param name="client">The ElasticsearchClient to use in order to contact elasticsearch.</param>
+        /// <param name="timeout">TimeSpan to wait for network responses before failing (optional, defaults to 10 seconds).</param>
+        /// <param name="index">Name of the index to use on the server (optional).</param>
+        /// <param name="options">Additional options that specify how this connection should behave.</param>
         public ElasticNetConnection(
             IElasticsearchClient client,
             string index = null,
@@ -32,6 +42,7 @@ namespace ElasticLinq.ElasticsearchNet
             this.client = client;
         }
 
+        /// <inheritdoc/>
         public override async Task<ElasticResponse> SearchAsync(
             string body,
             SearchRequest searchRequest,
@@ -59,6 +70,7 @@ namespace ElasticLinq.ElasticsearchNet
             return ParseResponse(response.Response, log);
         }
 
+        /// <inheritdoc/>
         public override Uri GetSearchUri(SearchRequest searchRequest)
         {
             return new Uri("");

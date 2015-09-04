@@ -68,7 +68,7 @@ namespace ElasticLinq
         /// </summary>
         /// <param name="body">The request body</param>
         /// <param name="searchRequest">The search request settings</param>
-        /// <param name="token"></param>
+        /// <param name="token">The cancellation token to allow aborting the operation</param>
         /// <param name="log">The logging mechanism for diagnostic information.</param>
         /// <returns>An elastic response</returns>
         public abstract Task<ElasticResponse> SearchAsync(string body, SearchRequest searchRequest, CancellationToken token, ILog log);

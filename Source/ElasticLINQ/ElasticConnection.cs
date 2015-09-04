@@ -104,14 +104,7 @@ namespace ElasticLinq
             }
         }
 
-        /// <summary>
-        /// Issues search requests to elastic search
-        /// </summary>
-        /// <param name="body">The request body</param>
-        /// <param name="searchRequest">The search request settings</param>
-        /// <param name="token"></param>
-        /// <param name="log">The logging mechanism for diagnostic information.</param>
-        /// <returns>An elastic response</returns>
+        /// <inheritdoc/>
         public override async Task<ElasticResponse> SearchAsync(
             string body,
             SearchRequest searchRequest,
@@ -129,11 +122,7 @@ namespace ElasticLinq
                 return ParseResponse(responseStream, log);
         }
 
-        /// <summary>
-        /// Gets the uri of the search
-        /// </summary>
-        /// <param name="searchRequest">The search request settings</param>
-        /// <returns>The uri of the search</returns>
+        /// <inheritdoc/>
         public override Uri GetSearchUri(SearchRequest searchRequest)
         {
             var builder = new UriBuilder(endpoint);
