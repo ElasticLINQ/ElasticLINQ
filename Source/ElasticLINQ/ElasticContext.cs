@@ -20,7 +20,7 @@ namespace ElasticLinq
         /// <param name="mapping">The object that helps map queries (optional, defaults to <see cref="TrivialElasticMapping"/>).</param>
         /// <param name="log">The object which logs information (optional, defaults to <see cref="NullLog"/>).</param>
         /// <param name="retryPolicy">The object which controls retry policy for the search (optional, defaults to <see cref="RetryPolicy"/>).</param>
-        public ElasticContext(ElasticConnection connection, IElasticMapping mapping = null, ILog log = null, IRetryPolicy retryPolicy = null)
+        public ElasticContext(IElasticConnection connection, IElasticMapping mapping = null, ILog log = null, IRetryPolicy retryPolicy = null)
         {
             Argument.EnsureNotNull("connection", connection);
 
@@ -33,7 +33,7 @@ namespace ElasticLinq
         /// <summary>
         /// Specifies the connection to the Elasticsearch server.
         /// </summary>
-        public ElasticConnection Connection { get; private set; }
+        public IElasticConnection Connection { get; private set; }
 
         /// <summary>
         /// The logging mechanism for diagnostic information.

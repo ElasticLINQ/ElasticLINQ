@@ -2,9 +2,18 @@
 
 using ElasticLinq.Utility;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
+using ElasticLinq.Logging;
+using ElasticLinq.Request;
+using ElasticLinq.Response.Model;
+using Newtonsoft.Json;
 
 namespace ElasticLinq
 {
@@ -12,15 +21,12 @@ namespace ElasticLinq
     /// Specifies connection parameters for Elasticsearch.
     /// </summary>
     [DebuggerDisplay("{Endpoint.ToString(),nq}{Index,nq}")]
-    public class ElasticConnection : IDisposable
+    public class ElasticConnection : BaseElasticConnection, IDisposable
     {
-        static readonly TimeSpan defaultTimeout = TimeSpan.FromSeconds(10);
+        private readonly string[] parameterSeparator = { "&" };
+        private readonly Uri endpoint;
 
-        readonly Uri endpoint;
-        readonly string index;
-        readonly TimeSpan timeout;
-        readonly ElasticConnectionOptions options;
-        HttpClient httpClient;
+        private HttpClient httpClient;
 
         /// <summary>
         /// Create a new ElasticConnection with the given parameters defining its properties.
@@ -46,17 +52,11 @@ namespace ElasticLinq
         /// <param name="index">Name of the index to use on the server (optional).</param>
         /// <param name="options">Additional options that specify how this connection should behave.</param>
         internal ElasticConnection(HttpMessageHandler innerMessageHandler, Uri endpoint, string userName = null, string password = null, string index = null, TimeSpan? timeout = null, ElasticConnectionOptions options = null)
+            : base(index, timeout, options)
         {
             Argument.EnsureNotNull("endpoint", endpoint);
-            if (timeout.HasValue)
-                Argument.EnsurePositive("value", timeout.Value);
-            if (index != null)
-                Argument.EnsureNotBlank("index", index);
 
             this.endpoint = endpoint;
-            this.index = index;
-            this.options = options ?? new ElasticConnectionOptions();
-            this.timeout = timeout ?? defaultTimeout;
 
             var httpClientHandler = innerMessageHandler as HttpClientHandler;
             if (httpClientHandler != null && httpClientHandler.SupportsAutomaticDecompression)
@@ -83,32 +83,6 @@ namespace ElasticLinq
         }
 
         /// <summary>
-        /// The name of the index on the Elasticsearch server.
-        /// </summary>
-        /// <example>northwind</example>
-        public string Index
-        {
-            get { return index; }
-        }
-
-        /// <summary>
-        /// How long to wait for a response to a network request before
-        /// giving up.
-        /// </summary>
-        public TimeSpan Timeout
-        {
-            get { return timeout; }
-        }
-
-        /// <summary>
-        /// Additional options that specify how this connection should behave.
-        /// </summary>
-        public ElasticConnectionOptions Options
-        {
-            get { return options; }
-        }
-
-        /// <summary>
         /// Dispose of this ElasticConnection and any associated resources.
         /// </summary>
         public void Dispose()
@@ -127,6 +101,106 @@ namespace ElasticLinq
                     httpClient.Dispose();
                     httpClient = null;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Issues search requests to elastic search
+        /// </summary>
+        /// <param name="body">The request body</param>
+        /// <param name="searchRequest">The search request settings</param>
+        /// <param name="token"></param>
+        /// <param name="log">The logging mechanism for diagnostic information.</param>
+        /// <returns>An elastic response</returns>
+        public override async Task<ElasticResponse> SearchAsync(
+            string body,
+            SearchRequest searchRequest,
+            CancellationToken token,
+            ILog log)
+        {
+            var uri = GetSearchUri(searchRequest);
+
+            log.Debug(null, null, "Request: POST {0}", uri);
+            log.Debug(null, null, "Body:\n{0}", body);
+
+            using (var requestMessage = new HttpRequestMessage(HttpMethod.Post, uri) { Content = new StringContent(body) })
+            using (var response = await SendRequestAsync(requestMessage, token, log))
+            using (var responseStream = await response.Content.ReadAsStreamAsync())
+                return ParseResponse(responseStream, log);
+        }
+
+        /// <summary>
+        /// Gets the uri of the search
+        /// </summary>
+        /// <param name="searchRequest">The search request settings</param>
+        /// <returns>The uri of the search</returns>
+        public override Uri GetSearchUri(SearchRequest searchRequest)
+        {
+            var builder = new UriBuilder(endpoint);
+            builder.Path += (Index ?? "_all") + "/";
+
+            if (!String.IsNullOrEmpty(searchRequest.DocumentType))
+                builder.Path += searchRequest.DocumentType + "/";
+
+            builder.Path += "_search";
+
+            var parameters = builder.Uri.GetComponents(UriComponents.Query, UriFormat.Unescaped)
+                .Split(parameterSeparator, StringSplitOptions.RemoveEmptyEntries)
+                .Select(p => p.Split('='))
+                .ToDictionary(k => k[0], v => v.Length > 1 ? v[1] : null);
+
+            if (!String.IsNullOrEmpty(searchRequest.SearchType))
+                parameters["search_type"] = searchRequest.SearchType;
+
+            if (Options.Pretty)
+                parameters["pretty"] = "true";
+
+            builder.Query = String.Join("&", parameters.Select(p => p.Value == null ? p.Key : p.Key + "=" + p.Value));
+
+            return builder.Uri;
+        }
+
+        private async Task<HttpResponseMessage> SendRequestAsync(HttpRequestMessage requestMessage, CancellationToken token, ILog log)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            var response = await httpClient.SendAsync(requestMessage, token);
+            stopwatch.Stop();
+
+            log.Debug(null, null, "Response: {0} {1} (in {2}ms)", (int)response.StatusCode, response.StatusCode, stopwatch.ElapsedMilliseconds);
+
+            response.EnsureSuccessStatusCode();
+            return response;
+        }
+
+        internal static ElasticResponse ParseResponse(Stream responseStream, ILog log)
+        {
+            var stopwatch = Stopwatch.StartNew();
+
+            using (var textReader = new JsonTextReader(new StreamReader(responseStream)))
+            {
+                var results = new JsonSerializer().Deserialize<ElasticResponse>(textReader);
+                stopwatch.Stop();
+
+                var resultSummary = String.Join(", ", GetResultSummary(results));
+                log.Debug(null, null, "Deserialized {0} bytes into {1} in {2}ms", responseStream.Length, resultSummary, stopwatch.ElapsedMilliseconds);
+
+                return results;
+            }
+        }
+
+        internal static IEnumerable<string> GetResultSummary(ElasticResponse results)
+        {
+            if (results == null)
+            {
+                yield return "nothing";
+            }
+            else
+            {
+                if (results.hits != null && results.hits.hits != null && results.hits.hits.Count > 0)
+                    yield return results.hits.hits.Count + " hits";
+
+                if (results.facets != null && results.facets.Count > 0)
+                    yield return results.facets.Count + " facets";
             }
         }
     }
