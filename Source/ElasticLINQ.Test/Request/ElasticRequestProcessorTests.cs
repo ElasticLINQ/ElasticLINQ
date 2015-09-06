@@ -29,7 +29,7 @@ namespace ElasticLinq.Test.Request
             Assert.Throws<ArgumentNullException>(() => new ElasticRequestProcessor(connection, mapping, log, null));
         }
 
-        [Fact(Skip = "NSubstitute returns null on recieved async until 1.8.3 (unreleased)")]
+        [Fact]
         public static async Task ShouldCallElasticSearchClient()
         {
             var spyLog = new SpyLog();
@@ -47,7 +47,9 @@ namespace ElasticLinq.Test.Request
 
             await processor.SearchAsync(request, token);
 
-            await mockConnection.Received(1).SearchAsync(
+#pragma warning disable 4014 // Remove this and await the SearchAsync below once NSubstitute 1.8.3 available
+            mockConnection.Received(1).SearchAsync(
+#pragma warning restore 4014
                @"{""size"":2112,""timeout"":""10s""}",
                request,
                token,
