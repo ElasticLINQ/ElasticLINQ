@@ -33,6 +33,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{133702
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElasticLINQ.IntegrationTest", "ElasticLINQ.IntegrationTest\ElasticLINQ.IntegrationTest.csproj", "{7D45D260-6B9A-40EB-8259-7D68E25B2EE3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElasticLINQ.ElasticsearchNet", "ElasticLINQ.ElasticsearchNet\ElasticLINQ.ElasticsearchNet.csproj", "{26EF8DBF-D804-464E-8D0A-A52211764C18}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElasticLINQ.ElasticsearchNet.Test", "ElasticLINQ.ElasticsearchNet.Test\ElasticLINQ.ElasticsearchNet.Test.csproj", "{70CF57CF-5701-4930-9044-482D8C832FE1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,6 +63,14 @@ Global
 		{7D45D260-6B9A-40EB-8259-7D68E25B2EE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D45D260-6B9A-40EB-8259-7D68E25B2EE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7D45D260-6B9A-40EB-8259-7D68E25B2EE3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26EF8DBF-D804-464E-8D0A-A52211764C18}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26EF8DBF-D804-464E-8D0A-A52211764C18}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26EF8DBF-D804-464E-8D0A-A52211764C18}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26EF8DBF-D804-464E-8D0A-A52211764C18}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70CF57CF-5701-4930-9044-482D8C832FE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70CF57CF-5701-4930-9044-482D8C832FE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70CF57CF-5701-4930-9044-482D8C832FE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70CF57CF-5701-4930-9044-482D8C832FE1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

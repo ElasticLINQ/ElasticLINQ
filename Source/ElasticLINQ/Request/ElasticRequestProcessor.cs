@@ -21,12 +21,12 @@ namespace ElasticLinq.Request
     /// </summary>
     class ElasticRequestProcessor
     {
-        readonly ElasticConnection connection;
+        readonly IElasticConnection connection;
         readonly ILog log;
         readonly IElasticMapping mapping;
         readonly IRetryPolicy retryPolicy;
 
-        public ElasticRequestProcessor(ElasticConnection connection, IElasticMapping mapping, ILog log, IRetryPolicy retryPolicy)
+        public ElasticRequestProcessor(IElasticConnection connection, IElasticMapping mapping, ILog log, IRetryPolicy retryPolicy)
         {
             Argument.EnsureNotNull("connection", connection);
             Argument.EnsureNotNull("mapping", mapping);
@@ -42,22 +42,18 @@ namespace ElasticLinq.Request
         public Task<ElasticResponse> SearchAsync(SearchRequest searchRequest, CancellationToken cancellationToken)
         {
             var formatter = new SearchRequestFormatter(connection, mapping, searchRequest);
-            log.Debug(null, null, "Request: POST {0}", formatter.Uri);
-            log.Debug(null, null, "Body:\n{0}", formatter.Body);
 
             return retryPolicy.ExecuteAsync(
-                async token =>
-                {
-                    using (var requestMessage = new HttpRequestMessage(HttpMethod.Post, formatter.Uri) { Content = new StringContent(formatter.Body) })
-                    using (var response = await SendRequestAsync(connection.HttpClient, requestMessage, token))
-                    using (var responseStream = await response.Content.ReadAsStreamAsync())
-                        return ParseResponse(responseStream, log);
-                },
+                async token => await connection.SearchAsync(
+                    formatter.Body,
+                    searchRequest,
+                    token,
+                    log),
                 (response, exception) => !cancellationToken.IsCancellationRequested && exception != null,
                 (response, additionalInfo) =>
                 {
                     additionalInfo["index"] = connection.Index;
-                    additionalInfo["uri"] = formatter.Uri;
+                    additionalInfo["uri"] = connection.GetSearchUri(searchRequest);
                     additionalInfo["query"] = formatter.Body;
                 }, cancellationToken);
         }

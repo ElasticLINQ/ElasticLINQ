@@ -33,7 +33,7 @@ namespace ElasticLinq
         /// <param name="mapping">A mapping to specify how queries and results are translated.</param>
         /// <param name="log">A log to receive any information or debugging messages.</param>
         /// <param name="retryPolicy">A policy to describe how to handle network issues.</param>
-        public ElasticQueryProvider(ElasticConnection connection, IElasticMapping mapping, ILog log, IRetryPolicy retryPolicy)
+        public ElasticQueryProvider(IElasticConnection connection, IElasticMapping mapping, ILog log, IRetryPolicy retryPolicy)
         {
             Argument.EnsureNotNull("connection", connection);
             Argument.EnsureNotNull("mapping", mapping);
@@ -48,7 +48,7 @@ namespace ElasticLinq
             requestProcessor = new ElasticRequestProcessor(connection, mapping, log, retryPolicy);
         }
 
-        internal ElasticConnection Connection { get; private set; }
+        internal IElasticConnection Connection { get; private set; }
         internal ILog Log { get; private set; }
         internal IElasticMapping Mapping { get; private set; }
         internal IRetryPolicy RetryPolicy { get; private set; }

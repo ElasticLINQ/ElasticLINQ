@@ -50,6 +50,7 @@
     <Compile Include="Async\AsyncQueryable.Sum.cs" />
     <Compile Include="Async\AsyncQueryable.Entity.cs" />
     <Compile Include="Async\IAsyncQueryExecutor.cs" />
+    <Compile Include="BaseElasticConnection.cs" />
     <Compile Include="ElasticConnection.cs" />
     <Compile Include="ElasticConnectionOptions.cs" />
     <Compile Include="ElasticContext.cs" />
@@ -58,6 +59,7 @@
     <Compile Include="ElasticQuery.cs" />
     <Compile Include="ElasticQueryExtensions.cs" />
     <Compile Include="ElasticQueryProvider.cs" />
+    <Compile Include="IElasticConnection.cs" />
     <Compile Include="IElasticContext.cs" />
     <Compile Include="IElasticQuery.cs" />
     <Compile Include="Logging\ILog.cs" />

@@ -7,7 +7,7 @@ namespace ElasticLinq.Request
     /// <summary>
     /// Specifies the options desired for sorting by an individual field.
     /// </summary>
-    class SortOption
+    public class SortOption
     {
         readonly string name;
         readonly bool ascending;
