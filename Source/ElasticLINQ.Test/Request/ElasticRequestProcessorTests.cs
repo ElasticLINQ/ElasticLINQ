@@ -29,7 +29,7 @@ namespace ElasticLinq.Test.Request
             Assert.Throws<ArgumentNullException>(() => new ElasticRequestProcessor(connection, mapping, log, null));
         }
 
-        [Fact]
+        [Fact(Skip = "NSubstitute returns null on recieved async until 1.8.3 (unreleased)")]
         public static async Task ShouldCallElasticSearchClient()
         {
             var spyLog = new SpyLog();
@@ -47,7 +47,7 @@ namespace ElasticLinq.Test.Request
 
             await processor.SearchAsync(request, token);
 
-            mockConnection.Received(1).SearchAsync(
+            await mockConnection.Received(1).SearchAsync(
                @"{""size"":2112,""timeout"":""10s""}",
                request,
                token,
