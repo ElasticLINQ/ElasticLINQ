@@ -1,5 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using ElasticLinq.Mapping;
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Visitors;
 using ElasticLinq.Test.TestSupport;
@@ -13,6 +14,28 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 {
     public class ElasticQueryTranslationWhereTests : ElasticQueryTranslationTestsBase
     {
+        class Outer
+        {
+            public Guid Id { get; set; }
+            public Inner Inner { get; set; }
+        }
+
+        class Inner
+        {
+            public Guid Id { get; set; }
+        }
+
+        [Fact]
+        public void Where_On_Inner_Property_Generates_Correct_FieldName()
+        {
+            var where = new ElasticQuery<Outer>(SharedProvider).Where(o => o.Inner.Id == Guid.NewGuid());
+            var criteria = ElasticQueryTranslator.Translate(new CouchbaseElasticMapping(), where.Expression).SearchRequest.Filter;
+
+            var andCriteria = Assert.IsType<AndCriteria>(criteria);
+            var termsCriteria = andCriteria.Criteria.OfType<TermCriteria>().Single();
+            Assert.Equal("doc.inner.id", termsCriteria.Field);
+        }
+
         [Fact]
         public void EqualsTrueIsTranslatedToEquals()
         {

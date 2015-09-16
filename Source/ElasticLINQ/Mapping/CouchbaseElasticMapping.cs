@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Globalization;
 using System.Reflection;
+using System.Linq.Expressions;
 
 namespace ElasticLinq.Mapping
 {
@@ -48,6 +49,22 @@ namespace ElasticLinq.Mapping
         public override string GetDocumentType(Type type)
         {
             return "couchbaseDocument";
+        }
+
+        /// <inheritdoc/>
+        public override string GetFieldName(Type type, MemberExpression memberExpression)
+        {
+            switch (memberExpression.Expression.NodeType)
+            {
+                case ExpressionType.MemberAccess:
+                    return GetFieldName(type, (MemberExpression)memberExpression.Expression) + "." + GetMemberName(memberExpression.Member);
+
+                case ExpressionType.Parameter:
+                    return GetFieldName(type, memberExpression.Member);
+
+                default:
+                    throw new NotSupportedException(string.Format("Unknown expression type {0} for left hand side of expression {1}", memberExpression.Expression.NodeType, memberExpression));
+            }
         }
 
         /// <inheritdoc/>
