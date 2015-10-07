@@ -8,6 +8,9 @@
     <owners>CenturyLink Cloud</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>LINQ provider for Elasticsearch</description>
+    <dependencies>
+      <dependency id="Newtonsoft.Json" version="6.0.8" />
+    </dependencies>
     <copyright>Copyright (c) 2013-2015 CenturyLink, Inc.</copyright>
     <licenseUrl>https://github.com/CenturyLinkCloud/ElasticLINQ/blob/dev/LICENCE.txt</licenseUrl>
     <projectUrl>https://github.com/CenturyLinkCloud/ElasticLINQ</projectUrl>
