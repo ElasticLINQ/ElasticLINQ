@@ -1,9 +1,7 @@
 ﻿using ElasticLinq.IntegrationTest.Models;
 using ElasticLinq.Mapping;
 using System;
-using System.Globalization;
 using System.Linq;
-using System.Reflection;
 using Xunit;
 
 namespace ElasticLinq.IntegrationTest
@@ -24,7 +22,7 @@ namespace ElasticLinq.IntegrationTest
     public class FieldMappingTests
     {
         static readonly IElasticMapping mapping = new TypePrefixedMapper();
-        static readonly Uri elasticsearchEndpoint = new Uri("http://elasticlinq.cloudapp.net:9200");
+        static readonly Uri elasticsearchEndpoint = new Uri("http://integration.elasticlinq.net:9200");
         static readonly ElasticConnectionOptions options = new ElasticConnectionOptions { SearchSizeDefault = 1000 };
         static readonly ElasticConnection connection = new ElasticConnection(elasticsearchEndpoint, index: "integrationtest-nested", options: options);
         static readonly ElasticContext context = new ElasticContext(connection, mapping);

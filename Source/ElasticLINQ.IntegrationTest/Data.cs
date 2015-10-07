@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using ElasticLinq.IntegrationTest.Models;
 using ElasticLinq.Mapping;
+using ElasticLinq.Retry;
 
 namespace ElasticLinq.IntegrationTest
 {
@@ -11,9 +14,9 @@ namespace ElasticLinq.IntegrationTest
         const string Index = "integrationtest";
         static readonly Uri elasticsearchEndpoint = new Uri("http://integration.elasticlinq.net:9200");
         static readonly ElasticConnectionOptions options = new ElasticConnectionOptions { SearchSizeDefault = 1000 };
-        static readonly ElasticConnection connection = new ElasticConnection(elasticsearchEndpoint, index:Index, options:options);
+        static readonly ElasticConnection connection = new ElasticConnection(elasticsearchEndpoint, index: Index, options: options);
 
-        readonly ElasticContext elasticContext = new ElasticContext(connection, new TrivialElasticMapping());
+        readonly ElasticContext elasticContext = new ElasticContext(connection, new TrivialElasticMapping(), retryPolicy: new NoRetryPolicy());
         readonly List<object> memory = new List<object>();
 
         public IQueryable<T> Elastic<T>()
@@ -38,6 +41,15 @@ namespace ElasticLinq.IntegrationTest
                     string.Format("Tests expect {0} entries but {1} loaded from Elasticsearch index '{2}' at {3}",
                         expectedDataCount, memory.Count,
                         elasticContext.Connection.Index, ((ElasticConnection)elasticContext.Connection).Endpoint));
+        }
+    }
+
+    public class NoRetryPolicy : IRetryPolicy
+    {
+        public async Task<TResult> ExecuteAsync<TResult>(Func<CancellationToken, Task<TResult>> operationFunc, Func<TResult, Exception, Boolean> shouldRetryFunc, Action<TResult, Dictionary<String, Object>> appendLogInfoFunc = null,
+            CancellationToken cancellationToken = new CancellationToken())
+        {
+            return await operationFunc(cancellationToken);
         }
     }
 }
