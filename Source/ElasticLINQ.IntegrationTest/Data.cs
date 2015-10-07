@@ -9,7 +9,7 @@ namespace ElasticLinq.IntegrationTest
     class Data
     {
         const string Index = "integrationtest";
-        static readonly Uri elasticsearchEndpoint = new Uri("http://elasticlinq.cloudapp.net:9200");
+        static readonly Uri elasticsearchEndpoint = new Uri("http://integration.elasticlinq.net:9200");
         static readonly ElasticConnectionOptions options = new ElasticConnectionOptions { SearchSizeDefault = 1000 };
         static readonly ElasticConnection connection = new ElasticConnection(elasticsearchEndpoint, index:Index, options:options);
 

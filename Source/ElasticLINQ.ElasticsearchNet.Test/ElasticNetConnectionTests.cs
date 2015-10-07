@@ -1,7 +1,5 @@
 ﻿using System;
-using System.IO;
 using System.Net.Http;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,7 +8,6 @@ using ElasticLinq.Logging;
 using ElasticLinq.Mapping;
 using ElasticLinq.Request;
 using ElasticLinq.Request.Formatters;
-using ElasticLinq.Test;
 using Elasticsearch.Net;
 using Elasticsearch.Net.Connection;
 using NSubstitute;
@@ -68,7 +65,7 @@ namespace ElasticLinq.ElasticsearchNet.Test
                     @"{""timeout"":""10s""}",
                     Arg.Any<Func<SearchRequestParameters, SearchRequestParameters>>())
                 .Returns(Task.FromResult(ElasticsearchResponse<string>.Create(
-                    new ConnectionConfiguration(), 
+                    new ConnectionConfiguration(),
                     404,
                     "_search",
                     "_all",
@@ -138,7 +135,7 @@ namespace ElasticLinq.ElasticsearchNet.Test
             const string id = "testId";
 
             var responseString = BuildResponseString(took, shards, hits, score, index, type, id);
-            
+
             var response = ElasticNetConnection.ParseResponse(responseString, log);
             Assert.NotNull(response);
             Assert.Equal(took, response.took);

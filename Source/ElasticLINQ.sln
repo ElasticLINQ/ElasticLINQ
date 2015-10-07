@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElasticLINQ", "ElasticLINQ\ElasticLINQ.csproj", "{875E1599-5B7F-4084-BBE0-0D70C3C80428}"
 EndProject
@@ -36,6 +36,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElasticLINQ.ElasticsearchNet", "ElasticLINQ.ElasticsearchNet\ElasticLINQ.ElasticsearchNet.csproj", "{26EF8DBF-D804-464E-8D0A-A52211764C18}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElasticLINQ.ElasticsearchNet.Test", "ElasticLINQ.ElasticsearchNet.Test\ElasticLINQ.ElasticsearchNet.Test.csproj", "{70CF57CF-5701-4930-9044-482D8C832FE1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Elasticsearch.Net", "Elasticsearch.Net", "{E1CB6D8E-72C3-4F47-8D06-C6C0C3B813CC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -79,5 +81,7 @@ Global
 		{DF49DB26-2CDA-437B-94C5-62200CB0ACFC} = {99B0D181-5D19-4E30-96EA-F8E42C81F8E6}
 		{8633ADE5-6F63-4008-8AA4-BE8E8A387809} = {5F0CC4DE-B1CB-49A4-B448-53CAE930F5AD}
 		{DA488B7B-BA05-4F15-9F19-EA1FDB57DA44} = {5F0CC4DE-B1CB-49A4-B448-53CAE930F5AD}
+		{26EF8DBF-D804-464E-8D0A-A52211764C18} = {E1CB6D8E-72C3-4F47-8D06-C6C0C3B813CC}
+		{70CF57CF-5701-4930-9044-482D8C832FE1} = {E1CB6D8E-72C3-4F47-8D06-C6C0C3B813CC}
 	EndGlobalSection
 EndGlobal
