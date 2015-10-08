@@ -54,5 +54,10 @@ namespace ElasticLinq.Mapping
         {
             return wrapped.Materialize(sourceDocument, objectType);
         }
+
+        public string ConcatFieldCall(params string[] fields)
+        {
+            return wrapped.ConcatFieldCall(fields);
+        }
     }
 }
