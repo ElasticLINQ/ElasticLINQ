@@ -36,7 +36,8 @@ namespace ElasticLinq.Request.Criteria
 
         public string Field
         {
-            get { return _field; }
+            //Concat fields to separate different FieldCallCriteria started from same field
+            get { return FieldCallHierarchy.Aggregate("", (a, e) => String.Concat(a, "_", e)); }
         }
 
         public string[] FieldCallHierarchy
