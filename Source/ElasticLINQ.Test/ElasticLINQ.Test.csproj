@@ -112,7 +112,8 @@
     <Compile Include="Request\Visitors\ConstantMemberPairTests.cs" />
     <Compile Include="Request\Visitors\CriteriaExpressionVisitorTests.cs" />
     <Compile Include="Request\Visitors\ElasticFieldsExpressionVisitorTests.cs" />
-    <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationGroupByFieldTests.cs" />
+    <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationAggregateGroupByFieldTests.cs" />
+    <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationAggregateGroupedByConstantTests.cs" />
     <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationNotSupportedTests.cs" />
     <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationSingularTests.cs" />
     <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationSelectTests.cs" />
@@ -123,7 +124,7 @@
     <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationWhereTests.cs" />
     <Compile Include="Request\Visitors\ElasticTranslateResultTests.cs" />
     <Compile Include="Request\Visitors\EvaluatingExpressionVisitorTests.cs" />
-    <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationGroupByConstantTests.cs" />
+    <Compile Include="Request\Visitors\ElasticQueryTranslation\ElasticQueryTranslationAggregateUngroupedTests.cs" />
     <Compile Include="Request\Visitors\PartialEvaluatorTests.cs" />
     <Compile Include="Request\Visitors\MemberProjectionExpressionVisitorTests.cs" />
     <Compile Include="Response\Materializers\AggregatesTests.cs" />

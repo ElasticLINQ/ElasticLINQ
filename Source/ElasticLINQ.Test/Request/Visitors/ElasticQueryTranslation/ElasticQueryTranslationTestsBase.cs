@@ -27,9 +27,12 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
         protected static Expression MakeQueryableExpression<TSource>(string name, IQueryable<TSource> source, params Expression[] parameters)
         {
+            parameters = parameters ?? new Expression[] { };
+
             var method = MakeQueryableMethod<TSource>(name, parameters.Length + 1);
             return Expression.Call(method, new[] { source.Expression }.Concat(parameters).ToArray());
         }
+
 
         protected static MethodInfo MakeQueryableMethod<TSource>(string name, int parameterCount)
         {
@@ -40,6 +43,11 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
                 .OfType<MethodInfo>()
                 .Single(a => a.GetParameters().Length == parameterCount)
                 .MakeGenericMethod(typeof(TSource));
+        }
+
+        protected static Expression CaptureExpression<TResult>(Expression<Func<TResult>> operation)
+        {
+            return null;
         }
     }
 }
