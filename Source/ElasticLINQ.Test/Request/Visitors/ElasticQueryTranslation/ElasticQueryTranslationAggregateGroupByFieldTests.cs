@@ -11,7 +11,7 @@ using Xunit;
 
 namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 {
-    public class ElasticQueryTranslationGroupByFieldTests : ElasticQueryTranslationTestsBase
+    public class ElasticQueryTranslationAggregateGroupByFieldTests : ElasticQueryTranslationTestsBase
     {
         [Fact]
         public void SelectSumCreatesTermsStatsFacet()

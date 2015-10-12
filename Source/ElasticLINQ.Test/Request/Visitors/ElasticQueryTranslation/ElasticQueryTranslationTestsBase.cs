@@ -3,11 +3,11 @@
 using ElasticLinq.Logging;
 using ElasticLinq.Mapping;
 using ElasticLinq.Retry;
+using ElasticLinq.Test.TestSupport;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using ElasticLinq.Test.TestSupport;
 
 namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 {
@@ -27,8 +27,16 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
         protected static Expression MakeQueryableExpression<TSource>(string name, IQueryable<TSource> source, params Expression[] parameters)
         {
+            parameters = parameters ?? new Expression[] { };
+
             var method = MakeQueryableMethod<TSource>(name, parameters.Length + 1);
             return Expression.Call(method, new[] { source.Expression }.Concat(parameters).ToArray());
+        }
+
+        protected static Expression MakeQueryableExpression<TSource, TResult>(IQueryable<TSource> source, Expression<Func<IQueryable<TSource>, TResult>> operation)
+        {
+            var methodCall = (MethodCallExpression)operation.Body;
+            return Expression.Call(methodCall.Method, new[] { source.Expression }.Concat(methodCall.Arguments.Skip(1)).ToArray());
         }
 
         protected static MethodInfo MakeQueryableMethod<TSource>(string name, int parameterCount)

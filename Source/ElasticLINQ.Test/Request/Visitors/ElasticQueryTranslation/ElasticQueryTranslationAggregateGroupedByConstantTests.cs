@@ -11,12 +11,12 @@ using Xunit;
 
 namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 {
-    public class ElasticQueryTranslationGroupByConstantTests : ElasticQueryTranslationTestsBase
+    public class ElasticQueryTranslationAggregateGroupedByConstantTests : ElasticQueryTranslationTestsBase
     {
         [Fact]
         public void SelectSumCreatesStatisticalFacet()
         {
-            var query = Robots.GroupBy(r => 1).Select(g => g.Sum(r => r.Cost));
+            var query = Robots.Where(r => r.Cost > 10).GroupBy(r => 1).Select(g => g.Sum(r => r.Cost));
 
             var translation = ElasticQueryTranslator.Translate(Mapping, query.Expression);
 

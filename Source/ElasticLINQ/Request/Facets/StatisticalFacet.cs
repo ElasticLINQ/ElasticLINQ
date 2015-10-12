@@ -2,6 +2,7 @@
 
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Utility;
+using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 
@@ -14,7 +15,7 @@ namespace ElasticLinq.Request.Facets
     /// within the documents specified by the filter criteria.
     /// </summary>
     /// <remarks>Mapped to .GroupBy(a => 1).Select(a => a.Count(b => b.SomeField))</remarks>
-    [DebuggerDisplay("StatisticalFacet {Fields} {Filter}")]
+    [DebuggerDisplay("StatisticalFacet {DebugFieldList} {Filter}")]
     class StatisticalFacet : IFacet
     {
         readonly string name;
@@ -40,5 +41,7 @@ namespace ElasticLinq.Request.Facets
         public string Name { get { return name; } }
         public ICriteria Filter { get { return criteria; } }
         public ReadOnlyCollection<string> Fields { get { return fields; } }
+
+        private string DebugFieldList { get { return String.Join(", ", fields); } }
     }
 }

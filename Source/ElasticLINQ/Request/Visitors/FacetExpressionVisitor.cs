@@ -165,10 +165,10 @@ namespace ElasticLinq.Request.Visitors
                 if (node.Method.Name == "Take" && node.Arguments.Count == 2)
                     return VisitTake(source, node.Arguments[1]);
 
+                // Consider whether to take the groupby operation and rebind the semantics into the projection
+                // and remove it from the expression tree so that processing can continue.
                 var reboundExpression = RebindAggregateOperation(node);
-
-                // Rebinding the root, need to fake the source
-                if (source is ConstantExpression && reboundExpression != null)
+                if (reboundExpression != null && !source.Type.IsGenericOf(typeof(IGrouping<,>)))
                 {
                     selectProjection = Expression.Lambda(reboundExpression, bindingParameter);
                     return Visit(source);
