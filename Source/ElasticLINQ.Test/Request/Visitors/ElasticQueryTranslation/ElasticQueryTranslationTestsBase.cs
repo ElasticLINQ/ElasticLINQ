@@ -3,11 +3,11 @@
 using ElasticLinq.Logging;
 using ElasticLinq.Mapping;
 using ElasticLinq.Retry;
+using ElasticLinq.Test.TestSupport;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using ElasticLinq.Test.TestSupport;
 
 namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 {
@@ -33,6 +33,11 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             return Expression.Call(method, new[] { source.Expression }.Concat(parameters).ToArray());
         }
 
+        protected static Expression MakeQueryableExpression<TSource, TResult>(IQueryable<TSource> source, Expression<Func<IQueryable<TSource>, TResult>> operation)
+        {
+            var methodCall = (MethodCallExpression)operation.Body;
+            return Expression.Call(methodCall.Method, new[] { source.Expression }.Concat(methodCall.Arguments.Skip(1)).ToArray());
+        }
 
         protected static MethodInfo MakeQueryableMethod<TSource>(string name, int parameterCount)
         {
@@ -43,11 +48,6 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
                 .OfType<MethodInfo>()
                 .Single(a => a.GetParameters().Length == parameterCount)
                 .MakeGenericMethod(typeof(TSource));
-        }
-
-        protected static Expression CaptureExpression<TResult>(Expression<Func<TResult>> operation)
-        {
-            return null;
         }
     }
 }
