@@ -33,6 +33,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>ElasticLINQ.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -77,6 +83,7 @@
     <Content Include="README.txt" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ElasticLINQ.snk" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
