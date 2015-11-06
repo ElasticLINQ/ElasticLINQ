@@ -4,4 +4,4 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyTitle("ElasticLINQ.ElasticsearchNet")]
 [assembly: AssemblyDescription("ElasticLINQ connection provider for ElasticsearchNet")]
 
-[assembly: InternalsVisibleTo("ElasticLinq.ElasticsearchNet.Test")]
+[assembly: InternalsVisibleTo("ElasticLinq.ElasticsearchNet.Test, PublicKey=002400000480000094000000060200000024000052534131000400000100010077e52808b60d3b0d8a01135a007f33c955b1ca9f8e45183d935ef80a85e837a9d0fa5b67a935f9699fd7d71ea1b8e36ad5f45024499fe9b92ddc236ec8ce4fcd80a63d0ec0266994000eceacafdeec92455cf2ef8e3e7c13ae4818b0e9f50a10d230731300e4596e78667e9a74030370a5a544a1379805051f425a42e1bf4ca0")]
