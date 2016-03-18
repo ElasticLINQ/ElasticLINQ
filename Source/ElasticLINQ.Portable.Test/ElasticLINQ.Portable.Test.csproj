@@ -56,7 +56,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="ElasticLINQ.snk" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
