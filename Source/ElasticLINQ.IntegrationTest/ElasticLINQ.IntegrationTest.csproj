@@ -83,7 +83,6 @@
     <Content Include="README.txt" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ElasticLINQ.snk" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
