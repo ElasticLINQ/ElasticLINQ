@@ -14,7 +14,7 @@ namespace ElasticLinq.Test.Request.Criteria
         [Fact]
         public void AndBecomesBoolWithMust()
         {
-            var expected = new [] { new RangeCriteria("fieldOne", memberInfo, RangeComparison.LessThan, 2), new RangeCriteria("fieldTwo", memberInfo, RangeComparison.GreaterThan, 4) };
+            var expected = new[] { new RangeCriteria("fieldOne", memberInfo, RangeComparison.LessThan, 2), new RangeCriteria("fieldTwo", memberInfo, RangeComparison.GreaterThan, 4) };
 
             var actual = QueryCriteriaRewriter.Compensate(AndCriteria.Combine(expected));
 
@@ -26,7 +26,7 @@ namespace ElasticLinq.Test.Request.Criteria
         }
 
         [Fact]
-        public void AndWithOrsBecomesBoolWithShould()
+        public void AndWithNestedOrsBecomesBoolWithMustAndNestedShould()
         {
             var expected1 = new[] { new RangeCriteria("field1", memberInfo, RangeComparison.LessThan, 2), new RangeCriteria("field2", memberInfo, RangeComparison.GreaterThan, 4) };
             var expected2 = new[] { new RangeCriteria("field3", memberInfo, RangeComparison.LessThan, 2), new RangeCriteria("field4", memberInfo, RangeComparison.GreaterThan, 4) };
@@ -35,9 +35,20 @@ namespace ElasticLinq.Test.Request.Criteria
 
             var boolActual = Assert.IsType<BoolCriteria>(actual);
 
-            Assert.Equal(boolActual.Should.AsEnumerable(), expected1.Concat(expected2));
-            Assert.Empty(boolActual.Must);
+            Assert.Empty(boolActual.Should);
             Assert.Empty(boolActual.MustNot);
+            Assert.Equal(2, boolActual.Must.Count);
+            Assert.All(boolActual.Must, c =>
+            {
+                var boolSub = Assert.IsType<BoolCriteria>(c);
+                Assert.Empty(boolSub.Must);
+                Assert.Empty(boolSub.MustNot);
+                Assert.Equal(2, boolSub.Should.Count);
+                Assert.All(boolSub.Should, s =>
+                {
+                    Assert.IsType<RangeCriteria>(s);
+                });
+            });
         }
 
         [Fact]
@@ -115,5 +126,5 @@ namespace ElasticLinq.Test.Request.Criteria
             Assert.Empty(subBoolActual.Should);
             Assert.Empty(subBoolActual.MustNot);
         }
-   }
+    }
 }
