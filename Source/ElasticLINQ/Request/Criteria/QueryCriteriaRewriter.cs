@@ -1,5 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using System.Collections.Generic;
 using System.Linq;
 
 namespace ElasticLinq.Request.Criteria
@@ -41,7 +42,7 @@ namespace ElasticLinq.Request.Criteria
         /// <returns><see cref="BoolCriteria" /> with the criteria from Not mapped into MustNot.</returns>
         static BoolCriteria Rewrite(NotCriteria not)
         {
-            var mustNotCriteria = (not.Criteria is OrCriteria)
+            var mustNotCriteria = not.Criteria is OrCriteria
                 ? ((OrCriteria) not.Criteria).Criteria
                 : Enumerable.Repeat(not.Criteria, 1);
             return new BoolCriteria(null, null, mustNotCriteria.Select(Compensate));
@@ -64,12 +65,16 @@ namespace ElasticLinq.Request.Criteria
         /// <returns><see cref="BoolCriteria" /> with the criteria from the And mapped into Must.</returns>
         static BoolCriteria Rewrite(AndCriteria and)
         {
-            var should = and.Criteria.OfType<OrCriteria>().ToList();
             var mustNot = and.Criteria.OfType<NotCriteria>().ToList();
-            var must = and.Criteria.Except(should).Except(mustNot);
+
+            var orCriteria = and.Criteria.OfType<OrCriteria>().ToArray();
+            var canFlattenOrCriteria = orCriteria.Length == 1;
+
+            var shouldCriteria = (canFlattenOrCriteria ? orCriteria.SelectMany(o => o.Criteria) : Enumerable.Empty<OrCriteria>()).ToList();
+            var must = and.Criteria.Except(mustNot).Except(shouldCriteria);
 
             return new BoolCriteria(must.Select(Compensate),
-                should.SelectMany(c => c.Criteria).Select(Compensate),
+                shouldCriteria,
                 mustNot.Select(c => c.Criteria).Select(Compensate));
         }
 

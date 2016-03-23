@@ -36,6 +36,9 @@
     <DocumentationFile>bin\Release\ElasticLinq.xml</DocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\ElasticLINQ.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\ElasticLINQ\**\*.cs">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
