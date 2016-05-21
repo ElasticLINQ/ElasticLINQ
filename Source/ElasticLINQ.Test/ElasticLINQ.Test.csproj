@@ -160,6 +160,7 @@
     <Compile Include="Test\TestableElasticQueryTests.cs" />
     <Compile Include="Test\TestableElasticContextTests.cs" />
     <Compile Include="Utility\ArgumentTests.cs" />
+    <Compile Include="Utility\ReadOnlyBatchedListTests.cs" />
     <Compile Include="Utility\SpyMessageHandler.cs" />
     <Compile Include="Utility\TypeHelperTests.cs" />
     <Compile Include="..\GlobalAssemblyInfo.cs">

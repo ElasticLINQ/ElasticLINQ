@@ -38,7 +38,7 @@ namespace ElasticLinq.Test.Response.Materializers
 
             var result = materializer.Materialize(respomse);
 
-            var actualList = Assert.IsType<List<SampleClassWithHighlight>>(result);
+            var actualList = Assert.IsAssignableFrom<IReadOnlyList<SampleClassWithHighlight>>(result);
             var highlighted = actualList.First().SampleField_Highlight;
             Assert.NotNull(highlighted);
         }
