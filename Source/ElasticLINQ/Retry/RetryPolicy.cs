@@ -31,8 +31,11 @@ namespace ElasticLinq.Retry
         }
 
         internal Delay Delay { get; private set; }
+
         internal int InitialRetryMilliseconds { get; private set; }
+
         internal ILog Log { get; private set; }
+
         internal int MaxAttempts { get; private set; }
 
         /// <inheritdoc/>

@@ -82,7 +82,7 @@ namespace ElasticLinq.ElasticsearchNet.Test
                 log));
 
             Assert.IsType<HttpRequestException>(ex);
-            Assert.Equal("Response status code does not indicate success: 404 (Not Found).", ex.Message);
+            Assert.Equal("Response status code does not indicate success: 404", ex.Message);
         }
 
         [Fact]

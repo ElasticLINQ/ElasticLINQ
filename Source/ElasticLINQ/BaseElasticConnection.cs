@@ -13,11 +13,11 @@ namespace ElasticLinq
     /// </summary>
     public abstract class BaseElasticConnection : IElasticConnection
     {
-        private static readonly TimeSpan defaultTimeout = TimeSpan.FromSeconds(10);
+        static readonly TimeSpan defaultTimeout = TimeSpan.FromSeconds(10);
 
-        private readonly string index;
-        private readonly TimeSpan timeout;
-        private readonly ElasticConnectionOptions options;
+        readonly string index;
+        readonly TimeSpan timeout;
+        readonly ElasticConnectionOptions options;
 
         /// <summary>
         /// Create a new BaseElasticConnection with the given parameters for internal testing.

@@ -21,7 +21,9 @@ namespace ElasticLinq.Request.Visitors
         }
 
         public Expression Expression { get { return expression; } }
+
         public ParameterExpression Parameter { get { return parameter; } }
+
         public ReadOnlyCollection<T> Collected { get { return collected; } }
     }
 }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -36,8 +38,7 @@ namespace ElasticLinq.ElasticsearchNet
             ElasticConnectionOptions options = null)
             : base(index, timeout, options)
         {
-            if (client == null)
-                throw new ArgumentNullException("client");
+            if (client == null) throw new ArgumentNullException("client");
 
             this.client = client;
         }
@@ -65,7 +66,7 @@ namespace ElasticLinq.ElasticsearchNet
             log.Log(TraceEventType.Verbose, null, null, "Response: {0} {1} (in {2}ms)", response.HttpStatusCode, response.HttpStatusCode.HasValue ? ((HttpStatusCode)response.HttpStatusCode).ToString() : "", stopwatch.ElapsedMilliseconds);
 
             if (!response.Success)
-                throw new HttpRequestException("Response status code does not indicate success: 404 (Not Found).");
+                throw new HttpRequestException(String.Format("Response status code does not indicate success: {0}", response.HttpStatusCode));
 
             return ParseResponse(response.Response, log);
         }

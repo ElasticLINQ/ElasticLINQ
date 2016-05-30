@@ -59,18 +59,16 @@ namespace ElasticLinq.Response.Materializers
             Argument.EnsureNotNull("response", response);
 
             var facets = response.facets;
-            if (facets != null && facets.Count > 0)
-            {
-                var facetsWithoutTerms = facets
-                    .Values()
-                    .Where(x => termlessFacetTypes.Contains(x["_type"].ToString()))
-                    .ToList();
+            if (facets == null || facets.Count <= 0) return null;
 
-                if (facetsWithoutTerms.Any())
-                    return projector(new AggregateStatisticalRow(key, facets));
-            }
+            var facetsWithoutTerms = facets
+                .Values()
+                .Where(x => termlessFacetTypes.Contains(x["_type"].ToString()))
+                .ToList();
 
-            return null;
+            return facetsWithoutTerms.Any()
+                ? projector(new AggregateStatisticalRow(key, facets))
+                : null;
         }
 
         /// <summary>

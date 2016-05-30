@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
+
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using ElasticLinq.Logging;
@@ -29,13 +31,13 @@ namespace ElasticLinq
         TimeSpan Timeout { get; }
 
         /// <summary>
-        /// Issues search requests to elastic search
+        /// Issuessearch requests to Elasticsearch.
         /// </summary>
-        /// <param name="body">The request body</param>
-        /// <param name="searchRequest">The search request settings</param>
-        /// <param name="token"></param>
+        /// <param name="body">The request body.</param>
+        /// <param name="searchRequest">The search request settings.</param>
+        /// <param name="token">The cancellation token to allow this request to be cancelled.</param>
         /// <param name="log">The logging mechanism for diagnostic information.</param>
-        /// <returns>An elastic response</returns>
+        /// <returns>An ElasticResponse object containing the desired search results.</returns>
         Task<ElasticResponse> SearchAsync(
             string body,
             SearchRequest searchRequest,
@@ -43,10 +45,10 @@ namespace ElasticLinq
             ILog log);
 
         /// <summary>
-        /// Gets the uri of the search
+        /// Get the uri to be used to search Elasticsearch.
         /// </summary>
-        /// <param name="searchRequest">The search request settings</param>
-        /// <returns>The uri of the search</returns>
+        /// <param name="searchRequest">The search request settings.</param>
+        /// <returns>The uri that will be used to search Elasticsearch.</returns>
         Uri GetSearchUri(SearchRequest searchRequest);
     }
 }
