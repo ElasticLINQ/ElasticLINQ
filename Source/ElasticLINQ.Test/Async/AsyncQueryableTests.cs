@@ -5,7 +5,7 @@ using ElasticLinq.Test.TestSupport;
 using System.Linq;
 using Xunit;
 
-namespace ElasticLinq.Test
+namespace ElasticLinq.Test.Async
 {
     public static class AsyncQueryableTests
     {
@@ -17,7 +17,7 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
-        public async static void CountAsyncReturnsSameResultAsCount()
+        public static async void CountAsyncReturnsSameResultAsCount()
         {
             var expected = context.Query<Robot>().Count();
             var actual = await context.Query<Robot>().CountAsync();
@@ -26,7 +26,7 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
-        public async static void CountPredicateAsyncReturnsSameResultAsCountPredicate()
+        public static async void CountPredicateAsyncReturnsSameResultAsCountPredicate()
         {
             var expected = context.Query<Robot>().Count(r => r.Zone == 3);
             var actual = await context.Query<Robot>().CountAsync(r => r.Zone == 3);
@@ -35,7 +35,7 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
-        public async static void LongCountAsyncReturnsSameResultAsCount()
+        public static async void LongCountAsyncReturnsSameResultAsCount()
         {
             var expected = context.Query<Robot>().LongCount();
             var actual = await context.Query<Robot>().LongCountAsync();
@@ -44,7 +44,7 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
-        public async static void LongCountPredicateAsyncReturnsSameResultAsCountPredicate()
+        public static async void LongCountPredicateAsyncReturnsSameResultAsCountPredicate()
         {
             var expected = context.Query<Robot>().LongCount(r => r.Zone == 3);
             var actual = await context.Query<Robot>().LongCountAsync(r => r.Zone == 3);
@@ -53,7 +53,7 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
-        public async static void MinAsyncReturnsSameResultAsMin()
+        public static async void MinAsyncReturnsSameResultAsMin()
         {
             var expected = context.Query<Robot>().Select(r => r.Cost).Min();
             var actual = await context.Query<Robot>().Select(r => r.Cost).MinAsync();
@@ -62,7 +62,7 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
-        public async static void MinSelectorAsyncReturnsSameResultAsMinSelector()
+        public static async void MinSelectorAsyncReturnsSameResultAsMinSelector()
         {
             var expected = context.Query<Robot>().Min(r => r.Cost);
             var actual = await context.Query<Robot>().MinAsync(r => r.Cost);
@@ -71,7 +71,7 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
-        public async static void MaxAsyncReturnsSameResultAsMax()
+        public static async void MaxAsyncReturnsSameResultAsMax()
         {
             var expected = context.Query<Robot>().Select(r => r.Cost).Max();
             var actual = await context.Query<Robot>().Select(r => r.Cost).MaxAsync();
@@ -80,7 +80,7 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
-        public async static void MaxSelectorAsyncReturnsSameResultAsMaxSelector()
+        public static async void MaxSelectorAsyncReturnsSameResultAsMaxSelector()
         {
             var expected = context.Query<Robot>().Max(r => r.Cost);
             var actual = await context.Query<Robot>().MaxAsync(r => r.Cost);
@@ -89,7 +89,7 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
-        public async static void ToArrayAsyncReturnsSameResultAsToArray()
+        public static async void ToArrayAsyncReturnsSameResultAsToArray()
         {
             var expected = context.Query<Robot>().ToArray();
             var actual = await context.Query<Robot>().ToArrayAsync();
@@ -98,7 +98,7 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
-        public async static void ToDictionaryAsyncReturnsSameResultAsToDictionary()
+        public static async void ToDictionaryAsyncReturnsSameResultAsToDictionary()
         {
             var expected = context.Query<Robot>().ToDictionary(r => r.Id);
             var actual = await context.Query<Robot>().ToDictionaryAsync(r => r.Id);
@@ -107,7 +107,7 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
-        public async static void ToDictionaryElementSelectorAsyncReturnsSameResultAsToDictionaryElementSelector()
+        public static async void ToDictionaryElementSelectorAsyncReturnsSameResultAsToDictionaryElementSelector()
         {
             var expected = context.Query<Robot>().ToDictionary(r => r.Id, v => v.Started);
             var actual = await context.Query<Robot>().ToDictionaryAsync(r => r.Id, v => v.Started);
