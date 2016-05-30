@@ -21,7 +21,7 @@ namespace ElasticLinq.Response.Materializers
         /// Materialize the result count for a given response.
         /// </summary>
         /// <param name="response">The <see cref="ElasticResponse"/> to obtain the count value from.</param>
-        /// <returns>The ewaulr count expressed as either an int or long depending on the size of the count.</returns>
+        /// <returns>The result count expressed as either an int or long depending on the size of the count.</returns>
         public object Materialize(ElasticResponse response)
         {
             if (response.hits.total < 0)
