@@ -246,9 +246,9 @@ namespace ElasticLinq.Request.Visitors
                 case "Count":
                 case "LongCount":
                     if (m.Arguments.Count == 1)
-                        return VisitCount(m.Arguments[0], null);
+                        return VisitCount(m.Arguments[0], null, m.Method.ReturnType);
                     if (m.Arguments.Count == 2)
-                        return VisitCount(m.Arguments[0], m.Arguments[1]);
+                        return VisitCount(m.Arguments[0], m.Arguments[1], m.Method.ReturnType);
                     throw GetOverloadUnsupportedException(m.Method);
 
                 case "Any":
@@ -278,9 +278,9 @@ namespace ElasticLinq.Request.Visitors
                 : Visit(source);
         }
 
-        Expression VisitCount(Expression source, Expression predicate)
+        Expression VisitCount(Expression source, Expression predicate, Type returnType)
         {
-            materializer = new CountElasticMaterializer();
+            materializer = new CountElasticMaterializer(returnType);
             searchRequest.SearchType = "count";
             return predicate != null
                 ? VisitWhere(source, predicate)

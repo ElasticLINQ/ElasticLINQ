@@ -25,7 +25,7 @@ namespace ElasticLinq.IntegrationTest
         static readonly Uri elasticsearchEndpoint = new Uri("http://integration.elasticlinq.net:9200");
         static readonly ElasticConnectionOptions options = new ElasticConnectionOptions { SearchSizeDefault = 1000 };
         static readonly ElasticConnection connection = new ElasticConnection(elasticsearchEndpoint, index: "integrationtest-nested", options: options);
-        static readonly ElasticContext context = new ElasticContext(connection, mapping);
+        static readonly ElasticContext context = new ElasticContext(connection, mapping, retryPolicy: new NoRetryPolicy());
 
         [Fact]
         public void ToList_Materializes_Complete_Objects()
