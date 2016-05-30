@@ -6,6 +6,7 @@ using ElasticLinq.Logging;
 using ElasticLinq.Mapping;
 using ElasticLinq.Retry;
 using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using Xunit;
@@ -67,7 +68,6 @@ namespace ElasticLinq.Test
         {
             Assert.Throws<ArgumentNullException>(() => sharedProvider.Execute<Sample>(null));
         }
-
 
         [Fact]
         public void ExecuteAsyncThrowsArgumentNullExceptionIfNull()
