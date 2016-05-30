@@ -58,18 +58,6 @@ namespace ElasticLinq.Request
                 }, cancellationToken);
         }
 
-        async Task<HttpResponseMessage> SendRequestAsync(HttpClient httpClient, HttpRequestMessage requestMessage, CancellationToken cancellationToken)
-        {
-            var stopwatch = Stopwatch.StartNew();
-            var response = await httpClient.SendAsync(requestMessage, cancellationToken);
-            stopwatch.Stop();
-
-            log.Debug(null, null, "Response: {0} {1} (in {2}ms)", (int)response.StatusCode, response.StatusCode, stopwatch.ElapsedMilliseconds);
-
-            response.EnsureSuccessStatusCode();
-            return response;
-        }
-
         internal static ElasticResponse ParseResponse(Stream responseStream, ILog log)
         {
             var stopwatch = Stopwatch.StartNew();

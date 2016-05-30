@@ -26,7 +26,7 @@ namespace ElasticLinq.Request.Visitors
         {
         }
 
-        internal static new RebindCollectionResult<string> Rebind(Type sourceType, IElasticMapping mapping, Expression selector)
+        internal new static RebindCollectionResult<string> Rebind(Type sourceType, IElasticMapping mapping, Expression selector)
         {
             var parameter = Expression.Parameter(typeof(Hit), "h");
             var visitor = new MemberProjectionExpressionVisitor(sourceType, parameter, mapping);

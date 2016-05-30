@@ -8,6 +8,6 @@ namespace ElasticLinq
     /// Used to mark serialized fields as being "not analayzed" in Elasticsearch
     /// (and therefore not subject to value transformations like lower-casing).
     /// </summary>
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public sealed class NotAnalyzedAttribute : Attribute { }
 }

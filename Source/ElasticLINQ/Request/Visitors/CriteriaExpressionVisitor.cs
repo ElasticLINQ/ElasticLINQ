@@ -18,7 +18,7 @@ namespace ElasticLinq.Request.Visitors
     /// Expression visitor to translate predicate expressions to criteria expressions.
     /// Used by Where, Query, Single, First, Count etc.
     /// </summary>
-    abstract class CriteriaExpressionVisitor : ExpressionVisitor
+    internal abstract class CriteriaExpressionVisitor : ExpressionVisitor
     {
         protected readonly IElasticMapping Mapping;
         protected readonly Type SourceType;

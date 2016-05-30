@@ -38,10 +38,13 @@ namespace ElasticLinq.Request.Facets
         }
 
         public string Type { get { return "statistical"; } }
+
         public string Name { get { return name; } }
+
         public ICriteria Filter { get { return criteria; } }
+
         public ReadOnlyCollection<string> Fields { get { return fields; } }
 
-        private string DebugFieldList { get { return String.Join(", ", fields); } }
+        string DebugFieldList { get { return String.Join(", ", fields); } }
     }
 }

@@ -2,7 +2,6 @@
 
 using System.Linq;
 using System.Linq.Expressions;
-using ElasticLinq.Utility;
 
 namespace ElasticLinq.Request.Visitors
 {

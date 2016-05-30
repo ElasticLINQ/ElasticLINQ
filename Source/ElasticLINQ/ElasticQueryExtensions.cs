@@ -167,8 +167,8 @@ namespace ElasticLinq
         }
 
         static readonly MethodInfo queryMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "Query");
-        static readonly MethodInfo queryStringMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "QueryString" && m.GetParameters().Count() == 2);
-        static readonly MethodInfo queryStringWithFieldsMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "QueryString" && m.GetParameters().Count() > 2);
+        static readonly MethodInfo queryStringMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "QueryString" && m.GetParameters().Length == 2);
+        static readonly MethodInfo queryStringWithFieldsMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "QueryString" && m.GetParameters().Length > 2);
         static readonly MethodInfo orderByScoreMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "OrderByScore");
         static readonly MethodInfo orderByScoreDescendingMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "OrderByScoreDescending");
         static readonly MethodInfo thenByScoreMethodInfo = typeof(ElasticQueryExtensions).GetMethodInfo(m => m.Name == "ThenByScore");

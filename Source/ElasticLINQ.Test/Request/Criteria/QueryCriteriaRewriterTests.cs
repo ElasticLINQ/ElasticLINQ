@@ -9,12 +9,12 @@ namespace ElasticLinq.Test.Request.Criteria
 {
     public class QueryCriteriaRewriterTests
     {
-        readonly static MemberInfo memberInfo = typeof(string).GetProperty("Length");
+        static readonly MemberInfo memberInfo = typeof(string).GetProperty("Length");
 
         [Fact]
         public void AndBecomesBoolWithMust()
         {
-            var expected = new[] { new RangeCriteria("fieldOne", memberInfo, RangeComparison.LessThan, 2), new RangeCriteria("fieldTwo", memberInfo, RangeComparison.GreaterThan, 4) };
+            ICriteria[] expected = { new RangeCriteria("fieldOne", memberInfo, RangeComparison.LessThan, 2), new RangeCriteria("fieldTwo", memberInfo, RangeComparison.GreaterThan, 4) };
 
             var actual = QueryCriteriaRewriter.Compensate(AndCriteria.Combine(expected));
 
@@ -28,8 +28,8 @@ namespace ElasticLinq.Test.Request.Criteria
         [Fact]
         public void AndWithNestedOrsBecomesBoolWithMustAndNestedShould()
         {
-            var expected1 = new[] { new RangeCriteria("field1", memberInfo, RangeComparison.LessThan, 2), new RangeCriteria("field2", memberInfo, RangeComparison.GreaterThan, 4) };
-            var expected2 = new[] { new RangeCriteria("field3", memberInfo, RangeComparison.LessThan, 2), new RangeCriteria("field4", memberInfo, RangeComparison.GreaterThan, 4) };
+            ICriteria[] expected1 = { new RangeCriteria("field1", memberInfo, RangeComparison.LessThan, 2), new RangeCriteria("field2", memberInfo, RangeComparison.GreaterThan, 4) };
+            ICriteria[] expected2 = { new RangeCriteria("field3", memberInfo, RangeComparison.LessThan, 2), new RangeCriteria("field4", memberInfo, RangeComparison.GreaterThan, 4) };
 
             var actual = QueryCriteriaRewriter.Compensate(AndCriteria.Combine(OrCriteria.Combine(expected1), OrCriteria.Combine(expected2)));
 
@@ -68,7 +68,7 @@ namespace ElasticLinq.Test.Request.Criteria
         [Fact]
         public void AndWithMixedContentBecomesBoolWithShouldMustAndMustNot()
         {
-            var expectedShould = new[] { new RangeCriteria("field1", memberInfo, RangeComparison.LessThan, 2), new RangeCriteria("field2", memberInfo, RangeComparison.GreaterThan, 4) };
+            ICriteria[] expectedShould = { new RangeCriteria("field1", memberInfo, RangeComparison.LessThan, 2), new RangeCriteria("field2", memberInfo, RangeComparison.GreaterThan, 4) };
             var expectedMust = new RangeCriteria("field3", memberInfo, RangeComparison.LessThan, 2);
             var expectedMustNot = new PrefixCriteria("field5", "prefix");
 
@@ -84,7 +84,7 @@ namespace ElasticLinq.Test.Request.Criteria
         [Fact]
         public void OrBecomesBoolWithShould()
         {
-            var expected = new[] { new RangeCriteria("fieldOne", memberInfo, RangeComparison.LessThan, 2), new RangeCriteria("fieldTwo", memberInfo, RangeComparison.GreaterThan, 4) };
+            ICriteria[] expected = { new RangeCriteria("fieldOne", memberInfo, RangeComparison.LessThan, 2), new RangeCriteria("fieldTwo", memberInfo, RangeComparison.GreaterThan, 4) };
 
             var actual = QueryCriteriaRewriter.Compensate(OrCriteria.Combine(expected));
 
@@ -98,7 +98,7 @@ namespace ElasticLinq.Test.Request.Criteria
         [Fact]
         public void NotWithOrBecomesBoolWithMustNot()
         {
-            var expected = new[] { new RangeCriteria("fieldOne", memberInfo, RangeComparison.LessThan, 2), new RangeCriteria("fieldTwo", memberInfo, RangeComparison.GreaterThan, 4) };
+            ICriteria[] expected = { new RangeCriteria("fieldOne", memberInfo, RangeComparison.LessThan, 2), new RangeCriteria("fieldTwo", memberInfo, RangeComparison.GreaterThan, 4) };
 
             var actual = QueryCriteriaRewriter.Compensate(NotCriteria.Create(OrCriteria.Combine(expected)));
 
@@ -112,7 +112,7 @@ namespace ElasticLinq.Test.Request.Criteria
         [Fact]
         public void NotWithAndBecomesBoolWithMustNotBool()
         {
-            var expected = new[] { new RangeCriteria("fieldOne", memberInfo, RangeComparison.LessThan, 2), new RangeCriteria("fieldTwo", memberInfo, RangeComparison.GreaterThan, 4) };
+            ICriteria[] expected = { new RangeCriteria("fieldOne", memberInfo, RangeComparison.LessThan, 2), new RangeCriteria("fieldTwo", memberInfo, RangeComparison.GreaterThan, 4) };
 
             var actual = QueryCriteriaRewriter.Compensate(NotCriteria.Create(AndCriteria.Combine(expected)));
 

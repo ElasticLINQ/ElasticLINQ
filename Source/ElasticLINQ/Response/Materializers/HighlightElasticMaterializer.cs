@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
+
 using ElasticLinq.Response.Model;
-using ElasticLinq.Utility;
 
 namespace ElasticLinq.Response.Materializers
 {
     class HighlightElasticMaterializer : ChainMaterializer
     {
-        public HighlightElasticMaterializer(IElasticMaterializer previous):base(previous)
+        public HighlightElasticMaterializer(IElasticMaterializer previous)
+            : base(previous)
         {
         }
 
@@ -20,13 +20,13 @@ namespace ElasticLinq.Response.Materializers
         {
             foreach (var hit in response.hits.hits)
             {
-                if (hit.highlight==null) continue;
+                if (hit.highlight == null) continue;
                 foreach (var prop in hit.highlight.Properties())
                 {
-                    hit._source.Add(string.Format("{0}_highlight",prop.Name),prop.Value);
+                    hit._source.Add(string.Format("{0}_highlight", prop.Name), prop.Value);
                 }
             }
-            
+
             return base.Materialize(response);
         }
     }

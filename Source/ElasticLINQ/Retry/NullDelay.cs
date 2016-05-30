@@ -13,7 +13,7 @@ namespace ElasticLinq.Retry
         /// <summary>
         /// Obtain a shared safe instance of the <see cref="NullDelay" />
         /// </summary>
-        public static readonly new NullDelay Instance = new NullDelay();
+        public new static readonly NullDelay Instance = new NullDelay();
 
         /// <summary>
         /// Obtain a task that will not delay.
