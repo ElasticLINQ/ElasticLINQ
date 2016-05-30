@@ -10,6 +10,13 @@ namespace ElasticLinq.Response.Materializers
     /// </summary>
     class CountElasticMaterializer : IElasticMaterializer
     {
+        readonly Type returnType;
+
+        public CountElasticMaterializer(Type returnType)
+        {
+            this.returnType = returnType;
+        }
+
         /// <summary>
         /// Materialize the result count for a given response.
         /// </summary>
@@ -20,10 +27,7 @@ namespace ElasticLinq.Response.Materializers
             if (response.hits.total < 0)
                 throw new ArgumentOutOfRangeException("response", "Contains a negative number of hits.");
 
-            if (response.hits.total <= int.MaxValue)
-                return (int)response.hits.total;
-
-            return response.hits.total;
+            return Convert.ChangeType(response.hits.total, returnType);
         }
     }
 }

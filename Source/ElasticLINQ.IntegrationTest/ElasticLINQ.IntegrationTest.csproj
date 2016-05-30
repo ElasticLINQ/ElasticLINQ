@@ -57,6 +57,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CountTests.cs" />
     <Compile Include="DataAssert.cs" />
     <Compile Include="Data.cs" />
     <Compile Include="FieldMappingTests.cs" />
