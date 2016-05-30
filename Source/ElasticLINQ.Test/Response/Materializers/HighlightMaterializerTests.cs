@@ -1,10 +1,10 @@
-﻿using ElasticLinq.Response.Materializers;
+﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
+
+using ElasticLinq.Response.Materializers;
 using ElasticLinq.Response.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace ElasticLinq.Test.Response.Materializers
@@ -22,23 +22,21 @@ namespace ElasticLinq.Test.Response.Materializers
         [Fact]
         public void HighlightMaterializerTests_Throws_If_Not_Chained()
         {
-            var respomse = MaterializerTestHelper.CreateSampleResponse(1);
+            var response = MaterializerTestHelper.CreateSampleResponse(1);
             var materializer = new HighlightElasticMaterializer(null);
 
-            Assert.Throws<ArgumentNullException>(()=>materializer.Materialize(respomse));
+            Assert.Throws<ArgumentNullException>(()=>materializer.Materialize(response));
         }
-
         
-
         [Fact]
-        public void HighlightMaterializerTests_Must_recognize_Highlighted_Result()
+        public void HighlightMaterializerTests_Must_Recognize_Highlighted_Result()
         {
-            var respomse = MaterializerTestHelper.CreateSampleResponseWithHighlight(1);
+            var response = MaterializerTestHelper.CreateSampleResponseWithHighlight(1);
             var materializer = new HighlightElasticMaterializer(new ListHitsElasticMaterializer(DefaultBySourceItemCreator, typeof(SampleClassWithHighlight)));
 
-            var result = materializer.Materialize(respomse);
+            var result = materializer.Materialize(response);
 
-            var actualList = Assert.IsType<List<SampleClassWithHighlight>>(result);
+            var actualList = Assert.IsAssignableFrom<IEnumerable<SampleClassWithHighlight>>(result);
             var highlighted = actualList.First().SampleField_Highlight;
             Assert.NotNull(highlighted);
         }
