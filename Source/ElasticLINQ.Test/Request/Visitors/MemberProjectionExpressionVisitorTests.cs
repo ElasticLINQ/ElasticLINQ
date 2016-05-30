@@ -99,6 +99,14 @@ namespace ElasticLinq.Test.Request.Visitors
         }
 
         [Fact]
+        public void GetDictionaryValueOrDefaultReturnsDefaultObjectIfDictionaryIsNull()
+        {
+            var actual = (DateTime)MemberProjectionExpressionVisitor.GetDictionaryValueOrDefault(null, "Any", typeof(DateTime));
+
+            Assert.Equal(default(DateTime), actual);
+        }
+
+        [Fact]
         public void GetDictionaryValueOrDefaultReturnsDefaultObjectIfKeyNotFoundForValueType()
         {
             var dictionary = new Dictionary<string, JToken>();

@@ -61,7 +61,7 @@ namespace ElasticLinq.Request.Visitors
         internal static object GetDictionaryValueOrDefault(IDictionary<string, JToken> dictionary, string key, Type expectedType)
         {
             JToken token;
-            if (!dictionary.TryGetValue(key, out token))
+            if (dictionary == null || !dictionary.TryGetValue(key, out token))
                 return TypeHelper.CreateDefault(expectedType);
 
             // Elasticsearch 1.0+ puts fields in an array, unwrap it if necessary
