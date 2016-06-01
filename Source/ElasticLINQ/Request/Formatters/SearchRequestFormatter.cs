@@ -205,6 +205,9 @@ namespace ElasticLinq.Request.Formatters
             if (criteria is TermsCriteria)
                 return Build((TermsCriteria)criteria);
 
+            if (criteria is FieldCallCriteria)
+                return Build((FieldCallCriteria)criteria);
+
             if (criteria is NotCriteria)
                 return Build((NotCriteria)criteria);
 
@@ -294,6 +297,15 @@ namespace ElasticLinq.Request.Formatters
                 termsCriteria.Add(new JProperty("execution", criteria.ExecutionMode.GetValueOrDefault().ToString()));
 
             return new JObject(new JProperty(criteria.Name, termsCriteria));
+        }
+
+        JObject Build(FieldCallCriteria criteria)
+        {
+            var concatedField = mapping.ConcatFieldCall(criteria.FieldCallHierarchy);
+
+            return new JObject(
+                 new JProperty(criteria.Name, new JObject(
+                     new JProperty(concatedField, mapping.FormatValue(criteria.Member, criteria.Values[0])))));
         }
 
         static JObject Build(SingleFieldCriteria criteria)

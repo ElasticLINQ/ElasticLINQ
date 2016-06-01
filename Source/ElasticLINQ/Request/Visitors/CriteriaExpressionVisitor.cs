@@ -1,5 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using System.Reflection;
 using ElasticLinq.Mapping;
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Expressions;
@@ -103,6 +104,10 @@ namespace ElasticLinq.Request.Visitors
                 case "Contains":
                     if (m.Arguments.Count == 2)
                         return VisitEnumerableContainsMethodCall(m.Arguments[0], m.Arguments[1]);
+                    break;
+                case "Any":
+                    if (m.Arguments.Count == 2)
+                        return VisitEnumerableAnyMethodCall(m.Arguments[0], m.Arguments[1]);
                     break;
             }
 
@@ -286,6 +291,32 @@ namespace ElasticLinq.Request.Visitors
             throw new NotSupportedException(source is MemberExpression
                 ? string.Format("Match '{0}' in Contains operation must be a constant", match)
                 : string.Format("Unknown source '{0}' for Contains operation", source));
+        }
+
+        private Expression VisitEnumerableAnyMethodCall(Expression source, Expression match)
+        {
+            var matched = Visit(match);
+            //             || Visit this part of expression         ||
+            //  Where(x => || x.Any(x1 => x1.SomeList.Contains("a") ||)
+            if (source is MemberExpression && matched is LambdaExpression)
+            {
+                var matchLambda = matched as LambdaExpression;
+
+                if (matchLambda.Body is CriteriaExpression)
+                {
+                    var criteriaExpression = matchLambda.Body as CriteriaExpression;
+
+                    var termCriteria = criteriaExpression.Criteria as TermCriteria;
+                    if (termCriteria != null)
+                    {
+                        var field = Mapping.GetFieldName(SourceType, source as MemberExpression);
+                        return new CriteriaExpression(new FieldCallCriteria(field, (source as MemberExpression).Member,termCriteria));
+                    }
+
+                }
+
+            }
+            return null;
         }
 
         protected virtual Expression VisitStringPatternCheckMethodCall(Expression source, Expression match, string pattern, string methodName)

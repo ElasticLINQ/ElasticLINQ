@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Globalization;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -187,6 +188,18 @@ namespace ElasticLinq.Mapping
         public virtual object Materialize(JToken sourceDocument, Type sourceType)
         {
             return sourceDocument.ToObject(sourceType);
+        }
+        /// <inheritedDoc />
+        public string ConcatFieldCall(params string[] fields)
+        {
+            return fields.Aggregate("", (a, s) =>
+            {
+                if (a.Length > 0)
+                {
+                    return String.Concat(a, ".", s);
+                }
+                return s;
+            });
         }
     }
 }

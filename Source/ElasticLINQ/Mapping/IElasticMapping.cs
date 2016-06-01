@@ -61,5 +61,12 @@ namespace ElasticLinq.Mapping
         /// <param name="sourceType">Type of CLR object to materialize to.</param>
         /// <returns>Freshly materialized CLR object version of the source document.</returns>
         object Materialize(JToken sourceDocument, Type sourceType);
+
+        /// <summary>
+        /// Concat fields to field Call hierarchy.
+        /// </summary>
+        /// <param name="fields">fields to concat</param>
+        /// <returns>Concated string of fields</returns>
+        string ConcatFieldCall(params String[] fields);
     }
 }
