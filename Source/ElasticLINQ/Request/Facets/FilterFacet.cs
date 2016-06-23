@@ -26,7 +26,9 @@ namespace ElasticLinq.Request.Facets
         }
 
         public string Type { get { return "filter"; } }
+
         public string Name { get { return name; } }
+
         public ICriteria Filter { get { return filter; } }
     }
 }

@@ -84,7 +84,7 @@ namespace ElasticLinq.Request.Formatters
             if (searchRequest.Highlight != null)
                 root.Add("highlight", Build(searchRequest.Highlight));
 
-            long? size = searchRequest.Size ?? connection.Options.SearchSizeDefault;
+            var size = searchRequest.Size ?? connection.Options.SearchSizeDefault;
             if (size.HasValue && !searchRequest.Facets.Any())
                 root.Add("size", size.Value);
 

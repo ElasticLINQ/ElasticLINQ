@@ -11,27 +11,27 @@ namespace ElasticLinq.Async
 {
     public static partial class AsyncQueryable
     {
-        private static readonly Lazy<MethodInfo> sumIntMethodInfo = QueryableMethodByReturnType("Sum", 1, typeof(int));
-        private static readonly Lazy<MethodInfo> sumIntNullableMethodInfo = QueryableMethodByReturnType("Sum", 1, typeof(int?));
-        private static readonly Lazy<MethodInfo> sumLongMethodInfo = QueryableMethodByReturnType("Sum", 1, typeof(long));
-        private static readonly Lazy<MethodInfo> sumLongNullableMethodInfo = QueryableMethodByReturnType("Sum", 1, typeof(long?));
-        private static readonly Lazy<MethodInfo> sumFloatMethodInfo = QueryableMethodByReturnType("Sum", 1, typeof(float));
-        private static readonly Lazy<MethodInfo> sumFloatNullableMethodInfo = QueryableMethodByReturnType("Sum", 1, typeof(float?));
-        private static readonly Lazy<MethodInfo> sumDoubleMethodInfo = QueryableMethodByReturnType("Sum", 1, typeof(double));
-        private static readonly Lazy<MethodInfo> sumDoubleNullableMethodInfo = QueryableMethodByReturnType("Sum", 1, typeof(double?));
-        private static readonly Lazy<MethodInfo> sumDecimalMethodInfo = QueryableMethodByReturnType("Sum", 1, typeof(decimal));
-        private static readonly Lazy<MethodInfo> sumDecimalNullableMethodInfo = QueryableMethodByReturnType("Sum", 1, typeof(decimal?));
+        static readonly Lazy<MethodInfo> sumIntMethodInfo = QueryableMethodByReturnType("Sum", 1, typeof(int));
+        static readonly Lazy<MethodInfo> sumIntNullableMethodInfo = QueryableMethodByReturnType("Sum", 1, typeof(int?));
+        static readonly Lazy<MethodInfo> sumLongMethodInfo = QueryableMethodByReturnType("Sum", 1, typeof(long));
+        static readonly Lazy<MethodInfo> sumLongNullableMethodInfo = QueryableMethodByReturnType("Sum", 1, typeof(long?));
+        static readonly Lazy<MethodInfo> sumFloatMethodInfo = QueryableMethodByReturnType("Sum", 1, typeof(float));
+        static readonly Lazy<MethodInfo> sumFloatNullableMethodInfo = QueryableMethodByReturnType("Sum", 1, typeof(float?));
+        static readonly Lazy<MethodInfo> sumDoubleMethodInfo = QueryableMethodByReturnType("Sum", 1, typeof(double));
+        static readonly Lazy<MethodInfo> sumDoubleNullableMethodInfo = QueryableMethodByReturnType("Sum", 1, typeof(double?));
+        static readonly Lazy<MethodInfo> sumDecimalMethodInfo = QueryableMethodByReturnType("Sum", 1, typeof(decimal));
+        static readonly Lazy<MethodInfo> sumDecimalNullableMethodInfo = QueryableMethodByReturnType("Sum", 1, typeof(decimal?));
 
-        private static readonly Lazy<MethodInfo> sumIntSelectorMethodInfo = QueryableMethodByReturnType("Sum", 2, typeof(int));
-        private static readonly Lazy<MethodInfo> sumIntNullableSelectorMethodInfo = QueryableMethodByReturnType("Sum", 2, typeof(int?));
-        private static readonly Lazy<MethodInfo> sumLongSelectorMethodInfo = QueryableMethodByReturnType("Sum", 2, typeof(long));
-        private static readonly Lazy<MethodInfo> sumLongNullableSelectorMethodInfo = QueryableMethodByReturnType("Sum", 2, typeof(long?));
-        private static readonly Lazy<MethodInfo> sumFloatSelectorMethodInfo = QueryableMethodByReturnType("Sum", 2, typeof(float));
-        private static readonly Lazy<MethodInfo> sumFloatNullableSelectorMethodInfo = QueryableMethodByReturnType("Sum", 2, typeof(float?));
-        private static readonly Lazy<MethodInfo> sumDoubleSelectorMethodInfo = QueryableMethodByReturnType("Sum", 2, typeof(double));
-        private static readonly Lazy<MethodInfo> sumDoubleNullableSelectorMethodInfo = QueryableMethodByReturnType("Sum", 2, typeof(double?));
-        private static readonly Lazy<MethodInfo> sumDecimalSelectorMethodInfo = QueryableMethodByReturnType("Sum", 2, typeof(decimal));
-        private static readonly Lazy<MethodInfo> sumDecimalNullableSelectorMethodInfo = QueryableMethodByReturnType("Sum", 2, typeof(decimal?));
+        static readonly Lazy<MethodInfo> sumIntSelectorMethodInfo = QueryableMethodByReturnType("Sum", 2, typeof(int));
+        static readonly Lazy<MethodInfo> sumIntNullableSelectorMethodInfo = QueryableMethodByReturnType("Sum", 2, typeof(int?));
+        static readonly Lazy<MethodInfo> sumLongSelectorMethodInfo = QueryableMethodByReturnType("Sum", 2, typeof(long));
+        static readonly Lazy<MethodInfo> sumLongNullableSelectorMethodInfo = QueryableMethodByReturnType("Sum", 2, typeof(long?));
+        static readonly Lazy<MethodInfo> sumFloatSelectorMethodInfo = QueryableMethodByReturnType("Sum", 2, typeof(float));
+        static readonly Lazy<MethodInfo> sumFloatNullableSelectorMethodInfo = QueryableMethodByReturnType("Sum", 2, typeof(float?));
+        static readonly Lazy<MethodInfo> sumDoubleSelectorMethodInfo = QueryableMethodByReturnType("Sum", 2, typeof(double));
+        static readonly Lazy<MethodInfo> sumDoubleNullableSelectorMethodInfo = QueryableMethodByReturnType("Sum", 2, typeof(double?));
+        static readonly Lazy<MethodInfo> sumDecimalSelectorMethodInfo = QueryableMethodByReturnType("Sum", 2, typeof(decimal));
+        static readonly Lazy<MethodInfo> sumDecimalNullableSelectorMethodInfo = QueryableMethodByReturnType("Sum", 2, typeof(decimal?));
 
         /// <summary>
         /// Asynchronously computes the sum of a sequence of <see cref="T:System.Int32"/> values.

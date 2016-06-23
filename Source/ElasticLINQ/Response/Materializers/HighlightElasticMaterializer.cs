@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using ElasticLinq.Response.Model;
-using ElasticLinq.Utility;
+﻿using ElasticLinq.Response.Model;
 
 namespace ElasticLinq.Response.Materializers
 {

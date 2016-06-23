@@ -16,7 +16,7 @@ namespace ElasticLinq.Request.Facets
     class TermsStatsFacet : IOrderableFacet
     {
         readonly string name;
-        readonly ICriteria criteria;
+        readonly ICriteria filter;
         readonly string key;
         readonly string value;
         readonly int? size;
@@ -27,23 +27,28 @@ namespace ElasticLinq.Request.Facets
             this.size = size;
         }
 
-        public TermsStatsFacet(string name, ICriteria criteria, string key, string value)
+        public TermsStatsFacet(string name, ICriteria filter, string key, string value)
         {
             Argument.EnsureNotBlank("name", name);
             Argument.EnsureNotBlank("key", key);
             Argument.EnsureNotBlank("value", value);
 
             this.name = name;
-            this.criteria = criteria;
+            this.filter = filter;
             this.key = key;
             this.value = value;
         }
 
         public string Type { get { return "terms_stats"; } }
+
         public string Name { get { return name; } }
-        public ICriteria Filter { get { return criteria; } }
+
+        public ICriteria Filter { get { return filter; } }
+
         public string Key { get { return key; } }
+
         public string Value { get { return value; } }
+
         public int? Size { get { return size; } }
     }
 }

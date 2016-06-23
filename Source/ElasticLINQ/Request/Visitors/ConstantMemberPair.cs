@@ -28,7 +28,7 @@ namespace ElasticLinq.Request.Visitors
             return null;
         }
 
-        public ConstantMemberPair(ConstantExpression constantExpression, MemberExpression memberExpression)
+        ConstantMemberPair(ConstantExpression constantExpression, MemberExpression memberExpression)
         {
             this.constantExpression = constantExpression;
             this.memberExpression = memberExpression;

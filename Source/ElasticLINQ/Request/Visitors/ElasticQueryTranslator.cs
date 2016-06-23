@@ -115,7 +115,7 @@ namespace ElasticLinq.Request.Visitors
             return base.VisitStringPatternCheckMethodCall(source, match, pattern, methodName);
         }
 
-        internal Expression VisitElasticQueryExtensionsMethodCall(MethodCallExpression m)
+        Expression VisitElasticQueryExtensionsMethodCall(MethodCallExpression m)
         {
             switch (m.Method.Name)
             {
@@ -177,13 +177,11 @@ namespace ElasticLinq.Request.Visitors
 
         Expression VisitMinimumScore(Expression source, Expression minScoreExpression)
         {
-            if (minScoreExpression is ConstantExpression)
-            {
-                searchRequest.MinScore = Convert.ToDouble(((ConstantExpression)minScoreExpression).Value);
-                return Visit(source);
-            }
+            if (!(minScoreExpression is ConstantExpression))
+                throw new NotSupportedException(string.Format("Score must be a constant expression, not a {0}.", minScoreExpression.NodeType));
 
-            throw new NotSupportedException(string.Format("Score must be a constant expression, not a {0}.", minScoreExpression.NodeType));
+            searchRequest.MinScore = Convert.ToDouble(((ConstantExpression)minScoreExpression).Value);
+            return Visit(source);
         }
 
         Expression VisitQueryString(Expression source, Expression queryExpression, Expression fieldsExpression = null)
@@ -197,7 +195,7 @@ namespace ElasticLinq.Request.Visitors
             return Visit(source);
         }
 
-        internal Expression VisitQueryableMethodCall(MethodCallExpression m)
+        Expression VisitQueryableMethodCall(MethodCallExpression m)
         {
             switch (m.Method.Name)
             {

@@ -1,10 +1,12 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
+﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
+
 using ElasticLinq.Logging;
 using ElasticLinq.Request;
 using ElasticLinq.Response.Model;
 using ElasticLinq.Utility;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ElasticLinq
 {
@@ -13,11 +15,11 @@ namespace ElasticLinq
     /// </summary>
     public abstract class BaseElasticConnection : IElasticConnection
     {
-        private static readonly TimeSpan defaultTimeout = TimeSpan.FromSeconds(10);
+        static readonly TimeSpan defaultTimeout = TimeSpan.FromSeconds(10);
 
-        private readonly string index;
-        private readonly TimeSpan timeout;
-        private readonly ElasticConnectionOptions options;
+        readonly string index;
+        readonly TimeSpan timeout;
+        readonly ElasticConnectionOptions options;
 
         /// <summary>
         /// Create a new BaseElasticConnection with the given parameters for internal testing.
@@ -28,7 +30,7 @@ namespace ElasticLinq
         protected BaseElasticConnection(string index = null, TimeSpan? timeout = null, ElasticConnectionOptions options = null)
         {
             if (timeout.HasValue)
-                Argument.EnsurePositive("value", timeout.Value);
+                Argument.EnsurePositive("timeout", timeout.Value);
             if (index != null)
                 Argument.EnsureNotBlank("index", index);
 

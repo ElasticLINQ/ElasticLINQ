@@ -1,6 +1,10 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
+using ElasticLinq.Logging;
+using ElasticLinq.Request;
+using ElasticLinq.Response.Model;
 using ElasticLinq.Utility;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,10 +14,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using ElasticLinq.Logging;
-using ElasticLinq.Request;
-using ElasticLinq.Response.Model;
-using Newtonsoft.Json;
 
 namespace ElasticLinq
 {
@@ -23,10 +23,10 @@ namespace ElasticLinq
     [DebuggerDisplay("{Endpoint.ToString(),nq}{Index,nq}")]
     public class ElasticConnection : BaseElasticConnection, IDisposable
     {
-        private readonly string[] parameterSeparator = { "&" };
-        private readonly Uri endpoint;
+        readonly string[] parameterSeparator = { "&" };
+        readonly Uri endpoint;
 
-        private HttpClient httpClient;
+        HttpClient httpClient;
 
         /// <summary>
         /// Create a new ElasticConnection with the given parameters defining its properties.
@@ -149,7 +149,7 @@ namespace ElasticLinq
             return builder.Uri;
         }
 
-        private async Task<HttpResponseMessage> SendRequestAsync(HttpRequestMessage requestMessage, CancellationToken token, ILog log)
+        async Task<HttpResponseMessage> SendRequestAsync(HttpRequestMessage requestMessage, CancellationToken token, ILog log)
         {
             var stopwatch = Stopwatch.StartNew();
             var response = await httpClient.SendAsync(requestMessage, token);
@@ -177,7 +177,7 @@ namespace ElasticLinq
             }
         }
 
-        internal static IEnumerable<string> GetResultSummary(ElasticResponse results)
+        static IEnumerable<string> GetResultSummary(ElasticResponse results)
         {
             if (results == null)
             {
