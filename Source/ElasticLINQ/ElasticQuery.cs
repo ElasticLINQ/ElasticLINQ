@@ -19,7 +19,6 @@ namespace ElasticLinq
     public class ElasticQuery<T> : IElasticQuery<T>
     {
         readonly ElasticQueryProvider provider;
-        readonly Expression expression;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ElasticQuery{T}"/> class.
@@ -30,7 +29,7 @@ namespace ElasticLinq
             Argument.EnsureNotNull(nameof(provider), provider);
 
             this.provider = provider;
-            expression = Expression.Constant(this);
+            Expression = Expression.Constant(this);
         }
 
         /// <summary>
@@ -47,19 +46,19 @@ namespace ElasticLinq
                 throw new ArgumentOutOfRangeException(nameof(expression));
 
             this.provider = provider;
-            this.expression = expression;
+            Expression = expression;
         }
 
         /// <inheritdoc/>
         public IEnumerator<T> GetEnumerator()
         {
-            return ((IEnumerable<T>)provider.Execute(expression)).GetEnumerator();
+            return ((IEnumerable<T>)provider.Execute(Expression)).GetEnumerator();
         }
 
         /// <inheritdoc/>
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return ((IEnumerable)provider.Execute(expression)).GetEnumerator();
+            return ((IEnumerable)provider.Execute(Expression)).GetEnumerator();
         }
 
         /// <inheritdoc/>
@@ -69,10 +68,7 @@ namespace ElasticLinq
         }
 
         /// <inheritdoc/>
-        public Expression Expression
-        {
-            get { return expression; }
-        }
+        public Expression Expression { get; }
 
         /// <inheritdoc/>
         public IQueryProvider Provider

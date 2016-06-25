@@ -14,10 +14,6 @@ namespace ElasticLinq.Request.Criteria
     /// </summary>
     public class TermsCriteria : SingleFieldCriteria, ITermsCriteria
     {
-        readonly TermsExecutionMode? executionMode;
-        readonly MemberInfo member;
-        readonly ReadOnlyCollection<object> values;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="TermsCriteria"/> class.
         /// </summary>
@@ -28,18 +24,15 @@ namespace ElasticLinq.Request.Criteria
         TermsCriteria(TermsExecutionMode? executionMode, string field, MemberInfo member, IEnumerable<object> values)
             : base(field)
         {
-            this.executionMode = executionMode;
-            this.member = member;
-            this.values = new ReadOnlyCollection<object>(values.ToArray());
+            ExecutionMode = executionMode;
+            Member = member;
+            Values = new ReadOnlyCollection<object>(values.ToArray());
         }
 
         /// <summary>
         /// Type of execution mode this terms criteria will take.
         /// </summary>
-        public TermsExecutionMode? ExecutionMode
-        {
-            get { return executionMode; }
-        }
+        public TermsExecutionMode? ExecutionMode { get; }
 
         bool ITermsCriteria.IsOrCriteria
         {
@@ -57,10 +50,7 @@ namespace ElasticLinq.Request.Criteria
         /// <summary>
         /// Property or field being checked for this term.
         /// </summary>
-        public MemberInfo Member
-        {
-            get { return member; }
-        }
+        public MemberInfo Member { get; }
 
         /// <inheritdoc/>
         public override string Name
@@ -71,10 +61,7 @@ namespace ElasticLinq.Request.Criteria
         /// <summary>
         /// Constant values being searched for.
         /// </summary>
-        public ReadOnlyCollection<object> Values
-        {
-            get { return values; }
-        }
+        public ReadOnlyCollection<object> Values { get; }
 
         /// <inheritdoc/>
         public override string ToString()

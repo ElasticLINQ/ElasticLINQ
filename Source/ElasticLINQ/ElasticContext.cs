@@ -33,22 +33,22 @@ namespace ElasticLinq
         /// <summary>
         /// Specifies the connection to the Elasticsearch server.
         /// </summary>
-        public IElasticConnection Connection { get; private set; }
+        public IElasticConnection Connection { get; }
 
         /// <summary>
         /// The logging mechanism for diagnostic information.
         /// </summary>
-        public ILog Log { get; private set; }
+        public ILog Log { get; }
 
         /// <summary>
         /// The mapping to describe how objects and their properties are mapped to Elasticsearch.
         /// </summary>
-        public IElasticMapping Mapping { get; private set; }
+        public IElasticMapping Mapping { get; }
 
         /// <summary>
         /// The retry policy for handling networking issues.
         /// </summary>
-        public IRetryPolicy RetryPolicy { get; private set; }
+        public IRetryPolicy RetryPolicy { get; }
 
         /// <inheritdoc/>
         public virtual IQueryable<T> Query<T>()

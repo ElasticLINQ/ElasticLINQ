@@ -12,19 +12,13 @@ namespace ElasticLinq.Request.Facets
     /// a given field broken down by a term. 
     /// </summary>
     /// <remarks>Mapped to .GroupBy(a => a.Term).Select(a => a.Sum(b => b.Field))</remarks>
-    [DebuggerDisplay("TermsStatsFacet \"{key,nq}.{value,nq}\"")]
+    [DebuggerDisplay("TermsStatsFacet \"{Key,nq}.{Value,nq}\"")]
     class TermsStatsFacet : IOrderableFacet
     {
-        readonly string name;
-        readonly ICriteria filter;
-        readonly string key;
-        readonly string value;
-        readonly int? size;
-
         public TermsStatsFacet(string name, string key, string value, int? size)
             : this(name, null, key, value)
         {
-            this.size = size;
+            Size = size;
         }
 
         public TermsStatsFacet(string name, ICriteria filter, string key, string value)
@@ -33,22 +27,22 @@ namespace ElasticLinq.Request.Facets
             Argument.EnsureNotBlank(nameof(key), key);
             Argument.EnsureNotBlank(nameof(value), value);
 
-            this.name = name;
-            this.filter = filter;
-            this.key = key;
-            this.value = value;
+            Name = name;
+            Filter = filter;
+            Key = key;
+            Value = value;
         }
 
         public string Type { get { return "terms_stats"; } }
 
-        public string Name { get { return name; } }
+        public string Name { get; }
 
-        public ICriteria Filter { get { return filter; } }
+        public ICriteria Filter { get; }
 
-        public string Key { get { return key; } }
+        public string Key { get; }
 
-        public string Value { get { return value; } }
+        public string Value { get; }
 
-        public int? Size { get { return size; } }
+        public int? Size { get; }
     }
 }

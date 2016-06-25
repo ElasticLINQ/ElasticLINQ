@@ -11,21 +11,19 @@ namespace ElasticLinq.Request.Expressions
     /// </summary>
     class CriteriaExpression : Expression
     {
-        readonly ICriteria criteria;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="CriteriaExpression"/> class.
         /// </summary>
         /// <param name="criteria"><see cref="ICriteria" /> to represent with this expression.</param>
         public CriteriaExpression(ICriteria criteria)
         {
-            this.criteria = criteria;
+            Criteria = criteria;
         }
 
         /// <summary>
         /// <see cref="ICriteria" /> that is represented by this expression.
         /// </summary>
-        public ICriteria Criteria { get { return criteria; } }
+        public ICriteria Criteria { get; }
 
         /// <inheritdoc/>
         public override ExpressionType NodeType
@@ -48,7 +46,7 @@ namespace ElasticLinq.Request.Expressions
         /// <inheritdoc/>
         public override string ToString()
         {
-            return criteria.ToString();
+            return Criteria.ToString();
         }
     }
 }

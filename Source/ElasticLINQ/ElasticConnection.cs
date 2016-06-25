@@ -24,9 +24,6 @@ namespace ElasticLinq
     public class ElasticConnection : BaseElasticConnection, IDisposable
     {
         readonly string[] parameterSeparator = { "&" };
-        readonly Uri endpoint;
-
-        HttpClient httpClient;
 
         /// <summary>
         /// Create a new ElasticConnection with the given parameters defining its properties.
@@ -56,31 +53,25 @@ namespace ElasticLinq
         {
             Argument.EnsureNotNull(nameof(endpoint), endpoint);
 
-            this.endpoint = endpoint;
+            Endpoint = endpoint;
 
             var httpClientHandler = innerMessageHandler as HttpClientHandler;
             if (httpClientHandler != null && httpClientHandler.SupportsAutomaticDecompression)
                 httpClientHandler.AutomaticDecompression = DecompressionMethods.GZip;
 
-            httpClient = new HttpClient(new ForcedAuthHandler(userName, password, innerMessageHandler), true);
+            HttpClient = new HttpClient(new ForcedAuthHandler(userName, password, innerMessageHandler), true);
         }
 
         /// <summary>
         /// The HttpClient used for issuing HTTP network requests.
         /// </summary>
-        internal HttpClient HttpClient
-        {
-            get { return httpClient; }
-        }
+        internal HttpClient HttpClient { get; set; }
 
         /// <summary>
         /// The Uri that specifies the public endpoint for the server.
         /// </summary>
         /// <example>http://myserver.example.com:9200</example>
-        public Uri Endpoint
-        {
-            get { return endpoint; }
-        }
+        public Uri Endpoint { get; }
 
         /// <summary>
         /// Dispose of this ElasticConnection and any associated resources.
@@ -96,10 +87,10 @@ namespace ElasticLinq
         {
             if (disposing)
             {
-                if (httpClient != null)
+                if (HttpClient != null)
                 {
-                    httpClient.Dispose();
-                    httpClient = null;
+                    HttpClient.Dispose();
+                    HttpClient = null;
                 }
             }
         }
@@ -125,7 +116,7 @@ namespace ElasticLinq
         /// <inheritdoc/>
         public override Uri GetSearchUri(SearchRequest searchRequest)
         {
-            var builder = new UriBuilder(endpoint);
+            var builder = new UriBuilder(Endpoint);
             builder.Path += (Index ?? "_all") + "/";
 
             if (!String.IsNullOrEmpty(searchRequest.DocumentType))
@@ -152,7 +143,7 @@ namespace ElasticLinq
         async Task<HttpResponseMessage> SendRequestAsync(HttpRequestMessage requestMessage, CancellationToken token, ILog log)
         {
             var stopwatch = Stopwatch.StartNew();
-            var response = await httpClient.SendAsync(requestMessage, token);
+            var response = await HttpClient.SendAsync(requestMessage, token);
             stopwatch.Stop();
 
             log.Debug(null, null, "Response: {0} {1} (in {2}ms)", (int)response.StatusCode, response.StatusCode, stopwatch.ElapsedMilliseconds);

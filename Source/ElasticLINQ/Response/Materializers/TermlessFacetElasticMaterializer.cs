@@ -16,7 +16,6 @@ namespace ElasticLinq.Response.Materializers
         static readonly string[] termlessFacetTypes = { "statistical", "filter" };
 
         readonly Func<AggregateRow, object> projector;
-        readonly Type elementType;
         readonly object key;
 
         /// <summary>
@@ -31,7 +30,7 @@ namespace ElasticLinq.Response.Materializers
             Argument.EnsureNotNull(nameof(elementType), elementType);
 
             this.projector = projector;
-            this.elementType = elementType;
+            ElementType = elementType;
             this.key = key;
         }
 
@@ -45,7 +44,7 @@ namespace ElasticLinq.Response.Materializers
         {
             Argument.EnsureNotNull(nameof(response), response);
 
-            return MaterializeSingle(response) ?? TypeHelper.CreateDefault(elementType);
+            return MaterializeSingle(response) ?? TypeHelper.CreateDefault(ElementType);
         }
 
         /// <summary>
@@ -76,6 +75,6 @@ namespace ElasticLinq.Response.Materializers
         /// <summary>
         /// Type of element being materialized.
         /// </summary>
-        internal Type ElementType { get { return elementType; } }
+        internal Type ElementType { get; }
     }
 }

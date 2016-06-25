@@ -16,15 +16,13 @@ namespace ElasticLinq.Request.Visitors
 {
     class FacetRebindCollectionResult : RebindCollectionResult<IFacet>
     {
-        readonly IElasticMaterializer materializer;
-
         public FacetRebindCollectionResult(Expression expression, IEnumerable<IFacet> collected, ParameterExpression parameter, IElasticMaterializer materializer)
             : base(expression, collected, parameter)
         {
-            this.materializer = materializer;
+            Materializer = materializer;
         }
 
-        public IElasticMaterializer Materializer { get { return materializer; } }
+        public IElasticMaterializer Materializer { get; }
     }
 
     /// <summary>

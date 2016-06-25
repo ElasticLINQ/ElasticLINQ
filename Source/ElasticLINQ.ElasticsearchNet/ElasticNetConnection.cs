@@ -22,7 +22,7 @@ namespace ElasticLinq.ElasticsearchNet
     /// </summary>
     public class ElasticNetConnection : BaseElasticConnection
     {
-        private readonly IElasticsearchClient client;
+        readonly IElasticsearchClient client;
 
         /// <summary>
         /// Create a new ElasticNetConnection with the given parameters defining its properties.

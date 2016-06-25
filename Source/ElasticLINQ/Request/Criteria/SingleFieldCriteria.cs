@@ -9,8 +9,6 @@ namespace ElasticLinq.Request.Criteria
     /// </summary>
     public abstract class SingleFieldCriteria : ICriteria
     {
-        readonly string field;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="SingleFieldCriteria"/> class.
         /// </summary>
@@ -18,16 +16,13 @@ namespace ElasticLinq.Request.Criteria
         protected SingleFieldCriteria(string field)
         {
             Argument.EnsureNotBlank(nameof(field), field);
-            this.field = field;
+            Field = field;
         }
 
         /// <summary>
         /// Field this criteria applies to.
         /// </summary>
-        public string Field
-        {
-            get { return field; }
-        }
+        public string Field { get; }
 
         /// <inheritdoc/>
         public abstract string Name

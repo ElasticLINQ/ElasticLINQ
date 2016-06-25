@@ -32,13 +32,13 @@ namespace ElasticLinq.Test
         /// <summary>
         /// The <see cref="TestableElasticContext"/> this query belongs to.
         /// </summary>
-        public TestableElasticContext Context { get; private set; }
+        public TestableElasticContext Context { get; }
 
         /// <inheritdoc/>
-        public Type ElementType { get; private set; }
+        public Type ElementType { get; }
 
         /// <inheritdoc/>
-        public Expression Expression { get; private set; }
+        public Expression Expression { get; }
 
         /// <inheritdoc/>
         public IQueryProvider Provider { get { return Context.Provider; } }

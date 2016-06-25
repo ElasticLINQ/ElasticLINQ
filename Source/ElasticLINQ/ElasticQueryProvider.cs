@@ -50,9 +50,9 @@ namespace ElasticLinq
 
         internal IElasticConnection Connection { get; private set; }
 
-        internal ILog Log { get; private set; }
+        internal ILog Log { get; }
 
-        internal IElasticMapping Mapping { get; private set; }
+        internal IElasticMapping Mapping { get; }
 
         internal IRetryPolicy RetryPolicy { get; private set; }
 

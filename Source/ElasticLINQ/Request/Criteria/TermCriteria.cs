@@ -11,7 +11,6 @@ namespace ElasticLinq.Request.Criteria
     /// </summary>
     class TermCriteria : SingleFieldCriteria, ITermsCriteria
     {
-        readonly MemberInfo member;
         readonly ReadOnlyCollection<object> values;
 
         /// <summary>
@@ -23,7 +22,7 @@ namespace ElasticLinq.Request.Criteria
         public TermCriteria(string field, MemberInfo member, object value)
             : base(field)
         {
-            this.member = member;
+            Member = member;
             values = new ReadOnlyCollection<object>(new[] { value });
         }
 
@@ -36,10 +35,7 @@ namespace ElasticLinq.Request.Criteria
         /// <summary>
         /// Property or field being checked for this term.
         /// </summary>
-        public MemberInfo Member
-        {
-            get { return member; }
-        }
+        public MemberInfo Member { get; }
 
         /// <inheritdoc/>
         public override string Name

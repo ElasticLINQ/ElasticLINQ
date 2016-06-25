@@ -16,10 +16,6 @@ namespace ElasticLinq.Request.Criteria
     [DebuggerDisplay("{Field}")]
     class RangeCriteria : ICriteria
     {
-        readonly string field;
-        readonly MemberInfo member;
-        readonly ReadOnlyCollection<RangeSpecificationCriteria> specifications;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="RangeCriteria"/> class.
         /// </summary>
@@ -32,9 +28,9 @@ namespace ElasticLinq.Request.Criteria
             Argument.EnsureNotNull(nameof(member), member);
             Argument.EnsureNotNull(nameof(specifications), specifications);
 
-            this.field = field;
-            this.member = member;
-            this.specifications = new ReadOnlyCollection<RangeSpecificationCriteria>(specifications.ToArray());
+            Field = field;
+            Member = member;
+            Specifications = new ReadOnlyCollection<RangeSpecificationCriteria>(specifications.ToArray());
         }
 
         public RangeCriteria(string field, MemberInfo member, RangeComparison comparison, object value)
@@ -43,10 +39,7 @@ namespace ElasticLinq.Request.Criteria
         /// <summary>
         /// Property or field that this range criteria applies to.
         /// </summary>
-        public MemberInfo Member
-        {
-            get { return member; }
-        }
+        public MemberInfo Member { get; }
 
         /// <inheritdoc/>
         public string Name
@@ -57,23 +50,17 @@ namespace ElasticLinq.Request.Criteria
         /// <summary>
         /// Field that must be within the specified ranges.
         /// </summary>
-        public string Field
-        {
-            get { return field; }
-        }
+        public string Field { get; }
 
         /// <summary>
         /// Specifications (upper and lower bounds) that must be met.
         /// </summary>
-        public ReadOnlyCollection<RangeSpecificationCriteria> Specifications
-        {
-            get { return specifications; }
-        }
+        public ReadOnlyCollection<RangeSpecificationCriteria> Specifications { get; }
 
         /// <inheritdoc/>
         public override string ToString()
         {
-            return string.Format("range: {0}({1})", field, string.Join(",", specifications.Select(s => s.ToString())));
+            return string.Format("range: {0}({1})", Field, string.Join(",", Specifications.Select(s => s.ToString())));
         }
 
         /// <summary>
@@ -110,9 +97,6 @@ namespace ElasticLinq.Request.Criteria
             { RangeComparison.LessThanOrEqual, "lte" },
         };
 
-        readonly RangeComparison comparison;
-        readonly object value;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="RangeSpecificationCriteria"/> class.
         /// </summary>
@@ -123,36 +107,30 @@ namespace ElasticLinq.Request.Criteria
             Argument.EnsureIsDefinedEnum(nameof(comparison), comparison);
             Argument.EnsureNotNull(nameof(value), value);
 
-            this.comparison = comparison;
-            this.value = value;
+            Comparison = comparison;
+            Value = value;
         }
 
         /// <summary>
         /// Type of comparison for this range specification.
         /// </summary>
-        public RangeComparison Comparison
-        {
-            get { return comparison; }
-        }
+        public RangeComparison Comparison { get; }
 
         /// <inheritdoc/>
         public string Name
         {
-            get { return rangeComparisonValues[comparison]; }
+            get { return rangeComparisonValues[Comparison]; }
         }
 
         /// <summary>
         /// Constant value that this range specification tests against.
         /// </summary>
-        public object Value
-        {
-            get { return value; }
-        }
+        public object Value { get; }
 
         /// <inheritdoc/>
         public override string ToString()
         {
-            return string.Format("{0} {1}", comparison, value);
+            return string.Format("{0} {1}", Comparison, Value);
         }
     }
 }

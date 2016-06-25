@@ -19,7 +19,6 @@ namespace ElasticLinq.Response.Materializers
         static readonly string[] termsFacetTypes = { "terms_stats", "terms" };
 
         readonly Func<AggregateRow, object> projector;
-        readonly Type elementType;
         readonly Type groupKeyType;
 
         /// <summary>
@@ -35,7 +34,7 @@ namespace ElasticLinq.Response.Materializers
             Argument.EnsureNotNull(nameof(groupKeyType), groupKeyType);
 
             this.projector = projector;
-            this.elementType = elementType;
+            ElementType = elementType;
             this.groupKeyType = groupKeyType;
         }
 
@@ -43,17 +42,17 @@ namespace ElasticLinq.Response.Materializers
         /// Materialize the facets from an response into a list of objects.
         /// </summary>
         /// <param name="response">The <see cref="ElasticResponse"/> containing the facets to materialize.</param>
-        /// <returns>List of <see cref="elementType"/> objects with these facets projected onto them.</returns>
+        /// <returns>List of <see cref="ElementType"/> objects with these facets projected onto them.</returns>
         public object Materialize(ElasticResponse response)
         {
             Argument.EnsureNotNull(nameof(response), response);
 
             var facets = response.facets;
             if (facets == null || facets.Count == 0)
-                return Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType));
+                return Activator.CreateInstance(typeof(List<>).MakeGenericType(ElementType));
 
             return manyMethodInfo
-                .MakeGenericMethod(elementType)
+                .MakeGenericMethod(ElementType)
                 .Invoke(this, new object[] { response.facets });
         }
 
@@ -105,6 +104,6 @@ namespace ElasticLinq.Response.Materializers
         /// <summary>
         /// Type of element being materialized.
         /// </summary>
-        internal Type ElementType { get { return elementType; } }
+        internal Type ElementType { get; }
     }
 }

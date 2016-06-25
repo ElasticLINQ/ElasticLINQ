@@ -18,10 +18,6 @@ namespace ElasticLinq.Request.Facets
     [DebuggerDisplay("StatisticalFacet {DebugFieldList} {Filter}")]
     class StatisticalFacet : IFacet
     {
-        readonly string name;
-        readonly ICriteria filter;
-        readonly ReadOnlyCollection<string> fields;
-
         public StatisticalFacet(string name, params string[] fields)
             : this(name, null, fields)
         {
@@ -32,19 +28,19 @@ namespace ElasticLinq.Request.Facets
             Argument.EnsureNotBlank(nameof(name), name);
             Argument.EnsureNotEmpty(nameof(fields), fields);
 
-            this.name = name;
-            this.filter = filter;
-            this.fields = new ReadOnlyCollection<string>(fields);
+            Name = name;
+            Filter = filter;
+            Fields = new ReadOnlyCollection<string>(fields);
         }
 
         public string Type { get { return "statistical"; } }
 
-        public string Name { get { return name; } }
+        public string Name { get; }
 
-        public ICriteria Filter { get { return filter; } }
+        public ICriteria Filter { get; }
 
-        public ReadOnlyCollection<string> Fields { get { return fields; } }
+        public ReadOnlyCollection<string> Fields { get; }
 
-        string DebugFieldList { get { return String.Join(", ", fields); } }
+        string DebugFieldList { get { return String.Join(", ", Fields); } }
     }
 }

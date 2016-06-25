@@ -7,8 +7,6 @@ namespace ElasticLinq.Request.Criteria
     /// </summary>
     public class RegexpCriteria : SingleFieldCriteria
     {
-        readonly string regexp;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="RegexpCriteria"/> class.
         /// </summary>
@@ -17,16 +15,13 @@ namespace ElasticLinq.Request.Criteria
         public RegexpCriteria(string field, string regexp)
             : base(field)
         {
-            this.regexp = regexp;
+            Regexp = regexp;
         }
 
         /// <summary>
         /// Regular expression (in Elasticsearch syntax) to test against the field.
         /// </summary>
-        public string Regexp
-        {
-            get { return regexp; }
-        }
+        public string Regexp { get; }
 
         /// <inheritdoc/>
         public override string Name
