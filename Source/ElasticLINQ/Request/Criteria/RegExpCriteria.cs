@@ -24,10 +24,7 @@ namespace ElasticLinq.Request.Criteria
         public string Regexp { get; }
 
         /// <inheritdoc/>
-        public override string Name
-        {
-            get { return "regexp"; }
-        }
+        public override string Name { get { return "regexp"; } }
 
         /// <inheritdoc/>
         public override string ToString()

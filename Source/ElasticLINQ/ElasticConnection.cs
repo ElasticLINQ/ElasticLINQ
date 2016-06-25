@@ -35,7 +35,9 @@ namespace ElasticLinq
         /// <param name="index">Name of the index to use on the server (optional).</param>
         /// <param name="options">Additional options that specify how this connection should behave.</param>
         public ElasticConnection(Uri endpoint, string userName = null, string password = null, TimeSpan? timeout = null, string index = null, ElasticConnectionOptions options = null)
-            : this(new HttpClientHandler(), endpoint, userName, password, index, timeout, options) { }
+            : this(new HttpClientHandler(), endpoint, userName, password, index, timeout, options)
+        {
+        }
 
 
         /// <summary>

@@ -52,11 +52,11 @@ namespace ElasticLinq.Mapping
         /// <param name="conversionCulture">The culture to use for the lower-casing, camel-casing, and pluralization operations. If <c>null</c>,
         /// uses <see cref="CultureInfo.CurrentCulture"/>.</param>
         public ElasticMapping(bool camelCaseFieldNames = true,
-                              bool camelCaseTypeNames = true,
-                              bool pluralizeTypeNames = true,
-                              bool lowerCaseAnalyzedFieldValues = true,
-                              EnumFormat enumFormat = EnumFormat.String,
-                              CultureInfo conversionCulture = null)
+            bool camelCaseTypeNames = true,
+            bool pluralizeTypeNames = true,
+            bool lowerCaseAnalyzedFieldValues = true,
+            EnumFormat enumFormat = EnumFormat.String,
+            CultureInfo conversionCulture = null)
         {
             this.camelCaseFieldNames = camelCaseFieldNames;
             this.camelCaseTypeNames = camelCaseTypeNames;

@@ -43,7 +43,7 @@ namespace ElasticLinq.Request.Criteria
                     .Criteria
                     .Select(Reduce)
                     .Where(c => c != ConstantCriteria.True && c != null)
-                .ToArray());
+                    .ToArray());
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace ElasticLinq.Request.Criteria
                     .Criteria
                     .Select(Reduce)
                     .Where(c => c != ConstantCriteria.False && c != null)
-                .ToArray());
+                    .ToArray());
         }
     }
 }

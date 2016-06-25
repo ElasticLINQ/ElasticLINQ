@@ -25,9 +25,9 @@ namespace ElasticLinq.Test
         /// <param name="maxAttempts">Maximum number of attempts to try before failing.</param>
         /// <param name="timeout">How long to wait before failing a request.</param>
         public TestableElasticContext(IElasticMapping mapping = null,
-                                      ILog log = null,
-                                      int maxAttempts = 1,
-                                      TimeSpan timeout = default(TimeSpan))
+            ILog log = null,
+            int maxAttempts = 1,
+            TimeSpan timeout = default(TimeSpan))
         {
             Connection = new ElasticConnection(new Uri("http://localhost/"), timeout: timeout);
             Mapping = mapping ?? new TrivialElasticMapping();

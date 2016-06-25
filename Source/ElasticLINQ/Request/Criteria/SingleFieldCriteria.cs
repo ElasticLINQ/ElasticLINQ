@@ -25,10 +25,7 @@ namespace ElasticLinq.Request.Criteria
         public string Field { get; }
 
         /// <inheritdoc/>
-        public abstract string Name
-        {
-            get;
-        }
+        public abstract string Name { get; }
 
         /// <inheritdoc/>
         public override string ToString()

@@ -36,7 +36,7 @@ namespace ElasticLinq.Response.Materializers
 
         /// <summary>
         /// Materialize a single object from the response using the <see cref="projector"/>
-       ///  or return a default value based on the element type.
+        ///  or return a default value based on the element type.
         /// </summary>
         /// <param name="response">The <see cref="ElasticResponse"/> to materialize facets from.</param>
         /// <returns>Object materialized from the response using the projector or default if no corresponding facets.</returns>

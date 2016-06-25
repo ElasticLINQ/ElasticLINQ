@@ -28,10 +28,7 @@ namespace ElasticLinq.Request.Criteria
         public string Prefix { get; }
 
         /// <inheritdoc/>
-        public override string Name
-        {
-            get { return "prefix"; }
-        }
+        public override string Name { get { return "prefix"; } }
 
         /// <inheritdoc/>
         public override string ToString()

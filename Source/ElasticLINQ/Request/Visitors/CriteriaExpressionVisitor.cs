@@ -12,7 +12,11 @@ using System.Linq.Expressions;
 
 namespace ElasticLinq.Request.Visitors
 {
-    enum CriteriaWithin { Query, Filter };
+    enum CriteriaWithin
+    {
+        Query,
+        Filter
+    };
 
     /// <summary>
     /// Expression visitor to translate predicate expressions to criteria expressions.
@@ -113,7 +117,7 @@ namespace ElasticLinq.Request.Visitors
         {
             switch (m.Method.Name)
             {
-                case "Contains":  // Where(x => x.StringProperty.Contains(value))
+                case "Contains": // Where(x => x.StringProperty.Contains(value))
                     if (m.Arguments.Count == 1)
                         return VisitStringPatternCheckMethodCall(m.Object, m.Arguments[0], "*{0}*", m.Method.Name);
                     break;
@@ -140,12 +144,12 @@ namespace ElasticLinq.Request.Visitors
                     return node.Operand;
 
                 case ExpressionType.Not:
-                    {
-                        var subExpression = Visit(node.Operand) as CriteriaExpression;
-                        if (subExpression != null)
-                            return new CriteriaExpression(NotCriteria.Create(subExpression.Criteria));
-                        break;
-                    }
+                {
+                    var subExpression = Visit(node.Operand) as CriteriaExpression;
+                    if (subExpression != null)
+                        return new CriteriaExpression(NotCriteria.Create(subExpression.Criteria));
+                    break;
+                }
             }
 
             return base.VisitUnary(node);
@@ -188,10 +192,10 @@ namespace ElasticLinq.Request.Visitors
 
                 case ExpressionType.GreaterThan:
                     return VisitRange(RangeComparison.GreaterThan, Visit(node.Left), Visit(node.Right));
-                
+
                 case ExpressionType.GreaterThanOrEqual:
                     return VisitRange(RangeComparison.GreaterThanOrEqual, Visit(node.Left), Visit(node.Right));
-                
+
                 case ExpressionType.LessThan:
                     return VisitRange(RangeComparison.LessThan, Visit(node.Left), Visit(node.Right));
 
@@ -232,7 +236,7 @@ namespace ElasticLinq.Request.Visitors
             // Do not use ConstantMemberPair - these expressions are not reversible
             if (fieldExpression is MemberExpression && startsWithExpression is ConstantExpression)
             {
-                var fieldName = Mapping.GetFieldName(SourceType, (MemberExpression) fieldExpression);
+                var fieldName = Mapping.GetFieldName(SourceType, (MemberExpression)fieldExpression);
                 return new CriteriaExpression(new PrefixCriteria(fieldName, ((ConstantExpression)startsWithExpression).Value.ToString()));
             }
 

@@ -4,7 +4,7 @@ namespace ElasticLinq.Response.Materializers
 {
     class HighlightElasticMaterializer : ChainMaterializer
     {
-        public HighlightElasticMaterializer(IElasticMaterializer previous):base(previous)
+        public HighlightElasticMaterializer(IElasticMaterializer previous) : base(previous)
         {
         }
 
@@ -17,13 +17,13 @@ namespace ElasticLinq.Response.Materializers
         {
             foreach (var hit in response.hits.hits)
             {
-                if (hit.highlight==null) continue;
+                if (hit.highlight == null) continue;
                 foreach (var prop in hit.highlight.Properties())
                 {
-                    hit._source.Add($"{prop.Name}_highlight",prop.Value);
+                    hit._source.Add($"{prop.Name}_highlight", prop.Value);
                 }
             }
-            
+
             return base.Materialize(response);
         }
     }

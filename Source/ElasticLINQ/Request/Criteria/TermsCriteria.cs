@@ -41,9 +41,9 @@ namespace ElasticLinq.Request.Criteria
                 // "plain" is the default; "plain", "or", and "bool" are all or queries, but
                 // with slightly different caching semantics.
                 return !ExecutionMode.HasValue
-                    || ExecutionMode == TermsExecutionMode.@bool
-                    || ExecutionMode == TermsExecutionMode.or
-                    || ExecutionMode == TermsExecutionMode.plain;
+                       || ExecutionMode == TermsExecutionMode.@bool
+                       || ExecutionMode == TermsExecutionMode.or
+                       || ExecutionMode == TermsExecutionMode.plain;
             }
         }
 
@@ -53,10 +53,7 @@ namespace ElasticLinq.Request.Criteria
         public MemberInfo Member { get; }
 
         /// <inheritdoc/>
-        public override string Name
-        {
-            get { return "terms"; }
-        }
+        public override string Name { get { return "terms"; } }
 
         /// <summary>
         /// Constant values being searched for.

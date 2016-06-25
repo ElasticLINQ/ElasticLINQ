@@ -41,8 +41,8 @@ namespace ElasticLinq.Request.Visitors
             {
                 // someProperty.HasValue
                 if (MemberExpression.Member.Name == "HasValue"
-                       && ConstantExpression.Type == typeof(bool)
-                       && MemberExpression.Member.DeclaringType.IsGenericOf(typeof(Nullable<>)))
+                    && ConstantExpression.Type == typeof(bool)
+                    && MemberExpression.Member.DeclaringType.IsGenericOf(typeof(Nullable<>)))
                     return true;
 
                 // something == null (for reference types or Nullable<T>)

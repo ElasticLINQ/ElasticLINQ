@@ -81,7 +81,7 @@ namespace ElasticLinq
             catch (TargetInvocationException ex)
             {
                 ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
-                return null;  // Never called, as the above code re-throws
+                return null; // Never called, as the above code re-throws
             }
         }
 
@@ -131,7 +131,7 @@ namespace ElasticLinq
             catch (AggregateException ex)
             {
                 ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
-                return null;  // Never called, as the above code re-throws
+                return null; // Never called, as the above code re-throws
             }
         }
     }

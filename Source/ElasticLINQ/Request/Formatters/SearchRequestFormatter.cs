@@ -44,10 +44,7 @@ namespace ElasticLinq.Request.Formatters
         /// <summary>
         /// The JSON formatted POST body for the request to be sent to Elasticsearch.
         /// </summary>
-        public string Body
-        {
-            get { return body.Value; }
-        }
+        public string Body { get { return body.Value; } }
 
         /// <summary>
         /// Create the Json HTTP request body for this request given the search query and connection.
@@ -143,7 +140,7 @@ namespace ElasticLinq.Request.Formatters
         {
             return new JObject(
                 BuildFieldProperty(statisticalFacet.Fields)
-            );
+                );
         }
 
         static JToken Build(TermsStatsFacet termStatsFacet)
@@ -151,7 +148,7 @@ namespace ElasticLinq.Request.Formatters
             return new JObject(
                 new JProperty("key_field", termStatsFacet.Key),
                 new JProperty("value_field", termStatsFacet.Value)
-            );
+                );
         }
 
         static JToken Build(TermsFacet termsFacet)

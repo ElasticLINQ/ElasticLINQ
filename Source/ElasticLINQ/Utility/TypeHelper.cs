@@ -122,7 +122,7 @@ namespace ElasticLinq.Utility
         public static bool IsGenericOf(this Type type, Type genericType)
         {
             return type != null && genericType != null
-                && type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == genericType;
+                   && type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == genericType;
         }
 
         /// <summary>

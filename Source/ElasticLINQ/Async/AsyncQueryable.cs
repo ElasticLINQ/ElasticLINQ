@@ -236,7 +236,7 @@ namespace ElasticLinq.Async
         {
             return new Lazy<MethodInfo>(() => typeof(Queryable).GetTypeInfo().DeclaredMethods
                 .Single(m => m.Name == name && m.GetParameters().Length == parameterCount &&
-                    (secondParameterType == null || m.GetParameters()[1].ParameterType == secondParameterType)));
+                             (secondParameterType == null || m.GetParameters()[1].ParameterType == secondParameterType)));
         }
 
         static Lazy<MethodInfo> QueryableMethodByReturnType(string name, int parameterCount, Type returnType)
@@ -265,13 +265,13 @@ namespace ElasticLinq.Async
 
                 return typeof(Queryable).GetTypeInfo().DeclaredMethods
                     .Single(m => m.Name == name && m.GetParameters().Length == parameterCount &&
-                            m.GetParameters()[0].ParameterType == parameterType);
+                                 m.GetParameters()[0].ParameterType == parameterType);
             });
         }
 
         static Expression FinalExpression<TSource>(IQueryable<TSource> source, MethodInfo method, params Expression[] arguments)
         {
-            var finalMethod = method.IsGenericMethod ? method.MakeGenericMethod(typeof (TSource)) : method;
+            var finalMethod = method.IsGenericMethod ? method.MakeGenericMethod(typeof(TSource)) : method;
             return Expression.Call(null, finalMethod, new[] { source.Expression }.Concat(arguments));
         }
 

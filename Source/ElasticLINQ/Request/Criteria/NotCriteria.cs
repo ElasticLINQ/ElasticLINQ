@@ -25,7 +25,7 @@ namespace ElasticLinq.Request.Criteria
 
             // Allow some criteria to provide their own negation instead
             return criteria is INegatableCriteria
-                ? ((INegatableCriteria) criteria).Negate()
+                ? ((INegatableCriteria)criteria).Negate()
                 : new NotCriteria(criteria);
         }
 
@@ -43,10 +43,7 @@ namespace ElasticLinq.Request.Criteria
         }
 
         /// <inheritdoc/>
-        public string Name
-        {
-            get { return "not"; }
-        }
+        public string Name { get { return "not"; } }
 
         /// <summary>
         /// <see cref="ICriteria" /> that is being negated.

@@ -21,7 +21,7 @@ namespace ElasticLinq.Request.Visitors
     class ElasticQueryTranslator : CriteriaExpressionVisitor
     {
         readonly SearchRequest searchRequest = new SearchRequest();
-        
+
         Type finalItemType;
         Func<Hit, object> itemProjector;
         IElasticMaterializer materializer;
@@ -307,12 +307,12 @@ namespace ElasticLinq.Request.Visitors
                     return node.Operand;
 
                 case ExpressionType.Not:
-                    {
-                        var subExpression = Visit(node.Operand) as CriteriaExpression;
-                        if (subExpression != null)
-                            return new CriteriaExpression(NotCriteria.Create(subExpression.Criteria));
-                        break;
-                    }
+                {
+                    var subExpression = Visit(node.Operand) as CriteriaExpression;
+                    if (subExpression != null)
+                        return new CriteriaExpression(NotCriteria.Create(subExpression.Criteria));
+                    break;
+                }
             }
 
             return base.VisitUnary(node);
@@ -449,9 +449,6 @@ namespace ElasticLinq.Request.Visitors
             return Visit(source);
         }
 
-        Func<Hit, object> DefaultItemProjector
-        {
-            get { return hit => Mapping.Materialize(hit._source, SourceType); }
-        }
+        Func<Hit, object> DefaultItemProjector { get { return hit => Mapping.Materialize(hit._source, SourceType); } }
     }
 }

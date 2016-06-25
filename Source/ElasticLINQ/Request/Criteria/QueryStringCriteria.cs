@@ -34,9 +34,6 @@ namespace ElasticLinq.Request.Criteria
         public string Value { get; }
 
         /// <inheritdoc/>
-        public string Name
-        {
-            get { return "query_string"; }
-        }
+        public string Name { get { return "query_string"; } }
     }
 }

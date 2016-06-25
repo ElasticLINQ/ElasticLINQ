@@ -23,10 +23,7 @@ namespace ElasticLinq.Request.Criteria
         }
 
         /// <inheritdoc/>
-        public override string Name
-        {
-            get { return "and"; }
-        }
+        public override string Name { get { return "and"; } }
 
         /// <summary>
         /// Combine a number of <see cref="ICriteria" /> with 'and' semantics.

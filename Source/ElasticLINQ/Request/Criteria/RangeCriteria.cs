@@ -34,7 +34,9 @@ namespace ElasticLinq.Request.Criteria
         }
 
         public RangeCriteria(string field, MemberInfo member, RangeComparison comparison, object value)
-            : this(field, member, new[] { new RangeSpecificationCriteria(comparison, value) }) { }
+            : this(field, member, new[] { new RangeSpecificationCriteria(comparison, value) })
+        {
+        }
 
         /// <summary>
         /// Property or field that this range criteria applies to.
@@ -42,10 +44,7 @@ namespace ElasticLinq.Request.Criteria
         public MemberInfo Member { get; }
 
         /// <inheritdoc/>
-        public string Name
-        {
-            get { return "range"; }
-        }
+        public string Name { get { return "range"; } }
 
         /// <summary>
         /// Field that must be within the specified ranges.
@@ -71,7 +70,7 @@ namespace ElasticLinq.Request.Criteria
         internal static bool SpecificationsCanBeCombined(List<RangeSpecificationCriteria> specifications)
         {
             return specifications.Count(r => r.Comparison == RangeComparison.GreaterThan || r.Comparison == RangeComparison.GreaterThanOrEqual) < 2
-                 && specifications.Count(r => r.Comparison == RangeComparison.LessThan || r.Comparison == RangeComparison.LessThanOrEqual) < 2;
+                   && specifications.Count(r => r.Comparison == RangeComparison.LessThan || r.Comparison == RangeComparison.LessThanOrEqual) < 2;
         }
     }
 
@@ -117,10 +116,7 @@ namespace ElasticLinq.Request.Criteria
         public RangeComparison Comparison { get; }
 
         /// <inheritdoc/>
-        public string Name
-        {
-            get { return rangeComparisonValues[Comparison]; }
-        }
+        public string Name { get { return rangeComparisonValues[Comparison]; } }
 
         /// <summary>
         /// Constant value that this range specification tests against.

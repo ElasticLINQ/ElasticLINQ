@@ -62,19 +62,13 @@ namespace ElasticLinq
         }
 
         /// <inheritdoc/>
-        public Type ElementType
-        {
-            get { return typeof(T); }
-        }
+        public Type ElementType { get { return typeof(T); } }
 
         /// <inheritdoc/>
         public Expression Expression { get; }
 
         /// <inheritdoc/>
-        public IQueryProvider Provider
-        {
-            get { return provider; }
-        }
+        public IQueryProvider Provider { get { return provider; } }
 
         /// <inheritdoc/>
         public QueryInfo ToQueryInfo()

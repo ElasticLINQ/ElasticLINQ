@@ -46,7 +46,7 @@ namespace ElasticLinq.Request.Visitors
         protected override Expression VisitElasticField(MemberExpression m)
         {
             var member = base.VisitElasticField(m);
-            fieldNames.Add("_" +  m.Member.Name.ToLowerInvariant());
+            fieldNames.Add("_" + m.Member.Name.ToLowerInvariant());
             return member;
         }
 

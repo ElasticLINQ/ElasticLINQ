@@ -43,31 +43,31 @@ namespace ElasticLinq.Request
         /// List of fields to return for each document instead of the
         /// </summary>
         public List<string> Fields { get; set; }
-        
+
         /// <summary>
         /// Sort sequence for the documents. This affects From and Size.
         /// </summary>
         /// <remarks>Determined by the OrderBy/ThenBy LINQ statements.</remarks>
         public List<SortOption> SortOptions { get; set; }
-        
+
         /// <summary>
         /// Filter criteria for the documents.
         /// </summary>
         /// <remarks>Determined by the Where LINQ statements.</remarks>
         public ICriteria Filter { get; set; }
-        
+
         /// <summary>
         /// Query criteria for the documents.
         /// </summary>
         /// <remarks>Determined by the Query extension methods.</remarks>
         public ICriteria Query { get; set; }
-        
+
         /// <summary>
         /// Facet aggregations and statistical inform that should be included.
         /// </summary>
         /// <remarks>Determined by the GroupBy/Count/Sum/Average statements of LINQ.</remarks>
         public List<IFacet> Facets { get; set; }
-        
+
         /// <summary>
         /// Type of search Elasticsearch should perform.
         /// </summary>

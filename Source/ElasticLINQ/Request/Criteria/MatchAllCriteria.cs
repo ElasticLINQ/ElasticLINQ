@@ -15,12 +15,11 @@ namespace ElasticLinq.Request.Criteria
         /// </summary>
         public static readonly MatchAllCriteria Instance = new MatchAllCriteria();
 
-        MatchAllCriteria() { }
+        MatchAllCriteria()
+        {
+        }
 
         /// <inheritdoc/>
-        public string Name
-        {
-            get { return "match_all"; }
-        }
+        public string Name { get { return "match_all"; } }
     }
 }

@@ -27,10 +27,7 @@ namespace ElasticLinq.Request.Criteria
         }
 
         // "term" is always implicitly combinable by OrCriteria.Combine
-        bool ITermsCriteria.IsOrCriteria
-        {
-            get { return true; }
-        }
+        bool ITermsCriteria.IsOrCriteria { get { return true; } }
 
         /// <summary>
         /// Property or field being checked for this term.
@@ -38,26 +35,17 @@ namespace ElasticLinq.Request.Criteria
         public MemberInfo Member { get; }
 
         /// <inheritdoc/>
-        public override string Name
-        {
-            get { return "term"; }
-        }
+        public override string Name { get { return "term"; } }
 
         /// <summary>
         /// Constant value being checked.
         /// </summary>
-        public object Value
-        {
-            get { return values[0]; }
-        }
+        public object Value { get { return values[0]; } }
 
         /// <summary>
         /// List of constant values being checked for.
         /// </summary>
-        ReadOnlyCollection<object> ITermsCriteria.Values
-        {
-            get { return values; }
-        }
+        ReadOnlyCollection<object> ITermsCriteria.Values { get { return values; } }
 
         /// <inheritdoc/>
         public override string ToString()

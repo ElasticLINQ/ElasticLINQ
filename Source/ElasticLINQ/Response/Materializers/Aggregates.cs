@@ -54,33 +54,33 @@ namespace ElasticLinq.Response.Materializers
             {
                 case "Infinity":
                 case "∞":
-                    {
-                        if (valueType == typeof(double))
-                            return double.PositiveInfinity;
+                {
+                    if (valueType == typeof(double))
+                        return double.PositiveInfinity;
 
-                        if (valueType == typeof(float))
-                            return float.PositiveInfinity;
+                    if (valueType == typeof(float))
+                        return float.PositiveInfinity;
 
-                        if (valueType == typeof(decimal?))
-                            return null;
+                    if (valueType == typeof(decimal?))
+                        return null;
 
-                        break;
-                    }
+                    break;
+                }
 
                 case "-Infinity":
                 case "-∞":
-                    {
-                        if (valueType == typeof(double))
-                            return double.NegativeInfinity;
+                {
+                    if (valueType == typeof(double))
+                        return double.NegativeInfinity;
 
-                        if (valueType == typeof(float))
-                            return float.NegativeInfinity;
+                    if (valueType == typeof(float))
+                        return float.NegativeInfinity;
 
-                        if (valueType == typeof(decimal?))
-                            return null;
+                    if (valueType == typeof(decimal?))
+                        return null;
 
-                        break;
-                    }
+                    break;
+                }
             }
 
             // Elasticsearch returns dates as milliseconds since epoch when using facets

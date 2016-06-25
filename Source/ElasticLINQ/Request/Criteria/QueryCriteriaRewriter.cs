@@ -42,7 +42,7 @@ namespace ElasticLinq.Request.Criteria
         static BoolCriteria Rewrite(NotCriteria not)
         {
             var mustNotCriteria = not.Criteria is OrCriteria
-                ? ((OrCriteria) not.Criteria).Criteria
+                ? ((OrCriteria)not.Criteria).Criteria
                 : Enumerable.Repeat(not.Criteria, 1);
             return new BoolCriteria(null, null, mustNotCriteria.Select(Compensate));
         }
