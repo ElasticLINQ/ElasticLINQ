@@ -63,7 +63,7 @@ namespace ElasticLinq.Mapping
                     return GetFieldName(type, memberExpression.Member);
 
                 default:
-                    throw new NotSupportedException(string.Format("Unknown expression type {0} for left hand side of expression {1}", memberExpression.Expression.NodeType, memberExpression));
+                    throw new NotSupportedException($"Unknown expression type {memberExpression.Expression.NodeType} for left hand side of expression {memberExpression}");
             }
         }
 
@@ -73,7 +73,7 @@ namespace ElasticLinq.Mapping
             var memberName = base.GetFieldName(type, memberInfo);
             var prefix = GetDocumentMappingPrefix(type);
 
-            return string.Format("{0}.{1}", prefix, memberName).TrimStart('.');
+            return $"{prefix}.{memberName}".TrimStart('.');
         } 
 
         /// <inheritdoc/>

@@ -136,7 +136,7 @@ namespace ElasticLinq.Request.Formatters
             if (facet is FilterFacet)
                 return new JObject();
 
-            throw new InvalidOperationException(string.Format("Unknown implementation of IFacet {0} can not be formatted", facet.GetType().Name));
+            throw new InvalidOperationException($"Unknown implementation of IFacet {facet.GetType().Name} can not be formatted");
         }
 
         static JToken Build(StatisticalFacet statisticalFacet)
@@ -225,7 +225,7 @@ namespace ElasticLinq.Request.Formatters
             if (criteria is CompoundCriteria)
                 return Build((CompoundCriteria)criteria);
 
-            throw new InvalidOperationException(string.Format("Unknown criteria type {0}", criteria.GetType()));
+            throw new InvalidOperationException($"Unknown criteria type {criteria.GetType()}");
         }
 
         static JObject Build(Highlight highlight)

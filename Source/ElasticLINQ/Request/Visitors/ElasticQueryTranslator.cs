@@ -110,7 +110,7 @@ namespace ElasticLinq.Request.Visitors
         protected override Expression VisitStringPatternCheckMethodCall(Expression source, Expression match, string pattern, string methodName)
         {
             if (within != CriteriaWithin.Query)
-                throw new NotSupportedException(string.Format("Method String.{0} can only be used within .Query() not in .Where()", methodName));
+                throw new NotSupportedException($"Method String.{methodName} can only be used within .Query() not in .Where()");
 
             return base.VisitStringPatternCheckMethodCall(source, match, pattern, methodName);
         }
@@ -149,7 +149,7 @@ namespace ElasticLinq.Request.Visitors
                     break;
             }
 
-            throw new NotSupportedException(string.Format("ElasticQuery.{0} method is not supported", m.Method.Name));
+            throw new NotSupportedException($"ElasticQuery.{m.Method.Name} method is not supported");
         }
 
         Expression VisitHighlight(Expression source, Expression highlightExpression, Expression configExpression)
@@ -178,7 +178,7 @@ namespace ElasticLinq.Request.Visitors
         Expression VisitMinimumScore(Expression source, Expression minScoreExpression)
         {
             if (!(minScoreExpression is ConstantExpression))
-                throw new NotSupportedException(string.Format("Score must be a constant expression, not a {0}.", minScoreExpression.NodeType));
+                throw new NotSupportedException($"Score must be a constant expression, not a {minScoreExpression.NodeType}.");
 
             searchRequest.MinScore = Convert.ToDouble(((ConstantExpression)minScoreExpression).Value);
             return Visit(source);
@@ -257,12 +257,12 @@ namespace ElasticLinq.Request.Visitors
                     throw GetOverloadUnsupportedException(m.Method);
             }
 
-            throw new NotSupportedException(string.Format("Queryable.{0} method is not supported", m.Method.Name));
+            throw new NotSupportedException($"Queryable.{m.Method.Name} method is not supported");
         }
 
         static NotSupportedException GetOverloadUnsupportedException(MethodInfo methodInfo)
         {
-            return new NotSupportedException(string.Format("Queryable.{0} method overload is not supported", methodInfo.GetSimpleSignature()));
+            return new NotSupportedException($"Queryable.{methodInfo.GetSimpleSignature()} method overload is not supported");
         }
 
         Expression VisitAny(Expression source, Expression predicate)
@@ -327,7 +327,7 @@ namespace ElasticLinq.Request.Visitors
 
             var criteriaExpression = body as CriteriaExpression;
             if (criteriaExpression == null)
-                throw new NotSupportedException(string.Format("Query expression '{0}' could not be translated", body));
+                throw new NotSupportedException($"Query expression '{body}' could not be translated");
 
             searchRequest.Query = AndCriteria.Combine(searchRequest.Query, criteriaExpression.Criteria);
             within = wasWithin;
@@ -342,7 +342,7 @@ namespace ElasticLinq.Request.Visitors
             var criteriaExpression = lambda.Body as CriteriaExpression ?? BooleanMemberAccessBecomesEquals(lambda.Body) as CriteriaExpression;
 
             if (criteriaExpression == null)
-                throw new NotSupportedException(string.Format("Where expression '{0}' could not be translated", lambda.Body));
+                throw new NotSupportedException($"Where expression '{lambda.Body}' could not be translated");
 
             searchRequest.Filter = AndCriteria.Combine(searchRequest.Filter, criteriaExpression.Criteria);
 

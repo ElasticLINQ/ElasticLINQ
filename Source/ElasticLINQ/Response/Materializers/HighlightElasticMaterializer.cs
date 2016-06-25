@@ -20,7 +20,7 @@ namespace ElasticLinq.Response.Materializers
                 if (hit.highlight==null) continue;
                 foreach (var prop in hit.highlight.Properties())
                 {
-                    hit._source.Add(string.Format("{0}_highlight",prop.Name),prop.Value);
+                    hit._source.Add($"{prop.Name}_highlight",prop.Value);
                 }
             }
             

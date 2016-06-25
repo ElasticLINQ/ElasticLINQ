@@ -35,7 +35,7 @@ namespace ElasticLinq.Request.Criteria
         /// <inheritdoc/>
         public override string ToString()
         {
-            return string.Format("{0} ({1})", Name, string.Join(", ", Criteria.Select(f => f.ToString()).ToArray()));
+            return $"{Name} ({string.Join(", ", Criteria.Select(f => f.ToString()).ToArray())})";
         }
     }
 }

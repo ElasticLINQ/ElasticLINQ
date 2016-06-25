@@ -55,7 +55,7 @@ namespace ElasticLinq.Utility
         public static void EnsureIsAssignableFrom<T>(string argumentName, Type type)
         {
             if (!typeof(T).IsAssignableFrom(type))
-                throw new ArgumentException(string.Format("Type {0} must be assignable from {1}.", type.Name, typeof(T).Name), argumentName);
+                throw new ArgumentException($"Type {type.Name} must be assignable from {typeof(T).Name}.", argumentName);
         }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace ElasticLinq.Utility
         public static void EnsureIsDefinedEnum<TEnum>(string argumentName, TEnum value) where TEnum : struct
         {
             if (!Enum.IsDefined(typeof(TEnum), value))
-                throw new ArgumentOutOfRangeException(argumentName, string.Format("Must be a defined {0} enum value.", typeof(TEnum)));
+                throw new ArgumentOutOfRangeException(argumentName, $"Must be a defined {typeof(TEnum)} enum value.");
         }
 
         /// <summary>

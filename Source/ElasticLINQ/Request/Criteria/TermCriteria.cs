@@ -62,7 +62,7 @@ namespace ElasticLinq.Request.Criteria
         /// <inheritdoc/>
         public override string ToString()
         {
-            return string.Format("term {0} {1}", Field, Value);
+            return $"term {Field} {Value}";
         }
     }
 }
