@@ -27,8 +27,8 @@ namespace ElasticLinq.Response.Materializers
         /// <param name="key">The constant value for any key references during materialization.</param>
         public TermlessFacetElasticMaterializer(Func<AggregateRow, object> projector, Type elementType, object key = null)
         {
-            Argument.EnsureNotNull("projector", projector);
-            Argument.EnsureNotNull("elementType", elementType);
+            Argument.EnsureNotNull(nameof(projector), projector);
+            Argument.EnsureNotNull(nameof(elementType), elementType);
 
             this.projector = projector;
             this.elementType = elementType;
@@ -43,7 +43,7 @@ namespace ElasticLinq.Response.Materializers
         /// <returns>Object materialized from the response using the projector or default if no corresponding facets.</returns>
         public virtual object Materialize(ElasticResponse response)
         {
-            Argument.EnsureNotNull("response", response);
+            Argument.EnsureNotNull(nameof(response), response);
 
             return MaterializeSingle(response) ?? TypeHelper.CreateDefault(elementType);
         }
@@ -56,7 +56,7 @@ namespace ElasticLinq.Response.Materializers
         /// <returns>Object materialized from the response using the projector or null if no corresponding facets.</returns>
         public object MaterializeSingle(ElasticResponse response)
         {
-            Argument.EnsureNotNull("response", response);
+            Argument.EnsureNotNull(nameof(response), response);
 
             var facets = response.facets;
             if (facets != null && facets.Count > 0)

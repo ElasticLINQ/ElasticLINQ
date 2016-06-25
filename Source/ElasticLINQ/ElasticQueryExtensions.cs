@@ -29,7 +29,7 @@ namespace ElasticLinq
         /// <exception cref="T:System.ArgumentNullException"><paramref name="source"/> or <paramref name="predicate"/> is null.</exception>
         public static IQueryable<TSource> Query<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, bool>> predicate)
         {
-            Argument.EnsureNotNull("predicate", predicate);
+            Argument.EnsureNotNull(nameof(predicate), predicate);
             return CreateQueryMethodCall(source, queryMethodInfo, Expression.Quote(predicate));
         }
 
@@ -45,7 +45,7 @@ namespace ElasticLinq
         /// <exception cref="T:System.ArgumentNullException"><paramref name="source"/> or <paramref name="query"/> is null.</exception>
         public static IQueryable<TSource> QueryString<TSource>(this IQueryable<TSource> source, string query)
         {
-            Argument.EnsureNotNull("query", query);
+            Argument.EnsureNotNull(nameof(query), query);
             return CreateQueryMethodCall(source, queryStringMethodInfo, Expression.Constant(query));
         }
 
@@ -62,8 +62,8 @@ namespace ElasticLinq
         /// <exception cref="T:System.ArgumentNullException"><paramref name="source"/>, <paramref name="query"/> or <paramref name="fields"/> is null.</exception>
         public static IQueryable<TSource> QueryString<TSource>(this IQueryable<TSource> source, string query, string[] fields)
         {
-            Argument.EnsureNotNull("query", query);
-            Argument.EnsureNotEmpty("fields", fields);
+            Argument.EnsureNotNull(nameof(query), query);
+            Argument.EnsureNotEmpty(nameof(fields), fields);
             return CreateQueryMethodCall(source, queryStringWithFieldsMethodInfo, Expression.Constant(query), Expression.Constant(fields));
         }
 
@@ -145,8 +145,8 @@ namespace ElasticLinq
         /// <exception cref="T:System.ArgumentNullException"><paramref name="source"/> or <paramref name="predicate"/> is null.</exception>
         public static IQueryable<TSource> Highlight<TSource, TKey>(this IQueryable<TSource> source, Expression<Func<TSource, TKey>> predicate, Highlight highlight = null)
         {
-            Argument.EnsureNotNull("source", source);
-            Argument.EnsureNotNull("predicate", predicate);
+            Argument.EnsureNotNull(nameof(source), source);
+            Argument.EnsureNotNull(nameof(predicate), predicate);
             return CreateQueryMethodCall<TSource, TKey>(source, highlightScoreMethodInfo, Expression.Quote(predicate), Expression.Constant(highlight ?? new Highlight()));
         }
 
@@ -161,7 +161,7 @@ namespace ElasticLinq
         {
             var elasticQuery = source as IElasticQuery<TSource>;
             if (elasticQuery == null)
-                throw new ArgumentException("Query must be of type IElasticQuery<> to call ToQueryInfo()", "source");
+                throw new ArgumentException("Query must be of type IElasticQuery<> to call ToQueryInfo()", nameof(source));
 
             return elasticQuery.ToQueryInfo();
         }
@@ -186,8 +186,8 @@ namespace ElasticLinq
         /// <returns>IQueryable that contains the query with the method call inserted into the query chain.</returns>
         static IQueryable<TSource> CreateQueryMethodCall<TSource>(IQueryable<TSource> source, MethodInfo method, params Expression[] arguments)
         {
-            Argument.EnsureNotNull("source", source);
-            Argument.EnsureNotNull("method", source);
+            Argument.EnsureNotNull(nameof(source), source);
+            Argument.EnsureNotNull(nameof(method), source);
 
             var callExpression = Expression.Call(null, method.MakeGenericMethod(typeof(TSource)), new[] { source.Expression }.Concat(arguments));
             return source.Provider.CreateQuery<TSource>(callExpression);
@@ -195,8 +195,8 @@ namespace ElasticLinq
 
         static IQueryable<TSource> CreateQueryMethodCall<TSource, TKey>(IQueryable<TSource> source, MethodInfo method, params Expression[] arguments)
         {
-            Argument.EnsureNotNull("source", source);
-            Argument.EnsureNotNull("method", source);
+            Argument.EnsureNotNull(nameof(source), source);
+            Argument.EnsureNotNull(nameof(method), source);
 
             var callExpression = Expression.Call(null, method.MakeGenericMethod(typeof(TSource), typeof(TKey)), new[] { source.Expression }.Concat(arguments));
             return source.Provider.CreateQuery<TSource>(callExpression);

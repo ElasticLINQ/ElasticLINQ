@@ -21,7 +21,7 @@ namespace ElasticLinq.Request
         /// <param name="ignoreUnmapped">Whether unmapped fields should be ignored or not.</param>
         public SortOption(string name, bool ascending, bool ignoreUnmapped = false)
         {
-            Argument.EnsureNotBlank("name", name);
+            Argument.EnsureNotBlank(nameof(name), name);
             this.name = name;
             this.ascending = ascending;
             this.ignoreUnmapped = ignoreUnmapped;

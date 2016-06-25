@@ -17,7 +17,7 @@ namespace ElasticLinq.Request.Criteria
         /// <param name="field">Field this criteria applies to.</param>
         protected SingleFieldCriteria(string field)
         {
-            Argument.EnsureNotBlank("field", field);
+            Argument.EnsureNotBlank(nameof(field), field);
             this.field = field;
         }
 

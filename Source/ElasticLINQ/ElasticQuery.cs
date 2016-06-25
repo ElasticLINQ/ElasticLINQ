@@ -27,7 +27,7 @@ namespace ElasticLinq
         /// <param name="provider">The <see cref="ElasticQueryProvider"/> used to execute the queries.</param>
         public ElasticQuery(ElasticQueryProvider provider)
         {
-            Argument.EnsureNotNull("provider", provider);
+            Argument.EnsureNotNull(nameof(provider), provider);
 
             this.provider = provider;
             expression = Expression.Constant(this);
@@ -40,11 +40,11 @@ namespace ElasticLinq
         /// <param name="expression">The <see cref="Expression"/> that represents the LINQ query so far.</param>
         public ElasticQuery(ElasticQueryProvider provider, Expression expression)
         {
-            Argument.EnsureNotNull("provider", provider);
-            Argument.EnsureNotNull("expression", expression);
+            Argument.EnsureNotNull(nameof(provider), provider);
+            Argument.EnsureNotNull(nameof(expression), expression);
 
             if (!typeof(IQueryable<T>).IsAssignableFrom(expression.Type))
-                throw new ArgumentOutOfRangeException("expression");
+                throw new ArgumentOutOfRangeException(nameof(expression));
 
             this.provider = provider;
             this.expression = expression;

@@ -68,7 +68,7 @@ namespace ElasticLinq.Test
 
             public static Expression Rewrite(Expression expression)
             {
-                Argument.EnsureNotNull("expression", expression);
+                Argument.EnsureNotNull(nameof(expression), expression);
                 return instance.Visit(expression);
             }
 

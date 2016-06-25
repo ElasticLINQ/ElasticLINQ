@@ -30,9 +30,9 @@ namespace ElasticLinq.Response.Materializers
         /// <param name="groupKeyType">The type of the term/group key field.</param>
         public ListTermFacetsElasticMaterializer(Func<AggregateRow, object> projector, Type elementType, Type groupKeyType)
         {
-            Argument.EnsureNotNull("projector", projector);
-            Argument.EnsureNotNull("elementType", elementType);
-            Argument.EnsureNotNull("groupKeyType", groupKeyType);
+            Argument.EnsureNotNull(nameof(projector), projector);
+            Argument.EnsureNotNull(nameof(elementType), elementType);
+            Argument.EnsureNotNull(nameof(groupKeyType), groupKeyType);
 
             this.projector = projector;
             this.elementType = elementType;
@@ -46,7 +46,7 @@ namespace ElasticLinq.Response.Materializers
         /// <returns>List of <see cref="elementType"/> objects with these facets projected onto them.</returns>
         public object Materialize(ElasticResponse response)
         {
-            Argument.EnsureNotNull("response", response);
+            Argument.EnsureNotNull(nameof(response), response);
 
             var facets = response.facets;
             if (facets == null || facets.Count == 0)

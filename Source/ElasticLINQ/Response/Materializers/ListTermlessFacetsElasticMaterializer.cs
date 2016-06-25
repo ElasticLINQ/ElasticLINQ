@@ -34,7 +34,7 @@ namespace ElasticLinq.Response.Materializers
         /// <returns>List containing a single object with these facets projected onto them.</returns>
         public override object Materialize(ElasticResponse response)
         {
-            Argument.EnsureNotNull("response", response);
+            Argument.EnsureNotNull(nameof(response), response);
 
             var element = MaterializeSingle(response);
             var listType = typeof(List<>).MakeGenericType(ElementType);

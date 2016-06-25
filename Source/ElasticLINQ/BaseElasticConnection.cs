@@ -30,9 +30,9 @@ namespace ElasticLinq
         protected BaseElasticConnection(string index = null, TimeSpan? timeout = null, ElasticConnectionOptions options = null)
         {
             if (timeout.HasValue)
-                Argument.EnsurePositive("timeout", timeout.Value);
+                Argument.EnsurePositive(nameof(timeout), timeout.Value);
             if (index != null)
-                Argument.EnsureNotBlank("index", index);
+                Argument.EnsureNotBlank(nameof(index), index);
 
             this.index = index;
             this.options = options ?? new ElasticConnectionOptions();

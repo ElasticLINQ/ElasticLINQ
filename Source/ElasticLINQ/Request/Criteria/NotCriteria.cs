@@ -23,7 +23,7 @@ namespace ElasticLinq.Request.Criteria
         /// </remarks>
         public static ICriteria Create(ICriteria criteria)
         {
-            Argument.EnsureNotNull("criteria", criteria);
+            Argument.EnsureNotNull(nameof(criteria), criteria);
 
             // Allow some criteria to provide their own negation instead
             return criteria is INegatableCriteria
