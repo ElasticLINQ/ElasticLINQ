@@ -14,9 +14,6 @@ namespace ElasticLinq.Request.Visitors
     [DebuggerDisplay("{MemberExpression,nq}, {ConstantExpression.Value}")]
     class ConstantMemberPair
     {
-        readonly ConstantExpression constantExpression;
-        readonly MemberExpression memberExpression;
-
         public static ConstantMemberPair Create(Expression a, Expression b)
         {
             if (a is ConstantExpression && b is MemberExpression)
@@ -28,35 +25,29 @@ namespace ElasticLinq.Request.Visitors
             return null;
         }
 
-        public ConstantMemberPair(ConstantExpression constantExpression, MemberExpression memberExpression)
+        ConstantMemberPair(ConstantExpression constantExpression, MemberExpression memberExpression)
         {
-            this.constantExpression = constantExpression;
-            this.memberExpression = memberExpression;
+            ConstantExpression = constantExpression;
+            MemberExpression = memberExpression;
         }
 
-        public ConstantExpression ConstantExpression
-        {
-            get { return constantExpression; }
-        }
+        public ConstantExpression ConstantExpression { get; }
 
-        public MemberExpression MemberExpression
-        {
-            get { return memberExpression; }
-        }
+        public MemberExpression MemberExpression { get; }
 
         public bool IsNullTest
         {
             get
             {
                 // someProperty.HasValue
-                if (memberExpression.Member.Name == "HasValue"
-                       && constantExpression.Type == typeof(bool)
-                       && memberExpression.Member.DeclaringType.IsGenericOf(typeof(Nullable<>)))
+                if (MemberExpression.Member.Name == "HasValue"
+                    && ConstantExpression.Type == typeof(bool)
+                    && MemberExpression.Member.DeclaringType.IsGenericOf(typeof(Nullable<>)))
                     return true;
 
                 // something == null (for reference types or Nullable<T>)
-                if (constantExpression.Value == null)
-                    return memberExpression.Type.IsNullable();
+                if (ConstantExpression.Value == null)
+                    return MemberExpression.Type.IsNullable();
 
                 return false;
             }

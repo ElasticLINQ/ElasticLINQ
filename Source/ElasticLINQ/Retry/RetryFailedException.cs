@@ -17,6 +17,8 @@ namespace ElasticLinq.Retry
         /// </summary>
         /// <param name="maxAttempts">Number of attempts tried.</param>
         public RetryFailedException(int maxAttempts)
-            : base(string.Format("The operation did not succeed after the maximum number of retries ({0}).", maxAttempts)) { }
+            : base($"The operation did not succeed after the maximum number of retries ({maxAttempts}).")
+        {
+        }
     }
 }

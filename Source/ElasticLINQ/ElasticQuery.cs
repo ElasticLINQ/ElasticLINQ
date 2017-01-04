@@ -19,7 +19,6 @@ namespace ElasticLinq
     public class ElasticQuery<T> : IElasticQuery<T>
     {
         readonly ElasticQueryProvider provider;
-        readonly Expression expression;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ElasticQuery{T}"/> class.
@@ -27,10 +26,10 @@ namespace ElasticLinq
         /// <param name="provider">The <see cref="ElasticQueryProvider"/> used to execute the queries.</param>
         public ElasticQuery(ElasticQueryProvider provider)
         {
-            Argument.EnsureNotNull("provider", provider);
+            Argument.EnsureNotNull(nameof(provider), provider);
 
             this.provider = provider;
-            expression = Expression.Constant(this);
+            Expression = Expression.Constant(this);
         }
 
         /// <summary>
@@ -40,45 +39,36 @@ namespace ElasticLinq
         /// <param name="expression">The <see cref="Expression"/> that represents the LINQ query so far.</param>
         public ElasticQuery(ElasticQueryProvider provider, Expression expression)
         {
-            Argument.EnsureNotNull("provider", provider);
-            Argument.EnsureNotNull("expression", expression);
+            Argument.EnsureNotNull(nameof(provider), provider);
+            Argument.EnsureNotNull(nameof(expression), expression);
 
             if (!typeof(IQueryable<T>).IsAssignableFrom(expression.Type))
-                throw new ArgumentOutOfRangeException("expression");
+                throw new ArgumentOutOfRangeException(nameof(expression));
 
             this.provider = provider;
-            this.expression = expression;
+            Expression = expression;
         }
 
         /// <inheritdoc/>
         public IEnumerator<T> GetEnumerator()
         {
-            return ((IEnumerable<T>)provider.Execute(expression)).GetEnumerator();
+            return ((IEnumerable<T>)provider.Execute(Expression)).GetEnumerator();
         }
 
         /// <inheritdoc/>
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return ((IEnumerable)provider.Execute(expression)).GetEnumerator();
+            return ((IEnumerable)provider.Execute(Expression)).GetEnumerator();
         }
 
         /// <inheritdoc/>
-        public Type ElementType
-        {
-            get { return typeof(T); }
-        }
+        public Type ElementType { get { return typeof(T); } }
 
         /// <inheritdoc/>
-        public Expression Expression
-        {
-            get { return expression; }
-        }
+        public Expression Expression { get; }
 
         /// <inheritdoc/>
-        public IQueryProvider Provider
-        {
-            get { return provider; }
-        }
+        public IQueryProvider Provider { get { return provider; } }
 
         /// <inheritdoc/>
         public QueryInfo ToQueryInfo()

@@ -11,27 +11,27 @@ namespace ElasticLinq.Async
 {
     public static partial class AsyncQueryable
     {
-        private static readonly Lazy<MethodInfo> averageIntMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(int));
-        private static readonly Lazy<MethodInfo> averageIntNullableMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(int?));
-        private static readonly Lazy<MethodInfo> averageLongMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(long));
-        private static readonly Lazy<MethodInfo> averageLongNullableMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(long?));
-        private static readonly Lazy<MethodInfo> averageFloatMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(float));
-        private static readonly Lazy<MethodInfo> averageFloatNullableMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(float?));
-        private static readonly Lazy<MethodInfo> averageDoubleMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(double));
-        private static readonly Lazy<MethodInfo> averageDoubleNullableMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(double?));
-        private static readonly Lazy<MethodInfo> averageDecimalMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(decimal));
-        private static readonly Lazy<MethodInfo> averageDecimalNullableMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(decimal?));
+        static readonly Lazy<MethodInfo> averageIntMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(int));
+        static readonly Lazy<MethodInfo> averageIntNullableMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(int?));
+        static readonly Lazy<MethodInfo> averageLongMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(long));
+        static readonly Lazy<MethodInfo> averageLongNullableMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(long?));
+        static readonly Lazy<MethodInfo> averageFloatMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(float));
+        static readonly Lazy<MethodInfo> averageFloatNullableMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(float?));
+        static readonly Lazy<MethodInfo> averageDoubleMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(double));
+        static readonly Lazy<MethodInfo> averageDoubleNullableMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(double?));
+        static readonly Lazy<MethodInfo> averageDecimalMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(decimal));
+        static readonly Lazy<MethodInfo> averageDecimalNullableMethodInfo = QueryableMethodByQueryableParameterType("Average", 1, typeof(decimal?));
 
-        private static readonly Lazy<MethodInfo> averageIntSelectorMethodInfo = QueryableMethodBySelectorParameterType("Average", 2, typeof(int));
-        private static readonly Lazy<MethodInfo> averageIntNullableSelectorMethodInfo = QueryableMethodBySelectorParameterType("Average", 2, typeof(int?));
-        private static readonly Lazy<MethodInfo> averageLongSelectorMethodInfo = QueryableMethodBySelectorParameterType("Average", 2, typeof(long));
-        private static readonly Lazy<MethodInfo> averageLongNullableSelectorMethodInfo = QueryableMethodBySelectorParameterType("Average", 2, typeof(long?));
-        private static readonly Lazy<MethodInfo> averageFloatSelectorMethodInfo = QueryableMethodBySelectorParameterType("Average", 2, typeof(float));
-        private static readonly Lazy<MethodInfo> averageFloatNullableSelectorMethodInfo = QueryableMethodBySelectorParameterType("Average", 2, typeof(float?));
-        private static readonly Lazy<MethodInfo> averageDoubleSelectorMethodInfo = QueryableMethodBySelectorParameterType("Average", 2, typeof(double));
-        private static readonly Lazy<MethodInfo> averageDoubleNullableSelectorMethodInfo = QueryableMethodBySelectorParameterType("Average", 2, typeof(double?));
-        private static readonly Lazy<MethodInfo> averageDecimalSelectorMethodInfo = QueryableMethodBySelectorParameterType("Average", 2, typeof(decimal));
-        private static readonly Lazy<MethodInfo> averageDecimalNullableSelectorMethodInfo = QueryableMethodBySelectorParameterType("Average", 2, typeof(decimal?));
+        static readonly Lazy<MethodInfo> averageIntSelectorMethodInfo = QueryableMethodBySelectorParameterType("Average", 2, typeof(int));
+        static readonly Lazy<MethodInfo> averageIntNullableSelectorMethodInfo = QueryableMethodBySelectorParameterType("Average", 2, typeof(int?));
+        static readonly Lazy<MethodInfo> averageLongSelectorMethodInfo = QueryableMethodBySelectorParameterType("Average", 2, typeof(long));
+        static readonly Lazy<MethodInfo> averageLongNullableSelectorMethodInfo = QueryableMethodBySelectorParameterType("Average", 2, typeof(long?));
+        static readonly Lazy<MethodInfo> averageFloatSelectorMethodInfo = QueryableMethodBySelectorParameterType("Average", 2, typeof(float));
+        static readonly Lazy<MethodInfo> averageFloatNullableSelectorMethodInfo = QueryableMethodBySelectorParameterType("Average", 2, typeof(float?));
+        static readonly Lazy<MethodInfo> averageDoubleSelectorMethodInfo = QueryableMethodBySelectorParameterType("Average", 2, typeof(double));
+        static readonly Lazy<MethodInfo> averageDoubleNullableSelectorMethodInfo = QueryableMethodBySelectorParameterType("Average", 2, typeof(double?));
+        static readonly Lazy<MethodInfo> averageDecimalSelectorMethodInfo = QueryableMethodBySelectorParameterType("Average", 2, typeof(decimal));
+        static readonly Lazy<MethodInfo> averageDecimalNullableSelectorMethodInfo = QueryableMethodBySelectorParameterType("Average", 2, typeof(decimal?));
 
         /// <summary>
         /// Asynchronously computes the average of a sequence of <see cref="T:System.Int32"/> values.

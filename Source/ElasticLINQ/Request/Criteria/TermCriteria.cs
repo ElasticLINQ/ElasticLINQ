@@ -11,7 +11,6 @@ namespace ElasticLinq.Request.Criteria
     /// </summary>
     class TermCriteria : SingleFieldCriteria, ITermsCriteria
     {
-        readonly MemberInfo member;
         readonly ReadOnlyCollection<object> values;
 
         /// <summary>
@@ -23,50 +22,35 @@ namespace ElasticLinq.Request.Criteria
         public TermCriteria(string field, MemberInfo member, object value)
             : base(field)
         {
-            this.member = member;
+            Member = member;
             values = new ReadOnlyCollection<object>(new[] { value });
         }
 
         // "term" is always implicitly combinable by OrCriteria.Combine
-        bool ITermsCriteria.IsOrCriteria
-        {
-            get { return true; }
-        }
+        bool ITermsCriteria.IsOrCriteria { get { return true; } }
 
         /// <summary>
         /// Property or field being checked for this term.
         /// </summary>
-        public MemberInfo Member
-        {
-            get { return member; }
-        }
+        public MemberInfo Member { get; }
 
         /// <inheritdoc/>
-        public override string Name
-        {
-            get { return "term"; }
-        }
+        public override string Name { get { return "term"; } }
 
         /// <summary>
         /// Constant value being checked.
         /// </summary>
-        public object Value
-        {
-            get { return values[0]; }
-        }
+        public object Value { get { return values[0]; } }
 
         /// <summary>
         /// List of constant values being checked for.
         /// </summary>
-        ReadOnlyCollection<object> ITermsCriteria.Values
-        {
-            get { return values; }
-        }
+        ReadOnlyCollection<object> ITermsCriteria.Values { get { return values; } }
 
         /// <inheritdoc/>
         public override string ToString()
         {
-            return string.Format("term {0} {1}", Field, Value);
+            return $"term {Field} {Value}";
         }
     }
 }

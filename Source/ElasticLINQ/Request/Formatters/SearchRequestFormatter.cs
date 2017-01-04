@@ -44,10 +44,7 @@ namespace ElasticLinq.Request.Formatters
         /// <summary>
         /// The JSON formatted POST body for the request to be sent to Elasticsearch.
         /// </summary>
-        public string Body
-        {
-            get { return body.Value; }
-        }
+        public string Body { get { return body.Value; } }
 
         /// <summary>
         /// Create the Json HTTP request body for this request given the search query and connection.
@@ -84,7 +81,7 @@ namespace ElasticLinq.Request.Formatters
             if (searchRequest.Highlight != null)
                 root.Add("highlight", Build(searchRequest.Highlight));
 
-            long? size = searchRequest.Size ?? connection.Options.SearchSizeDefault;
+            var size = searchRequest.Size ?? connection.Options.SearchSizeDefault;
             if (size.HasValue && !searchRequest.Facets.Any())
                 root.Add("size", size.Value);
 
@@ -104,7 +101,7 @@ namespace ElasticLinq.Request.Formatters
 
         JProperty Build(IFacet facet, long? defaultSize)
         {
-            Argument.EnsureNotNull("facet", facet);
+            Argument.EnsureNotNull(nameof(facet), facet);
 
             var specificBody = Build(facet);
             if (facet is IOrderableFacet)
@@ -136,14 +133,14 @@ namespace ElasticLinq.Request.Formatters
             if (facet is FilterFacet)
                 return new JObject();
 
-            throw new InvalidOperationException(string.Format("Unknown implementation of IFacet {0} can not be formatted", facet.GetType().Name));
+            throw new InvalidOperationException($"Unknown implementation of IFacet {facet.GetType().Name} can not be formatted");
         }
 
         static JToken Build(StatisticalFacet statisticalFacet)
         {
             return new JObject(
                 BuildFieldProperty(statisticalFacet.Fields)
-            );
+                );
         }
 
         static JToken Build(TermsStatsFacet termStatsFacet)
@@ -151,7 +148,7 @@ namespace ElasticLinq.Request.Formatters
             return new JObject(
                 new JProperty("key_field", termStatsFacet.Key),
                 new JProperty("value_field", termStatsFacet.Value)
-            );
+                );
         }
 
         static JToken Build(TermsFacet termsFacet)
@@ -225,7 +222,7 @@ namespace ElasticLinq.Request.Formatters
             if (criteria is CompoundCriteria)
                 return Build((CompoundCriteria)criteria);
 
-            throw new InvalidOperationException(string.Format("Unknown criteria type {0}", criteria.GetType()));
+            throw new InvalidOperationException($"Unknown criteria type {criteria.GetType()}");
         }
 
         static JObject Build(Highlight highlight)

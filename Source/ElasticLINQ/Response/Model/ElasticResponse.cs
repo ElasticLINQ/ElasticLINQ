@@ -2,7 +2,6 @@
 
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
-using System.Net;
 
 namespace ElasticLinq.Response.Model
 {

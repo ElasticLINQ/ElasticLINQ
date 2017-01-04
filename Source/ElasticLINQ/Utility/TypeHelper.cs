@@ -28,7 +28,7 @@ namespace ElasticLinq.Utility
                 return ((PropertyInfo)memberInfo).PropertyType;
 
             var declaredName = memberInfo.DeclaringType != null ? memberInfo.DeclaringType.FullName : "unknown";
-            throw new NotSupportedException(string.Format("Member '{0}' on type {1} is of unsupported type '{2}'", memberInfo.Name, declaredName, memberInfo.GetType().FullName));
+            throw new NotSupportedException($"Member '{memberInfo.Name}' on type {declaredName} is of unsupported type '{memberInfo.GetType().FullName}'");
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace ElasticLinq.Utility
                     return ((MemberExpression)lambdaExpression.Body).Member;
 
                 default:
-                    throw new NotSupportedException(string.Format("Selector node type of '{0}' not supported.", lambdaExpression.Body.NodeType));
+                    throw new NotSupportedException($"Selector node type of '{lambdaExpression.Body.NodeType}' not supported.");
             }
         }
 
@@ -122,7 +122,7 @@ namespace ElasticLinq.Utility
         public static bool IsGenericOf(this Type type, Type genericType)
         {
             return type != null && genericType != null
-                && type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == genericType;
+                   && type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == genericType;
         }
 
         /// <summary>

@@ -13,18 +13,12 @@ namespace ElasticLinq
         /// <summary>
         /// A property that stands in for the Elasticsearch _score field.
         /// </summary>
-        public static double Score
-        {
-            get { throw BuildException(); } 
-        }
+        public static double Score { get { throw BuildException(); } }
 
         /// <summary>
         /// A property that stands in for the Elasticsearch _id field.
         /// </summary>
-        public static string Id
-        {
-            get { throw BuildException(); }
-        }
+        public static string Id { get { throw BuildException(); } }
 
         /// <summary>
         /// Create the InvalidOperationException fired when trying to access properties of this proxy class.
@@ -34,7 +28,7 @@ namespace ElasticLinq
         static InvalidOperationException BuildException([CallerMemberName] string memberName = null)
         {
             return new InvalidOperationException(
-                string.Format("ElasticFields.{0} is a property for mapping queries to Elasticsearch and should not be evaluated directly.", memberName));
+                $"ElasticFields.{memberName} is a property for mapping queries to Elasticsearch and should not be evaluated directly.");
         }
     }
 }

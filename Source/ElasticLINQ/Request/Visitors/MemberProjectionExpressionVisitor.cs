@@ -17,7 +17,7 @@ namespace ElasticLinq.Request.Visitors
     /// </summary>
     class MemberProjectionExpressionVisitor : ElasticFieldsExpressionVisitor
     {
-        protected static readonly MethodInfo GetDictionaryValueMethod = typeof(MemberProjectionExpressionVisitor).GetMethodInfo(m => m.Name == "GetDictionaryValueOrDefault");
+        static readonly MethodInfo getDictionaryValueMethod = typeof(MemberProjectionExpressionVisitor).GetMethodInfo(m => m.Name == "GetDictionaryValueOrDefault");
 
         readonly HashSet<string> fieldNames = new HashSet<string>();
 
@@ -26,11 +26,11 @@ namespace ElasticLinq.Request.Visitors
         {
         }
 
-        internal static new RebindCollectionResult<string> Rebind(Type sourceType, IElasticMapping mapping, Expression selector)
+        internal new static RebindCollectionResult<string> Rebind(Type sourceType, IElasticMapping mapping, Expression selector)
         {
             var parameter = Expression.Parameter(typeof(Hit), "h");
             var visitor = new MemberProjectionExpressionVisitor(sourceType, parameter, mapping);
-            Argument.EnsureNotNull("selector", selector);
+            Argument.EnsureNotNull(nameof(selector), selector);
             var materializer = visitor.Visit(selector);
             return new RebindCollectionResult<string>(materializer, visitor.fieldNames, parameter);
         }
@@ -46,7 +46,7 @@ namespace ElasticLinq.Request.Visitors
         protected override Expression VisitElasticField(MemberExpression m)
         {
             var member = base.VisitElasticField(m);
-            fieldNames.Add("_" +  m.Member.Name.ToLowerInvariant());
+            fieldNames.Add("_" + m.Member.Name.ToLowerInvariant());
             return member;
         }
 
@@ -54,7 +54,7 @@ namespace ElasticLinq.Request.Visitors
         {
             var fieldName = Mapping.GetFieldName(SourceType, m);
             fieldNames.Add(fieldName);
-            var getFieldExpression = Expression.Call(null, GetDictionaryValueMethod, Expression.PropertyOrField(BindingParameter, "fields"), Expression.Constant(fieldName), Expression.Constant(m.Type));
+            var getFieldExpression = Expression.Call(null, getDictionaryValueMethod, Expression.PropertyOrField(BindingParameter, "fields"), Expression.Constant(fieldName), Expression.Constant(m.Type));
             return Expression.Convert(getFieldExpression, m.Type);
         }
 

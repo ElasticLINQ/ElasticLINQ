@@ -52,11 +52,11 @@ namespace ElasticLinq.Mapping
         /// <param name="conversionCulture">The culture to use for the lower-casing, camel-casing, and pluralization operations. If <c>null</c>,
         /// uses <see cref="CultureInfo.CurrentCulture"/>.</param>
         public ElasticMapping(bool camelCaseFieldNames = true,
-                              bool camelCaseTypeNames = true,
-                              bool pluralizeTypeNames = true,
-                              bool lowerCaseAnalyzedFieldValues = true,
-                              EnumFormat enumFormat = EnumFormat.String,
-                              CultureInfo conversionCulture = null)
+            bool camelCaseTypeNames = true,
+            bool pluralizeTypeNames = true,
+            bool lowerCaseAnalyzedFieldValues = true,
+            EnumFormat enumFormat = EnumFormat.String,
+            CultureInfo conversionCulture = null)
         {
             this.camelCaseFieldNames = camelCaseFieldNames;
             this.camelCaseTypeNames = camelCaseTypeNames;
@@ -69,7 +69,7 @@ namespace ElasticLinq.Mapping
         /// <inheritdoc/>
         public virtual JToken FormatValue(MemberInfo member, object value)
         {
-            Argument.EnsureNotNull("member", member);
+            Argument.EnsureNotNull(nameof(member), member);
 
             if (value == null)
                 return new JValue((string)null);
@@ -95,8 +95,8 @@ namespace ElasticLinq.Mapping
 
             var nameValue = Enum.GetName(returnType, value);
             if (nameValue == null)
-                throw new ArgumentOutOfRangeException("value",
-                    string.Format("Value '{0}' is not defined for enum type '{1}'.", value, returnType.FullName));
+                throw new ArgumentOutOfRangeException(nameof(value),
+                    $"Value '{value}' is not defined for enum type '{returnType.FullName}'.");
 
             return nameValue;
         }
@@ -104,7 +104,7 @@ namespace ElasticLinq.Mapping
         /// <inheritdoc/>
         public virtual string GetFieldName(Type type, MemberExpression memberExpression)
         {
-            Argument.EnsureNotNull("memberExpression", memberExpression);
+            Argument.EnsureNotNull(nameof(memberExpression), memberExpression);
 
             switch (memberExpression.Expression.NodeType)
             {
@@ -115,7 +115,7 @@ namespace ElasticLinq.Mapping
                     return GetFieldName(type, memberExpression.Member);
 
                 default:
-                    throw new NotSupportedException(string.Format("Unknown expression type {0} for left hand side of expression {1}", memberExpression.Expression.NodeType, memberExpression));
+                    throw new NotSupportedException($"Unknown expression type {memberExpression.Expression.NodeType} for left hand side of expression {memberExpression}");
             }
         }
 
@@ -128,8 +128,8 @@ namespace ElasticLinq.Mapping
         /// <returns>The Elasticsearch field name that matches the member.</returns>
         public virtual string GetFieldName(Type type, MemberInfo memberInfo)
         {
-            Argument.EnsureNotNull("type", type);
-            Argument.EnsureNotNull("memberInfo", memberInfo);
+            Argument.EnsureNotNull(nameof(type), type);
+            Argument.EnsureNotNull(nameof(memberInfo), memberInfo);
 
             return GetMemberName(memberInfo);
         }
@@ -154,7 +154,7 @@ namespace ElasticLinq.Mapping
         /// <inheritdoc/>
         public virtual string GetDocumentType(Type type)
         {
-            Argument.EnsureNotNull("type", type);
+            Argument.EnsureNotNull(nameof(type), type);
 
             var result = type.Name;
             if (pluralizeTypeNames)
@@ -168,7 +168,7 @@ namespace ElasticLinq.Mapping
         /// <inheritdoc/>
         public virtual ICriteria GetTypeSelectionCriteria(Type type)
         {
-            Argument.EnsureNotNull("docType", type);
+            Argument.EnsureNotNull(nameof(type), type);
             return null;
         }
 

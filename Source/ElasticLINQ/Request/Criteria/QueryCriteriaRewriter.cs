@@ -1,6 +1,5 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
-using System.Collections.Generic;
 using System.Linq;
 
 namespace ElasticLinq.Request.Criteria
@@ -43,7 +42,7 @@ namespace ElasticLinq.Request.Criteria
         static BoolCriteria Rewrite(NotCriteria not)
         {
             var mustNotCriteria = not.Criteria is OrCriteria
-                ? ((OrCriteria) not.Criteria).Criteria
+                ? ((OrCriteria)not.Criteria).Criteria
                 : Enumerable.Repeat(not.Criteria, 1);
             return new BoolCriteria(null, null, mustNotCriteria.Select(Compensate));
         }

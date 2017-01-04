@@ -1,7 +1,5 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
-using System;
-
 namespace ElasticLinq.Request.Criteria
 {
     /// <summary>
@@ -13,8 +11,6 @@ namespace ElasticLinq.Request.Criteria
     /// </remarks>
     public class PrefixCriteria : SingleFieldCriteria
     {
-        readonly string prefix;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="PrefixCriteria"/> class.
         /// </summary>
@@ -23,27 +19,21 @@ namespace ElasticLinq.Request.Criteria
         public PrefixCriteria(string field, string prefix)
             : base(field)
         {
-            this.prefix = prefix;
+            Prefix = prefix;
         }
 
         /// <summary>
         /// Prefix to check the field begins with.
         /// </summary>
-        public string Prefix
-        {
-            get { return prefix; }
-        }
+        public string Prefix { get; }
 
         /// <inheritdoc/>
-        public override string Name
-        {
-            get { return "prefix"; }
-        }
+        public override string Name { get { return "prefix"; } }
 
         /// <inheritdoc/>
         public override string ToString()
         {
-            return string.Format("{0}\"{1}\"", base.ToString(), Prefix);
+            return $"{base.ToString()}\"{Prefix}\"";
         }
     }
 }

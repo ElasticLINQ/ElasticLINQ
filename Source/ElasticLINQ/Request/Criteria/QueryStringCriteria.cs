@@ -10,9 +10,6 @@ namespace ElasticLinq.Request.Criteria
     /// </summary>
     public class QueryStringCriteria : ICriteria
     {
-        readonly string value;
-        readonly ReadOnlyCollection<string> fields;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="QueryStringCriteria"/> class.
         /// </summary>
@@ -20,32 +17,23 @@ namespace ElasticLinq.Request.Criteria
         /// <param name="fields">Colleciton of fields to be searched.</param>
         public QueryStringCriteria(string value, params string[] fields)
         {
-            Argument.EnsureNotBlank("value", value);
+            Argument.EnsureNotBlank(nameof(value), value);
 
-            this.value = value;
-            this.fields = new ReadOnlyCollection<string>(fields ?? new string[0]);
+            Value = value;
+            Fields = new ReadOnlyCollection<string>(fields ?? new string[0]);
         }
 
         /// <summary>
         /// Collection of fields to be searched.
         /// </summary>
-        public ReadOnlyCollection<string> Fields
-        {
-            get { return fields; }
-        }
+        public ReadOnlyCollection<string> Fields { get; }
 
         /// <summary>
         /// Value to be found within the fields.
         /// </summary>
-        public string Value
-        {
-            get { return value; }
-        }
+        public string Value { get; }
 
         /// <inheritdoc/>
-        public string Name
-        {
-            get { return "query_string"; }
-        }
+        public string Name { get { return "query_string"; } }
     }
 }

@@ -1,7 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using ElasticLinq.Utility;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -15,10 +14,6 @@ namespace ElasticLinq.Request.Criteria
     /// </summary>
     public class TermsCriteria : SingleFieldCriteria, ITermsCriteria
     {
-        readonly TermsExecutionMode? executionMode;
-        readonly MemberInfo member;
-        readonly ReadOnlyCollection<object> values;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="TermsCriteria"/> class.
         /// </summary>
@@ -29,18 +24,15 @@ namespace ElasticLinq.Request.Criteria
         TermsCriteria(TermsExecutionMode? executionMode, string field, MemberInfo member, IEnumerable<object> values)
             : base(field)
         {
-            this.executionMode = executionMode;
-            this.member = member;
-            this.values = new ReadOnlyCollection<object>(values.ToArray());
+            ExecutionMode = executionMode;
+            Member = member;
+            Values = new ReadOnlyCollection<object>(values.ToArray());
         }
 
         /// <summary>
         /// Type of execution mode this terms criteria will take.
         /// </summary>
-        public TermsExecutionMode? ExecutionMode
-        {
-            get { return executionMode; }
-        }
+        public TermsExecutionMode? ExecutionMode { get; }
 
         bool ITermsCriteria.IsOrCriteria
         {
@@ -49,40 +41,31 @@ namespace ElasticLinq.Request.Criteria
                 // "plain" is the default; "plain", "or", and "bool" are all or queries, but
                 // with slightly different caching semantics.
                 return !ExecutionMode.HasValue
-                    || ExecutionMode == TermsExecutionMode.@bool
-                    || ExecutionMode == TermsExecutionMode.or
-                    || ExecutionMode == TermsExecutionMode.plain;
+                       || ExecutionMode == TermsExecutionMode.@bool
+                       || ExecutionMode == TermsExecutionMode.or
+                       || ExecutionMode == TermsExecutionMode.plain;
             }
         }
 
         /// <summary>
         /// Property or field being checked for this term.
         /// </summary>
-        public MemberInfo Member
-        {
-            get { return member; }
-        }
+        public MemberInfo Member { get; }
 
         /// <inheritdoc/>
-        public override string Name
-        {
-            get { return "terms"; }
-        }
+        public override string Name { get { return "terms"; } }
 
         /// <summary>
         /// Constant values being searched for.
         /// </summary>
-        public ReadOnlyCollection<object> Values
-        {
-            get { return values; }
-        }
+        public ReadOnlyCollection<object> Values { get; }
 
         /// <inheritdoc/>
         public override string ToString()
         {
-            var result = string.Format("terms {0} [{1}]", Field, string.Join(", ", Values));
+            var result = $"terms {Field} [{string.Join(", ", Values)}]";
             if (ExecutionMode.HasValue)
-                result += string.Format(" (execution: {0})", ExecutionMode);
+                result += $" (execution: {ExecutionMode})";
 
             return result;
         }
@@ -138,7 +121,7 @@ namespace ElasticLinq.Request.Criteria
         /// <returns>Either a <see cref="TermCriteria"/> object or a <see cref="TermsCriteria"/> object.</returns>
         internal static ITermsCriteria Build(TermsExecutionMode? executionMode, string field, MemberInfo member, IEnumerable<object> values)
         {
-            Argument.EnsureNotNull("values", values);
+            Argument.EnsureNotNull(nameof(values), values);
 
             var hashValues = new HashSet<object>(values);
             if (hashValues.Count == 1)

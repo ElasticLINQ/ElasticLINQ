@@ -13,8 +13,6 @@ namespace ElasticLinq.Request.Criteria
     /// </summary>
     abstract class CompoundCriteria : ICriteria
     {
-        readonly ReadOnlyCollection<ICriteria> criteria;
-
         /// <summary>
         /// Create a criteria that has subcriteria. The exact semantics of
         /// the subcriteria are controlled by subclasses of CompoundCriteria.
@@ -22,8 +20,8 @@ namespace ElasticLinq.Request.Criteria
         /// <param name="criteria"></param>
         protected CompoundCriteria(IEnumerable<ICriteria> criteria)
         {
-            Argument.EnsureNotNull("criteria", criteria);
-            this.criteria = new ReadOnlyCollection<ICriteria>(criteria.ToArray());
+            Argument.EnsureNotNull(nameof(criteria), criteria);
+            Criteria = new ReadOnlyCollection<ICriteria>(criteria.ToArray());
         }
 
         /// <inheritdoc/>
@@ -32,15 +30,12 @@ namespace ElasticLinq.Request.Criteria
         /// <summary>
         /// Criteria that is compounded by this criteria in some way (as determined by the subclass).
         /// </summary>
-        public ReadOnlyCollection<ICriteria> Criteria
-        {
-            get { return criteria; }
-        }
+        public ReadOnlyCollection<ICriteria> Criteria { get; }
 
         /// <inheritdoc/>
         public override string ToString()
         {
-            return string.Format("{0} ({1})", Name, string.Join(", ", Criteria.Select(f => f.ToString()).ToArray()));
+            return $"{Name} ({string.Join(", ", Criteria.Select(f => f.ToString()).ToArray())})";
         }
     }
 }

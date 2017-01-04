@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -20,7 +22,7 @@ namespace ElasticLinq.ElasticsearchNet
     /// </summary>
     public class ElasticNetConnection : BaseElasticConnection
     {
-        private readonly IElasticsearchClient client;
+        readonly IElasticsearchClient client;
 
         /// <summary>
         /// Create a new ElasticNetConnection with the given parameters defining its properties.
@@ -37,7 +39,7 @@ namespace ElasticLinq.ElasticsearchNet
             : base(index, timeout, options)
         {
             if (client == null)
-                throw new ArgumentNullException("client");
+                throw new ArgumentNullException(nameof(client));
 
             this.client = client;
         }

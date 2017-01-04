@@ -13,20 +13,16 @@ namespace ElasticLinq.Response.Materializers
     [DebuggerDisplay("Field {Name,nq}.{Operation,nq} = {Token}")]
     class AggregateField
     {
-        readonly string name;
-        readonly string operation;
-        readonly JToken token;
-
         public AggregateField(string name, string operation, JToken token)
         {
-            this.name = name;
-            this.operation = operation;
-            this.token = token;
+            Name = name;
+            Operation = operation;
+            Token = token;
         }
 
-        public string Name { get { return name; } }
-        public string Operation { get { return operation; } }
-        public JToken Token { get { return token; } }
+        public string Name { get; }
+        public string Operation { get; }
+        public JToken Token { get; }
     }
 
     abstract class AggregateRow
@@ -58,33 +54,33 @@ namespace ElasticLinq.Response.Materializers
             {
                 case "Infinity":
                 case "∞":
-                    {
-                        if (valueType == typeof(double))
-                            return double.PositiveInfinity;
+                {
+                    if (valueType == typeof(double))
+                        return double.PositiveInfinity;
 
-                        if (valueType == typeof(float))
-                            return float.PositiveInfinity;
+                    if (valueType == typeof(float))
+                        return float.PositiveInfinity;
 
-                        if (valueType == typeof(decimal?))
-                            return null;
+                    if (valueType == typeof(decimal?))
+                        return null;
 
-                        break;
-                    }
+                    break;
+                }
 
                 case "-Infinity":
                 case "-∞":
-                    {
-                        if (valueType == typeof(double))
-                            return double.NegativeInfinity;
+                {
+                    if (valueType == typeof(double))
+                        return double.NegativeInfinity;
 
-                        if (valueType == typeof(float))
-                            return float.NegativeInfinity;
+                    if (valueType == typeof(float))
+                        return float.NegativeInfinity;
 
-                        if (valueType == typeof(decimal?))
-                            return null;
+                    if (valueType == typeof(decimal?))
+                        return null;
 
-                        break;
-                    }
+                    break;
+                }
             }
 
             // Elasticsearch returns dates as milliseconds since epoch when using facets
@@ -103,12 +99,11 @@ namespace ElasticLinq.Response.Materializers
     [DebuggerDisplay("Statistical Row")]
     class AggregateStatisticalRow : AggregateRow
     {
-        readonly object key;
         readonly JObject facets;
 
         public AggregateStatisticalRow(object key, JObject facets)
         {
-            this.key = key;
+            Key = key;
             this.facets = facets;
         }
 
@@ -122,34 +117,25 @@ namespace ElasticLinq.Response.Materializers
                 : TypeHelper.CreateDefault(valueType);
         }
 
-        public object Key { get { return key; } }
+        public object Key { get; }
     }
 
     [DebuggerDisplay("Term Row {Key} Fields({Fields.Count})")]
     class AggregateTermRow : AggregateRow
     {
-        readonly object key;
-        readonly ReadOnlyCollection<AggregateField> fields;
-
         public AggregateTermRow(object key, IEnumerable<AggregateField> fields)
         {
-            this.key = key;
-            this.fields = new ReadOnlyCollection<AggregateField>(fields.ToArray());
+            Key = key;
+            Fields = new ReadOnlyCollection<AggregateField>(fields.ToArray());
         }
 
-        public object Key
-        {
-            get { return key; }
-        }
+        public object Key { get; }
 
-        public ReadOnlyCollection<AggregateField> Fields
-        {
-            get { return fields; }
-        }
+        public ReadOnlyCollection<AggregateField> Fields { get; }
 
         internal override object GetValue(string name, string operation, Type valueType)
         {
-            var field = fields.FirstOrDefault(f => f.Name == name && f.Operation == operation);
+            var field = Fields.FirstOrDefault(f => f.Name == name && f.Operation == operation);
 
             return field == null
                 ? TypeHelper.CreateDefault(valueType)

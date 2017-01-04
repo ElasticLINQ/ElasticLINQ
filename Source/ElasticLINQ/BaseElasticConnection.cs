@@ -1,10 +1,12 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
+﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
+
 using ElasticLinq.Logging;
 using ElasticLinq.Request;
 using ElasticLinq.Response.Model;
 using ElasticLinq.Utility;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ElasticLinq
 {
@@ -13,11 +15,7 @@ namespace ElasticLinq
     /// </summary>
     public abstract class BaseElasticConnection : IElasticConnection
     {
-        private static readonly TimeSpan defaultTimeout = TimeSpan.FromSeconds(10);
-
-        private readonly string index;
-        private readonly TimeSpan timeout;
-        private readonly ElasticConnectionOptions options;
+        static readonly TimeSpan defaultTimeout = TimeSpan.FromSeconds(10);
 
         /// <summary>
         /// Create a new BaseElasticConnection with the given parameters for internal testing.
@@ -28,40 +26,31 @@ namespace ElasticLinq
         protected BaseElasticConnection(string index = null, TimeSpan? timeout = null, ElasticConnectionOptions options = null)
         {
             if (timeout.HasValue)
-                Argument.EnsurePositive("value", timeout.Value);
+                Argument.EnsurePositive(nameof(timeout), timeout.Value);
             if (index != null)
-                Argument.EnsureNotBlank("index", index);
+                Argument.EnsureNotBlank(nameof(index), index);
 
-            this.index = index;
-            this.options = options ?? new ElasticConnectionOptions();
-            this.timeout = timeout ?? defaultTimeout;
+            Index = index;
+            Options = options ?? new ElasticConnectionOptions();
+            Timeout = timeout ?? defaultTimeout;
         }
 
         /// <summary>
         /// The name of the index on the Elasticsearch server.
         /// </summary>
         /// <example>northwind</example>
-        public string Index
-        {
-            get { return index; }
-        }
+        public string Index { get; }
 
         /// <summary>
         /// How long to wait for a response to a network request before
         /// giving up.
         /// </summary>
-        public TimeSpan Timeout
-        {
-            get { return timeout; }
-        }
+        public TimeSpan Timeout { get; }
 
         /// <summary>
         /// Additional options that specify how this connection should behave.
         /// </summary>
-        public ElasticConnectionOptions Options
-        {
-            get { return options; }
-        }
+        public ElasticConnectionOptions Options { get; }
 
         /// <summary>
         /// Issues search requests to elastic search

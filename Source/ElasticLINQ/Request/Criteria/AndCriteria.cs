@@ -23,10 +23,7 @@ namespace ElasticLinq.Request.Criteria
         }
 
         /// <inheritdoc/>
-        public override string Name
-        {
-            get { return "and"; }
-        }
+        public override string Name { get { return "and"; } }
 
         /// <summary>
         /// Combine a number of <see cref="ICriteria" /> with 'and' semantics.
@@ -37,7 +34,7 @@ namespace ElasticLinq.Request.Criteria
         /// a single criteria.</remarks>
         public static ICriteria Combine(params ICriteria[] criteria)
         {
-            Argument.EnsureNotNull("criteria", criteria);
+            Argument.EnsureNotNull(nameof(criteria), criteria);
 
             // Strip out null args and handle cases where no combination required
             criteria = criteria.Where(c => c != null).ToArray();

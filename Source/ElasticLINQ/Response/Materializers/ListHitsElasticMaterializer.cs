@@ -37,7 +37,7 @@ namespace ElasticLinq.Response.Materializers
         /// <returns>List of <see cref="elementType"/> objects as constructed by the <see cref="projector"/>.</returns>
         public object Materialize(ElasticResponse response)
         {
-            Argument.EnsureNotNull("response", response);
+            Argument.EnsureNotNull(nameof(response), response);
 
             var hits = response.hits;
             if (hits == null || hits.hits == null || !hits.hits.Any())

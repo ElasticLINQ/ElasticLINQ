@@ -15,7 +15,7 @@ namespace ElasticLinq.Mapping
     public class CouchbaseElasticMapping : ElasticMapping
     {
         const string TypeCriteriaMissingExceptionMessage = "Unable to determine document type selection criteria for type '{0}'. " +
-                                                                   "Ensure the type has a public read/write property that is non-nullable or marked with the Required attribute.";
+                                                           "Ensure the type has a public read/write property that is non-nullable or marked with the Required attribute.";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CouchbaseElasticMapping"/> class.
@@ -25,9 +25,11 @@ namespace ElasticLinq.Mapping
         /// <param name="conversionCulture">The culture to use for the lower-casing, camel-casing, and pluralization operations. If <c>null</c>,
         /// uses <see cref="CultureInfo.CurrentCulture"/>.</param>
         public CouchbaseElasticMapping(bool camelCaseFieldNames = true,
-                                       bool lowerCaseAnalyzedFieldValues = true,
-                                       CultureInfo conversionCulture = null)
-            : base(camelCaseFieldNames, false, false, lowerCaseAnalyzedFieldValues, EnumFormat.String, conversionCulture) { }
+            bool lowerCaseAnalyzedFieldValues = true,
+            CultureInfo conversionCulture = null)
+            : base(camelCaseFieldNames, false, false, lowerCaseAnalyzedFieldValues, EnumFormat.String, conversionCulture)
+        {
+        }
 
         /// <summary>
         /// Gets the fully document prefix for a given CLR type. Extending this allows you to change
@@ -63,7 +65,7 @@ namespace ElasticLinq.Mapping
                     return GetFieldName(type, memberExpression.Member);
 
                 default:
-                    throw new NotSupportedException(string.Format("Unknown expression type {0} for left hand side of expression {1}", memberExpression.Expression.NodeType, memberExpression));
+                    throw new NotSupportedException($"Unknown expression type {memberExpression.Expression.NodeType} for left hand side of expression {memberExpression}");
             }
         }
 
@@ -73,8 +75,8 @@ namespace ElasticLinq.Mapping
             var memberName = base.GetFieldName(type, memberInfo);
             var prefix = GetDocumentMappingPrefix(type);
 
-            return string.Format("{0}.{1}", prefix, memberName).TrimStart('.');
-        } 
+            return $"{prefix}.{memberName}".TrimStart('.');
+        }
 
         /// <inheritdoc/>
         public override ICriteria GetTypeSelectionCriteria(Type type)

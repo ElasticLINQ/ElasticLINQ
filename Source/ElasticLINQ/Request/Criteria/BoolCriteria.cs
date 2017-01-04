@@ -29,10 +29,7 @@ namespace ElasticLinq.Request.Criteria
         }
 
         /// <inheritdoc/>
-        public string Name
-        {
-            get { return "bool"; }
-        }
+        public string Name { get { return "bool"; } }
 
         /// <summary>
         /// Criteria that must be satisfied for this bool criteria to be satisfied.

@@ -12,23 +12,14 @@ namespace ElasticLinq.Request.Visitors
     /// </summary>
     class ElasticTranslateResult
     {
-        readonly SearchRequest searchRequest;
-        readonly IElasticMaterializer materializer;
-
         public ElasticTranslateResult(SearchRequest searchRequest, IElasticMaterializer materializer)
         {
-            this.searchRequest = searchRequest;
-            this.materializer = materializer;
+            SearchRequest = searchRequest;
+            Materializer = materializer;
         }
 
-        public SearchRequest SearchRequest
-        {
-            get { return searchRequest; }
-        }
+        public SearchRequest SearchRequest { get; }
 
-        public IElasticMaterializer Materializer
-        {
-            get { return materializer; }
-        }
+        public IElasticMaterializer Materializer { get; }
     }
 }

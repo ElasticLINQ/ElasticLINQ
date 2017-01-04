@@ -9,10 +9,6 @@ namespace ElasticLinq.Request
     /// </summary>
     public class SortOption
     {
-        readonly string name;
-        readonly bool ascending;
-        readonly bool ignoreUnmapped;
-
         /// <summary>
         /// Create a new SortOption for the given name, order and ignore.
         /// </summary>
@@ -21,34 +17,25 @@ namespace ElasticLinq.Request
         /// <param name="ignoreUnmapped">Whether unmapped fields should be ignored or not.</param>
         public SortOption(string name, bool ascending, bool ignoreUnmapped = false)
         {
-            Argument.EnsureNotBlank("name", name);
-            this.name = name;
-            this.ascending = ascending;
-            this.ignoreUnmapped = ignoreUnmapped;
+            Argument.EnsureNotBlank(nameof(name), name);
+            Name = name;
+            Ascending = ascending;
+            IgnoreUnmapped = ignoreUnmapped;
         }
 
         /// <summary>
         /// Name of the field to be sorted.
         /// </summary>
-        public string Name
-        {
-            get { return name; }
-        }
+        public string Name { get; }
 
         /// <summary>
         /// Whether this field should be sorted in ascending order or not.
         /// </summary>
-        public bool Ascending
-        {
-            get { return ascending; }
-        }
+        public bool Ascending { get; }
 
         /// <summary>
         /// Whether documents with unmapped fields should be ignored or not.
         /// </summary>
-        public bool IgnoreUnmapped
-        {
-            get { return ignoreUnmapped; }
-        }
+        public bool IgnoreUnmapped { get; }
     }
 }

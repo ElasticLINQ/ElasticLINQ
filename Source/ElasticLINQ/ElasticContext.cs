@@ -22,7 +22,7 @@ namespace ElasticLinq
         /// <param name="retryPolicy">The object which controls retry policy for the search (optional, defaults to <see cref="RetryPolicy"/>).</param>
         public ElasticContext(IElasticConnection connection, IElasticMapping mapping = null, ILog log = null, IRetryPolicy retryPolicy = null)
         {
-            Argument.EnsureNotNull("connection", connection);
+            Argument.EnsureNotNull(nameof(connection), connection);
 
             Connection = connection;
             Mapping = mapping ?? new TrivialElasticMapping();
@@ -33,22 +33,22 @@ namespace ElasticLinq
         /// <summary>
         /// Specifies the connection to the Elasticsearch server.
         /// </summary>
-        public IElasticConnection Connection { get; private set; }
+        public IElasticConnection Connection { get; }
 
         /// <summary>
         /// The logging mechanism for diagnostic information.
         /// </summary>
-        public ILog Log { get; private set; }
+        public ILog Log { get; }
 
         /// <summary>
         /// The mapping to describe how objects and their properties are mapped to Elasticsearch.
         /// </summary>
-        public IElasticMapping Mapping { get; private set; }
+        public IElasticMapping Mapping { get; }
 
         /// <summary>
         /// The retry policy for handling networking issues.
         /// </summary>
-        public IRetryPolicy RetryPolicy { get; private set; }
+        public IRetryPolicy RetryPolicy { get; }
 
         /// <inheritdoc/>
         public virtual IQueryable<T> Query<T>()

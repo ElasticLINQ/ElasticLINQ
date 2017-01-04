@@ -9,5 +9,7 @@ namespace ElasticLinq
     /// (and therefore not subject to value transformations like lower-casing).
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
-    public sealed class NotAnalyzedAttribute : Attribute { }
+    public sealed class NotAnalyzedAttribute : Attribute
+    {
+    }
 }

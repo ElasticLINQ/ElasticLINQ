@@ -28,7 +28,7 @@ namespace ElasticLinq.Request.Visitors
                 return false;
 
             if (e is MemberExpression && doNotEvaluateMembersDeclaredOn.Contains(((MemberExpression)e).Member.DeclaringType) ||
-               (e is MethodCallExpression && doNotEvaluateMethodsDeclaredOn.Contains(((MethodCallExpression)e).Method.DeclaringType)))
+                (e is MethodCallExpression && doNotEvaluateMethodsDeclaredOn.Contains(((MethodCallExpression)e).Method.DeclaringType)))
                 return false;
 
             return true;

@@ -14,19 +14,18 @@ namespace ElasticLinq.Request.Facets
     [DebuggerDisplay("FilterFacet {Filter}")]
     class FilterFacet : IFacet
     {
-        readonly string name;
-        readonly ICriteria filter;
-
         public FilterFacet(string name, ICriteria filter)
         {
-            Argument.EnsureNotBlank("name", name);
+            Argument.EnsureNotBlank(nameof(name), name);
 
-            this.name = name;
-            this.filter = filter;
+            Name = name;
+            Filter = filter;
         }
 
         public string Type { get { return "filter"; } }
-        public string Name { get { return name; } }
-        public ICriteria Filter { get { return filter; } }
+
+        public string Name { get; }
+
+        public ICriteria Filter { get; }
     }
 }

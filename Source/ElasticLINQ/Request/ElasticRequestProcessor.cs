@@ -6,11 +6,6 @@ using ElasticLinq.Request.Formatters;
 using ElasticLinq.Response.Model;
 using ElasticLinq.Retry;
 using ElasticLinq.Utility;
-using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -28,10 +23,10 @@ namespace ElasticLinq.Request
 
         public ElasticRequestProcessor(IElasticConnection connection, IElasticMapping mapping, ILog log, IRetryPolicy retryPolicy)
         {
-            Argument.EnsureNotNull("connection", connection);
-            Argument.EnsureNotNull("mapping", mapping);
-            Argument.EnsureNotNull("log", log);
-            Argument.EnsureNotNull("retryPolicy", retryPolicy);
+            Argument.EnsureNotNull(nameof(connection), connection);
+            Argument.EnsureNotNull(nameof(mapping), mapping);
+            Argument.EnsureNotNull(nameof(log), log);
+            Argument.EnsureNotNull(nameof(retryPolicy), retryPolicy);
 
             this.connection = connection;
             this.mapping = mapping;
@@ -56,50 +51,6 @@ namespace ElasticLinq.Request
                     additionalInfo["uri"] = connection.GetSearchUri(searchRequest);
                     additionalInfo["query"] = formatter.Body;
                 }, cancellationToken);
-        }
-
-        async Task<HttpResponseMessage> SendRequestAsync(HttpClient httpClient, HttpRequestMessage requestMessage, CancellationToken cancellationToken)
-        {
-            var stopwatch = Stopwatch.StartNew();
-            var response = await httpClient.SendAsync(requestMessage, cancellationToken);
-            stopwatch.Stop();
-
-            log.Debug(null, null, "Response: {0} {1} (in {2}ms)", (int)response.StatusCode, response.StatusCode, stopwatch.ElapsedMilliseconds);
-
-            response.EnsureSuccessStatusCode();
-            return response;
-        }
-
-        internal static ElasticResponse ParseResponse(Stream responseStream, ILog log)
-        {
-            var stopwatch = Stopwatch.StartNew();
-
-            using (var textReader = new JsonTextReader(new StreamReader(responseStream)))
-            {
-                var results = new JsonSerializer().Deserialize<ElasticResponse>(textReader);
-                stopwatch.Stop();
-
-                var resultSummary = string.Join(", ", GetResultSummary(results));
-                log.Debug(null, null, "Deserialized {0} bytes into {1} in {2}ms", responseStream.Length, resultSummary, stopwatch.ElapsedMilliseconds);
-
-                return results;
-            }
-        }
-
-        static IEnumerable<string> GetResultSummary(ElasticResponse results)
-        {
-            if (results == null)
-            {
-                yield return "nothing";
-            }
-            else
-            {
-                if (results.hits != null && results.hits.hits != null && results.hits.hits.Count > 0)
-                    yield return results.hits.hits.Count + " hits";
-
-                if (results.facets != null && results.facets.Count > 0)
-                    yield return results.facets.Count + " facets";
-            }
         }
     }
 }

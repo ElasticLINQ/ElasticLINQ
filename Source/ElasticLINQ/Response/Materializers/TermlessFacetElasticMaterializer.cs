@@ -16,7 +16,6 @@ namespace ElasticLinq.Response.Materializers
         static readonly string[] termlessFacetTypes = { "statistical", "filter" };
 
         readonly Func<AggregateRow, object> projector;
-        readonly Type elementType;
         readonly object key;
 
         /// <summary>
@@ -27,25 +26,25 @@ namespace ElasticLinq.Response.Materializers
         /// <param name="key">The constant value for any key references during materialization.</param>
         public TermlessFacetElasticMaterializer(Func<AggregateRow, object> projector, Type elementType, object key = null)
         {
-            Argument.EnsureNotNull("projector", projector);
-            Argument.EnsureNotNull("elementType", elementType);
+            Argument.EnsureNotNull(nameof(projector), projector);
+            Argument.EnsureNotNull(nameof(elementType), elementType);
 
             this.projector = projector;
-            this.elementType = elementType;
+            ElementType = elementType;
             this.key = key;
         }
 
         /// <summary>
         /// Materialize a single object from the response using the <see cref="projector"/>
-       ///  or return a default value based on the element type.
+        ///  or return a default value based on the element type.
         /// </summary>
         /// <param name="response">The <see cref="ElasticResponse"/> to materialize facets from.</param>
         /// <returns>Object materialized from the response using the projector or default if no corresponding facets.</returns>
         public virtual object Materialize(ElasticResponse response)
         {
-            Argument.EnsureNotNull("response", response);
+            Argument.EnsureNotNull(nameof(response), response);
 
-            return MaterializeSingle(response) ?? TypeHelper.CreateDefault(elementType);
+            return MaterializeSingle(response) ?? TypeHelper.CreateDefault(ElementType);
         }
 
         /// <summary>
@@ -56,7 +55,7 @@ namespace ElasticLinq.Response.Materializers
         /// <returns>Object materialized from the response using the projector or null if no corresponding facets.</returns>
         public object MaterializeSingle(ElasticResponse response)
         {
-            Argument.EnsureNotNull("response", response);
+            Argument.EnsureNotNull(nameof(response), response);
 
             var facets = response.facets;
             if (facets != null && facets.Count > 0)
@@ -76,6 +75,6 @@ namespace ElasticLinq.Response.Materializers
         /// <summary>
         /// Type of element being materialized.
         /// </summary>
-        internal Type ElementType { get { return elementType; } }
+        internal Type ElementType { get; }
     }
 }

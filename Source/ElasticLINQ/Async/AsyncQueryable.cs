@@ -15,14 +15,14 @@ namespace ElasticLinq.Async
     /// </summary>
     public static partial class AsyncQueryable
     {
-        private static readonly Lazy<MethodInfo> countMethodInfo = QueryableMethodByArgs("Count", 1);
-        private static readonly Lazy<MethodInfo> countPredicateMethodInfo = QueryableMethodByArgs("Count", 2);
-        private static readonly Lazy<MethodInfo> longCountMethodInfo = QueryableMethodByArgs("LongCount", 1);
-        private static readonly Lazy<MethodInfo> longCountPredicateMethodInfo = QueryableMethodByArgs("LongCount", 2);
-        private static readonly Lazy<MethodInfo> minMethodInfo = QueryableMethodByArgs("Min", 1);
-        private static readonly Lazy<MethodInfo> minSelectorMethodInfo = QueryableMethodByArgs("Min", 2);
-        private static readonly Lazy<MethodInfo> maxMethodInfo = QueryableMethodByArgs("Max", 1);
-        private static readonly Lazy<MethodInfo> maxSelectorMethodInfo = QueryableMethodByArgs("Max", 2);
+        static readonly Lazy<MethodInfo> countMethodInfo = QueryableMethodByArgs("Count", 1);
+        static readonly Lazy<MethodInfo> countPredicateMethodInfo = QueryableMethodByArgs("Count", 2);
+        static readonly Lazy<MethodInfo> longCountMethodInfo = QueryableMethodByArgs("LongCount", 1);
+        static readonly Lazy<MethodInfo> longCountPredicateMethodInfo = QueryableMethodByArgs("LongCount", 2);
+        static readonly Lazy<MethodInfo> minMethodInfo = QueryableMethodByArgs("Min", 1);
+        static readonly Lazy<MethodInfo> minSelectorMethodInfo = QueryableMethodByArgs("Min", 2);
+        static readonly Lazy<MethodInfo> maxMethodInfo = QueryableMethodByArgs("Max", 1);
+        static readonly Lazy<MethodInfo> maxSelectorMethodInfo = QueryableMethodByArgs("Max", 2);
 
         /// <summary>
         /// Asynchronously returns the number of elements in a sequence.
@@ -171,7 +171,7 @@ namespace ElasticLinq.Async
         /// <param name="source">A sequence of values to create a list from.</param>
         /// <param name="cancellationToken">The optional <see cref="T:System.Threading.CancellationToken"/> which can be used to cancel this task.</param>
         /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
-        public async static Task<List<TSource>> ToListAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default(CancellationToken))
+        public static async Task<List<TSource>> ToListAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default(CancellationToken))
         {
             return ((IEnumerable<TSource>)await ExecuteAsync(source.Provider, source.Expression, cancellationToken)).ToList();
         }
@@ -185,7 +185,7 @@ namespace ElasticLinq.Async
         /// <param name="source">A sequence of values to create an array from.</param>
         /// <param name="cancellationToken">The optional <see cref="T:System.Threading.CancellationToken"/> which can be used to cancel this task.</param>
         /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
-        public async static Task<TSource[]> ToArrayAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default(CancellationToken))
+        public static async Task<TSource[]> ToArrayAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default(CancellationToken))
         {
             return ((IEnumerable<TSource>)await ExecuteAsync(source.Provider, source.Expression, cancellationToken)).ToArray();
         }
@@ -205,7 +205,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source" /> or <paramref name="keySelector" /> is null.-or-<paramref name="keySelector" /> produces a key that is null.</exception>
         /// <exception cref="T:System.ArgumentException">
         /// <paramref name="keySelector" /> produces duplicate keys for two elements.</exception>
-        public async static Task<Dictionary<TKey, TSource>> ToDictionaryAsync<TSource, TKey>(this IQueryable<TSource> source, Func<TSource, TKey> keySelector, CancellationToken cancellationToken = default(CancellationToken))
+        public static async Task<Dictionary<TKey, TSource>> ToDictionaryAsync<TSource, TKey>(this IQueryable<TSource> source, Func<TSource, TKey> keySelector, CancellationToken cancellationToken = default(CancellationToken))
         {
             return ((IEnumerable<TSource>)await ExecuteAsync(source.Provider, source.Expression, cancellationToken)).ToDictionary(keySelector);
         }
@@ -227,25 +227,25 @@ namespace ElasticLinq.Async
         /// <paramref name="source" /> or <paramref name="keySelector" /> or <paramref name="elementSelector" /> is null.-or-<paramref name="keySelector" /> produces a key that is null.</exception>
         /// <exception cref="T:System.ArgumentException">
         /// <paramref name="keySelector" /> produces duplicate keys for two elements.</exception>
-        public async static Task<Dictionary<TKey, TElement>> ToDictionaryAsync<TSource, TKey, TElement>(this IQueryable<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, CancellationToken cancellationToken = default(CancellationToken))
+        public static async Task<Dictionary<TKey, TElement>> ToDictionaryAsync<TSource, TKey, TElement>(this IQueryable<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, CancellationToken cancellationToken = default(CancellationToken))
         {
             return ((IEnumerable<TSource>)await ExecuteAsync(source.Provider, source.Expression, cancellationToken)).ToDictionary(keySelector, elementSelector);
         }
 
-        private static Lazy<MethodInfo> QueryableMethodByArgs(string name, int parameterCount, Type secondParameterType = null)
+        static Lazy<MethodInfo> QueryableMethodByArgs(string name, int parameterCount, Type secondParameterType = null)
         {
             return new Lazy<MethodInfo>(() => typeof(Queryable).GetTypeInfo().DeclaredMethods
                 .Single(m => m.Name == name && m.GetParameters().Length == parameterCount &&
-                    (secondParameterType == null || m.GetParameters()[1].ParameterType == secondParameterType)));
+                             (secondParameterType == null || m.GetParameters()[1].ParameterType == secondParameterType)));
         }
 
-        private static Lazy<MethodInfo> QueryableMethodByReturnType(string name, int parameterCount, Type returnType)
+        static Lazy<MethodInfo> QueryableMethodByReturnType(string name, int parameterCount, Type returnType)
         {
             return new Lazy<MethodInfo>(() => typeof(Queryable).GetTypeInfo().DeclaredMethods
                 .Single(m => m.Name == name && m.ReturnType == returnType && m.GetParameters().Length == parameterCount));
         }
 
-        private static Lazy<MethodInfo> QueryableMethodBySelectorParameterType(string name, int parameterCount, Type selectorParameterType)
+        static Lazy<MethodInfo> QueryableMethodBySelectorParameterType(string name, int parameterCount, Type selectorParameterType)
         {
             return new Lazy<MethodInfo>(() =>
             {
@@ -257,7 +257,7 @@ namespace ElasticLinq.Async
             });
         }
 
-        private static Lazy<MethodInfo> QueryableMethodByQueryableParameterType(string name, int parameterCount, Type sourceParameterType)
+        static Lazy<MethodInfo> QueryableMethodByQueryableParameterType(string name, int parameterCount, Type sourceParameterType)
         {
             return new Lazy<MethodInfo>(() =>
             {
@@ -265,22 +265,22 @@ namespace ElasticLinq.Async
 
                 return typeof(Queryable).GetTypeInfo().DeclaredMethods
                     .Single(m => m.Name == name && m.GetParameters().Length == parameterCount &&
-                            m.GetParameters()[0].ParameterType == parameterType);
+                                 m.GetParameters()[0].ParameterType == parameterType);
             });
         }
 
-        private static Expression FinalExpression<TSource>(IQueryable<TSource> source, MethodInfo method, params Expression[] arguments)
+        static Expression FinalExpression<TSource>(IQueryable<TSource> source, MethodInfo method, params Expression[] arguments)
         {
-            var finalMethod = method.IsGenericMethod ? method.MakeGenericMethod(typeof (TSource)) : method;
+            var finalMethod = method.IsGenericMethod ? method.MakeGenericMethod(typeof(TSource)) : method;
             return Expression.Call(null, finalMethod, new[] { source.Expression }.Concat(arguments));
         }
 
-        private static Expression FinalExpression<TSource, TResult>(IQueryable<TSource> source, MethodInfo method, params Expression[] arguments)
+        static Expression FinalExpression<TSource, TResult>(IQueryable<TSource> source, MethodInfo method, params Expression[] arguments)
         {
             return Expression.Call(null, method.MakeGenericMethod(typeof(TSource), typeof(TResult)), new[] { source.Expression }.Concat(arguments));
         }
 
-        private static Task<object> ExecuteAsync(IQueryProvider provider, Expression expression, CancellationToken cancellationToken)
+        static Task<object> ExecuteAsync(IQueryProvider provider, Expression expression, CancellationToken cancellationToken)
         {
             return ((IAsyncQueryExecutor)provider).ExecuteAsync(expression, cancellationToken);
         }

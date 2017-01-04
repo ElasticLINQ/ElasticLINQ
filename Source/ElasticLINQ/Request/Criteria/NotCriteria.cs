@@ -9,8 +9,6 @@ namespace ElasticLinq.Request.Criteria
     /// </summary>
     class NotCriteria : ICriteria, INegatableCriteria
     {
-        readonly ICriteria criteria;
-
         /// <summary>
         /// Create a negated version of the criteria supplied.
         /// </summary>
@@ -23,11 +21,11 @@ namespace ElasticLinq.Request.Criteria
         /// </remarks>
         public static ICriteria Create(ICriteria criteria)
         {
-            Argument.EnsureNotNull("criteria", criteria);
+            Argument.EnsureNotNull(nameof(criteria), criteria);
 
             // Allow some criteria to provide their own negation instead
             return criteria is INegatableCriteria
-                ? ((INegatableCriteria) criteria).Negate()
+                ? ((INegatableCriteria)criteria).Negate()
                 : new NotCriteria(criteria);
         }
 
@@ -41,22 +39,16 @@ namespace ElasticLinq.Request.Criteria
         /// </remarks>
         NotCriteria(ICriteria criteria)
         {
-            this.criteria = criteria;
+            Criteria = criteria;
         }
 
         /// <inheritdoc/>
-        public string Name
-        {
-            get { return "not"; }
-        }
+        public string Name { get { return "not"; } }
 
         /// <summary>
         /// <see cref="ICriteria" /> that is being negated.
         /// </summary>
-        public ICriteria Criteria
-        {
-            get { return criteria; }
-        }
+        public ICriteria Criteria { get; }
 
         /// <summary>
         /// Negate this <see cref="NotCriteria"/> by returning the criteria it is wrapping.
@@ -64,13 +56,13 @@ namespace ElasticLinq.Request.Criteria
         /// <returns>Inner criteria no longer wrapped with Not.</returns>
         public ICriteria Negate()
         {
-            return criteria;
+            return Criteria;
         }
 
         /// <inheritdoc/>
         public override string ToString()
         {
-            return "not " + criteria;
+            return "not " + Criteria;
         }
     }
 }

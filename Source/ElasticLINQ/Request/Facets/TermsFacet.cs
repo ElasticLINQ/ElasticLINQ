@@ -15,31 +15,30 @@ namespace ElasticLinq.Request.Facets
     [DebuggerDisplay("TermsFacet {Fields} {Filter}")]
     class TermsFacet : IOrderableFacet
     {
-        readonly string name;
-        readonly ICriteria criteria;
-        readonly ReadOnlyCollection<string> fields;
-        readonly int? size;
-
         public TermsFacet(string name, int? size, params string[] fields)
             : this(name, null, size, fields)
         {
         }
 
-        public TermsFacet(string name, ICriteria criteria, int? size, params string[] fields)
+        public TermsFacet(string name, ICriteria filter, int? size, params string[] fields)
         {
-            Argument.EnsureNotBlank("name", name);
-            Argument.EnsureNotEmpty("fields", fields);
+            Argument.EnsureNotBlank(nameof(name), name);
+            Argument.EnsureNotEmpty(nameof(fields), fields);
 
-            this.name = name;
-            this.criteria = criteria;
-            this.size = size;
-            this.fields = new ReadOnlyCollection<string>(fields);
+            Name = name;
+            Filter = filter;
+            Size = size;
+            Fields = new ReadOnlyCollection<string>(fields);
         }
 
         public string Type { get { return "terms"; } }
-        public string Name { get { return name; } }
-        public ReadOnlyCollection<string> Fields { get { return fields; } }
-        public ICriteria Filter { get { return criteria; } }
-        public int? Size { get { return size; } }
+
+        public string Name { get; }
+
+        public ReadOnlyCollection<string> Fields { get; }
+
+        public ICriteria Filter { get; }
+
+        public int? Size { get; }
     }
 }

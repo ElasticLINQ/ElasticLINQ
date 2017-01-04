@@ -35,10 +35,10 @@ namespace ElasticLinq
         /// <param name="retryPolicy">A policy to describe how to handle network issues.</param>
         public ElasticQueryProvider(IElasticConnection connection, IElasticMapping mapping, ILog log, IRetryPolicy retryPolicy)
         {
-            Argument.EnsureNotNull("connection", connection);
-            Argument.EnsureNotNull("mapping", mapping);
-            Argument.EnsureNotNull("log", log);
-            Argument.EnsureNotNull("retryPolicy", retryPolicy);
+            Argument.EnsureNotNull(nameof(connection), connection);
+            Argument.EnsureNotNull(nameof(mapping), mapping);
+            Argument.EnsureNotNull(nameof(log), log);
+            Argument.EnsureNotNull(nameof(retryPolicy), retryPolicy);
 
             Connection = connection;
             Mapping = mapping;
@@ -49,17 +49,20 @@ namespace ElasticLinq
         }
 
         internal IElasticConnection Connection { get; private set; }
-        internal ILog Log { get; private set; }
-        internal IElasticMapping Mapping { get; private set; }
+
+        internal ILog Log { get; }
+
+        internal IElasticMapping Mapping { get; }
+
         internal IRetryPolicy RetryPolicy { get; private set; }
 
         /// <inheritdoc/>
         public IQueryable<T> CreateQuery<T>(Expression expression)
         {
-            Argument.EnsureNotNull("expression", expression);
+            Argument.EnsureNotNull(nameof(expression), expression);
 
             if (!typeof(IQueryable<T>).IsAssignableFrom(expression.Type))
-                throw new ArgumentOutOfRangeException("expression");
+                throw new ArgumentOutOfRangeException(nameof(expression));
 
             return new ElasticQuery<T>(this, expression);
         }
@@ -67,7 +70,7 @@ namespace ElasticLinq
         /// <inheritdoc/>
         public IQueryable CreateQuery(Expression expression)
         {
-            Argument.EnsureNotNull("expression", expression);
+            Argument.EnsureNotNull(nameof(expression), expression);
 
             var elementType = TypeHelper.GetSequenceElementType(expression.Type);
             var queryType = typeof(ElasticQuery<>).MakeGenericType(elementType);
@@ -78,7 +81,7 @@ namespace ElasticLinq
             catch (TargetInvocationException ex)
             {
                 ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
-                return null;  // Never called, as the above code re-throws
+                return null; // Never called, as the above code re-throws
             }
         }
 
@@ -103,7 +106,7 @@ namespace ElasticLinq
         /// <inheritdoc/>
         public async Task<object> ExecuteAsync(Expression expression, CancellationToken cancellationToken = default(CancellationToken))
         {
-            Argument.EnsureNotNull("expression", expression);
+            Argument.EnsureNotNull(nameof(expression), expression);
 
             var translation = ElasticQueryTranslator.Translate(Mapping, expression);
 
@@ -143,7 +146,7 @@ namespace ElasticLinq
             catch (AggregateException ex)
             {
                 ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
-                return null;  // Never called, as the above code re-throws
+                return null; // Never called, as the above code re-throws
             }
         }
     }

@@ -33,7 +33,7 @@ namespace ElasticLinq.Response.Materializers
 
         public object Materialize(ElasticResponse response)
         {
-            Argument.EnsureNotNull("response", response);
+            Argument.EnsureNotNull(nameof(response), response);
 
             using (var enumerator = response.hits.hits.GetEnumerator())
             {

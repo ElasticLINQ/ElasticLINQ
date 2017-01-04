@@ -15,7 +15,9 @@ namespace ElasticLinq.Logging
         /// </summary>
         public static readonly NullLog Instance = new NullLog();
 
-        NullLog() { }
+        NullLog()
+        {
+        }
 
         /// <inheritdoc/>
         public void Log(TraceEventType type, Exception ex, IDictionary<string, object> additionalInfo, string messageFormat, object[] args)

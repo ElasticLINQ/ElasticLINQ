@@ -12,7 +12,11 @@ using System.Linq.Expressions;
 
 namespace ElasticLinq.Request.Visitors
 {
-    enum CriteriaWithin { Query, Filter };
+    enum CriteriaWithin
+    {
+        Query,
+        Filter
+    };
 
     /// <summary>
     /// Expression visitor to translate predicate expressions to criteria expressions.
@@ -93,7 +97,7 @@ namespace ElasticLinq.Request.Visitors
                     break;
             }
 
-            throw new NotSupportedException(string.Format("ElasticMethods.{0} method is not supported", m.Method.Name));
+            throw new NotSupportedException($"ElasticMethods.{m.Method.Name} method is not supported");
         }
 
         protected Expression VisitEnumerableMethodCall(MethodCallExpression m)
@@ -106,14 +110,14 @@ namespace ElasticLinq.Request.Visitors
                     break;
             }
 
-            throw new NotSupportedException(string.Format("Enumerable.{0} method is not supported", m.Method.Name));
+            throw new NotSupportedException($"Enumerable.{m.Method.Name} method is not supported");
         }
 
         protected Expression VisitStringMethodCall(MethodCallExpression m)
         {
             switch (m.Method.Name)
             {
-                case "Contains":  // Where(x => x.StringProperty.Contains(value))
+                case "Contains": // Where(x => x.StringProperty.Contains(value))
                     if (m.Arguments.Count == 1)
                         return VisitStringPatternCheckMethodCall(m.Object, m.Arguments[0], "*{0}*", m.Method.Name);
                     break;
@@ -140,12 +144,12 @@ namespace ElasticLinq.Request.Visitors
                     return node.Operand;
 
                 case ExpressionType.Not:
-                    {
-                        var subExpression = Visit(node.Operand) as CriteriaExpression;
-                        if (subExpression != null)
-                            return new CriteriaExpression(NotCriteria.Create(subExpression.Criteria));
-                        break;
-                    }
+                {
+                    var subExpression = Visit(node.Operand) as CriteriaExpression;
+                    if (subExpression != null)
+                        return new CriteriaExpression(NotCriteria.Create(subExpression.Criteria));
+                    break;
+                }
             }
 
             return base.VisitUnary(node);
@@ -166,7 +170,7 @@ namespace ElasticLinq.Request.Visitors
                     var memberName = node.Member.Name;
                     if (node.Member.DeclaringType != null)
                         memberName = node.Member.DeclaringType.Name + "." + node.Member.Name;
-                    throw new NotSupportedException(string.Format("{0} is of unsupported type {1}", memberName, node.Expression.NodeType));
+                    throw new NotSupportedException($"{memberName} is of unsupported type {node.Expression.NodeType}");
             }
         }
 
@@ -188,10 +192,10 @@ namespace ElasticLinq.Request.Visitors
 
                 case ExpressionType.GreaterThan:
                     return VisitRange(RangeComparison.GreaterThan, Visit(node.Left), Visit(node.Right));
-                
+
                 case ExpressionType.GreaterThanOrEqual:
                     return VisitRange(RangeComparison.GreaterThanOrEqual, Visit(node.Left), Visit(node.Right));
-                
+
                 case ExpressionType.LessThan:
                     return VisitRange(RangeComparison.LessThan, Visit(node.Left), Visit(node.Right));
 
@@ -199,7 +203,7 @@ namespace ElasticLinq.Request.Visitors
                     return VisitRange(RangeComparison.LessThanOrEqual, Visit(node.Left), Visit(node.Right));
 
                 default:
-                    throw new NotSupportedException(string.Format("Binary expression '{0}' is not supported", node.NodeType));
+                    throw new NotSupportedException($"Binary expression '{node.NodeType}' is not supported");
             }
         }
 
@@ -232,7 +236,7 @@ namespace ElasticLinq.Request.Visitors
             // Do not use ConstantMemberPair - these expressions are not reversible
             if (fieldExpression is MemberExpression && startsWithExpression is ConstantExpression)
             {
-                var fieldName = Mapping.GetFieldName(SourceType, (MemberExpression) fieldExpression);
+                var fieldName = Mapping.GetFieldName(SourceType, (MemberExpression)fieldExpression);
                 return new CriteriaExpression(new PrefixCriteria(fieldName, ((ConstantExpression)startsWithExpression).Value.ToString()));
             }
 
@@ -284,8 +288,8 @@ namespace ElasticLinq.Request.Visitors
             }
 
             throw new NotSupportedException(source is MemberExpression
-                ? string.Format("Match '{0}' in Contains operation must be a constant", match)
-                : string.Format("Unknown source '{0}' for Contains operation", source));
+                ? $"Match '{match}' in Contains operation must be a constant"
+                : $"Unknown source '{source}' for Contains operation");
         }
 
         protected virtual Expression VisitStringPatternCheckMethodCall(Expression source, Expression match, string pattern, string methodName)
@@ -300,8 +304,8 @@ namespace ElasticLinq.Request.Visitors
             }
 
             throw new NotSupportedException(source is MemberExpression
-                ? string.Format("Match '{0}' in Contains operation must be a constant", match)
-                : string.Format("Unknown source '{0}' for Contains operation", source));
+                ? $"Match '{match}' in Contains operation must be a constant"
+                : $"Unknown source '{source}' for Contains operation");
         }
 
         Expression VisitAndAlso(BinaryExpression b)
@@ -321,7 +325,7 @@ namespace ElasticLinq.Request.Visitors
             foreach (var expression in expressions.Select(BooleanMemberAccessBecomesEquals))
             {
                 if ((expression as T) == null)
-                    throw new NotSupportedException(string.Format("Unexpected binary expression '{0}'", expression));
+                    throw new NotSupportedException($"Unexpected binary expression '{expression}'");
 
                 yield return (T)expression;
             }
