@@ -48,9 +48,9 @@ namespace ElasticLinq.Response.Materializers
                 .Invoke(null, new object[] { hits.hits, projector });
         }
 
-        internal static List<T> Many<T>(IEnumerable<Hit> hits, Func<Hit, object> projector)
+        internal static IReadOnlyList<T> Many<T>(IEnumerable<Hit> hits, Func<Hit, object> projector)
         {
-            return hits.Select(projector).Cast<T>().ToList();
+            return hits.Select(projector).Cast<T>().ToReadOnlyBatchedList();
         }
     }
 }

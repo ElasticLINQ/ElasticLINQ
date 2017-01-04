@@ -31,7 +31,7 @@ namespace ElasticLinq.Test.Response.Materializers
             var materializer = new ListHitsElasticMaterializer(MaterializerTestHelper.ItemCreator, typeof(SampleClass));
             var actual = materializer.Materialize(response);
 
-            var actualList = Assert.IsType<List<SampleClass>>(actual);
+            var actualList = Assert.IsAssignableFrom<IReadOnlyList<SampleClass>>(actual);
 
             Assert.Equal(expected.Count, actualList.Count);
             var index = 0;

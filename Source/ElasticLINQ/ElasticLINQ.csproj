@@ -142,9 +142,11 @@
     <Compile Include="Test\TestableElasticQueryProvider.cs" />
     <Compile Include="Utility\Argument.cs" />
     <Compile Include="Utility\AsyncHelper.cs" />
+    <Compile Include="Utility\EnumerableExtensions.cs" />
     <Compile Include="Utility\ExpressionExtensions.cs" />
     <Compile Include="Utility\ForcedAuthHandler.cs" />
     <Compile Include="Request\Highlight.cs" />
+    <Compile Include="Utility\ReadOnlyBatchedList.cs" />
     <Compile Include="Utility\TypeHelper.cs" />
     <Compile Include="Mapping\IElasticMapping.cs" />
     <Compile Include="Mapping\TrivialElasticMapping.cs" />
