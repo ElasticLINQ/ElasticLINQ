@@ -77,13 +77,7 @@ namespace ElasticLinq.Utility
             }
         }
 
-        public int Count
-        {
-            get
-            {
-                return count;
-            }
-        }
+        public int Count => count;
 
         public IEnumerator<T> GetEnumerator()
         {
@@ -108,13 +102,7 @@ namespace ElasticLinq.Utility
             }
 
             [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
-            public T[] Items
-            {
-                get
-                {
-                    return list.ToArray();
-                }
-            }
+            public T[] Items => list.ToArray();
         }
     }
 }

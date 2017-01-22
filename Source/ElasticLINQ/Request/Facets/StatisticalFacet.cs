@@ -37,14 +37,14 @@ namespace ElasticLinq.Request.Facets
             this.fields = new ReadOnlyCollection<string>(fields);
         }
 
-        public string Type { get { return "statistical"; } }
+        public string Type => "statistical";
 
-        public string Name { get { return name; } }
+        public string Name => name;
 
-        public ICriteria Filter { get { return criteria; } }
+        public ICriteria Filter => criteria;
 
-        public ReadOnlyCollection<string> Fields { get { return fields; } }
+        public ReadOnlyCollection<string> Fields => fields;
 
-        string DebugFieldList { get { return String.Join(", ", fields); } }
+        string DebugFieldList => String.Join(", ", fields);
     }
 }

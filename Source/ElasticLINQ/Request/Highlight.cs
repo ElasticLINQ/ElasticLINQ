@@ -36,9 +36,6 @@ namespace ElasticLinq.Request
         /// <summary>
         /// The fields highlighted by this request.
         /// </summary>
-        public ReadOnlyCollection<string> Fields
-        {
-            get { return new ReadOnlyCollection<string>(fields); }
-        }
+        public ReadOnlyCollection<string> Fields => new ReadOnlyCollection<string>(fields);
     }
 }

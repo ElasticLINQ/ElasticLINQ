@@ -18,10 +18,7 @@ namespace ElasticLinq.Request.Criteria
         }
 
         /// <inheritdoc/>
-        public override string Name
-        {
-            get { return "exists"; }
-        }
+        public override string Name => "exists";
 
         /// <summary>
         /// Negate this Exists criteria by turning it into a Missing criteria.

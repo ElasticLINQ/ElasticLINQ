@@ -25,25 +25,16 @@ namespace ElasticLinq.Request.Expressions
         /// <summary>
         /// <see cref="IFacet" /> that is represented by this expression.
         /// </summary>
-        public IFacet Facet { get { return facet; } }
+        public IFacet Facet => facet;
 
         /// <inheritdoc/>
-        public override ExpressionType NodeType
-        {
-            get { return ElasticExpressionType.Facet; }
-        }
+        public override ExpressionType NodeType => ElasticExpressionType.Facet;
 
         /// <inheritdoc/>
-        public override Type Type
-        {
-            get { return typeof(bool); }
-        }
+        public override Type Type => typeof(bool);
 
         /// <inheritdoc/>
-        public override bool CanReduce
-        {
-            get { return false; }
-        }
+        public override bool CanReduce => false;
 
         /// <inheritdoc/>
         public override string ToString()

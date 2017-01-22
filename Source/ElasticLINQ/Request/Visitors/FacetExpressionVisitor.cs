@@ -24,7 +24,7 @@ namespace ElasticLinq.Request.Visitors
             this.materializer = materializer;
         }
 
-        public IElasticMaterializer Materializer { get { return materializer; } }
+        public IElasticMaterializer Materializer => materializer;
     }
 
     /// <summary>

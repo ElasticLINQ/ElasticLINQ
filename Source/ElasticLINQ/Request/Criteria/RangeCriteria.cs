@@ -43,32 +43,20 @@ namespace ElasticLinq.Request.Criteria
         /// <summary>
         /// Property or field that this range criteria applies to.
         /// </summary>
-        public MemberInfo Member
-        {
-            get { return member; }
-        }
+        public MemberInfo Member => member;
 
         /// <inheritdoc/>
-        public string Name
-        {
-            get { return "range"; }
-        }
+        public string Name => "range";
 
         /// <summary>
         /// Field that must be within the specified ranges.
         /// </summary>
-        public string Field
-        {
-            get { return field; }
-        }
+        public string Field => field;
 
         /// <summary>
         /// Specifications (upper and lower bounds) that must be met.
         /// </summary>
-        public ReadOnlyCollection<RangeSpecificationCriteria> Specifications
-        {
-            get { return specifications; }
-        }
+        public ReadOnlyCollection<RangeSpecificationCriteria> Specifications => specifications;
 
         /// <inheritdoc/>
         public override string ToString()
@@ -130,24 +118,15 @@ namespace ElasticLinq.Request.Criteria
         /// <summary>
         /// Type of comparison for this range specification.
         /// </summary>
-        public RangeComparison Comparison
-        {
-            get { return comparison; }
-        }
+        public RangeComparison Comparison => comparison;
 
         /// <inheritdoc/>
-        public string Name
-        {
-            get { return rangeComparisonValues[comparison]; }
-        }
+        public string Name => rangeComparisonValues[comparison];
 
         /// <summary>
         /// Constant value that this range specification tests against.
         /// </summary>
-        public object Value
-        {
-            get { return value; }
-        }
+        public object Value => value;
 
         /// <inheritdoc/>
         public override string ToString()

@@ -36,45 +36,25 @@ namespace ElasticLinq.Request.Criteria
         /// <summary>
         /// Type of execution mode this terms criteria will take.
         /// </summary>
-        public TermsExecutionMode? ExecutionMode
-        {
-            get { return executionMode; }
-        }
+        public TermsExecutionMode? ExecutionMode => executionMode;
 
-        bool ITermsCriteria.IsOrCriteria
-        {
-            get
-            {
-                // "plain" is the default; "plain", "or", and "bool" are all or queries, but
-                // with slightly different caching semantics.
-                return !ExecutionMode.HasValue
-                    || ExecutionMode == TermsExecutionMode.@bool
-                    || ExecutionMode == TermsExecutionMode.or
-                    || ExecutionMode == TermsExecutionMode.plain;
-            }
-        }
+        bool ITermsCriteria.IsOrCriteria => !ExecutionMode.HasValue
+                                            || ExecutionMode == TermsExecutionMode.@bool
+                                            || ExecutionMode == TermsExecutionMode.or
+                                            || ExecutionMode == TermsExecutionMode.plain;
 
         /// <summary>
         /// Property or field being checked for this term.
         /// </summary>
-        public MemberInfo Member
-        {
-            get { return member; }
-        }
+        public MemberInfo Member => member;
 
         /// <inheritdoc/>
-        public override string Name
-        {
-            get { return "terms"; }
-        }
+        public override string Name => "terms";
 
         /// <summary>
         /// Constant values being searched for.
         /// </summary>
-        public ReadOnlyCollection<object> Values
-        {
-            get { return values; }
-        }
+        public ReadOnlyCollection<object> Values => values;
 
         /// <inheritdoc/>
         public override string ToString()

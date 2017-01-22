@@ -24,9 +24,9 @@ namespace ElasticLinq.Response.Materializers
             this.token = token;
         }
 
-        public string Name { get { return name; } }
-        public string Operation { get { return operation; } }
-        public JToken Token { get { return token; } }
+        public string Name => name;
+        public string Operation => operation;
+        public JToken Token => token;
     }
 
     abstract class AggregateRow
@@ -122,7 +122,7 @@ namespace ElasticLinq.Response.Materializers
                 : TypeHelper.CreateDefault(valueType);
         }
 
-        public object Key { get { return key; } }
+        public object Key => key;
     }
 
     [DebuggerDisplay("Term Row {Key} Fields({Fields.Count})")]
@@ -137,15 +137,9 @@ namespace ElasticLinq.Response.Materializers
             this.fields = new ReadOnlyCollection<AggregateField>(fields.ToArray());
         }
 
-        public object Key
-        {
-            get { return key; }
-        }
+        public object Key => key;
 
-        public ReadOnlyCollection<AggregateField> Fields
-        {
-            get { return fields; }
-        }
+        public ReadOnlyCollection<AggregateField> Fields => fields;
 
         internal override object GetValue(string name, string operation, Type valueType)
         {

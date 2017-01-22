@@ -45,18 +45,12 @@ namespace ElasticLinq.Request.Criteria
         }
 
         /// <inheritdoc/>
-        public string Name
-        {
-            get { return "not"; }
-        }
+        public string Name => "not";
 
         /// <summary>
         /// <see cref="ICriteria" /> that is being negated.
         /// </summary>
-        public ICriteria Criteria
-        {
-            get { return criteria; }
-        }
+        public ICriteria Criteria => criteria;
 
         /// <summary>
         /// Negate this <see cref="NotCriteria"/> by returning the criteria it is wrapping.

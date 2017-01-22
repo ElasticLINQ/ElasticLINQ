@@ -32,10 +32,7 @@ namespace ElasticLinq.Request.Criteria
         /// <summary>
         /// Criteria that is compounded by this criteria in some way (as determined by the subclass).
         /// </summary>
-        public ReadOnlyCollection<ICriteria> Criteria
-        {
-            get { return criteria; }
-        }
+        public ReadOnlyCollection<ICriteria> Criteria => criteria;
 
         /// <inheritdoc/>
         public override string ToString()

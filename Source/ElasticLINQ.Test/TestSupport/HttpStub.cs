@@ -26,7 +26,7 @@ namespace ElasticLinq.Test.TestSupport
 
         bool disposed;
 
-        public Uri Uri { get { return new Uri(listener.Prefixes.Single()); } }
+        public Uri Uri => new Uri(listener.Prefixes.Single());
 
         public HttpStub(Action<HttpListenerContext> responder, int completeRequestCount)
         {
@@ -55,15 +55,9 @@ namespace ElasticLinq.Test.TestSupport
             while (true);
         }
 
-        public Task Completion
-        {
-            get { return responseCompletion.Task; }
-        }
+        public Task Completion => responseCompletion.Task;
 
-        public ReadOnlyCollection<HttpListenerRequest> Requests
-        {
-            get { return requests.AsReadOnly(); }
-        }
+        public ReadOnlyCollection<HttpListenerRequest> Requests => requests.AsReadOnly();
 
         public void Dispose()
         {

@@ -29,24 +29,21 @@ namespace ElasticLinq.Request.Criteria
         }
 
         /// <inheritdoc/>
-        public string Name
-        {
-            get { return "bool"; }
-        }
+        public string Name => "bool";
 
         /// <summary>
         /// Criteria that must be satisfied for this bool criteria to be satisfied.
         /// </summary>
-        public IReadOnlyCollection<ICriteria> Must { get { return must; } }
+        public IReadOnlyCollection<ICriteria> Must => must;
 
         /// <summary>
         /// Criteria that should be satisfied for this bool criteria to be satisfied.
         /// </summary>
-        public IReadOnlyCollection<ICriteria> Should { get { return should; } }
+        public IReadOnlyCollection<ICriteria> Should => should;
 
         /// <summary>
         /// Criteria that must not be satisfied for this bool criteria to be satisfied.
         /// </summary>
-        public IReadOnlyCollection<ICriteria> MustNot { get { return mustNot; } }
+        public IReadOnlyCollection<ICriteria> MustNot => mustNot;
     }
 }

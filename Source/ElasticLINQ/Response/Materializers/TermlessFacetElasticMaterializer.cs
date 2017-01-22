@@ -74,6 +74,6 @@ namespace ElasticLinq.Response.Materializers
         /// <summary>
         /// Type of element being materialized.
         /// </summary>
-        internal Type ElementType { get { return elementType; } }
+        internal Type ElementType => elementType;
     }
 }

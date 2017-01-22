@@ -34,15 +34,9 @@ namespace ElasticLinq.Request.Visitors
             this.memberExpression = memberExpression;
         }
 
-        public ConstantExpression ConstantExpression
-        {
-            get { return constantExpression; }
-        }
+        public ConstantExpression ConstantExpression => constantExpression;
 
-        public MemberExpression MemberExpression
-        {
-            get { return memberExpression; }
-        }
+        public MemberExpression MemberExpression => memberExpression;
 
         public bool IsNullTest
         {

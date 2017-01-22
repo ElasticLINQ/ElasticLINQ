@@ -41,7 +41,7 @@ namespace ElasticLinq.Test
         public Expression Expression { get; private set; }
 
         /// <inheritdoc/>
-        public IQueryProvider Provider { get { return Context.Provider; } }
+        public IQueryProvider Provider => Context.Provider;
 
         /// <inheritdoc/>
         public IEnumerator<T> GetEnumerator()

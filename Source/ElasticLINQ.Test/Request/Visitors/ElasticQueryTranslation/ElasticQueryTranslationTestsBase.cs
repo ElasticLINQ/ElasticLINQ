@@ -20,10 +20,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         protected static readonly IRetryPolicy RetryPolicy = NullRetryPolicy.Instance;
         protected static readonly ElasticQueryProvider SharedProvider = new ElasticQueryProvider(Connection, Mapping, Log, RetryPolicy);
 
-        protected static IQueryable<Robot> Robots
-        {
-            get { return new ElasticQuery<Robot>(SharedProvider); }
-        }
+        protected static IQueryable<Robot> Robots => new ElasticQuery<Robot>(SharedProvider);
 
         protected static Expression MakeQueryableExpression<TSource>(string name, IQueryable<TSource> source, params Expression[] parameters)
         {

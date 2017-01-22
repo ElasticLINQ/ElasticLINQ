@@ -36,10 +36,10 @@ namespace ElasticLinq.Request.Facets
             this.fields = new ReadOnlyCollection<string>(fields);
         }
 
-        public string Type { get { return "terms"; } }
-        public string Name { get { return name; } }
-        public ReadOnlyCollection<string> Fields { get { return fields; } }
-        public ICriteria Filter { get { return criteria; } }
-        public int? Size { get { return size; } }
+        public string Type => "terms";
+        public string Name => name;
+        public ReadOnlyCollection<string> Fields => fields;
+        public ICriteria Filter => criteria;
+        public int? Size => size;
     }
 }

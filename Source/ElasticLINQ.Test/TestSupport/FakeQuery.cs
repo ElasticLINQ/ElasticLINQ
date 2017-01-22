@@ -35,19 +35,10 @@ namespace ElasticLinq.Test.TestSupport
             return ((IEnumerable)provider.Execute(expression)).GetEnumerator();
         }
 
-        public Type ElementType
-        {
-            get { return typeof(T); }
-        }
+        public Type ElementType => typeof(T);
 
-        public Expression Expression
-        {
-            get { return expression; }
-        }
+        public Expression Expression => expression;
 
-        public IQueryProvider Provider
-        {
-            get { return provider; }
-        }
+        public IQueryProvider Provider => provider;
     }
 }

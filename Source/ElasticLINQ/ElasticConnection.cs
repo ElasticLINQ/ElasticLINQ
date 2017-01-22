@@ -68,19 +68,13 @@ namespace ElasticLinq
         /// <summary>
         /// The HttpClient used for issuing HTTP network requests.
         /// </summary>
-        internal HttpClient HttpClient
-        {
-            get { return httpClient; }
-        }
+        internal HttpClient HttpClient => httpClient;
 
         /// <summary>
         /// The Uri that specifies the public endpoint for the server.
         /// </summary>
         /// <example>http://myserver.example.com:9200</example>
-        public Uri Endpoint
-        {
-            get { return endpoint; }
-        }
+        public Uri Endpoint => endpoint;
 
         /// <summary>
         /// Dispose of this ElasticConnection and any associated resources.

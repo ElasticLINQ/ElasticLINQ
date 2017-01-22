@@ -24,10 +24,7 @@ namespace ElasticLinq.Request.Criteria
         /// <summary>
         /// Field this criteria applies to.
         /// </summary>
-        public string Field
-        {
-            get { return field; }
-        }
+        public string Field => field;
 
         /// <inheritdoc/>
         public abstract string Name

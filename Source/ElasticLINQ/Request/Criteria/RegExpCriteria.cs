@@ -23,16 +23,10 @@ namespace ElasticLinq.Request.Criteria
         /// <summary>
         /// Regular expression (in Elasticsearch syntax) to test against the field.
         /// </summary>
-        public string Regexp
-        {
-            get { return regexp; }
-        }
+        public string Regexp => regexp;
 
         /// <inheritdoc/>
-        public override string Name
-        {
-            get { return "regexp"; }
-        }
+        public override string Name => "regexp";
 
         /// <inheritdoc/>
         public override string ToString()

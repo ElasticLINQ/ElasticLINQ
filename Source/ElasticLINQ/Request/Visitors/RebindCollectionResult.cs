@@ -20,10 +20,10 @@ namespace ElasticLinq.Request.Visitors
             this.parameter = parameter;
         }
 
-        public Expression Expression { get { return expression; } }
+        public Expression Expression => expression;
 
-        public ParameterExpression Parameter { get { return parameter; } }
+        public ParameterExpression Parameter => parameter;
 
-        public ReadOnlyCollection<T> Collected { get { return collected; } }
+        public ReadOnlyCollection<T> Collected => collected;
     }
 }

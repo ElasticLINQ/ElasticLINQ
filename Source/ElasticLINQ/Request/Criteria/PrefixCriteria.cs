@@ -27,16 +27,10 @@ namespace ElasticLinq.Request.Criteria
         /// <summary>
         /// Prefix to check the field begins with.
         /// </summary>
-        public string Prefix
-        {
-            get { return prefix; }
-        }
+        public string Prefix => prefix;
 
         /// <inheritdoc/>
-        public override string Name
-        {
-            get { return "prefix"; }
-        }
+        public override string Name => "prefix";
 
         /// <inheritdoc/>
         public override string ToString()

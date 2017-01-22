@@ -44,10 +44,7 @@ namespace ElasticLinq.Request.Formatters
         /// <summary>
         /// The JSON formatted POST body for the request to be sent to Elasticsearch.
         /// </summary>
-        public string Body
-        {
-            get { return body.Value; }
-        }
+        public string Body => body.Value;
 
         /// <summary>
         /// Create the Json HTTP request body for this request given the search query and connection.

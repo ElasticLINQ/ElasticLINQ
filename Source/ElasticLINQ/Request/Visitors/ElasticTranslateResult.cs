@@ -21,14 +21,8 @@ namespace ElasticLinq.Request.Visitors
             this.materializer = materializer;
         }
 
-        public SearchRequest SearchRequest
-        {
-            get { return searchRequest; }
-        }
+        public SearchRequest SearchRequest => searchRequest;
 
-        public IElasticMaterializer Materializer
-        {
-            get { return materializer; }
-        }
+        public IElasticMaterializer Materializer => materializer;
     }
 }

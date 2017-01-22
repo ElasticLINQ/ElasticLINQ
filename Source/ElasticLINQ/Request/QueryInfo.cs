@@ -24,11 +24,11 @@ namespace ElasticLinq.Request
         /// <summary>
         /// Query JSON body to be sent to Elasticsearch.
         /// </summary>
-        public string Query { get { return query; } }
+        public string Query => query;
 
         /// <summary>
         /// Uri to be used to send the query to Elasticsearch.
         /// </summary>
-        public Uri Uri { get { return uri; } }
+        public Uri Uri => uri;
     }
 }

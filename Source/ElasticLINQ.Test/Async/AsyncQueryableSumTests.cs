@@ -11,10 +11,7 @@ namespace ElasticLinq.Test.Async
     {
         static readonly TestableElasticContext context = new TestableElasticContext();
 
-        static IQueryable<WithAllTypes> source
-        {
-            get { return context.Query<WithAllTypes>(); }
-        }
+        static IQueryable<WithAllTypes> source => context.Query<WithAllTypes>();
 
         static AsyncQueryableSumTests()
         {

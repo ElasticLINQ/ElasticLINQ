@@ -25,25 +25,16 @@ namespace ElasticLinq.Request.Expressions
         /// <summary>
         /// <see cref="ICriteria" /> that is represented by this expression.
         /// </summary>
-        public ICriteria Criteria { get { return criteria; } }
+        public ICriteria Criteria => criteria;
 
         /// <inheritdoc/>
-        public override ExpressionType NodeType
-        {
-            get { return ElasticExpressionType.Criteria; }
-        }
+        public override ExpressionType NodeType => ElasticExpressionType.Criteria;
 
         /// <inheritdoc/>
-        public override Type Type
-        {
-            get { return typeof(bool); }
-        }
+        public override Type Type => typeof(bool);
 
         /// <inheritdoc/>
-        public override bool CanReduce
-        {
-            get { return false; }
-        }
+        public override bool CanReduce => false;
 
         /// <inheritdoc/>
         public override string ToString()

@@ -30,25 +30,16 @@ namespace ElasticLinq.Request
         /// <summary>
         /// Name of the field to be sorted.
         /// </summary>
-        public string Name
-        {
-            get { return name; }
-        }
+        public string Name => name;
 
         /// <summary>
         /// Whether this field should be sorted in ascending order or not.
         /// </summary>
-        public bool Ascending
-        {
-            get { return ascending; }
-        }
+        public bool Ascending => @ascending;
 
         /// <summary>
         /// Whether documents with unmapped fields should be ignored or not.
         /// </summary>
-        public bool IgnoreUnmapped
-        {
-            get { return ignoreUnmapped; }
-        }
+        public bool IgnoreUnmapped => ignoreUnmapped;
     }
 }

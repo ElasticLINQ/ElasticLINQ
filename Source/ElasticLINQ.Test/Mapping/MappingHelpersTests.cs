@@ -154,7 +154,7 @@ namespace ElasticLinq.Test.Mapping
 
             public int? Nullable { get; set; }
             public int WriteOnly { set { backing = value; } }
-            public int ReadOnly { get { return backing; } }
+            public int ReadOnly => backing;
             public string NotValueType { get; set; }
             int NonPublic { get; set; }
             public static bool IsStatic { get; set; }

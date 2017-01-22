@@ -41,27 +41,18 @@ namespace ElasticLinq
         /// The name of the index on the Elasticsearch server.
         /// </summary>
         /// <example>northwind</example>
-        public string Index
-        {
-            get { return index; }
-        }
+        public string Index => index;
 
         /// <summary>
         /// How long to wait for a response to a network request before
         /// giving up.
         /// </summary>
-        public TimeSpan Timeout
-        {
-            get { return timeout; }
-        }
+        public TimeSpan Timeout => timeout;
 
         /// <summary>
         /// Additional options that specify how this connection should behave.
         /// </summary>
-        public ElasticConnectionOptions Options
-        {
-            get { return options; }
-        }
+        public ElasticConnectionOptions Options => options;
 
         /// <summary>
         /// Issues search requests to elastic search

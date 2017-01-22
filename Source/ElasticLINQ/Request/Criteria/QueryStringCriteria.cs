@@ -29,23 +29,14 @@ namespace ElasticLinq.Request.Criteria
         /// <summary>
         /// Collection of fields to be searched.
         /// </summary>
-        public ReadOnlyCollection<string> Fields
-        {
-            get { return fields; }
-        }
+        public ReadOnlyCollection<string> Fields => fields;
 
         /// <summary>
         /// Value to be found within the fields.
         /// </summary>
-        public string Value
-        {
-            get { return value; }
-        }
+        public string Value => value;
 
         /// <inheritdoc/>
-        public string Name
-        {
-            get { return "query_string"; }
-        }
+        public string Name => "query_string";
     }
 }

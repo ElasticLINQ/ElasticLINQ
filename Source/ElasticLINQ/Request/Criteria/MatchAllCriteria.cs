@@ -18,9 +18,6 @@ namespace ElasticLinq.Request.Criteria
         MatchAllCriteria() { }
 
         /// <inheritdoc/>
-        public string Name
-        {
-            get { return "match_all"; }
-        }
+        public string Name => "match_all";
     }
 }
