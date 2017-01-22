@@ -11,4 +11,4 @@ ElasticLINQ supports .NET 4.5 & PCL with Elasticsearch 0.9.0 through Elasticsear
 
 Binary releases are available via [NuGet](http://www.nuget.org/packages/ElasticLinq/). For information on getting started, [see the Wiki](https://github.com/CenturyLinkCloud/ElasticLINQ/wiki/Getting-Started).
 
-[![Build Status](https://ci.appveyor.com/api/projects/status/2k89jg56g5xoeau3?svg=true)](https://ci.appveyor.com/project/damieng/elasticlinq/)![NuGet version](https://img.shields.io/nuget/v/elasticlinq.svg?style=flat)
+[![Build Status](https://ci.appveyor.com/api/projects/status/7p4c73ocmmwjc05q?svg=true)](https://ci.appveyor.com/project/ElasticLINQ/elasticlinq/)![NuGet version](https://img.shields.io/nuget/v/elasticlinq.svg?style=flat)
