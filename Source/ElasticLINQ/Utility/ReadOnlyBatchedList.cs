@@ -18,7 +18,6 @@ namespace ElasticLinq.Utility
 
         readonly int maxBatchCapacity;
         readonly IReadOnlyList<IReadOnlyList<T>> batches;
-        readonly int count;
 
         public ReadOnlyBatchedList(IEnumerable<T> enumerable) : this(enumerable, DefaultMaxBatchCapacity)
         {
@@ -61,7 +60,7 @@ namespace ElasticLinq.Utility
             }
 
             this.batches = batches;
-            count = currentTotalCount;
+            Count = currentTotalCount;
         }
 
         public T this[int index]
@@ -77,7 +76,7 @@ namespace ElasticLinq.Utility
             }
         }
 
-        public int Count => count;
+        public int Count { get; }
 
         public IEnumerator<T> GetEnumerator()
         {

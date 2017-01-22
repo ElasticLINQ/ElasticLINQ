@@ -102,7 +102,7 @@ namespace ElasticLinq.Request.Visitors
             if (groupBy.NodeType == ExpressionType.MemberAccess)
                 return GetTermFacets();
 
-            throw new NotSupportedException(string.Format("GroupBy must be either a Member or a Constant not {0}", groupBy.NodeType));
+            throw new NotSupportedException($"GroupBy must be either a Member or a Constant not {groupBy.NodeType}");
         }
 
         IEnumerable<IFacet> GetTermlessFacets()
@@ -219,7 +219,7 @@ namespace ElasticLinq.Request.Visitors
 
             var criteriaExpression = body as CriteriaExpression;
             if (criteriaExpression == null)
-                throw new NotSupportedException(string.Format("Unknown Aggregate predicate '{0}'", body));
+                throw new NotSupportedException($"Unknown Aggregate predicate '{body}'");
 
             var facetName = string.Format(GroupKeyFacet + "." + (aggregateCriteria.Count + 1));
             aggregateCriteria.Add(facetName, criteriaExpression.Criteria);
@@ -256,11 +256,13 @@ namespace ElasticLinq.Request.Visitors
         {
             var lambda = expression.StripQuotes() as LambdaExpression;
             if (lambda == null)
-                throw new NotSupportedException(string.Format("Aggregate required Lambda expression, {0} expression encountered.", expression.NodeType));
+                throw new NotSupportedException(
+                    $"Aggregate required Lambda expression, {expression.NodeType} expression encountered.");
 
             var memberExpressionBody = lambda.Body as MemberExpression;
             if (memberExpressionBody == null)
-                throw new NotSupportedException(string.Format("Aggregates must be specified against a member of the entity not {0}", lambda.Body.Type));
+                throw new NotSupportedException(
+                    $"Aggregates must be specified against a member of the entity not {lambda.Body.Type}");
 
             return memberExpressionBody;
         }

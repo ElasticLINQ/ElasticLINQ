@@ -55,7 +55,7 @@ namespace ElasticLinq.Utility
         public static void EnsureIsDefinedEnum<TEnum>(string argumentName, TEnum value) where TEnum : struct
         {
             if (!Enum.IsDefined(typeof(TEnum), value))
-                throw new ArgumentOutOfRangeException(argumentName, string.Format("Must be a defined {0} enum value.", typeof(TEnum)));
+                throw new ArgumentOutOfRangeException(argumentName, $"Must be a defined {typeof(TEnum)} enum value.");
         }
 
         /// <summary>

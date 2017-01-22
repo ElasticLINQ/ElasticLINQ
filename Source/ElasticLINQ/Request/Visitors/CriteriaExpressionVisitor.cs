@@ -93,7 +93,7 @@ namespace ElasticLinq.Request.Visitors
                     break;
             }
 
-            throw new NotSupportedException(string.Format("ElasticMethods.{0} method is not supported", m.Method.Name));
+            throw new NotSupportedException($"ElasticMethods.{m.Method.Name} method is not supported");
         }
 
         protected Expression VisitEnumerableMethodCall(MethodCallExpression m)
@@ -106,7 +106,7 @@ namespace ElasticLinq.Request.Visitors
                     break;
             }
 
-            throw new NotSupportedException(string.Format("Enumerable.{0} method is not supported", m.Method.Name));
+            throw new NotSupportedException($"Enumerable.{m.Method.Name} method is not supported");
         }
 
         protected Expression VisitStringMethodCall(MethodCallExpression m)
@@ -166,7 +166,7 @@ namespace ElasticLinq.Request.Visitors
                     var memberName = node.Member.Name;
                     if (node.Member.DeclaringType != null)
                         memberName = node.Member.DeclaringType.Name + "." + node.Member.Name;
-                    throw new NotSupportedException(string.Format("{0} is of unsupported type {1}", memberName, node.Expression.NodeType));
+                    throw new NotSupportedException($"{memberName} is of unsupported type {node.Expression.NodeType}");
             }
         }
 
@@ -199,7 +199,7 @@ namespace ElasticLinq.Request.Visitors
                     return VisitRange(RangeComparison.LessThanOrEqual, Visit(node.Left), Visit(node.Right));
 
                 default:
-                    throw new NotSupportedException(string.Format("Binary expression '{0}' is not supported", node.NodeType));
+                    throw new NotSupportedException($"Binary expression '{node.NodeType}' is not supported");
             }
         }
 
@@ -284,8 +284,8 @@ namespace ElasticLinq.Request.Visitors
             }
 
             throw new NotSupportedException(source is MemberExpression
-                ? string.Format("Match '{0}' in Contains operation must be a constant", match)
-                : string.Format("Unknown source '{0}' for Contains operation", source));
+                ? $"Match '{match}' in Contains operation must be a constant"
+                : $"Unknown source '{source}' for Contains operation");
         }
 
         protected virtual Expression VisitStringPatternCheckMethodCall(Expression source, Expression match, string pattern, string methodName)
@@ -300,8 +300,8 @@ namespace ElasticLinq.Request.Visitors
             }
 
             throw new NotSupportedException(source is MemberExpression
-                ? string.Format("Match '{0}' in Contains operation must be a constant", match)
-                : string.Format("Unknown source '{0}' for Contains operation", source));
+                ? $"Match '{match}' in Contains operation must be a constant"
+                : $"Unknown source '{source}' for Contains operation");
         }
 
         Expression VisitAndAlso(BinaryExpression b)
@@ -321,7 +321,7 @@ namespace ElasticLinq.Request.Visitors
             foreach (var expression in expressions.Select(BooleanMemberAccessBecomesEquals))
             {
                 if ((expression as T) == null)
-                    throw new NotSupportedException(string.Format("Unexpected binary expression '{0}'", expression));
+                    throw new NotSupportedException($"Unexpected binary expression '{expression}'");
 
                 yield return (T)expression;
             }

@@ -55,9 +55,9 @@ namespace ElasticLinq.Request.Criteria
         /// <inheritdoc/>
         public override string ToString()
         {
-            var result = string.Format("terms {0} [{1}]", Field, string.Join(", ", Values));
+            var result = $"terms {Field} [{string.Join(", ", Values)}]";
             if (ExecutionMode.HasValue)
-                result += string.Format(" (execution: {0})", ExecutionMode);
+                result += $" (execution: {ExecutionMode})";
 
             return result;
         }

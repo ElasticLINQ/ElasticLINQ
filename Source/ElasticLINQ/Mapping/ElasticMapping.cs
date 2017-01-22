@@ -95,8 +95,7 @@ namespace ElasticLinq.Mapping
 
             var nameValue = Enum.GetName(returnType, value);
             if (nameValue == null)
-                throw new ArgumentOutOfRangeException(nameof(value),
-                    string.Format("Value '{0}' is not defined for enum type '{1}'.", value, returnType.FullName));
+                throw new ArgumentOutOfRangeException(nameof(value), $"Value '{value}' is not defined for enum type '{returnType.FullName}'.");
 
             return nameValue;
         }
@@ -115,7 +114,7 @@ namespace ElasticLinq.Mapping
                     return GetFieldName(type, memberExpression.Member);
 
                 default:
-                    throw new NotSupportedException(string.Format("Unknown expression type {0} for left hand side of expression {1}", memberExpression.Expression.NodeType, memberExpression));
+                    throw new NotSupportedException($"Unknown expression type {memberExpression.Expression.NodeType} for left hand side of expression {memberExpression}");
             }
         }
 

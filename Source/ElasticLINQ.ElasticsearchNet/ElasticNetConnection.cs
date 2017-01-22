@@ -66,7 +66,7 @@ namespace ElasticLinq.ElasticsearchNet
             log.Log(TraceEventType.Verbose, null, null, "Response: {0} {1} (in {2}ms)", response.HttpStatusCode, response.HttpStatusCode.HasValue ? ((HttpStatusCode)response.HttpStatusCode).ToString() : "", stopwatch.ElapsedMilliseconds);
 
             if (!response.Success)
-                throw new HttpRequestException(String.Format("Response status code does not indicate success: {0}", response.HttpStatusCode));
+                throw new HttpRequestException($"Response status code does not indicate success: {response.HttpStatusCode}");
 
             return ParseResponse(response.Response, log);
         }
