@@ -115,6 +115,7 @@ namespace ElasticLinq.Test
             await Assert.ThrowsAsync<NullReferenceException>(() => connection.HttpClient.GetAsync(new Uri("http://something.com")));
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times")]
         [Fact]
         public void DoubleDisposeDoesNotThrow()
         {
