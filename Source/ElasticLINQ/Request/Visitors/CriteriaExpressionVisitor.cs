@@ -208,7 +208,7 @@ namespace ElasticLinq.Request.Visitors
             e = Visit(e);
 
             var c = e as ConstantExpression;
-            if (c != null && c.Value != null)
+            if (c?.Value != null)
             {
                 if (c.Value.Equals(true))
                     return new CriteriaExpression(ConstantCriteria.True);

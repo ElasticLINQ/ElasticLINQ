@@ -16,8 +16,6 @@ namespace ElasticLinq.Request.Criteria
     [DebuggerDisplay("{" + nameof(Field) + "}")]
     class RangeCriteria : ICriteria
     {
-        readonly ReadOnlyCollection<RangeSpecificationCriteria> specifications;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="RangeCriteria"/> class.
         /// </summary>
@@ -32,7 +30,7 @@ namespace ElasticLinq.Request.Criteria
 
             Field = field;
             Member = member;
-            this.specifications = new ReadOnlyCollection<RangeSpecificationCriteria>(specifications.ToArray());
+            Specifications = new ReadOnlyCollection<RangeSpecificationCriteria>(specifications.ToArray());
         }
 
         public RangeCriteria(string field, MemberInfo member, RangeComparison comparison, object value)
@@ -54,12 +52,12 @@ namespace ElasticLinq.Request.Criteria
         /// <summary>
         /// Specifications (upper and lower bounds) that must be met.
         /// </summary>
-        public ReadOnlyCollection<RangeSpecificationCriteria> Specifications => specifications;
+        public ReadOnlyCollection<RangeSpecificationCriteria> Specifications { get; }
 
         /// <inheritdoc/>
         public override string ToString()
         {
-            return $"range: {Field}({string.Join(",", specifications.Select(s => s.ToString()))})";
+            return $"range: {Field}({string.Join(",", Specifications.Select(s => s.ToString()))})";
         }
 
         /// <summary>
@@ -96,8 +94,6 @@ namespace ElasticLinq.Request.Criteria
             { RangeComparison.LessThanOrEqual, "lte" },
         };
 
-        readonly object value;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="RangeSpecificationCriteria"/> class.
         /// </summary>
@@ -109,7 +105,7 @@ namespace ElasticLinq.Request.Criteria
             Argument.EnsureNotNull(nameof(value), value);
 
             Comparison = comparison;
-            this.value = value;
+            Value = value;
         }
 
         /// <summary>
@@ -123,12 +119,12 @@ namespace ElasticLinq.Request.Criteria
         /// <summary>
         /// Constant value that this range specification tests against.
         /// </summary>
-        public object Value => value;
+        public object Value { get; }
 
         /// <inheritdoc/>
         public override string ToString()
         {
-            return $"{Comparison} {value}";
+            return $"{Comparison} {Value}";
         }
     }
 }

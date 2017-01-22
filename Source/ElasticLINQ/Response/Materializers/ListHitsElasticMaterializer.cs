@@ -40,7 +40,7 @@ namespace ElasticLinq.Response.Materializers
             Argument.EnsureNotNull(nameof(response), response);
 
             var hits = response.hits;
-            if (hits == null || hits.hits == null || !hits.hits.Any())
+            if (hits?.hits == null || !hits.hits.Any())
                 return Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType));
 
             return manyMethodInfo

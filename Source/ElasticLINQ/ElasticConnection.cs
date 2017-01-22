@@ -1,6 +1,10 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using ElasticLinq.Utility;
+using ElasticLinq.Logging;
+using ElasticLinq.Request;
+using ElasticLinq.Response.Model;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,10 +14,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using ElasticLinq.Logging;
-using ElasticLinq.Request;
-using ElasticLinq.Response.Model;
-using Newtonsoft.Json;
 
 namespace ElasticLinq
 {
@@ -177,7 +177,7 @@ namespace ElasticLinq
             }
             else
             {
-                if (results.hits != null && results.hits.hits != null && results.hits.hits.Count > 0)
+                if (results.hits?.hits != null && results.hits.hits.Count > 0)
                     yield return results.hits.hits.Count + " hits";
 
                 if (results.facets != null && results.facets.Count > 0)

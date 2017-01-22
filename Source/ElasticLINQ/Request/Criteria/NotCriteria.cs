@@ -9,8 +9,6 @@ namespace ElasticLinq.Request.Criteria
     /// </summary>
     class NotCriteria : ICriteria, INegatableCriteria
     {
-        readonly ICriteria criteria;
-
         /// <summary>
         /// Create a negated version of the criteria supplied.
         /// </summary>
@@ -41,7 +39,7 @@ namespace ElasticLinq.Request.Criteria
         /// </remarks>
         NotCriteria(ICriteria criteria)
         {
-            this.criteria = criteria;
+            Criteria = criteria;
         }
 
         /// <inheritdoc/>
@@ -50,7 +48,7 @@ namespace ElasticLinq.Request.Criteria
         /// <summary>
         /// <see cref="ICriteria" /> that is being negated.
         /// </summary>
-        public ICriteria Criteria => criteria;
+        public ICriteria Criteria { get; }
 
         /// <summary>
         /// Negate this <see cref="NotCriteria"/> by returning the criteria it is wrapping.
@@ -58,13 +56,13 @@ namespace ElasticLinq.Request.Criteria
         /// <returns>Inner criteria no longer wrapped with Not.</returns>
         public ICriteria Negate()
         {
-            return criteria;
+            return Criteria;
         }
 
         /// <inheritdoc/>
         public override string ToString()
         {
-            return "not " + criteria;
+            return "not " + Criteria;
         }
     }
 }

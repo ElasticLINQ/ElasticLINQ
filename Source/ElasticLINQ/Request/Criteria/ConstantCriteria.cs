@@ -33,7 +33,7 @@ namespace ElasticLinq.Request.Criteria
         }
 
         /// <inheritdoc/>
-        public string Name => constantValue == null ? "null" : constantValue.ToString();
+        public string Name => constantValue?.ToString() ?? "null";
 
         /// <inheritdoc/>
         public override string ToString()

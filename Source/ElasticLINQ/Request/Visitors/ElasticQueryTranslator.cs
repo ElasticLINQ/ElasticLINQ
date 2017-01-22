@@ -191,7 +191,7 @@ namespace ElasticLinq.Request.Visitors
         {
             var constantQueryExpression = (ConstantExpression)queryExpression;
             var constantFieldExpression = fieldsExpression as ConstantExpression;
-            var constantFields = constantFieldExpression == null ? null : (string[])constantFieldExpression.Value;
+            var constantFields = (string[]) constantFieldExpression?.Value;
             var criteriaExpression = new CriteriaExpression(new QueryStringCriteria(constantQueryExpression.Value.ToString(), constantFields));
             searchRequest.Query = AndCriteria.Combine(searchRequest.Query, criteriaExpression.Criteria);
 

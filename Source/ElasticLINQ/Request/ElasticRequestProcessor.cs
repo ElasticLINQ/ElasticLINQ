@@ -81,7 +81,7 @@ namespace ElasticLinq.Request
             }
             else
             {
-                if (results.hits != null && results.hits.hits != null && results.hits.hits.Count > 0)
+                if (results.hits?.hits != null && results.hits.hits.Count > 0)
                     yield return results.hits.hits.Count + " hits";
 
                 if (results.facets != null && results.facets.Count > 0)
