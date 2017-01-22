@@ -6,26 +6,11 @@ using Xunit;
 
 namespace ElasticLinq.IntegrationTest
 {
-    public class TypePrefixedMapper : CouchbaseElasticMapping
-    {
-        public override string GetDocumentMappingPrefix(Type type)
-        {
-            return type.Name.ToLower();
-        }
-
-        public override string GetDocumentType(Type type)
-        {
-            return "doc";
-        }
-    }
-
     public class FieldMappingTests
     {
-        static readonly IElasticMapping mapping = new TypePrefixedMapper();
-        static readonly Uri elasticsearchEndpoint = new Uri("http://integration.elasticlinq.net:9200");
         static readonly ElasticConnectionOptions options = new ElasticConnectionOptions { SearchSizeDefault = 1000 };
-        static readonly ElasticConnection connection = new ElasticConnection(elasticsearchEndpoint, index: "integrationtest-nested", options: options);
-        static readonly ElasticContext context = new ElasticContext(connection, mapping, retryPolicy: new NoRetryPolicy());
+        static readonly ElasticConnection connection = new ElasticConnection(Data.v1Endpoint, index: "integrationtest", options: options);
+        static readonly ElasticContext context = new ElasticContext(connection, new TrivialElasticMapping(), retryPolicy: new NoRetryPolicy());
 
         [Fact]
         public void ToList_Materializes_Complete_Objects()
@@ -34,7 +19,7 @@ namespace ElasticLinq.IntegrationTest
 
             Assert.Contains(results, w => w.Email == "mlewis1@sitemeter.com");
             Assert.Contains(results, w => w.Email == "cwilson0@mayoclinic.com");
-            Assert.Equal(2, results.Count);
+            Assert.Equal(100, results.Count);
         }
 
         [Fact]
@@ -44,7 +29,7 @@ namespace ElasticLinq.IntegrationTest
 
             Assert.Contains(results, w => w.Item1 == "mlewis1@sitemeter.com");
             Assert.Contains(results, w => w.Item1 == "cwilson0@mayoclinic.com");
-            Assert.Equal(2, results.Count);
+            Assert.Equal(100, results.Count);
         }
 
         [Fact]
@@ -62,7 +47,7 @@ namespace ElasticLinq.IntegrationTest
             var results = context.Query<WebUser>().GroupBy(g => 1).Select(s => s.Max(w => w.Joined)).ToList();
 
             Assert.Equal(1, results.Count);
-            Assert.Equal(new DateTime(2014, 10, 5, 17, 22, 54, DateTimeKind.Utc), results[0]);
+            Assert.Equal(new DateTime(2015, 4, 8, 1, 32, 00, DateTimeKind.Utc), results[0]);
         }
 
         [Fact]

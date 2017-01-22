@@ -11,10 +11,11 @@ namespace ElasticLinq.IntegrationTest
 {
     class Data
     {
+        public static readonly Uri v1Endpoint = new Uri("http://integration.elasticlinq.net:9200");
+
         const string Index = "integrationtest";
-        static readonly Uri elasticsearchEndpoint = new Uri("http://integration.elasticlinq.net:9200");
         static readonly ElasticConnectionOptions options = new ElasticConnectionOptions { SearchSizeDefault = 1000 };
-        static readonly ElasticConnection connection = new ElasticConnection(elasticsearchEndpoint, index: Index, options: options);
+        static readonly ElasticConnection connection = new ElasticConnection(v1Endpoint, index: Index, options: options);
 
         readonly ElasticContext elasticContext = new ElasticContext(connection, new TrivialElasticMapping(), retryPolicy: new NoRetryPolicy());
         readonly List<object> memory = new List<object>();
