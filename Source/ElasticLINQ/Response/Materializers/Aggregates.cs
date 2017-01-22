@@ -13,20 +13,18 @@ namespace ElasticLinq.Response.Materializers
     [DebuggerDisplay("Field {Name,nq}.{Operation,nq} = {Token}")]
     class AggregateField
     {
-        readonly string name;
-        readonly string operation;
-        readonly JToken token;
-
         public AggregateField(string name, string operation, JToken token)
         {
-            this.name = name;
-            this.operation = operation;
-            this.token = token;
+            Name = name;
+            Operation = operation;
+            Token = token;
         }
 
-        public string Name => name;
-        public string Operation => operation;
-        public JToken Token => token;
+        public string Name { get; }
+
+        public string Operation { get; }
+
+        public JToken Token { get; }
     }
 
     abstract class AggregateRow
@@ -103,12 +101,11 @@ namespace ElasticLinq.Response.Materializers
     [DebuggerDisplay("Statistical Row")]
     class AggregateStatisticalRow : AggregateRow
     {
-        readonly object key;
         readonly JObject facets;
 
         public AggregateStatisticalRow(object key, JObject facets)
         {
-            this.key = key;
+            Key = key;
             this.facets = facets;
         }
 
@@ -122,28 +119,25 @@ namespace ElasticLinq.Response.Materializers
                 : TypeHelper.CreateDefault(valueType);
         }
 
-        public object Key => key;
+        public object Key { get; }
     }
 
     [DebuggerDisplay("Term Row {Key} Fields({Fields.Count})")]
     class AggregateTermRow : AggregateRow
     {
-        readonly object key;
-        readonly ReadOnlyCollection<AggregateField> fields;
-
         public AggregateTermRow(object key, IEnumerable<AggregateField> fields)
         {
-            this.key = key;
-            this.fields = new ReadOnlyCollection<AggregateField>(fields.ToArray());
+            Key = key;
+            Fields = new ReadOnlyCollection<AggregateField>(fields.ToArray());
         }
 
-        public object Key => key;
+        public object Key { get; }
 
-        public ReadOnlyCollection<AggregateField> Fields => fields;
+        public ReadOnlyCollection<AggregateField> Fields { get; }
 
         internal override object GetValue(string name, string operation, Type valueType)
         {
-            var field = fields.FirstOrDefault(f => f.Name == name && f.Operation == operation);
+            var field = Fields.FirstOrDefault(f => f.Name == name && f.Operation == operation);
 
             return field == null
                 ? TypeHelper.CreateDefault(valueType)

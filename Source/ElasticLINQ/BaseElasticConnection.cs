@@ -15,10 +15,6 @@ namespace ElasticLinq
     {
         static readonly TimeSpan defaultTimeout = TimeSpan.FromSeconds(10);
 
-        readonly string index;
-        readonly TimeSpan timeout;
-        readonly ElasticConnectionOptions options;
-
         /// <summary>
         /// Create a new BaseElasticConnection with the given parameters for internal testing.
         /// </summary>
@@ -32,27 +28,27 @@ namespace ElasticLinq
             if (index != null)
                 Argument.EnsureNotBlank(nameof(index), index);
 
-            this.index = index;
-            this.options = options ?? new ElasticConnectionOptions();
-            this.timeout = timeout ?? defaultTimeout;
+            Index = index;
+            Options = options ?? new ElasticConnectionOptions();
+            Timeout = timeout ?? defaultTimeout;
         }
 
         /// <summary>
         /// The name of the index on the Elasticsearch server.
         /// </summary>
         /// <example>northwind</example>
-        public string Index => index;
+        public string Index { get; }
 
         /// <summary>
         /// How long to wait for a response to a network request before
         /// giving up.
         /// </summary>
-        public TimeSpan Timeout => timeout;
+        public TimeSpan Timeout { get; }
 
         /// <summary>
         /// Additional options that specify how this connection should behave.
         /// </summary>
-        public ElasticConnectionOptions Options => options;
+        public ElasticConnectionOptions Options { get; }
 
         /// <summary>
         /// Issues search requests to elastic search

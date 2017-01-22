@@ -30,13 +30,13 @@ namespace ElasticLinq.Retry
             Delay = delay ?? Delay.Instance;
         }
 
-        internal Delay Delay { get; private set; }
+        internal Delay Delay { get; }
 
-        internal int InitialRetryMilliseconds { get; private set; }
+        internal int InitialRetryMilliseconds { get; }
 
-        internal ILog Log { get; private set; }
+        internal ILog Log { get; }
 
-        internal int MaxAttempts { get; private set; }
+        internal int MaxAttempts { get; }
 
         /// <inheritdoc/>
         public async Task<TOperation> ExecuteAsync<TOperation>(

@@ -9,21 +9,17 @@ namespace ElasticLinq.Request.Visitors
 {
     class RebindCollectionResult<T>
     {
-        readonly Expression expression;
-        readonly ReadOnlyCollection<T> collected;
-        readonly ParameterExpression parameter;
-
         public RebindCollectionResult(Expression expression, IEnumerable<T> collected, ParameterExpression parameter)
         {
-            this.expression = expression;
-            this.collected = new ReadOnlyCollection<T>(collected.ToArray());
-            this.parameter = parameter;
+            Expression = expression;
+            Collected = new ReadOnlyCollection<T>(collected.ToArray());
+            Parameter = parameter;
         }
 
-        public Expression Expression => expression;
+        public Expression Expression { get; }
 
-        public ParameterExpression Parameter => parameter;
+        public ParameterExpression Parameter { get; }
 
-        public ReadOnlyCollection<T> Collected => collected;
+        public ReadOnlyCollection<T> Collected { get; }
     }
 }

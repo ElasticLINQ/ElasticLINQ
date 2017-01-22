@@ -9,11 +9,11 @@ namespace ElasticLinq.IntegrationTest
     {
         static readonly Data data = new Data();
 
-        static IQueryable<JobOpening> ElasticJobs { get; set; }
+        static IQueryable<JobOpening> ElasticJobs { get; }
 
-        static List<JobOpening> MemoryJobs { get; set; }
+        static List<JobOpening> MemoryJobs { get; }
 
-        static long MidPoint { get; set; }
+        static long MidPoint { get; }
 
         static CountTests()
         {

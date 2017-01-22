@@ -1,11 +1,11 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using ElasticLinq.Logging;
 using ElasticLinq.Request;
 using ElasticLinq.Response.Model;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ElasticLinq
 {

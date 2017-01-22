@@ -26,8 +26,6 @@ namespace ElasticLinq
         private readonly string[] parameterSeparator = { "&" };
         private readonly Uri endpoint;
 
-        private HttpClient httpClient;
-
         /// <summary>
         /// Create a new ElasticConnection with the given parameters defining its properties.
         /// </summary>
@@ -62,13 +60,13 @@ namespace ElasticLinq
             if (httpClientHandler != null && httpClientHandler.SupportsAutomaticDecompression)
                 httpClientHandler.AutomaticDecompression = DecompressionMethods.GZip;
 
-            httpClient = new HttpClient(new ForcedAuthHandler(userName, password, innerMessageHandler), true);
+            HttpClient = new HttpClient(new ForcedAuthHandler(userName, password, innerMessageHandler), true);
         }
 
         /// <summary>
         /// The HttpClient used for issuing HTTP network requests.
         /// </summary>
-        internal HttpClient HttpClient => httpClient;
+        internal HttpClient HttpClient { get; private set; }
 
         /// <summary>
         /// The Uri that specifies the public endpoint for the server.
@@ -90,10 +88,10 @@ namespace ElasticLinq
         {
             if (disposing)
             {
-                if (httpClient != null)
+                if (HttpClient != null)
                 {
-                    httpClient.Dispose();
-                    httpClient = null;
+                    HttpClient.Dispose();
+                    HttpClient = null;
                 }
             }
         }
@@ -146,7 +144,7 @@ namespace ElasticLinq
         private async Task<HttpResponseMessage> SendRequestAsync(HttpRequestMessage requestMessage, CancellationToken token, ILog log)
         {
             var stopwatch = Stopwatch.StartNew();
-            var response = await httpClient.SendAsync(requestMessage, token);
+            var response = await HttpClient.SendAsync(requestMessage, token);
             stopwatch.Stop();
 
             log.Debug(null, null, "Response: {0} {1} (in {2}ms)", (int)response.StatusCode, response.StatusCode, stopwatch.ElapsedMilliseconds);

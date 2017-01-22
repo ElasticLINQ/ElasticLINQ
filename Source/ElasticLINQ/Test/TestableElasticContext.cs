@@ -45,7 +45,7 @@ namespace ElasticLinq.Test
         /// <summary>
         /// The logging mechanism for diagnostics information.
         /// </summary>
-        public ILog Log { get; private set; }
+        public ILog Log { get; }
 
         /// <summary>
         /// The mapping to describe how objects and their properties are mapped to Elasticsearch.

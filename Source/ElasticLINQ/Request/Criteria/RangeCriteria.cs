@@ -16,8 +16,6 @@ namespace ElasticLinq.Request.Criteria
     [DebuggerDisplay("{" + nameof(Field) + "}")]
     class RangeCriteria : ICriteria
     {
-        readonly string field;
-        readonly MemberInfo member;
         readonly ReadOnlyCollection<RangeSpecificationCriteria> specifications;
 
         /// <summary>
@@ -32,8 +30,8 @@ namespace ElasticLinq.Request.Criteria
             Argument.EnsureNotNull(nameof(member), member);
             Argument.EnsureNotNull(nameof(specifications), specifications);
 
-            this.field = field;
-            this.member = member;
+            Field = field;
+            Member = member;
             this.specifications = new ReadOnlyCollection<RangeSpecificationCriteria>(specifications.ToArray());
         }
 
@@ -43,7 +41,7 @@ namespace ElasticLinq.Request.Criteria
         /// <summary>
         /// Property or field that this range criteria applies to.
         /// </summary>
-        public MemberInfo Member => member;
+        public MemberInfo Member { get; }
 
         /// <inheritdoc/>
         public string Name => "range";
@@ -51,7 +49,7 @@ namespace ElasticLinq.Request.Criteria
         /// <summary>
         /// Field that must be within the specified ranges.
         /// </summary>
-        public string Field => field;
+        public string Field { get; }
 
         /// <summary>
         /// Specifications (upper and lower bounds) that must be met.
@@ -61,7 +59,7 @@ namespace ElasticLinq.Request.Criteria
         /// <inheritdoc/>
         public override string ToString()
         {
-            return string.Format("range: {0}({1})", field, string.Join(",", specifications.Select(s => s.ToString())));
+            return string.Format("range: {0}({1})", Field, string.Join(",", specifications.Select(s => s.ToString())));
         }
 
         /// <summary>
@@ -98,7 +96,6 @@ namespace ElasticLinq.Request.Criteria
             { RangeComparison.LessThanOrEqual, "lte" },
         };
 
-        readonly RangeComparison comparison;
         readonly object value;
 
         /// <summary>
@@ -111,17 +108,17 @@ namespace ElasticLinq.Request.Criteria
             Argument.EnsureIsDefinedEnum(nameof(comparison), comparison);
             Argument.EnsureNotNull(nameof(value), value);
 
-            this.comparison = comparison;
+            Comparison = comparison;
             this.value = value;
         }
 
         /// <summary>
         /// Type of comparison for this range specification.
         /// </summary>
-        public RangeComparison Comparison => comparison;
+        public RangeComparison Comparison { get; }
 
         /// <inheritdoc/>
-        public string Name => rangeComparisonValues[comparison];
+        public string Name => rangeComparisonValues[Comparison];
 
         /// <summary>
         /// Constant value that this range specification tests against.
@@ -131,7 +128,7 @@ namespace ElasticLinq.Request.Criteria
         /// <inheritdoc/>
         public override string ToString()
         {
-            return string.Format("{0} {1}", comparison, value);
+            return string.Format("{0} {1}", Comparison, value);
         }
     }
 }

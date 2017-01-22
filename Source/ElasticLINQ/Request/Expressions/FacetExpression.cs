@@ -11,21 +11,19 @@ namespace ElasticLinq.Request.Expressions
     /// </summary>
     class FacetExpression : Expression
     {
-        readonly IFacet facet;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="FacetExpression"/> class.
         /// </summary>
         /// <param name="facet"><see cref="IFacet" /> to represent with this expression.</param>
         public FacetExpression(IFacet facet)
         {
-            this.facet = facet;
+            Facet = facet;
         }
 
         /// <summary>
         /// <see cref="IFacet" /> that is represented by this expression.
         /// </summary>
-        public IFacet Facet => facet;
+        public IFacet Facet { get; }
 
         /// <inheritdoc/>
         public override ExpressionType NodeType => ElasticExpressionType.Facet;
@@ -39,7 +37,7 @@ namespace ElasticLinq.Request.Expressions
         /// <inheritdoc/>
         public override string ToString()
         {
-            return facet.ToString();
+            return Facet.ToString();
         }
     }
 }

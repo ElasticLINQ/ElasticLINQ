@@ -7,9 +7,6 @@ namespace ElasticLinq.Request
     /// </summary>
     public class QueryInfo
     {
-        readonly string query;
-        readonly Uri uri;
-
         /// <summary>
         /// Create a new instance of the QueryInfo class with a given query and Uri.
         /// </summary>
@@ -17,18 +14,18 @@ namespace ElasticLinq.Request
         /// <param name="uri">Uri to be used to send the query to Elasticsearch.</param>
         internal QueryInfo(string query, Uri uri)
         {
-            this.query = query;
-            this.uri = uri;
+            Query = query;
+            Uri = uri;
         }
 
         /// <summary>
         /// Query JSON body to be sent to Elasticsearch.
         /// </summary>
-        public string Query => query;
+        public string Query { get; }
 
         /// <summary>
         /// Uri to be used to send the query to Elasticsearch.
         /// </summary>
-        public Uri Uri => uri;
+        public Uri Uri { get; }
     }
 }
