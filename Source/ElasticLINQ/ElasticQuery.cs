@@ -44,7 +44,7 @@ namespace ElasticLinq
             Argument.EnsureNotNull(nameof(expression), expression);
 
             if (!typeof(IQueryable<T>).IsAssignableFrom(expression.Type))
-                throw new ArgumentOutOfRangeException("expression");
+                throw new ArgumentOutOfRangeException(nameof(expression));
 
             this.provider = provider;
             this.expression = expression;

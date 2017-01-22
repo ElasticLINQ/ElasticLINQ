@@ -13,7 +13,7 @@ namespace ElasticLinq.Request.Criteria
     /// Criteria that specifies a range of desired values for a given
     /// field that need to be satisfied to select a document.
     /// </summary>
-    [DebuggerDisplay("{Field}")]
+    [DebuggerDisplay("{" + nameof(Field) + "}")]
     class RangeCriteria : ICriteria
     {
         readonly string field;

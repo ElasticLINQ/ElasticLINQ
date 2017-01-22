@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace ElasticLinq.Utility
 {
-    [DebuggerDisplay("Count = {Count}")]
+    [DebuggerDisplay("Count = {" + nameof(Count) + "}")]
     [DebuggerTypeProxy(typeof(ReadOnlyBatchedList<>.BatchedListDebugView))]
     internal class ReadOnlyBatchedList<T> : IReadOnlyList<T>
     {

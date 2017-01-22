@@ -38,7 +38,7 @@ namespace ElasticLinq.ElasticsearchNet
             ElasticConnectionOptions options = null)
             : base(index, timeout, options)
         {
-            if (client == null) throw new ArgumentNullException("client");
+            if (client == null) throw new ArgumentNullException(nameof(client));
 
             this.client = client;
         }

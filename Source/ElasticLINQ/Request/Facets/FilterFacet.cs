@@ -11,7 +11,7 @@ namespace ElasticLinq.Request.Facets
     /// Filter facets return the number of documents that  match the specified filter criteria.
     /// </summary>
     /// <remarks>Mapped to .GroupBy(a => 1).Select(a => a.Sum(b => b.Field))</remarks>
-    [DebuggerDisplay("FilterFacet {Filter}")]
+    [DebuggerDisplay("FilterFacet {" + nameof(Filter) + "}")]
     class FilterFacet : IFacet
     {
         readonly string name;

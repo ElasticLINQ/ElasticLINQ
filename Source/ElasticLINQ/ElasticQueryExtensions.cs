@@ -161,7 +161,7 @@ namespace ElasticLinq
         {
             var elasticQuery = source as IElasticQuery<TSource>;
             if (elasticQuery == null)
-                throw new ArgumentException("Query must be of type IElasticQuery<> to call ToQueryInfo()", "source");
+                throw new ArgumentException("Query must be of type IElasticQuery<> to call ToQueryInfo()", nameof(source));
 
             return elasticQuery.ToQueryInfo();
         }

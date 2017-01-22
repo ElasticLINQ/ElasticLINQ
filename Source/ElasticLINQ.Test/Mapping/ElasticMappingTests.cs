@@ -53,7 +53,7 @@ namespace ElasticLinq.Test.Mapping
         }
 
         [Theory]
-        [MemberData("FormatClassData")]
+        [MemberData(nameof(FormatClassData))]
         public static void FormatValue(bool lowerCaseAnalyzedFieldValues, string propertyName, object inputValue, string expected)
         {
             var memberInfo = typeof(FormatClass).GetProperty(propertyName);

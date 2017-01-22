@@ -25,7 +25,7 @@ namespace ElasticLinq.Response.Materializers
         public object Materialize(ElasticResponse response)
         {
             if (response.hits.total < 0)
-                throw new ArgumentOutOfRangeException("response", "Contains a negative number of hits.");
+                throw new ArgumentOutOfRangeException(nameof(response), "Contains a negative number of hits.");
 
             return Convert.ChangeType(response.hits.total, returnType);
         }

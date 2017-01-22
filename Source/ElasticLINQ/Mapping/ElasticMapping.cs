@@ -95,7 +95,7 @@ namespace ElasticLinq.Mapping
 
             var nameValue = Enum.GetName(returnType, value);
             if (nameValue == null)
-                throw new ArgumentOutOfRangeException("value",
+                throw new ArgumentOutOfRangeException(nameof(value),
                     string.Format("Value '{0}' is not defined for enum type '{1}'.", value, returnType.FullName));
 
             return nameValue;
