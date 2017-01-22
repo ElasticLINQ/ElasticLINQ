@@ -27,8 +27,8 @@ namespace ElasticLinq.Request.Facets
 
         public TermsFacet(string name, ICriteria criteria, int? size, params string[] fields)
         {
-            Argument.EnsureNotBlank("name", name);
-            Argument.EnsureNotEmpty("fields", fields);
+            Argument.EnsureNotBlank(nameof(name), name);
+            Argument.EnsureNotEmpty(nameof(fields), fields);
 
             this.name = name;
             this.criteria = criteria;

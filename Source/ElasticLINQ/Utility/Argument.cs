@@ -47,18 +47,6 @@ namespace ElasticLinq.Utility
         }
 
         /// <summary>
-        /// Throw an ArgumentException if the type is not assignable.
-        /// </summary>
-        /// <param name="argumentName">Name of the argument.</param>
-        /// <param name="type">Type being checked for assignment.</param>
-        /// <typeparam name="T">Type being checked against.</typeparam>
-        public static void EnsureIsAssignableFrom<T>(string argumentName, Type type)
-        {
-            if (!typeof(T).IsAssignableFrom(type))
-                throw new ArgumentException(string.Format("Type {0} must be assignable from {1}.", type.Name, typeof(T).Name), argumentName);
-        }
-
-        /// <summary>
         /// Throw an ArgumentOutOfRangeException if the enum is not defined.
         /// </summary>
         /// <param name="argumentName">Name of the argument.</param>

@@ -65,19 +65,6 @@ namespace ElasticLinq.Test.Utility
 
         [Fact]
         [ExcludeFromCodeCoverage] // Expression isn't "executed"
-        public void EnsureIsAssignableThrowsArgumentExceptionWhenTypeIsNotAssignable()
-        {
-            Assert.Throws<ArgumentException>(() => Argument.EnsureIsAssignableFrom<List<object>>("a", typeof(List<int>)));
-        }
-
-        [Fact]
-        public void EnsureIsAssignableDoesNotThrowWhenTypeIsAssignable()
-        {
-            Argument.EnsureIsAssignableFrom<IEnumerable<object>>("a", typeof(List<object>));
-        }
-
-        [Fact]
-        [ExcludeFromCodeCoverage] // Expression isn't "executed"
         public void EnsureNotEmptyThrowsArgumentExceptionWhenValuesIsNull()
         {
             Assert.Throws<ArgumentOutOfRangeException>(() => Argument.EnsureNotEmpty("a", null));

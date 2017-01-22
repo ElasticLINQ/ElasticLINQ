@@ -104,7 +104,7 @@ namespace ElasticLinq.Request.Formatters
 
         JProperty Build(IFacet facet, long? defaultSize)
         {
-            Argument.EnsureNotNull("facet", facet);
+            Argument.EnsureNotNull(nameof(facet), facet);
 
             var specificBody = Build(facet);
             if (facet is IOrderableFacet)

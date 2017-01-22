@@ -22,7 +22,7 @@ namespace ElasticLinq.Mapping
         /// <returns>String that has been converted to camel-case.</returns>
         public static string ToCamelCase(this string value, CultureInfo culture)
         {
-            Argument.EnsureNotNull("value", value);
+            Argument.EnsureNotNull(nameof(value), value);
 
             var words = Regex.Split(value, "(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])");
             return string.Concat(words.First().ToLowerInvariant(), string.Concat(words.Skip(1)));
@@ -39,7 +39,7 @@ namespace ElasticLinq.Mapping
         /// </remarks>
         public static string ToPlural(this string value, CultureInfo culture)
         {
-            Argument.EnsureNotNull("value", value);
+            Argument.EnsureNotNull(nameof(value), value);
 
             return value.Length < 1
                 ? value

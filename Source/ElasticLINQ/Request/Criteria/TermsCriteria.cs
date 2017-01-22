@@ -137,7 +137,7 @@ namespace ElasticLinq.Request.Criteria
         /// <returns>Either a <see cref="TermCriteria"/> object or a <see cref="TermsCriteria"/> object.</returns>
         internal static ITermsCriteria Build(TermsExecutionMode? executionMode, string field, MemberInfo member, IEnumerable<object> values)
         {
-            Argument.EnsureNotNull("values", values);
+            Argument.EnsureNotNull(nameof(values), values);
 
             var hashValues = new HashSet<object>(values);
             if (hashValues.Count == 1)

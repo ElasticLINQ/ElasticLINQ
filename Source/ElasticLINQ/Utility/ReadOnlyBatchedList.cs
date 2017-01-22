@@ -14,13 +14,13 @@ namespace ElasticLinq.Utility
     internal class ReadOnlyBatchedList<T> : IReadOnlyList<T>
     {
         // 8192 * 8-byte (i.e. 64-bit) pointers = 65536 bytes, which is below the 85000 byte large object heap threshold. We could have a higher limit when running in 32-bit processes, but that would complicate the logic
-        static int defaultMaxBatchCapacity = 8192;
+        private const int DefaultMaxBatchCapacity = 8192;
 
         readonly int maxBatchCapacity;
         readonly IReadOnlyList<IReadOnlyList<T>> batches;
         readonly int count;
 
-        public ReadOnlyBatchedList(IEnumerable<T> enumerable) : this(enumerable, defaultMaxBatchCapacity)
+        public ReadOnlyBatchedList(IEnumerable<T> enumerable) : this(enumerable, DefaultMaxBatchCapacity)
         {
         }
 
@@ -40,16 +40,16 @@ namespace ElasticLinq.Utility
 
             var batches = new List<IReadOnlyList<T>>();
 
-            int currentTotalCount = 0;
+            var currentTotalCount = 0;
             List<T> currentBatch = null;
             foreach (var item in enumerable)
             {
                 if (currentBatch == null || currentBatch.Count == maxBatchCapacity)
                 {
-                    int capacity = 0;
+                    var capacity = 0;
                     if (totalCount.HasValue)
                     {
-                        int remainingCount = totalCount.Value - currentTotalCount;
+                        var remainingCount = totalCount.Value - currentTotalCount;
                         capacity = Math.Min(remainingCount, maxBatchCapacity);
                     }
                     currentBatch = new List<T>(capacity);
@@ -61,7 +61,7 @@ namespace ElasticLinq.Utility
             }
 
             this.batches = batches;
-            this.count = currentTotalCount;
+            count = currentTotalCount;
         }
 
         public T this[int index]
@@ -71,8 +71,8 @@ namespace ElasticLinq.Utility
                 if (index < 0 || index >= Count)
                     throw new ArgumentOutOfRangeException(nameof(index), index, "Index was out of range. Must be non-negative and less than the size of the collection.");
 
-                int batchNumber = index / maxBatchCapacity;
-                int batchIndex = index % maxBatchCapacity;
+                var batchNumber = index / maxBatchCapacity;
+                var batchIndex = index % maxBatchCapacity;
                 return batches[batchNumber][batchIndex];
             }
         }

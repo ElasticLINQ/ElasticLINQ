@@ -20,8 +20,8 @@ namespace ElasticLinq.Request.Visitors
 
         public ElasticFieldsExpressionVisitor(Type sourcetype, ParameterExpression bindingParameter, IElasticMapping mapping)
         {
-            Argument.EnsureNotNull("bindingParameter", bindingParameter);
-            Argument.EnsureNotNull("mapping", mapping);
+            Argument.EnsureNotNull(nameof(bindingParameter), bindingParameter);
+            Argument.EnsureNotNull(nameof(mapping), mapping);
 
             SourceType = sourcetype;
             BindingParameter = bindingParameter;
@@ -32,7 +32,7 @@ namespace ElasticLinq.Request.Visitors
         {
             var parameter = Expression.Parameter(typeof(Hit), "h");
             var visitor = new ElasticFieldsExpressionVisitor(sourceType, parameter, mapping);
-            Argument.EnsureNotNull("selector", selector);
+            Argument.EnsureNotNull(nameof(selector), selector);
             return Tuple.Create(visitor.Visit(selector), parameter);
         }
 

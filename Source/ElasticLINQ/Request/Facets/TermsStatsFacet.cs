@@ -29,9 +29,9 @@ namespace ElasticLinq.Request.Facets
 
         public TermsStatsFacet(string name, ICriteria criteria, string key, string value)
         {
-            Argument.EnsureNotBlank("name", name);
-            Argument.EnsureNotBlank("key", key);
-            Argument.EnsureNotBlank("value", value);
+            Argument.EnsureNotBlank(nameof(name), name);
+            Argument.EnsureNotBlank(nameof(key), key);
+            Argument.EnsureNotBlank(nameof(value), value);
 
             this.name = name;
             this.criteria = criteria;

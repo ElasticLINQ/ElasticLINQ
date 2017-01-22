@@ -22,7 +22,7 @@ namespace ElasticLinq.Request.Criteria
         /// <param name="criteria"></param>
         protected CompoundCriteria(IEnumerable<ICriteria> criteria)
         {
-            Argument.EnsureNotNull("criteria", criteria);
+            Argument.EnsureNotNull(nameof(criteria), criteria);
             this.criteria = new ReadOnlyCollection<ICriteria>(criteria.ToArray());
         }
 

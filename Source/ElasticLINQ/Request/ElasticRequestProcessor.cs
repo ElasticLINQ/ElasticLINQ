@@ -28,10 +28,10 @@ namespace ElasticLinq.Request
 
         public ElasticRequestProcessor(IElasticConnection connection, IElasticMapping mapping, ILog log, IRetryPolicy retryPolicy)
         {
-            Argument.EnsureNotNull("connection", connection);
-            Argument.EnsureNotNull("mapping", mapping);
-            Argument.EnsureNotNull("log", log);
-            Argument.EnsureNotNull("retryPolicy", retryPolicy);
+            Argument.EnsureNotNull(nameof(connection), connection);
+            Argument.EnsureNotNull(nameof(mapping), mapping);
+            Argument.EnsureNotNull(nameof(log), log);
+            Argument.EnsureNotNull(nameof(retryPolicy), retryPolicy);
 
             this.connection = connection;
             this.mapping = mapping;

@@ -66,8 +66,8 @@ namespace ElasticLinq.Request.Visitors
 
         internal static FacetRebindCollectionResult Rebind(IElasticMapping mapping, Type sourceType, Expression expression)
         {
-            Argument.EnsureNotNull("mapping", mapping);
-            Argument.EnsureNotNull("expression", expression);
+            Argument.EnsureNotNull(nameof(mapping), mapping);
+            Argument.EnsureNotNull(nameof(expression), expression);
 
             var visitor = new FacetExpressionVisitor(mapping, sourceType);
             var visitedExpression = visitor.Visit(expression);

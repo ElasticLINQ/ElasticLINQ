@@ -28,9 +28,9 @@ namespace ElasticLinq.Request.Criteria
         /// <param name="specifications">Specifications (upper and lower bounds) that must be met.</param>
         public RangeCriteria(string field, MemberInfo member, IEnumerable<RangeSpecificationCriteria> specifications)
         {
-            Argument.EnsureNotBlank("field", field);
-            Argument.EnsureNotNull("member", member);
-            Argument.EnsureNotNull("specifications", specifications);
+            Argument.EnsureNotBlank(nameof(field), field);
+            Argument.EnsureNotNull(nameof(member), member);
+            Argument.EnsureNotNull(nameof(specifications), specifications);
 
             this.field = field;
             this.member = member;
@@ -120,8 +120,8 @@ namespace ElasticLinq.Request.Criteria
         /// <param name="value">Constant value that this range specification tests against.</param>
         public RangeSpecificationCriteria(RangeComparison comparison, object value)
         {
-            Argument.EnsureIsDefinedEnum("comparison", comparison);
-            Argument.EnsureNotNull("value", value);
+            Argument.EnsureIsDefinedEnum(nameof(comparison), comparison);
+            Argument.EnsureNotNull(nameof(value), value);
 
             this.comparison = comparison;
             this.value = value;

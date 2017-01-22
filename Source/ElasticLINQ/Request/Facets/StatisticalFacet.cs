@@ -29,8 +29,8 @@ namespace ElasticLinq.Request.Facets
 
         public StatisticalFacet(string name, ICriteria criteria, params string[] fields)
         {
-            Argument.EnsureNotBlank("name", name);
-            Argument.EnsureNotEmpty("fields", fields);
+            Argument.EnsureNotBlank(nameof(name), name);
+            Argument.EnsureNotEmpty(nameof(fields), fields);
 
             this.name = name;
             this.criteria = criteria;

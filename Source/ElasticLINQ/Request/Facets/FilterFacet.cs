@@ -19,7 +19,7 @@ namespace ElasticLinq.Request.Facets
 
         public FilterFacet(string name, ICriteria filter)
         {
-            Argument.EnsureNotBlank("name", name);
+            Argument.EnsureNotBlank(nameof(name), name);
 
             this.name = name;
             this.filter = filter;

@@ -30,7 +30,7 @@ namespace ElasticLinq.Request.Visitors
         {
             var parameter = Expression.Parameter(typeof(Hit), "h");
             var visitor = new MemberProjectionExpressionVisitor(sourceType, parameter, mapping);
-            Argument.EnsureNotNull("selector", selector);
+            Argument.EnsureNotNull(nameof(selector), selector);
             var materializer = visitor.Visit(selector);
             return new RebindCollectionResult<string>(materializer, visitor.fieldNames, parameter);
         }

@@ -54,7 +54,7 @@ namespace ElasticLinq
         internal ElasticConnection(HttpMessageHandler innerMessageHandler, Uri endpoint, string userName = null, string password = null, string index = null, TimeSpan? timeout = null, ElasticConnectionOptions options = null)
             : base(index, timeout, options)
         {
-            Argument.EnsureNotNull("endpoint", endpoint);
+            Argument.EnsureNotNull(nameof(endpoint), endpoint);
 
             this.endpoint = endpoint;
 

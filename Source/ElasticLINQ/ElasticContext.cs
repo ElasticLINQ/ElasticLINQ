@@ -22,7 +22,7 @@ namespace ElasticLinq
         /// <param name="retryPolicy">The object which controls retry policy for the search (optional, defaults to <see cref="RetryPolicy"/>).</param>
         public ElasticContext(IElasticConnection connection, IElasticMapping mapping = null, ILog log = null, IRetryPolicy retryPolicy = null)
         {
-            Argument.EnsureNotNull("connection", connection);
+            Argument.EnsureNotNull(nameof(connection), connection);
 
             Connection = connection;
             Mapping = mapping ?? new TrivialElasticMapping();

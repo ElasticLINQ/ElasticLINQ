@@ -20,7 +20,7 @@ namespace ElasticLinq.Request.Criteria
         /// <param name="fields">Colleciton of fields to be searched.</param>
         public QueryStringCriteria(string value, params string[] fields)
         {
-            Argument.EnsureNotBlank("value", value);
+            Argument.EnsureNotBlank(nameof(value), value);
 
             this.value = value;
             this.fields = new ReadOnlyCollection<string>(fields ?? new string[0]);
