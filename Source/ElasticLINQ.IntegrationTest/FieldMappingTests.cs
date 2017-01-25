@@ -9,7 +9,7 @@ namespace ElasticLinq.IntegrationTest
     public class FieldMappingTests
     {
         static readonly ElasticConnectionOptions options = new ElasticConnectionOptions { SearchSizeDefault = 1000 };
-        static readonly ElasticConnection connection = new ElasticConnection(Data.v1Endpoint, index: "integrationtest", options: options);
+        static readonly ElasticConnection connection = new ElasticConnection(Data.Endpoint, index: "integrationtest", options: options);
         static readonly ElasticContext context = new ElasticContext(connection, new TrivialElasticMapping(), retryPolicy: new NoRetryPolicy());
 
         [Fact]
