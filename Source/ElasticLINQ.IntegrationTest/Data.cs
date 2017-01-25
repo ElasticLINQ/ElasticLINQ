@@ -14,8 +14,8 @@ namespace ElasticLinq.IntegrationTest
         public static readonly Uri Endpoint = new Uri("http://52.183.26.158:9200/");
 
         const string Index = "integrationtest";
-        static readonly ElasticConnectionOptions options = new ElasticConnectionOptions { SearchSizeDefault = 1000 };
-        static readonly ElasticConnection connection = new ElasticConnection(Endpoint, index: Index, options: options);
+        static readonly ElasticConnectionOptions options = new ElasticConnectionOptions { SearchSizeDefault = 1000, Pretty = true };
+        static readonly IElasticConnection connection = new BreakOnInvalidQueryConnection(Endpoint, index: Index, options: options);
 
         readonly ElasticContext elasticContext = new ElasticContext(connection, new TrivialElasticMapping(), retryPolicy: new NoRetryPolicy());
         readonly List<object> memory = new List<object>();
