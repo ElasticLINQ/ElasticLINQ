@@ -61,12 +61,6 @@ namespace ElasticLinq.Request
         public ICriteria Query { get; set; }
                 
         /// <summary>
-        /// Type of search Elasticsearch should perform.
-        /// </summary>
-        /// <remarks>Is usually blank but can be set to Count when facets are required instead of hits.</remarks>
-        public string SearchType { get; set; }
-
-        /// <summary>
         /// Minimum score of results to be returned.
         /// </summary>
         public double? MinScore { get; set; }

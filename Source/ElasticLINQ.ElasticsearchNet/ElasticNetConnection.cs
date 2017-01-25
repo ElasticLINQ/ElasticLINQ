@@ -56,7 +56,7 @@ namespace ElasticLinq.ElasticsearchNet
                                 Index ?? "_all",
                                 searchRequest.DocumentType,
                                 body,
-                                searchParams => SetRequestParameters(searchParams, searchRequest)),
+                                searchParams => searchParams),
                             token);
 
             stopwatch.Stop();
@@ -75,16 +75,6 @@ namespace ElasticLinq.ElasticsearchNet
         public override Uri GetSearchUri(SearchRequest searchRequest)
         {
             return new Uri("");
-        }
-
-        SearchRequestParameters SetRequestParameters(
-            SearchRequestParameters searchRequestParameters,
-            SearchRequest searchRequest)
-        {
-            if (string.Equals(searchRequest.SearchType, "count", StringComparison.OrdinalIgnoreCase))
-                searchRequestParameters.SearchType(SearchType.Count);
-
-            return searchRequestParameters;
         }
 
         internal static ElasticResponse ParseResponse(string response, ILog log)

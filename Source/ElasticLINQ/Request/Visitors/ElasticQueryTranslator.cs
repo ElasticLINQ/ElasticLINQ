@@ -256,7 +256,6 @@ namespace ElasticLinq.Request.Visitors
         Expression VisitAny(Expression source, Expression predicate)
         {
             materializer = new AnyElasticMaterializer();
-            searchRequest.SearchType = "count";
             searchRequest.Size = 1;
 
             return predicate != null
@@ -267,7 +266,7 @@ namespace ElasticLinq.Request.Visitors
         Expression VisitCount(Expression source, Expression predicate, Type returnType)
         {
             materializer = new CountElasticMaterializer(returnType);
-            searchRequest.SearchType = "count";
+            searchRequest.Size = 0;
             return predicate != null
                 ? VisitWhere(source, predicate)
                 : Visit(source);
