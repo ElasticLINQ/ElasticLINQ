@@ -81,12 +81,15 @@ namespace ElasticLinq.Request.Formatters
                 root.Add("highlight", Build(searchRequest.Highlight));
 
             long? size = searchRequest.Size ?? connection.Options.SearchSizeDefault;
+            if (size.HasValue) 
+                root.Add("size", size.Value); 
 
             if (connection.Timeout != TimeSpan.Zero)
                 root.Add("timeout", Format(connection.Timeout));
 
             return root;
         }
+
 
         static JToken BuildFieldProperty(ReadOnlyCollection<string> fields)
         {

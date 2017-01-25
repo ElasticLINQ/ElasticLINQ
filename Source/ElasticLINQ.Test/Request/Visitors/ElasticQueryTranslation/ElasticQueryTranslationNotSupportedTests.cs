@@ -178,13 +178,6 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         }
 
         [Fact]
-        public static void GroupByCannotBeExpression()
-        {
-            var ex = Assert.Throws<NotSupportedException>(() => Translate(Robots.GroupBy(r => r.Id / 2)));
-            Assert.Contains("GroupBy must be either a", ex.Message);
-        }
-
-        [Fact]
         public static void WhereCannotTakeAFunc()
         {
             Func<Robot, bool> wherePredicateFunc = r => r.Name.Contains("a");
