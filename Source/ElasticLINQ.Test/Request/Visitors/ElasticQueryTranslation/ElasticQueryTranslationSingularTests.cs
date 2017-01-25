@@ -1,7 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using ElasticLinq.Request.Criteria;
-using ElasticLinq.Request.Facets;
 using ElasticLinq.Request.Visitors;
 using ElasticLinq.Test.TestSupport;
 using System;
@@ -144,20 +143,6 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         }
 
         [Fact]
-        public void CountTranslatesToFacetWhenGroupBy()
-        {
-            var first = Robots.GroupBy(g => 1).Select(a => a.Count());
-
-            var request = ElasticQueryTranslator.Translate(CouchMapping, first.Expression).SearchRequest;
-
-            Assert.Equal("count", request.SearchType);
-            Assert.IsType<ExistsCriteria>(request.Filter);
-
-            var facet = Assert.Single(request.Facets);
-            Assert.IsType<FilterFacet>(facet);
-        }
-
-        [Fact]
         public void LongCountTranslatesToSearchTypeOfCount()
         {
             var first = MakeQueryableExpression("LongCount", Robots);
@@ -181,20 +166,6 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var termCriteria = Assert.IsType<TermCriteria>(request.Filter);
             Assert.Equal("name", termCriteria.Field);
             Assert.Equal(expectedTermValue, termCriteria.Value);
-        }
-
-        [Fact]
-        public void LongCountTranslatesToFacetWhenGroupBy()
-        {
-            var first = Robots.GroupBy(g => 1).Select(a => a.LongCount());
-
-            var request = ElasticQueryTranslator.Translate(CouchMapping, first.Expression).SearchRequest;
-
-            Assert.Equal("count", request.SearchType);
-            Assert.IsType<ExistsCriteria>(request.Filter);
-
-            var facet = Assert.Single(request.Facets);
-            Assert.IsType<FilterFacet>(facet);
         }
 
         [Fact]

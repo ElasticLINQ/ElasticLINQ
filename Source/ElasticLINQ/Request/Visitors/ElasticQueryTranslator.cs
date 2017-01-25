@@ -48,12 +48,7 @@ namespace ElasticLinq.Request.Visitors
         ElasticTranslateResult Translate(Expression e)
         {
             var evaluated = PartialEvaluator.Evaluate(e);
-            var aggregated = FacetExpressionVisitor.Rebind(Mapping, SourceType, evaluated);
-
-            if (aggregated.Collected.Count > 0)
-                CompleteFacetTranslation(aggregated);
-            else
-                CompleteHitTranslation(evaluated);
+            CompleteHitTranslation(evaluated);
 
             searchRequest.Query = QueryCriteriaRewriter.Compensate(searchRequest.Query);
             searchRequest.Filter = ConstantCriteriaFilterReducer.Reduce(searchRequest.Filter);
@@ -80,17 +75,6 @@ namespace ElasticLinq.Request.Visitors
                 materializer = new ListHitsElasticMaterializer(itemProjector ?? DefaultItemProjector, finalItemType ?? SourceType);
             else if (materializer is ChainMaterializer && ((ChainMaterializer)materializer).Next == null)
                 ((ChainMaterializer)materializer).Next = new ListHitsElasticMaterializer(itemProjector ?? DefaultItemProjector, finalItemType ?? SourceType);
-        }
-
-        void CompleteFacetTranslation(FacetRebindCollectionResult aggregated)
-        {
-            Visit(aggregated.Expression);
-            searchRequest.DocumentType = Mapping.GetDocumentType(SourceType);
-
-            searchRequest.Facets = aggregated.Collected.ToList();
-            searchRequest.SearchType = "count"; // We only want facets, not hits
-
-            materializer = aggregated.Materializer;
         }
 
         protected override Expression VisitMethodCall(MethodCallExpression node)

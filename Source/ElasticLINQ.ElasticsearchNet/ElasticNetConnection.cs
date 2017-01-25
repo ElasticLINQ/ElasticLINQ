@@ -121,9 +121,6 @@ namespace ElasticLinq.ElasticsearchNet
             {
                 if (results.hits?.hits != null && results.hits.hits.Count > 0)
                     yield return results.hits.hits.Count + " hits";
-
-                if (results.facets != null && results.facets.Count > 0)
-                    yield return results.facets.Count + " facets";
             }
         }
     }

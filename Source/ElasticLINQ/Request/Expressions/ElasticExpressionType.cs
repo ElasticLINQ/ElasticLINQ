@@ -10,6 +10,5 @@ namespace ElasticLinq.Request.Expressions
     static class ElasticExpressionType
     {
         public const ExpressionType Criteria = (ExpressionType)10000;
-        public const ExpressionType Facet = (ExpressionType)10001;
     }
 }
