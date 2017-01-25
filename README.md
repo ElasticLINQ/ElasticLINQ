@@ -12,7 +12,7 @@ ElasticLINQ supports .NET 4.5 & PCL.
 * 0.9 works
 * 1.x works
 * 2.x facets fail, other queries might work
-* 5.x [under development](https://github.com/ElasticLINQ/ElasticLINQ/tree/elasticsearch5 ) in
+* 5.x [under development](https://github.com/ElasticLINQ/ElasticLINQ/tree/elasticsearch5)
 
 ## Builds
 
