@@ -201,7 +201,7 @@ namespace ElasticLinq.Test.Request.Formatters
             var rangeCriteria = new RangeCriteria("ranged", memberInfo, RangeComparison.GreaterThanOrEqual, 88);
             var boolMust = new BoolCriteria(new[] { rangeCriteria }, null, null);
 
-            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Query = boolMust });
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = boolMust });
             var body = JObject.Parse(formatter.Body);
 
             var mustItems = body.TraverseWithAssert("query", "bool", "must");
@@ -215,7 +215,7 @@ namespace ElasticLinq.Test.Request.Formatters
             var rangeCriteria = new RangeCriteria("ranged", memberInfo, RangeComparison.GreaterThanOrEqual, 88);
             var boolMust = new BoolCriteria(null, null, new[] { rangeCriteria });
 
-            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Query = boolMust });
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = boolMust });
             var body = JObject.Parse(formatter.Body);
 
             var mustNotItems = body.TraverseWithAssert("query", "bool", "must_not");
@@ -230,7 +230,7 @@ namespace ElasticLinq.Test.Request.Formatters
             var range2 = new RangeCriteria("range2", memberInfo, RangeComparison.GreaterThanOrEqual, 88);
             var boolMust = new BoolCriteria(null, new[] { range1, range2 }, null);
 
-            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Query = boolMust });
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = boolMust });
             var body = JObject.Parse(formatter.Body);
 
             var boolBody = body.TraverseWithAssert("query", "bool");
@@ -246,7 +246,7 @@ namespace ElasticLinq.Test.Request.Formatters
         [Fact]
         public void ParseThrowsInvalidOperationForUnknownCriteriaTypes()
         {
-            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Query = new FakeCriteria() });
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = new FakeCriteria() });
             Assert.Throws<InvalidOperationException>(() => JObject.Parse(formatter.Body));
         }
 

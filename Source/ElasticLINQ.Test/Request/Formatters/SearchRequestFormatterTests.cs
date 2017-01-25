@@ -44,7 +44,7 @@ namespace ElasticLinq.Test.Request.Formatters
             const string expectedQuery = "this is my query string";
             var queryString = new QueryStringCriteria(expectedQuery);
 
-            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Query = queryString });
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = queryString });
             var body = JObject.Parse(formatter.Body);
 
             var result = body.TraverseWithAssert("query", "query_string", "query");
@@ -58,7 +58,7 @@ namespace ElasticLinq.Test.Request.Formatters
             var expectedFields = new[] { "green", "brown", "yellow" };
             var queryString = new QueryStringCriteria(expectedQuery, expectedFields);
 
-            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Query = queryString });
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = queryString });
             var body = JObject.Parse(formatter.Body);
 
             var result = body.TraverseWithAssert("query", "query_string");
@@ -76,7 +76,7 @@ namespace ElasticLinq.Test.Request.Formatters
                     new RangeSpecificationCriteria(RangeComparison.GreaterThan, 200)
                 });
 
-            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Query = rangeCriteria });
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = rangeCriteria });
             var body = JObject.Parse(formatter.Body);
 
             var result = body.TraverseWithAssert("query", "range");

@@ -52,14 +52,8 @@ namespace ElasticLinq.Request
         /// Filter criteria for the documents.
         /// </summary>
         /// <remarks>Determined by the Where LINQ statements.</remarks>
-        public ICriteria Filter { get; set; }
-        
-        /// <summary>
-        /// Query criteria for the documents.
-        /// </summary>
-        /// <remarks>Determined by the Query extension methods.</remarks>
-        public ICriteria Query { get; set; }
-                
+        public ICriteria Filter { get; set; }        
+               
         /// <summary>
         /// Minimum score of results to be returned.
         /// </summary>

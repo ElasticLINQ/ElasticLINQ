@@ -142,8 +142,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
             var request = ElasticQueryTranslator.Translate(Mapping, query.Expression).SearchRequest;
 
-            Assert.Null(request.Filter);
-            Assert.NotNull(request.Query);
+            Assert.NotNull(request.Filter);
             Assert.Equal(expectedScore, request.MinScore);
         }
     }

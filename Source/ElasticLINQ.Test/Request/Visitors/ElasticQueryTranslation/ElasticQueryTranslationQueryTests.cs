@@ -15,7 +15,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             const string expectedConstant = "Kryten";
             var where = Robots.Query(e => e.Name.Contains(expectedConstant));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Query;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
             var queryStringCriteria = Assert.IsType<QueryStringCriteria>(criteria);
             Assert.Equal("name", queryStringCriteria.Fields.Single());
@@ -27,7 +27,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             const string expectedConstant = "Kryten";
             var where = Robots.Query(e => e.Name.StartsWith(expectedConstant));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Query;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
             var queryStringCriteria = Assert.IsType<QueryStringCriteria>(criteria);
             Assert.Equal("name", queryStringCriteria.Fields.Single());
@@ -39,7 +39,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             const string expectedConstant = "Kryten";
             var where = Robots.Query(e => e.Name.EndsWith(expectedConstant));
-            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Query;
+            var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
             var queryStringCriteria = Assert.IsType<QueryStringCriteria>(criteria);
             Assert.Equal("name", queryStringCriteria.Fields.Single());
@@ -53,8 +53,9 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
             var searchRequest = ElasticQueryTranslator.Translate(Mapping, query.Expression).SearchRequest;
 
-            Assert.IsType<RegexpCriteria>(searchRequest.Query);
-            Assert.IsType<ExistsCriteria>(searchRequest.Filter);
+            var andCriteria = Assert.IsType<AndCriteria>(searchRequest.Filter);
+            Assert.IsType<RegexpCriteria>(andCriteria.Criteria[0]);
+            Assert.IsType<ExistsCriteria>(andCriteria.Criteria[1]);
         }
 
         [Fact]
@@ -63,8 +64,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var where = Robots.Query(r => r.Name == "IG-88" && r.Cost > 1);
             var request = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest;
 
-            var boolCriteria = Assert.IsType<BoolCriteria>(request.Query);
-            Assert.Null(request.Filter);
+            var boolCriteria = Assert.IsType<BoolCriteria>(request.Filter);
             Assert.Single(boolCriteria.Must, f => f.Name == "term");
             Assert.Single(boolCriteria.Must, f => f.Name == "range");
             Assert.Equal(2, boolCriteria.Must.Count);
@@ -77,9 +77,8 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var where = Robots.QueryString(expectedQueryStringValue);
             var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest;
 
-            Assert.Null(criteria.Filter);
-            Assert.NotNull(criteria.Query);
-            var queryStringCriteria = Assert.IsType<QueryStringCriteria>(criteria.Query);
+            Assert.NotNull(criteria.Filter);
+            var queryStringCriteria = Assert.IsType<QueryStringCriteria>(criteria.Filter);
             Assert.Equal(expectedQueryStringValue, queryStringCriteria.Value);
         }
 
@@ -91,9 +90,8 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var where = Robots.QueryString(expectedQueryStringValue, expectedFields);
             var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest;
 
-            Assert.Null(criteria.Filter);
-            Assert.NotNull(criteria.Query);
-            var queryStringCriteria = Assert.IsType<QueryStringCriteria>(criteria.Query);
+            Assert.NotNull(criteria.Filter);
+            var queryStringCriteria = Assert.IsType<QueryStringCriteria>(criteria.Filter);
             Assert.Equal(expectedQueryStringValue, queryStringCriteria.Value);
             Assert.Equal(expectedFields, queryStringCriteria.Fields);
         }
@@ -105,9 +103,8 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var where = Robots.QueryString(expectedQueryStringValue).Query(q => q.Cost > 0);
             var request = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest;
 
-            Assert.Null(request.Filter);
-            Assert.NotNull(request.Query);
-            var boolCriteria = Assert.IsType<BoolCriteria>(request.Query);
+            Assert.NotNull(request.Filter);
+            var boolCriteria = Assert.IsType<BoolCriteria>(request.Filter);
             Assert.Single(boolCriteria.Must, a => a.Name == "query_string");
             Assert.Single(boolCriteria.Must, a => a.Name == "range");
             Assert.Equal(2, boolCriteria.Must.Count);
@@ -120,8 +117,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
             var request = ElasticQueryTranslator.Translate(Mapping, query.Expression).SearchRequest;
 
-            Assert.Null(request.Filter);
-            Assert.IsType<BoolCriteria>(request.Query);
+            Assert.IsType<BoolCriteria>(request.Filter);
         }
 
         [Fact]
@@ -131,8 +127,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
             var request = ElasticQueryTranslator.Translate(Mapping, query.Expression).SearchRequest;
 
-            Assert.Null(request.Filter);
-            Assert.IsType<MatchAllCriteria>(request.Query);
+            Assert.IsType<MatchAllCriteria>(request.Filter);
         }
 
         [Fact]
@@ -142,8 +137,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
             var request = ElasticQueryTranslator.Translate(Mapping, query.Expression).SearchRequest;
 
-            Assert.Null(request.Filter);
-            Assert.IsType<MatchAllCriteria>(request.Query);
+            Assert.IsType<MatchAllCriteria>(request.Filter);
         }
 
         [Fact]
@@ -153,8 +147,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
             var request = ElasticQueryTranslator.Translate(Mapping, query.Expression).SearchRequest;
 
-            Assert.Null(request.Filter);
-            var notCriteria = Assert.IsType<NotCriteria>(request.Query);
+            var notCriteria = Assert.IsType<NotCriteria>(request.Filter);
             Assert.IsType<MatchAllCriteria>(notCriteria.Criteria);
         }
 
@@ -165,8 +158,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
             var request = ElasticQueryTranslator.Translate(Mapping, query.Expression).SearchRequest;
 
-            Assert.Null(request.Filter);
-            var notCriteria = Assert.IsType<NotCriteria>(request.Query);
+            var notCriteria = Assert.IsType<NotCriteria>(request.Filter);
             Assert.IsType<MatchAllCriteria>(notCriteria.Criteria);
         }
 
@@ -177,8 +169,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
             var request = ElasticQueryTranslator.Translate(Mapping, query.Expression).SearchRequest;
 
-            Assert.Null(request.Filter);
-            var boolCriteria = Assert.IsType<BoolCriteria>(request.Query);
+            var boolCriteria = Assert.IsType<BoolCriteria>(request.Filter);
             Assert.Empty(boolCriteria.Must);
             Assert.Empty(boolCriteria.MustNot);
             Assert.Equal(2, boolCriteria.Should.Count);

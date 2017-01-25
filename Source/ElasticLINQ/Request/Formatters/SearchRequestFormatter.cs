@@ -61,15 +61,8 @@ namespace ElasticLinq.Request.Formatters
 
             var queryRoot = root;
 
-            // Filters cause a filtered query to be created
             if (searchRequest.Filter != null)
-            {
-                queryRoot = new JObject(new JProperty("filter", Build(searchRequest.Filter)));
-                root.Add("query", new JObject(new JProperty("bool", queryRoot)));
-            }
-
-            if (searchRequest.Query != null)
-                queryRoot.Add("query", Build(searchRequest.Query));
+                queryRoot.Add("query", Build(searchRequest.Filter));
 
             if (searchRequest.SortOptions.Any())
                 root.Add("sort", Build(searchRequest.SortOptions));
