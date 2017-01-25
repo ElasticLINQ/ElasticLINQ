@@ -220,7 +220,7 @@ namespace ElasticLinq.Request.Formatters
 
         JObject Build(NotCriteria criteria)
         {
-            return new JObject(new JProperty(criteria.Name, Build(criteria.Criteria)));
+            return new JObject(new JProperty("bool", new JObject(new JProperty(criteria.Name, Build(criteria.Criteria)))));
         }
 
         static JObject Build(MatchAllCriteria criteria)
