@@ -83,14 +83,6 @@ namespace ElasticLinq.Request.Formatters
             return root;
         }
 
-
-        static JToken BuildFieldProperty(ReadOnlyCollection<string> fields)
-        {
-            return fields.Count == 1
-                ? new JProperty("field", fields.First())
-                : new JProperty("fields", new JArray(fields));
-        }
-
         static JArray Build(IEnumerable<SortOption> sortOptions)
         {
             return new JArray(sortOptions.Select(Build));
