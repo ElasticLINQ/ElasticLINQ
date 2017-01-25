@@ -65,7 +65,7 @@ namespace ElasticLinq.Request.Formatters
             if (searchRequest.Filter != null)
             {
                 queryRoot = new JObject(new JProperty("filter", Build(searchRequest.Filter)));
-                root.Add("query", new JObject(new JProperty("filtered", queryRoot)));
+                root.Add("query", new JObject(new JProperty("bool", queryRoot)));
             }
 
             if (searchRequest.Query != null)
