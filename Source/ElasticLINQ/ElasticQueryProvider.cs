@@ -127,20 +127,7 @@ namespace ElasticLinq
                 }
 
                 var result = translation.Materializer.Materialize(response);
-
-                if (response.hits != null)
-                {
-                    var hits = response.hits.hits;
-                    if (hits != null && hits.Capacity > 4096)
-                    {
-                        // If the response has a large number of hits then the List<T> instance might end up allocating an array on the large object heap.
-                        // This means that the elements in that array can survive multiple rounds of garbage collection, even if they are not actually
-                        // reachable anymore.
-                        // Clearing out the collection after we materialized the result means the elements can be freed up.
-                        hits.Clear();
-                    }
-                }
-
+                response.hits?.hits?.Clear(); // Clear list aggressively
                 return result;
             }
             catch (AggregateException ex)
