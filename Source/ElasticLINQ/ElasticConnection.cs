@@ -24,7 +24,6 @@ namespace ElasticLinq
     public class ElasticConnection : BaseElasticConnection, IDisposable
     {
         private readonly string[] parameterSeparator = { "&" };
-        private readonly Uri endpoint;
 
         /// <summary>
         /// Create a new ElasticConnection with the given parameters defining its properties.
@@ -54,7 +53,7 @@ namespace ElasticLinq
         {
             Argument.EnsureNotNull(nameof(endpoint), endpoint);
 
-            this.endpoint = endpoint;
+            this.Endpoint = endpoint;
 
             var httpClientHandler = innerMessageHandler as HttpClientHandler;
             if (httpClientHandler != null && httpClientHandler.SupportsAutomaticDecompression)
@@ -72,7 +71,7 @@ namespace ElasticLinq
         /// The Uri that specifies the public endpoint for the server.
         /// </summary>
         /// <example>http://myserver.example.com:9200</example>
-        public Uri Endpoint => endpoint;
+        public Uri Endpoint { get; }
 
         /// <summary>
         /// Dispose of this ElasticConnection and any associated resources.
@@ -117,7 +116,7 @@ namespace ElasticLinq
         /// <inheritdoc/>
         public override Uri GetSearchUri(SearchRequest searchRequest)
         {
-            var builder = new UriBuilder(endpoint);
+            var builder = new UriBuilder(Endpoint);
             builder.Path += (Index ?? "_all") + "/";
 
             if (!String.IsNullOrEmpty(searchRequest.DocumentType))
