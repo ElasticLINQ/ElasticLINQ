@@ -7,7 +7,7 @@ var p = db.Query<People>().Where(p => p.Tags.Contains("tech") && p.State == "WA"
 
 ElasticLINQ supports .NET 4.5 & PCL.
 
-## Supported Elasticsearch version
+## Elasticsearch version compatibility
 
 * 0.9 works
 * 1.x works
