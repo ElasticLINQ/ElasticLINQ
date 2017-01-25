@@ -40,20 +40,5 @@ namespace ElasticLinq.IntegrationTest
             Assert.Single(results, w => w.Email == "mlewis1@sitemeter.com");
             Assert.Equal(1, results.Count);
         }
-
-        [Fact]
-        public void GroupByInt_Returns_Correct_Single_Field()
-        {
-            var results = context.Query<WebUser>().GroupBy(g => 1).Select(s => s.Max(w => w.Joined)).ToList();
-
-            Assert.Equal(1, results.Count);
-            Assert.Equal(new DateTime(2015, 4, 8, 1, 32, 00, DateTimeKind.Utc), results[0]);
-        }
-
-        [Fact]
-        public void GroupByDateTime()
-        {
-            DataAssert.Same((IQueryable<WebUser> q) => q.GroupBy(w => w.Joined).Select(g => KeyValuePair.Create(g.Key, g.Count())), true);
-        }
     }
 }
