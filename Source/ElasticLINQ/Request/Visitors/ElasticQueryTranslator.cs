@@ -391,6 +391,9 @@ namespace ElasticLinq.Request.Visitors
             if (selectBody is MethodCallExpression)
                 RebindSelectBody(selectBody, ((MethodCallExpression)selectBody).Arguments, lambda.Parameters);
 
+            if (selectBody is MemberInitExpression)
+                RebindPropertiesAndElasticFields(selectBody);
+
             finalItemType = selectBody.Type;
 
             return Visit(source);

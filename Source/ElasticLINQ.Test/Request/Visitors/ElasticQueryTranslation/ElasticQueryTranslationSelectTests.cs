@@ -3,10 +3,20 @@
 using ElasticLinq.Request.Visitors;
 using System;
 using System.Linq;
+using ElasticLinq.Test.TestSupport;
 using Xunit;
 
 namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 {
+    class Robot2 : Robot
+    {
+        public Robot2(int id, DateTime started)
+        {
+            Id = id;
+            Started = started;
+        }
+    }
+
     public class ElasticQueryTranslationSelectTests : ElasticQueryTranslationTestsBase
     {
         [Fact]
@@ -26,6 +36,43 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         public void SelectAnonymousProjectionWithSomeIdentifiersTranslatesToFields()
         {
             var selected = Robots.Select(r => new { First = r.Id, Second = r.Started, r.Cost });
+            var fields = ElasticQueryTranslator.Translate(Mapping, selected.Expression).SearchRequest.Fields;
+
+            Assert.NotNull(fields);
+            Assert.Contains("id", fields);
+            Assert.Contains("started", fields);
+            Assert.Contains("cost", fields);
+            Assert.Equal(3, fields.Count);
+        }
+
+        [Fact]
+        public void SelectNewObjectWithConstructorArgsTranslatesToFields()
+        {
+            var selected = Robots.Select(r => new Robot2(r.Id, r.Started));
+            var fields = ElasticQueryTranslator.Translate(Mapping, selected.Expression).SearchRequest.Fields;
+
+            Assert.NotNull(fields);
+            Assert.Contains("id", fields);
+            Assert.Contains("started", fields);
+            Assert.Equal(2, fields.Count);
+        }
+
+        [Fact]
+        public void SelectNewObjectWithMemberInitializersTranslatesToFields()
+        {
+            var selected = Robots.Select(r => new Robot { Id = r.Id, Started = r.Started });
+            var fields = ElasticQueryTranslator.Translate(Mapping, selected.Expression).SearchRequest.Fields;
+
+            Assert.NotNull(fields);
+            Assert.Contains("id", fields);
+            Assert.Contains("started", fields);
+            Assert.Equal(2, fields.Count);
+        }
+
+        [Fact]
+        public void SelectNewObjectWithConstructorArgsAndMemberInitializersTranslatesToFields()
+        {
+            var selected = Robots.Select(r => new Robot2(r.Id, r.Started) { Cost = r.Cost });
             var fields = ElasticQueryTranslator.Translate(Mapping, selected.Expression).SearchRequest.Fields;
 
             Assert.NotNull(fields);
