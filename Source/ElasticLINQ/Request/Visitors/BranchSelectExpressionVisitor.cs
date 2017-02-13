@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace ElasticLinq.Request.Visitors
@@ -26,6 +27,20 @@ namespace ElasticLinq.Request.Visitors
             var visitor = new BranchSelectExpressionVisitor(predicate);
             visitor.Visit(e);
             return visitor.matches;
+        }
+
+        protected override Expression VisitMemberInit(MemberInitExpression node)
+        {
+            Visit(node.NewExpression);
+            Visit(node.Bindings, VisitMemberBinding);
+
+            if (matches.Contains(node.NewExpression) && node.Bindings.Count > 0)
+            {
+                // We should never consider the newExpression in isolation from the bindings
+                matches.Remove(node.NewExpression);
+            }
+
+            return node;
         }
 
         public override Expression Visit(Expression node)

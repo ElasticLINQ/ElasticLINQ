@@ -76,6 +76,7 @@
     <Compile Include="AsyncTests.cs" />
     <Compile Include="OrderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ProjectionTests.cs" />
     <Compile Include="WhereTests\StringWhereTests.cs" />
     <Compile Include="WhereTests\IntWhereTests.cs" />
     <Compile Include="WhereTests\DateWhereTests.cs" />

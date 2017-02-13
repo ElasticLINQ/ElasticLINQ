@@ -38,5 +38,14 @@ namespace ElasticLinq.IntegrationTest.Models
         {
             return Id.GetHashCode();
         }
+
+        public WebUser()
+        {            
+        }
+
+        public WebUser(string phone)
+        {
+            Phone = phone;
+        }
     }
 }
