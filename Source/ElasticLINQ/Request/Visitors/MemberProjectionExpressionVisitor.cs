@@ -37,8 +37,17 @@ namespace ElasticLinq.Request.Visitors
 
         protected override Expression VisitMember(MemberExpression node)
         {
-            if (node.Expression != null && node.Expression.NodeType == ExpressionType.Parameter)
-                return VisitFieldSelection(node);
+            if (node.Expression != null)
+            {
+                switch (node.Expression.NodeType)
+                {
+                    case ExpressionType.Parameter:
+                        return VisitFieldSelection(node);
+                    case ExpressionType.MemberAccess:
+                        if (!IsElasticField(node)) return VisitFieldSelection(node);
+                        break;
+                }
+            }
 
             return base.VisitMember(node);
         }
