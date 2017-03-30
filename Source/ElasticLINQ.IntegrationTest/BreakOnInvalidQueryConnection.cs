@@ -21,7 +21,7 @@ namespace ElasticLinq.IntegrationTest
             {
                 return await base.SearchAsync(body, searchRequest, token, log);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 var url = GetSearchUri(searchRequest);
                 Debugger.Break();
