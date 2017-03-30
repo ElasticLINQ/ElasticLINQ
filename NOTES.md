@@ -137,10 +137,9 @@ This includes currently:
 3. Error reporting for bad or incorrect return data
 
 ### Not yet supported
-1. Async<T>
-2. Caching
-3. Hooks for profiling
-4. Any other desired Elasticsearch operations
+1. Caching
+2. Hooks for profiling
+3. Any other desired Elasticsearch operations
 
 ### Not supported; not recommended
 
