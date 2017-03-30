@@ -1,9 +1,9 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using ElasticLinq.Request.Visitors;
+using ElasticLinq.Test.TestSupport;
 using System;
 using System.Linq;
-using ElasticLinq.Test.TestSupport;
 using Xunit;
 
 namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
@@ -14,7 +14,17 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             Id = id;
             Started = started;
-        }
+        }          
+    }
+
+    class RobotWithOs : Robot
+    {
+        public OperatingSystem OperatingSystem { get; set; }
+    }
+
+    class OperatingSystem
+    {
+        public string Name { get; set; }
     }
 
     public class ElasticQueryTranslationSelectTests : ElasticQueryTranslationTestsBase
@@ -30,6 +40,20 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             Assert.Contains("id", searchRequest.Fields);
             Assert.Contains("cost", searchRequest.Fields);
             Assert.Equal(2, searchRequest.Fields.Count);
+        }
+
+        [Fact]
+        public void SelectAnonymousProjectionTranslatesToNestedField()
+        {
+            var RobotsWithOs = new ElasticQuery<RobotWithOs>(SharedProvider);
+
+            var selected = RobotsWithOs.Select(r => new { r.OperatingSystem.Name });
+            var searchRequest = ElasticQueryTranslator.Translate(Mapping, selected.Expression).SearchRequest;
+
+            Assert.Equal("robotWithOs", searchRequest.DocumentType);
+            Assert.NotNull(searchRequest.Fields);
+            Assert.Contains("operatingSystem.name", searchRequest.Fields);
+            Assert.Equal(1, searchRequest.Fields.Count);
         }
 
         [Fact]

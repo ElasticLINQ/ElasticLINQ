@@ -18,6 +18,8 @@ namespace ElasticLinq.Test.Request.Visitors
         {
             public string Name { get; set; }
             public string Id { get; set; }
+
+            public Sample Nested { get; set; }
         }
         readonly IElasticMapping validMapping = new TrivialElasticMapping();
 
@@ -39,27 +41,39 @@ namespace ElasticLinq.Test.Request.Visitors
         }
 
         [Fact]
+        public void RebindCollectsSinglePropertyNestedFieldName()
+        {
+            var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(s => s.Nested.Name);
+            var rebound = MemberProjectionExpressionVisitor.Rebind(typeof(Sample), validMapping, source.Expression);
+
+            Assert.Contains("nested.name", rebound.Collected);
+            Assert.Equal(1, rebound.Collected.Count());
+        }
+
+        [Fact]
         public void RebindCollectsAnonymousProjectionPropertiesFieldNames()
         {
-            var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(s => new { s.Name, s.Id, score = ElasticFields.Score });
+            var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(s => new { s.Name, s.Id, score = ElasticFields.Score, nestedName = s.Nested.Name });
             var rebound = MemberProjectionExpressionVisitor.Rebind(typeof(Sample), validMapping, source.Expression);
 
             Assert.Contains("name", rebound.Collected);
             Assert.Contains("id", rebound.Collected);
             Assert.Contains("_score", rebound.Collected);
-            Assert.Equal(3, rebound.Collected.Count());
+            Assert.Contains("nested.name", rebound.Collected);
+            Assert.Equal(4, rebound.Collected.Count());
         }
 
         [Fact]
         public void RebindCollectsTupleCreateProjectionPropertiesFieldNames()
         {
-            var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(s => Tuple.Create(s.Name, s.Id, ElasticFields.Score));
+            var source = new FakeQuery<Sample>(new FakeQueryProvider()).Select(s => Tuple.Create(s.Name, s.Id, ElasticFields.Score, s.Nested.Name));
             var rebound = MemberProjectionExpressionVisitor.Rebind(typeof(Sample), validMapping, source.Expression);
 
             Assert.Contains("name", rebound.Collected);
             Assert.Contains("id", rebound.Collected);
             Assert.Contains("_score", rebound.Collected);
-            Assert.Equal(3, rebound.Collected.Count());
+            Assert.Contains("nested.name", rebound.Collected);
+            Assert.Equal(4, rebound.Collected.Count());
         }
 
         [Fact]

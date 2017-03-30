@@ -38,9 +38,12 @@ namespace ElasticLinq.Request.Visitors
 
         protected override Expression VisitMember(MemberExpression node)
         {
-            return node.Member.DeclaringType == typeof(ElasticFields)
-                ? VisitElasticField(node)
-                : base.VisitMember(node);
+            return IsElasticField(node) ? VisitElasticField(node) : base.VisitMember(node);
+        }
+
+        protected bool IsElasticField (MemberExpression node)
+        {
+            return node.Member.DeclaringType == typeof(ElasticFields);
         }
 
         protected virtual Expression VisitElasticField(MemberExpression m)

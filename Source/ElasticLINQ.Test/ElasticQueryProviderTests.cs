@@ -98,8 +98,8 @@ namespace ElasticLinq.Test
         class ThrowsRetryPolicy : IRetryPolicy
         {
             public Task<TResult> ExecuteAsync<TResult>(
-                Func<CancellationToken, Task<TResult>> operationFunc, 
-                Func<TResult, Exception, bool> shouldRetryFunc, 
+                Func<CancellationToken, Task<TResult>> operationFunc,
+                Func<TResult, Exception, bool> shouldRetryFunc,
                 Action<TResult, Dictionary<string, object>> appendLogInfoFunc = null,
                 CancellationToken cancellationToken = new CancellationToken())
             {
