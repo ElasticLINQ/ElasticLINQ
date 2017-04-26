@@ -103,7 +103,7 @@ namespace ElasticLinq.Test.Request.Formatters
                     var first = (JProperty)actualSort.First;
                     Assert.Equal(desiredSort.Name, first.Name);
                     var childProperties = first.First.Children().Cast<JProperty>().ToArray();
-                    Assert.Single(childProperties, f => f.Name == "ignore_unmapped" && f.Value.ToObject<bool>());
+                    Assert.Single(childProperties, f => f.Name == "unmapped_type" && f.Value.ToObject<string>() == "long");
                     Assert.Single(childProperties, f => f.Name == "order" && f.Value.ToObject<string>() == "desc");
                 }
                 else
