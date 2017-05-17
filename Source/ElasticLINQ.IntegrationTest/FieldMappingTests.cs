@@ -1,4 +1,6 @@
-﻿using ElasticLinq.IntegrationTest.Models;
+﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
+
+using ElasticLinq.IntegrationTest.Models;
 using ElasticLinq.Mapping;
 using System;
 using System.Linq;
