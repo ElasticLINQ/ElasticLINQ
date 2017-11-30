@@ -12,7 +12,7 @@ namespace ElasticLinq.Utility
         {
             return SynchronizationContext.Current == null
                 ? action().GetAwaiter().GetResult()
-                : Task.Run(async () => await action()).GetAwaiter().GetResult();
+                : Task.Run(async () => await action().ConfigureAwait(false)).GetAwaiter().GetResult();
         }
     }
 }

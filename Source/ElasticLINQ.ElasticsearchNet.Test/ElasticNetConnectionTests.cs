@@ -55,7 +55,7 @@ namespace ElasticLinq.ElasticsearchNet.Test
         }
 
         [Fact]
-        public static async void NonSuccessfulHttpRequestThrows()
+        public static async Task NonSuccessfulHttpRequestThrows()
         {
             var client = Substitute.For<IElasticsearchClient>();
 
@@ -79,7 +79,7 @@ namespace ElasticLinq.ElasticsearchNet.Test
                 formatter.Body,
                 request,
                 CancellationToken.None,
-                log));
+                log)).ConfigureAwait(false);
 
             Assert.IsType<HttpRequestException>(ex);
             Assert.Equal("Response status code does not indicate success: 404", ex.Message);
@@ -114,7 +114,7 @@ namespace ElasticLinq.ElasticsearchNet.Test
                 formatter.Body,
                 request,
                 CancellationToken.None,
-                spyLog);
+                spyLog).ConfigureAwait(false);
 
             Assert.Equal(4, spyLog.Entries.Count);
             Assert.Equal(@"Request: POST http://localhost/SearchIndex/abc123/_search", spyLog.Entries[0].Message);
@@ -150,7 +150,7 @@ namespace ElasticLinq.ElasticsearchNet.Test
         }
 
         [Fact]
-        public static async void SearchAsyncThrowsTaskCancelledExceptionWithAlreadyCancelledCancellationToken()
+        public static async Task SearchAsyncThrowsTaskCancelledExceptionWithAlreadyCancelledCancellationToken()
         {
             var client = Substitute.For<IElasticsearchClient>();
 
@@ -163,7 +163,7 @@ namespace ElasticLinq.ElasticsearchNet.Test
                 formatter.Body,
                 request,
                 new CancellationToken(true),
-                spyLog));
+                spyLog)).ConfigureAwait(false);
 
             Assert.IsType<TaskCanceledException>(ex);
         }

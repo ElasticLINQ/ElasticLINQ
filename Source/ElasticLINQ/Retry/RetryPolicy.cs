@@ -55,7 +55,7 @@ namespace ElasticLinq.Retry
                 var operationResult = default(TOperation);
                 try
                 {
-                    operationResult = await operationFunc(cancellationToken);
+                    operationResult = await operationFunc(cancellationToken).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
@@ -91,7 +91,7 @@ namespace ElasticLinq.Retry
 
                 Log.Info(operationException, loggerInfo, "The operation failed (attempt #{0}) and will be retried.", attempt);
 
-                await Delay.For(retryDelay, cancellationToken);
+                await Delay.For(retryDelay, cancellationToken).ConfigureAwait(false);
                 retryDelay = retryDelay * 2;
             }
         }

@@ -32,7 +32,7 @@ namespace ElasticLinq.Test.Retry
             var delay = Substitute.For<Delay>();
             var retryHandler = new RetryPolicy(logger, 100, 10, delay);
 
-            var result = await retryHandler.ExecuteAsync(fake.DoSomething, fake.IsRetryable);
+            var result = await retryHandler.ExecuteAsync(fake.DoSomething, fake.IsRetryable).ConfigureAwait(false);
 
             Assert.Equal(0, result);
             fake.Received(1, x => x.DoSomething(CancellationToken.None));
@@ -49,7 +49,7 @@ namespace ElasticLinq.Test.Retry
             var delay = Substitute.For<Delay>();
             var retryHandler = new RetryPolicy(logger, 100, 10, delay);
 
-            await retryHandler.ExecuteAsync(fake.DoSomething, fake.IsRetryable);
+            await retryHandler.ExecuteAsync(fake.DoSomething, fake.IsRetryable).ConfigureAwait(false);
 
             fake.Received(4, x => x.DoSomething(CancellationToken.None));
             delay.Received(1, x => x.Received(100));
@@ -63,7 +63,7 @@ namespace ElasticLinq.Test.Retry
         }
 
         [Fact]
-        public static async void Throws_WhenExceptionIsNotRetryable()
+        public static async Task Throws_WhenExceptionIsNotRetryable()
         {
             var fake = Substitute.For<IFake>();
             var ex = new Exception();
@@ -73,31 +73,31 @@ namespace ElasticLinq.Test.Retry
             var delay = Substitute.For<Delay>();
             var retryHandler = new RetryPolicy(logger, 100, 10, delay);
 
-            var actualEx = await Record.ExceptionAsync(() => retryHandler.ExecuteAsync(fake.DoSomething, fake.IsRetryable));
+            var actualEx = await Record.ExceptionAsync(() => retryHandler.ExecuteAsync(fake.DoSomething, fake.IsRetryable)).ConfigureAwait(false);
 
             Assert.Equal(ex, actualEx);
         }
 
         [Fact]
-        public static async void Throws_WhenCancellationTokenIsAlreadyCancelled()
+        public static async Task Throws_WhenCancellationTokenIsAlreadyCancelled()
         {
             var logger = Substitute.For<ILog>();
             var retryHandler = new RetryPolicy(logger);
 
-            var ex = await Assert.ThrowsAsync<TaskCanceledException>(() => retryHandler.ExecuteAsync(async c => { await Task.Delay(5000, c); return true; }, (b, e) => true,  cancellationToken: new CancellationToken(true)));
+            var ex = await Assert.ThrowsAsync<TaskCanceledException>(() => retryHandler.ExecuteAsync(async c => { await Task.Delay(5000, c).ConfigureAwait(false); return true; }, (b, e) => true,  cancellationToken: new CancellationToken(true))).ConfigureAwait(false);
             Assert.True(ex.Task.IsCanceled);
         }
 
         [Fact]
-        public static async void Throws_WhenCancellationTokenIsSubsequentlyCancelled()
+        public static async Task Throws_WhenCancellationTokenIsSubsequentlyCancelled()
         {
             var logger = Substitute.For<ILog>();
             var retryHandler = new RetryPolicy(logger);
 
             var cts = new CancellationTokenSource(500);
-            var result = retryHandler.ExecuteAsync(async c => { await Task.Delay(4000, c); return true; }, (b, e) => true, cancellationToken: cts.Token);
+            var result = retryHandler.ExecuteAsync(async c => { await Task.Delay(4000, c).ConfigureAwait(false); return true; }, (b, e) => true, cancellationToken: cts.Token);
 
-            await Assert.ThrowsAsync<TaskCanceledException>(async () => await result);
+            await Assert.ThrowsAsync<TaskCanceledException>(async () => await result.ConfigureAwait(false)).ConfigureAwait(false);
             Assert.True(result.IsCanceled);
         }
 
@@ -117,7 +117,7 @@ namespace ElasticLinq.Test.Retry
                 {
                     loggerInfo["couchbaseDocumentKey"] = "mykey";
                     loggerInfo["result"] = result;
-                });
+                }).ConfigureAwait(false);
 
             var fields = AssertInfoLog(logger, 0, 100, 1);
             Assert.Equal("mykey", fields["couchbaseDocumentKey"]);
@@ -125,20 +125,20 @@ namespace ElasticLinq.Test.Retry
         }
 
         [Fact]
-        public static async void NullDelayDoesNotDelay()
+        public static async Task NullDelayDoesNotDelay()
         {
             var delay = new NullDelay();
             var stopwatch = new Stopwatch();
 
             stopwatch.Start();
-            await delay.For((int)TimeSpan.FromSeconds(10).TotalMilliseconds, CancellationToken.None);
+            await delay.For((int)TimeSpan.FromSeconds(10).TotalMilliseconds, CancellationToken.None).ConfigureAwait(false);
             stopwatch.Stop();
 
             Assert.True(stopwatch.ElapsedMilliseconds < 1000);
         }
 
         [Fact]
-        public static async void DelayDoesDelay()
+        public static async Task DelayDoesDelay()
         {
             const int timingFudge = 50; // Task.Delay sometimes returns too soon...
             var delayTime = TimeSpan.FromSeconds(2);
@@ -146,7 +146,7 @@ namespace ElasticLinq.Test.Retry
             var stopwatch = new Stopwatch();
 
             stopwatch.Start();
-            await delay.For((int)delayTime.TotalMilliseconds, CancellationToken.None);
+            await delay.For((int)delayTime.TotalMilliseconds, CancellationToken.None).ConfigureAwait(false);
             stopwatch.Stop();
 
             Assert.True(stopwatch.ElapsedMilliseconds + timingFudge >= delayTime.TotalMilliseconds, string.Format("Requested {0}ms delay but only took {1}ms", delayTime.TotalMilliseconds, stopwatch.ElapsedMilliseconds));
@@ -163,7 +163,7 @@ namespace ElasticLinq.Test.Retry
         }
 
         [Fact]
-        public static async void Throws_IfRetriesAreExhausted()
+        public static async Task Throws_IfRetriesAreExhausted()
         {
             var fake = Substitute.For<IFake>();
             fake.DoSomething(CancellationToken.None).ReturnsTask(1337, 1337);
@@ -173,7 +173,7 @@ namespace ElasticLinq.Test.Retry
             var delay = Substitute.For<Delay>();
             var retryHandler = new RetryPolicy(logger, 100, 2, delay);
 
-            var ex = await Assert.ThrowsAsync<RetryFailedException>(() => retryHandler.ExecuteAsync(fake.DoSomething, fake.IsRetryable));
+            var ex = await Assert.ThrowsAsync<RetryFailedException>(() => retryHandler.ExecuteAsync(fake.DoSomething, fake.IsRetryable)).ConfigureAwait(false);
             Assert.Equal("The operation did not succeed after the maximum number of retries (2).", ex.Message);
         }
 
