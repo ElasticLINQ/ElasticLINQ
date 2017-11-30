@@ -57,7 +57,7 @@ namespace ElasticLinq.ElasticsearchNet
                                 searchRequest.DocumentType,
                                 body,
                                 searchParams => searchParams),
-                            token);
+                            token).ConfigureAwait(false);
 
             stopwatch.Stop();
 

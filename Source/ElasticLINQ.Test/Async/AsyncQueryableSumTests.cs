@@ -3,6 +3,7 @@
 using ElasticLinq.Async;
 using ElasticLinq.Test.TestSupport;
 using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace ElasticLinq.Test.Async
@@ -19,181 +20,181 @@ namespace ElasticLinq.Test.Async
         }
 
         [Fact]
-        public static async void SumIntAsyncReturnsSameResultAsSumInt()
+        public static async Task SumIntAsyncReturnsSameResultAsSumInt()
         {
             var expected = source.Sum(r => r.Int);
-            var actual = await source.SumAsync(r => r.Int);
+            var actual = await source.SumAsync(r => r.Int).ConfigureAwait(false);
 
             Assert.Equal(expected, actual);
         }
 
         [Fact]
-        public static async void SumIntNullableAsyncReturnsSameResultAsSumIntNullable()
+        public static async Task SumIntNullableAsyncReturnsSameResultAsSumIntNullable()
         {
             var expected = source.Sum(r => r.IntNullable);
-            var actual = await source.SumAsync(r => r.IntNullable);
+            var actual = await source.SumAsync(r => r.IntNullable).ConfigureAwait(false);
 
             Assert.Equal(expected, actual);
         }
 
         [Fact]
-        public static async void SumLongAsyncReturnsSameResultAsSumLong()
+        public static async Task SumLongAsyncReturnsSameResultAsSumLong()
         {
             var expected = source.Sum(r => r.Long);
-            var actual = await source.SumAsync(r => r.Long);
+            var actual = await source.SumAsync(r => r.Long).ConfigureAwait(false);
 
             Assert.Equal(expected, actual);
         }
 
         [Fact]
-        public static async void SumLongNullableAsyncReturnsSameResultAsSumLongNullable()
+        public static async Task SumLongNullableAsyncReturnsSameResultAsSumLongNullable()
         {
             var expected = source.Sum(r => r.LongNullable);
-            var actual = await source.SumAsync(r => r.LongNullable);
+            var actual = await source.SumAsync(r => r.LongNullable).ConfigureAwait(false);
 
             Assert.Equal(expected, actual);
         }
 
         [Fact]
-        public static async void SumFloatAsyncReturnsSameResultAsSumFloat()
+        public static async Task SumFloatAsyncReturnsSameResultAsSumFloat()
         {
             var expected = source.Sum(r => r.Float);
-            var actual = await source.SumAsync(r => r.Float);
+            var actual = await source.SumAsync(r => r.Float).ConfigureAwait(false);
 
             Assert.Equal(expected, actual);
         }
 
         [Fact]
-        public static async void SumFloatNullableAsyncReturnsSameResultAsSumFloatNullable()
+        public static async Task SumFloatNullableAsyncReturnsSameResultAsSumFloatNullable()
         {
             var expected = source.Sum(r => r.FloatNullable);
-            var actual = await source.SumAsync(r => r.FloatNullable);
+            var actual = await source.SumAsync(r => r.FloatNullable).ConfigureAwait(false);
 
             Assert.Equal(expected, actual);
         }
 
         [Fact]
-        public static async void SumDoubleAsyncReturnsSameResultAsSumDouble()
+        public static async Task SumDoubleAsyncReturnsSameResultAsSumDouble()
         {
             var expected = source.Sum(r => r.Double);
-            var actual = await source.SumAsync(r => r.Double);
+            var actual = await source.SumAsync(r => r.Double).ConfigureAwait(false);
 
             Assert.Equal(expected, actual);
         }
 
         [Fact]
-        public static async void SumDoubleNullableAsyncReturnsSameResultAsSumDoubleNullable()
+        public static async Task SumDoubleNullableAsyncReturnsSameResultAsSumDoubleNullable()
         {
             var expected = source.Sum(r => r.DoubleNullable);
-            var actual = await source.SumAsync(r => r.DoubleNullable);
+            var actual = await source.SumAsync(r => r.DoubleNullable).ConfigureAwait(false);
 
             Assert.Equal(expected, actual);
         }
 
         [Fact]
-        public static async void SumDecimalAsyncReturnsSameResultAsSumDecimal()
+        public static async Task SumDecimalAsyncReturnsSameResultAsSumDecimal()
         {
             var expected = source.Sum(r => r.Decimal);
-            var actual = await source.SumAsync(r => r.Decimal);
+            var actual = await source.SumAsync(r => r.Decimal).ConfigureAwait(false);
 
             Assert.Equal(expected, actual);
         }
 
         [Fact]
-        public static async void SumDecimalNullableAsyncReturnsSameResultAsSumDecimalNullable()
+        public static async Task SumDecimalNullableAsyncReturnsSameResultAsSumDecimalNullable()
         {
             var expected = source.Sum(r => r.DecimalNullable);
-            var actual = await source.SumAsync(r => r.DecimalNullable);
+            var actual = await source.SumAsync(r => r.DecimalNullable).ConfigureAwait(false);
 
             Assert.Equal(expected, actual);
         }
 
         [Fact]
-        public static async void SumSelectIntAsyncReturnsSameResultAsSumInt()
+        public static async Task SumSelectIntAsyncReturnsSameResultAsSumInt()
         {
             var expected = source.Select(r => r.Int).Sum();
-            var actual = await source.Select(r => r.Int).SumAsync();
+            var actual = await source.Select(r => r.Int).SumAsync().ConfigureAwait(false);
 
             Assert.Equal(expected, actual);
         }
 
         [Fact]
-        public static async void SumSelectIntNullableAsyncReturnsSameResultAsSumIntNullable()
+        public static async Task SumSelectIntNullableAsyncReturnsSameResultAsSumIntNullable()
         {
             var expected = source.Select(r => r.IntNullable).Sum();
-            var actual = await source.Select(r => r.IntNullable).SumAsync();
+            var actual = await source.Select(r => r.IntNullable).SumAsync().ConfigureAwait(false);
 
             Assert.Equal(expected, actual);
         }
 
         [Fact]
-        public static async void SumSelectLongAsyncReturnsSameResultAsSumLong()
+        public static async Task SumSelectLongAsyncReturnsSameResultAsSumLong()
         {
             var expected = source.Select(r => r.Long).Sum();
-            var actual = await source.Select(r => r.Long).SumAsync();
+            var actual = await source.Select(r => r.Long).SumAsync().ConfigureAwait(false);
 
             Assert.Equal(expected, actual);
         }
 
         [Fact]
-        public static async void SumSelectLongNullableAsyncReturnsSameResultAsSumLongNullable()
+        public static async Task SumSelectLongNullableAsyncReturnsSameResultAsSumLongNullable()
         {
             var expected = source.Select(r => r.LongNullable).Sum();
-            var actual = await source.Select(r => r.LongNullable).SumAsync();
+            var actual = await source.Select(r => r.LongNullable).SumAsync().ConfigureAwait(false);
 
             Assert.Equal(expected, actual);
         }
 
         [Fact]
-        public static async void SumSelectFloatAsyncReturnsSameResultAsSumFloat()
+        public static async Task SumSelectFloatAsyncReturnsSameResultAsSumFloat()
         {
             var expected = source.Select(r => r.Float).Sum();
-            var actual = await source.Select(r => r.Float).SumAsync();
+            var actual = await source.Select(r => r.Float).SumAsync().ConfigureAwait(false);
 
             Assert.Equal(expected, actual);
         }
 
         [Fact]
-        public static async void SumSelectFloatNullableAsyncReturnsSameResultAsSumFloatNullable()
+        public static async Task SumSelectFloatNullableAsyncReturnsSameResultAsSumFloatNullable()
         {
             var expected = source.Select(r => r.FloatNullable).Sum();
-            var actual = await source.Select(r => r.FloatNullable).SumAsync();
+            var actual = await source.Select(r => r.FloatNullable).SumAsync().ConfigureAwait(false);
 
             Assert.Equal(expected, actual);
         }
 
         [Fact]
-        public static async void SumSelectDoubleAsyncReturnsSameResultAsSumDouble()
+        public static async Task SumSelectDoubleAsyncReturnsSameResultAsSumDouble()
         {
             var expected = source.Select(r => r.Double).Sum();
-            var actual = await source.Select(r => r.Double).SumAsync();
+            var actual = await source.Select(r => r.Double).SumAsync().ConfigureAwait(false);
 
             Assert.Equal(expected, actual);
         }
 
         [Fact]
-        public static async void SumSelectDoubleNullableAsyncReturnsSameResultAsSumDoubleNullable()
+        public static async Task SumSelectDoubleNullableAsyncReturnsSameResultAsSumDoubleNullable()
         {
             var expected = source.Select(r => r.DoubleNullable).Sum();
-            var actual = await source.Select(r => r.DoubleNullable).SumAsync();
+            var actual = await source.Select(r => r.DoubleNullable).SumAsync().ConfigureAwait(false);
 
             Assert.Equal(expected, actual);
         }
 
         [Fact]
-        public static async void SumSelectDecimalAsyncReturnsSameResultAsSumDecimal()
+        public static async Task SumSelectDecimalAsyncReturnsSameResultAsSumDecimal()
         {
             var expected = source.Select(r => r.Decimal).Sum();
-            var actual = await source.Select(r => r.Decimal).SumAsync();
+            var actual = await source.Select(r => r.Decimal).SumAsync().ConfigureAwait(false);
 
             Assert.Equal(expected, actual);
         }
 
         [Fact]
-        public static async void SumSelectDecimalNullableAsyncReturnsSameResultAsSumDecimalNullable()
+        public static async Task SumSelectDecimalNullableAsyncReturnsSameResultAsSumDecimalNullable()
         {
             var expected = source.Select(r => r.DecimalNullable).Sum();
-            var actual = await source.Select(r => r.DecimalNullable).SumAsync();
+            var actual = await source.Select(r => r.DecimalNullable).SumAsync().ConfigureAwait(false);
 
             Assert.Equal(expected, actual);
         }

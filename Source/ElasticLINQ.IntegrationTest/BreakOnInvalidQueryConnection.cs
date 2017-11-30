@@ -19,7 +19,7 @@ namespace ElasticLinq.IntegrationTest
         {
             try
             {
-                return await base.SearchAsync(body, searchRequest, token, log);
+                return await base.SearchAsync(body, searchRequest, token, log).ConfigureAwait(false);
             }
             catch (Exception)
             {

@@ -112,7 +112,7 @@ namespace ElasticLinq.Test
 
             connection.Dispose();
 
-            await Assert.ThrowsAsync<NullReferenceException>(() => connection.HttpClient.GetAsync(new Uri("http://something.com")));
+            await Assert.ThrowsAsync<NullReferenceException>(() => connection.HttpClient.GetAsync(new Uri("http://something.com"))).ConfigureAwait(false);
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times")]
@@ -133,7 +133,7 @@ namespace ElasticLinq.Test
             Assert.Null(connection.Disposing);
             connection.Dispose();
 
-            await Assert.ThrowsAsync<NullReferenceException>(() => connection.HttpClient.GetAsync(new Uri("http://something.com")));
+            await Assert.ThrowsAsync<NullReferenceException>(() => connection.HttpClient.GetAsync(new Uri("http://something.com"))).ConfigureAwait(false);
             Assert.Equal(connection.Disposing, true);
         }
 
@@ -149,7 +149,7 @@ namespace ElasticLinq.Test
                 formatter.Body,
                 request,
                 token,
-                log);
+                log).ConfigureAwait(false);
 
             Assert.Null(messageHandler.Request.Headers.Authorization);
         }
@@ -166,7 +166,7 @@ namespace ElasticLinq.Test
                 formatter.Body,
                 request,
                 token,
-                log);
+                log).ConfigureAwait(false);
 
             var auth = messageHandler.Request.Headers.Authorization;
             Assert.NotNull(auth);
@@ -175,7 +175,7 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
-        public static async void NonSuccessfulHttpRequestThrows()
+        public static async Task NonSuccessfulHttpRequestThrows()
         {
             var messageHandler = new SpyMessageHandler();
             messageHandler.Response.StatusCode = HttpStatusCode.NotFound;
@@ -187,7 +187,7 @@ namespace ElasticLinq.Test
                 formatter.Body,
                 request,
                 token,
-                log));
+                log)).ConfigureAwait(false);
 
             Assert.IsType<HttpRequestException>(ex);
             Assert.Equal("Response status code does not indicate success: 404 (Not Found).", ex.Message);
@@ -208,7 +208,7 @@ namespace ElasticLinq.Test
                 formatter.Body,
                 request,
                 token,
-                spyLog);
+                spyLog).ConfigureAwait(false);
 
             Assert.Equal(4, spyLog.Entries.Count);
             Assert.Equal(@"Request: POST http://localhost/SearchIndex/abc123/_search", spyLog.Entries[0].Message);
@@ -295,7 +295,7 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
-        public static async void SearchAsyncThrowsTaskCancelledExceptionWithAlreadyCancelledCancellationToken()
+        public static async Task SearchAsyncThrowsTaskCancelledExceptionWithAlreadyCancelledCancellationToken()
         {
             var spyLog = new SpyLog();
             var localConnection = new ElasticConnection(new Uri("http://localhost"), index: "SearchIndex");
@@ -306,7 +306,7 @@ namespace ElasticLinq.Test
                 formatter.Body,
                 request,
                 new CancellationToken(true),
-                spyLog));
+                spyLog)).ConfigureAwait(false);
 
             Assert.IsType<TaskCanceledException>(ex);
         }
