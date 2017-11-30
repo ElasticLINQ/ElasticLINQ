@@ -52,7 +52,7 @@ namespace ElasticLinq.IntegrationTest
         public async Task<TResult> ExecuteAsync<TResult>(Func<CancellationToken, Task<TResult>> operationFunc, Func<TResult, Exception, Boolean> shouldRetryFunc, Action<TResult, Dictionary<String, Object>> appendLogInfoFunc = null,
             CancellationToken cancellationToken = new CancellationToken())
         {
-            return await operationFunc(cancellationToken);
+            return await operationFunc(cancellationToken).ConfigureAwait(false);
         }
     }
 }

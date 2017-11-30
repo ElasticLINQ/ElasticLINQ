@@ -47,7 +47,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> contains no elements.</exception>
         public static async Task<double> AverageAsync(this IQueryable<int> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (double)await ExecuteAsync(source.Provider, FinalExpression(source, averageIntMethodInfo.Value), cancellationToken);
+            return (double)await ExecuteAsync(source.Provider, FinalExpression(source, averageIntMethodInfo.Value), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> is null.</exception>
         public static async Task<double?> AverageAsync(this IQueryable<int?> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (double?)await ExecuteAsync(source.Provider, FinalExpression(source, averageIntNullableMethodInfo.Value), cancellationToken);
+            return (double?)await ExecuteAsync(source.Provider, FinalExpression(source, averageIntNullableMethodInfo.Value), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> contains no elements.</exception>
         public static async Task<double> AverageAsync(this IQueryable<long> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (double)await ExecuteAsync(source.Provider, FinalExpression(source, averageLongMethodInfo.Value), cancellationToken);
+            return (double)await ExecuteAsync(source.Provider, FinalExpression(source, averageLongMethodInfo.Value), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> is null.</exception>
         public static async Task<double?> AverageAsync(this IQueryable<long?> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (double)await ExecuteAsync(source.Provider, FinalExpression(source, averageLongNullableMethodInfo.Value), cancellationToken);
+            return (double)await ExecuteAsync(source.Provider, FinalExpression(source, averageLongNullableMethodInfo.Value), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> contains no elements.</exception>
         public static async Task<float> AverageAsync(this IQueryable<float> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (float)await ExecuteAsync(source.Provider, FinalExpression(source, averageFloatMethodInfo.Value), cancellationToken);
+            return (float)await ExecuteAsync(source.Provider, FinalExpression(source, averageFloatMethodInfo.Value), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> is null.</exception>
         public static async Task<float?> AverageAsync(this IQueryable<float?> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (float?)await ExecuteAsync(source.Provider, FinalExpression(source, averageFloatNullableMethodInfo.Value), cancellationToken);
+            return (float?)await ExecuteAsync(source.Provider, FinalExpression(source, averageFloatNullableMethodInfo.Value), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -143,7 +143,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> contains no elements.</exception>
         public static async Task<double> AverageAsync(this IQueryable<double> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (double)await ExecuteAsync(source.Provider, FinalExpression(source, averageDoubleMethodInfo.Value), cancellationToken);
+            return (double)await ExecuteAsync(source.Provider, FinalExpression(source, averageDoubleMethodInfo.Value), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -158,7 +158,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> is null.</exception>
         public static async Task<double?> AverageAsync(this IQueryable<double?> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (double?)await ExecuteAsync(source.Provider, FinalExpression(source, averageDoubleNullableMethodInfo.Value), cancellationToken);
+            return (double?)await ExecuteAsync(source.Provider, FinalExpression(source, averageDoubleNullableMethodInfo.Value), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -175,7 +175,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> contains no elements.</exception>
         public static async Task<decimal> AverageAsync(this IQueryable<decimal> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (decimal)await ExecuteAsync(source.Provider, FinalExpression(source, averageDecimalMethodInfo.Value), cancellationToken);
+            return (decimal)await ExecuteAsync(source.Provider, FinalExpression(source, averageDecimalMethodInfo.Value), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -190,7 +190,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> is null.</exception>
         public static async Task<decimal?> AverageAsync(this IQueryable<decimal?> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (decimal?)await ExecuteAsync(source.Provider, FinalExpression(source, averageDecimalNullableMethodInfo.Value), cancellationToken);
+            return (decimal?)await ExecuteAsync(source.Provider, FinalExpression(source, averageDecimalNullableMethodInfo.Value), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -209,7 +209,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> contains no elements.</exception>
         public static async Task<double> AverageAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, int>> selector, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (double)await ExecuteAsync(source.Provider, FinalExpression(source, averageIntSelectorMethodInfo.Value, selector), cancellationToken);
+            return (double)await ExecuteAsync(source.Provider, FinalExpression(source, averageIntSelectorMethodInfo.Value, selector), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -226,7 +226,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> or <paramref name="selector"/> is null.</exception>
         public static async Task<double?> AverageAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, int?>> selector, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (double?)await ExecuteAsync(source.Provider, FinalExpression(source, averageIntNullableSelectorMethodInfo.Value, selector), cancellationToken);
+            return (double?)await ExecuteAsync(source.Provider, FinalExpression(source, averageIntNullableSelectorMethodInfo.Value, selector), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -245,7 +245,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> contains no elements.</exception>
         public static async Task<float> AverageAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, float>> selector, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (float)await ExecuteAsync(source.Provider, FinalExpression(source, averageFloatSelectorMethodInfo.Value, selector), cancellationToken);
+            return (float)await ExecuteAsync(source.Provider, FinalExpression(source, averageFloatSelectorMethodInfo.Value, selector), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -262,7 +262,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> or <paramref name="selector"/> is null.</exception>
         public static async Task<float?> AverageAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, float?>> selector, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (float?)await ExecuteAsync(source.Provider, FinalExpression(source, averageFloatNullableSelectorMethodInfo.Value, selector), cancellationToken);
+            return (float?)await ExecuteAsync(source.Provider, FinalExpression(source, averageFloatNullableSelectorMethodInfo.Value, selector), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -281,7 +281,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> contains no elements.</exception>
         public static async Task<double> AverageAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, long>> selector, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (double)await ExecuteAsync(source.Provider, FinalExpression(source, averageLongSelectorMethodInfo.Value, selector), cancellationToken);
+            return (double)await ExecuteAsync(source.Provider, FinalExpression(source, averageLongSelectorMethodInfo.Value, selector), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -298,7 +298,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> or <paramref name="selector"/> is null.</exception>
         public static async Task<double?> AverageAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, long?>> selector, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (double?)await ExecuteAsync(source.Provider, FinalExpression(source, averageLongNullableSelectorMethodInfo.Value, selector), cancellationToken);
+            return (double?)await ExecuteAsync(source.Provider, FinalExpression(source, averageLongNullableSelectorMethodInfo.Value, selector), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -317,7 +317,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> contains no elements.</exception>
         public static async Task<double> AverageAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, double>> selector, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (double)await ExecuteAsync(source.Provider, FinalExpression(source, averageDoubleSelectorMethodInfo.Value, selector), cancellationToken);
+            return (double)await ExecuteAsync(source.Provider, FinalExpression(source, averageDoubleSelectorMethodInfo.Value, selector), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -334,7 +334,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> or <paramref name="selector"/> is null.</exception>
         public static async Task<double?> AverageAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, double?>> selector, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (double?)await ExecuteAsync(source.Provider, FinalExpression(source, averageDoubleNullableSelectorMethodInfo.Value, selector), cancellationToken);
+            return (double?)await ExecuteAsync(source.Provider, FinalExpression(source, averageDoubleNullableSelectorMethodInfo.Value, selector), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -353,7 +353,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> contains no elements.</exception>
         public static async Task<decimal> AverageAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, decimal>> selector, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (decimal)await ExecuteAsync(source.Provider, FinalExpression(source, averageDecimalSelectorMethodInfo.Value, selector), cancellationToken);
+            return (decimal)await ExecuteAsync(source.Provider, FinalExpression(source, averageDecimalSelectorMethodInfo.Value, selector), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -370,7 +370,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> or <paramref name="selector"/> is null.</exception>
         public static async Task<decimal?> AverageAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, decimal?>> selector, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (decimal)await ExecuteAsync(source.Provider, FinalExpression(source, averageDecimalNullableSelectorMethodInfo.Value, selector), cancellationToken);
+            return (decimal)await ExecuteAsync(source.Provider, FinalExpression(source, averageDecimalNullableSelectorMethodInfo.Value, selector), cancellationToken).ConfigureAwait(false);
         }
     }
 }

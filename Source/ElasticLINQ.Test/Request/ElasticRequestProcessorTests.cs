@@ -45,7 +45,7 @@ namespace ElasticLinq.Test.Request
 
             var processor = new ElasticRequestProcessor(mockConnection, mapping, spyLog, retryPolicy);
 
-            await processor.SearchAsync(request, token);
+            await processor.SearchAsync(request, token).ConfigureAwait(false);
 
 #pragma warning disable 4014 // Remove this and await the SearchAsync below once NSubstitute 1.8.3 available
             mockConnection.Received(1).SearchAsync(
@@ -58,18 +58,18 @@ namespace ElasticLinq.Test.Request
         }
 
         [Fact]
-        public static async void SearchAsyncThrowsTaskCancelledExceptionWithSubsequentlyCancelledCancellationToken()
+        public static async Task SearchAsyncThrowsTaskCancelledExceptionWithSubsequentlyCancelledCancellationToken()
         {
             var request = new SearchRequest { DocumentType = "docType" };
             var processor = new ElasticRequestProcessor(connection, mapping, log, retryPolicy);
 
-            var ex = await Record.ExceptionAsync(() => processor.SearchAsync(request, new CancellationTokenSource(500).Token));
+            var ex = await Record.ExceptionAsync(() => processor.SearchAsync(request, new CancellationTokenSource(500).Token)).ConfigureAwait(false);
 
             Assert.IsType<TaskCanceledException>(ex);
         }
 
         [Fact]
-        public static async void SearchAsyncCapturesRequestInfoOnFailure()
+        public static async Task SearchAsyncCapturesRequestInfoOnFailure()
         {
             var spyLog = new SpyLog();
             var brokenConnection = new ElasticConnection(new Uri("http://localhost:12"), index: "MyIndex");
@@ -77,7 +77,7 @@ namespace ElasticLinq.Test.Request
             var searchRequest = new SearchRequest { DocumentType = "docType" };
             var formatter = new SearchRequestFormatter(brokenConnection, mapping, searchRequest);
 
-            var ex = await Record.ExceptionAsync(() => processor.SearchAsync(searchRequest, CancellationToken.None));
+            var ex = await Record.ExceptionAsync(() => processor.SearchAsync(searchRequest, CancellationToken.None)).ConfigureAwait(false);
 
             Assert.IsType<RetryFailedException>(ex);
             var retryLogEntry = Assert.Single(spyLog.Entries, s => s.AdditionalInfo.ContainsKey("category") && s.AdditionalInfo["category"].Equals("retry"));

@@ -100,7 +100,7 @@ namespace ElasticLinq
         /// <inheritdoc/>
         public async Task<TResult> ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (TResult)await ExecuteAsync(expression, cancellationToken);
+            return (TResult)await ExecuteAsync(expression, cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -121,7 +121,7 @@ namespace ElasticLinq
                 }
                 else
                 {
-                    response = await requestProcessor.SearchAsync(translation.SearchRequest, cancellationToken);
+                    response = await requestProcessor.SearchAsync(translation.SearchRequest, cancellationToken).ConfigureAwait(false);
                     if (response == null)
                         throw new InvalidOperationException("No HTTP response received.");
                 }
