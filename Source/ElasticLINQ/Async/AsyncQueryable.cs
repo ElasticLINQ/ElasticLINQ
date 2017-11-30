@@ -38,7 +38,7 @@ namespace ElasticLinq.Async
         /// <exception cref="T:System.OverflowException">The number of elements in <paramref name="source"/> is larger than <see cref="F:System.Int32.MaxValue"/>.</exception>
         public static async Task<int> CountAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (int)await ExecuteAsync(source.Provider, FinalExpression(source, countMethodInfo.Value), cancellationToken);
+            return (int)await ExecuteAsync(source.Provider, FinalExpression(source, countMethodInfo.Value), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace ElasticLinq.Async
         /// <exception cref="T:System.OverflowException">The number of elements in <paramref name="source"/> is larger than <see cref="F:System.Int32.MaxValue"/>.</exception>
         public static async Task<int> CountAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (int)await ExecuteAsync(source.Provider, FinalExpression(source, countPredicateMethodInfo.Value, predicate), cancellationToken);
+            return (int)await ExecuteAsync(source.Provider, FinalExpression(source, countPredicateMethodInfo.Value, predicate), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace ElasticLinq.Async
         /// <exception cref="T:System.OverflowException">The number of elements exceeds <see cref="F:System.Int64.MaxValue"/>.</exception>
         public static async Task<long> LongCountAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (long)await ExecuteAsync(source.Provider, FinalExpression(source, longCountMethodInfo.Value), cancellationToken);
+            return (long)await ExecuteAsync(source.Provider, FinalExpression(source, longCountMethodInfo.Value), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace ElasticLinq.Async
         /// <exception cref="T:System.OverflowException">The number of matching elements exceeds <see cref="F:System.Int64.MaxValue"/>.</exception>
         public static async Task<long> LongCountAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (long)await ExecuteAsync(source.Provider, FinalExpression(source, longCountPredicateMethodInfo.Value, predicate), cancellationToken);
+            return (long)await ExecuteAsync(source.Provider, FinalExpression(source, longCountPredicateMethodInfo.Value, predicate), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -107,7 +107,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> is null.</exception>
         public static async Task<TSource> MinAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (TSource)await ExecuteAsync(source.Provider, FinalExpression(source, minMethodInfo.Value), cancellationToken);
+            return (TSource)await ExecuteAsync(source.Provider, FinalExpression(source, minMethodInfo.Value), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -125,7 +125,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> or <paramref name="selector"/> is null.</exception>
         public static async Task<TResult> MinAsync<TSource, TResult>(this IQueryable<TSource> source, Expression<Func<TSource, TResult>> selector, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (TResult)await ExecuteAsync(source.Provider, FinalExpression<TSource, TResult>(source, minSelectorMethodInfo.Value, selector), cancellationToken);
+            return (TResult)await ExecuteAsync(source.Provider, FinalExpression<TSource, TResult>(source, minSelectorMethodInfo.Value, selector), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -141,7 +141,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> is null.</exception>
         public static async Task<TSource> MaxAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (TSource)await ExecuteAsync(source.Provider, FinalExpression(source, maxMethodInfo.Value), cancellationToken);
+            return (TSource)await ExecuteAsync(source.Provider, FinalExpression(source, maxMethodInfo.Value), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -159,11 +159,11 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> or <paramref name="selector"/> is null.</exception>
         public static async Task<TResult> MaxAsync<TSource, TResult>(this IQueryable<TSource> source, Expression<Func<TSource, TResult>> selector, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (TResult)await ExecuteAsync(source.Provider, FinalExpression<TSource, TResult>(source, maxSelectorMethodInfo.Value, selector), cancellationToken);
+            return (TResult)await ExecuteAsync(source.Provider, FinalExpression<TSource, TResult>(source, maxSelectorMethodInfo.Value, selector), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
-        /// Creates a <see cref="T:System.Collection.List`1"/> from an <see cref="T:System.Linq.IQueryable`1"/> that is executed asyncronously.
+        /// Creates a <see cref="T:System.Collection.List`1"/> from an <see cref="T:System.Linq.IQueryable`1"/> that is executed asynchronously.
         /// </summary>
         /// <returns>
         /// A task that returns the newly created list.
@@ -173,11 +173,11 @@ namespace ElasticLinq.Async
         /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
         public static async Task<List<TSource>> ToListAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return ((IEnumerable<TSource>)await ExecuteAsync(source.Provider, source.Expression, cancellationToken)).ToList();
+            return ((IEnumerable<TSource>)await ExecuteAsync(source.Provider, source.Expression, cancellationToken).ConfigureAwait(false)).ToList();
         }
 
         /// <summary>
-        /// Creates an array from an <see cref="T:System.Linq.IQueryable`1"/> that is executed asyncronously.
+        /// Creates an array from an <see cref="T:System.Linq.IQueryable`1"/> that is executed asynchronously.
         /// </summary>
         /// <returns>
         /// A task that returns the newly created array.
@@ -187,7 +187,7 @@ namespace ElasticLinq.Async
         /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
         public static async Task<TSource[]> ToArrayAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return ((IEnumerable<TSource>)await ExecuteAsync(source.Provider, source.Expression, cancellationToken)).ToArray();
+            return ((IEnumerable<TSource>)await ExecuteAsync(source.Provider, source.Expression, cancellationToken).ConfigureAwait(false)).ToArray();
         }
 
         /// <summary>
@@ -207,7 +207,7 @@ namespace ElasticLinq.Async
         /// <paramref name="keySelector" /> produces duplicate keys for two elements.</exception>
         public static async Task<Dictionary<TKey, TSource>> ToDictionaryAsync<TSource, TKey>(this IQueryable<TSource> source, Func<TSource, TKey> keySelector, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return ((IEnumerable<TSource>)await ExecuteAsync(source.Provider, source.Expression, cancellationToken)).ToDictionary(keySelector);
+            return ((IEnumerable<TSource>)await ExecuteAsync(source.Provider, source.Expression, cancellationToken).ConfigureAwait(false)).ToDictionary(keySelector);
         }
 
         /// <summary>
@@ -229,7 +229,7 @@ namespace ElasticLinq.Async
         /// <paramref name="keySelector" /> produces duplicate keys for two elements.</exception>
         public static async Task<Dictionary<TKey, TElement>> ToDictionaryAsync<TSource, TKey, TElement>(this IQueryable<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return ((IEnumerable<TSource>)await ExecuteAsync(source.Provider, source.Expression, cancellationToken)).ToDictionary(keySelector, elementSelector);
+            return ((IEnumerable<TSource>)await ExecuteAsync(source.Provider, source.Expression, cancellationToken).ConfigureAwait(false)).ToDictionary(keySelector, elementSelector);
         }
 
         static Lazy<MethodInfo> QueryableMethodByArgs(string name, int parameterCount, Type secondParameterType = null)

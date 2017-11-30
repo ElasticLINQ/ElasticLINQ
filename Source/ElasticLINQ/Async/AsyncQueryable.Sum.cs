@@ -46,7 +46,7 @@ namespace ElasticLinq.Async
         /// <exception cref="T:System.OverflowException">The sum is larger than <see cref="F:System.Int32.MaxValue"/>.</exception>
         public static async Task<int> SumAsync(this IQueryable<int> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (int)await ExecuteAsync(source.Provider, FinalExpression(source, sumIntMethodInfo.Value), cancellationToken);
+            return (int)await ExecuteAsync(source.Provider, FinalExpression(source, sumIntMethodInfo.Value), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace ElasticLinq.Async
         /// <exception cref="T:System.OverflowException">The sum is larger than <see cref="F:System.Int32.MaxValue"/>.</exception>
         public static async Task<int?> SumAsync(this IQueryable<int?> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (int)await ExecuteAsync(source.Provider, FinalExpression(source, sumIntNullableMethodInfo.Value), cancellationToken);
+            return (int)await ExecuteAsync(source.Provider, FinalExpression(source, sumIntNullableMethodInfo.Value), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace ElasticLinq.Async
         /// <exception cref="T:System.OverflowException">The sum is larger than <see cref="F:System.Int64.MaxValue"/>.</exception>
         public static async Task<long> SumAsync(this IQueryable<long> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (long)await ExecuteAsync(source.Provider, FinalExpression(source, sumLongMethodInfo.Value), cancellationToken);
+            return (long)await ExecuteAsync(source.Provider, FinalExpression(source, sumLongMethodInfo.Value), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace ElasticLinq.Async
         /// <exception cref="T:System.OverflowException">The sum is larger than <see cref="F:System.Int64.MaxValue"/>.</exception>
         public static async Task<long?> SumAsync(this IQueryable<long?> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (long?)await ExecuteAsync(source.Provider, FinalExpression(source, sumLongNullableMethodInfo.Value), cancellationToken);
+            return (long?)await ExecuteAsync(source.Provider, FinalExpression(source, sumLongNullableMethodInfo.Value), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> is null.</exception>
         public static async Task<float> SumAsync(this IQueryable<float> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (float)await ExecuteAsync(source.Provider, FinalExpression(source, sumFloatMethodInfo.Value), cancellationToken);
+            return (float)await ExecuteAsync(source.Provider, FinalExpression(source, sumFloatMethodInfo.Value), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -124,7 +124,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> is null.</exception>
         public static async Task<float?> SumAsync(this IQueryable<float?> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (float?)await ExecuteAsync(source.Provider, FinalExpression(source, sumFloatNullableMethodInfo.Value), cancellationToken);
+            return (float?)await ExecuteAsync(source.Provider, FinalExpression(source, sumFloatNullableMethodInfo.Value), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -139,7 +139,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> is null.</exception>
         public static async Task<double> SumAsync(this IQueryable<double> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (double)await ExecuteAsync(source.Provider, FinalExpression(source, sumDoubleMethodInfo.Value), cancellationToken);
+            return (double)await ExecuteAsync(source.Provider, FinalExpression(source, sumDoubleMethodInfo.Value), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -154,7 +154,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> is null.</exception>
         public static async Task<double?> SumAsync(this IQueryable<double?> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (double?)await ExecuteAsync(source.Provider, FinalExpression(source, sumDoubleNullableMethodInfo.Value), cancellationToken);
+            return (double?)await ExecuteAsync(source.Provider, FinalExpression(source, sumDoubleNullableMethodInfo.Value), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -170,7 +170,7 @@ namespace ElasticLinq.Async
         /// <exception cref="T:System.OverflowException">The sum is larger than <see cref="F:System.Decimal.MaxValue"/>.</exception>
         public static async Task<decimal> SumAsync(this IQueryable<decimal> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (decimal)await ExecuteAsync(source.Provider, FinalExpression(source, sumDecimalMethodInfo.Value), cancellationToken);
+            return (decimal)await ExecuteAsync(source.Provider, FinalExpression(source, sumDecimalMethodInfo.Value), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -186,7 +186,7 @@ namespace ElasticLinq.Async
         /// <exception cref="T:System.OverflowException">The sum is larger than <see cref="F:System.Decimal.MaxValue"/>.</exception>
         public static async Task<decimal?> SumAsync(this IQueryable<decimal?> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (decimal?)await ExecuteAsync(source.Provider, FinalExpression(source, sumDecimalNullableMethodInfo.Value), cancellationToken);
+            return (decimal?)await ExecuteAsync(source.Provider, FinalExpression(source, sumDecimalNullableMethodInfo.Value), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -204,7 +204,7 @@ namespace ElasticLinq.Async
         /// <exception cref="T:System.OverflowException">The sum is larger than <see cref="F:System.Int32.MaxValue"/>.</exception>
         public static async Task<int> SumAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, int>> selector, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (int)await ExecuteAsync(source.Provider, FinalExpression(source, sumIntSelectorMethodInfo.Value, selector), cancellationToken);
+            return (int)await ExecuteAsync(source.Provider, FinalExpression(source, sumIntSelectorMethodInfo.Value, selector), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -222,7 +222,7 @@ namespace ElasticLinq.Async
         /// <exception cref="T:System.OverflowException">The sum is larger than <see cref="F:System.Int32.MaxValue"/>.</exception>
         public static async Task<int?> SumAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, int?>> selector, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (int?)await ExecuteAsync(source.Provider, FinalExpression(source, sumIntNullableSelectorMethodInfo.Value, selector), cancellationToken);
+            return (int?)await ExecuteAsync(source.Provider, FinalExpression(source, sumIntNullableSelectorMethodInfo.Value, selector), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -240,7 +240,7 @@ namespace ElasticLinq.Async
         /// <exception cref="T:System.OverflowException">The sum is larger than <see cref="F:System.Int64.MaxValue"/>.</exception>
         public static async Task<long> SumAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, long>> selector, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (long)await ExecuteAsync(source.Provider, FinalExpression(source, sumLongSelectorMethodInfo.Value, selector), cancellationToken);
+            return (long)await ExecuteAsync(source.Provider, FinalExpression(source, sumLongSelectorMethodInfo.Value, selector), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -258,7 +258,7 @@ namespace ElasticLinq.Async
         /// <exception cref="T:System.OverflowException">The sum is larger than <see cref="F:System.Int64.MaxValue"/>.</exception>
         public static async Task<long?> SumAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, long?>> selector, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (long?)await ExecuteAsync(source.Provider, FinalExpression(source, sumLongNullableSelectorMethodInfo.Value, selector), cancellationToken);
+            return (long?)await ExecuteAsync(source.Provider, FinalExpression(source, sumLongNullableSelectorMethodInfo.Value, selector), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -275,7 +275,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> or <paramref name="selector"/> is null.</exception>
         public static async Task<float> SumAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, float>> selector, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (float)await ExecuteAsync(source.Provider, FinalExpression(source, sumFloatSelectorMethodInfo.Value, selector), cancellationToken);
+            return (float)await ExecuteAsync(source.Provider, FinalExpression(source, sumFloatSelectorMethodInfo.Value, selector), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -292,7 +292,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> or <paramref name="selector"/> is null.</exception>
         public static async Task<float?> SumAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, float?>> selector, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (float?)await ExecuteAsync(source.Provider, FinalExpression(source, sumFloatNullableSelectorMethodInfo.Value, selector), cancellationToken);
+            return (float?)await ExecuteAsync(source.Provider, FinalExpression(source, sumFloatNullableSelectorMethodInfo.Value, selector), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -309,7 +309,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> or <paramref name="selector"/> is null.</exception>
         public static async Task<double> SumAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, double>> selector, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (double)await ExecuteAsync(source.Provider, FinalExpression(source, sumDoubleSelectorMethodInfo.Value, selector), cancellationToken);
+            return (double)await ExecuteAsync(source.Provider, FinalExpression(source, sumDoubleSelectorMethodInfo.Value, selector), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -326,7 +326,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> or <paramref name="selector"/> is null.</exception>
         public static async Task<double?> SumAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, double?>> selector, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (double?)await ExecuteAsync(source.Provider, FinalExpression(source, sumDoubleNullableSelectorMethodInfo.Value, selector), cancellationToken);
+            return (double?)await ExecuteAsync(source.Provider, FinalExpression(source, sumDoubleNullableSelectorMethodInfo.Value, selector), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -344,7 +344,7 @@ namespace ElasticLinq.Async
         /// <exception cref="T:System.OverflowException">The sum is larger than <see cref="F:System.Decimal.MaxValue"/>.</exception>
         public static async Task<decimal> SumAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, decimal>> selector, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (decimal)await ExecuteAsync(source.Provider, FinalExpression(source, sumDecimalSelectorMethodInfo.Value, selector), cancellationToken);
+            return (decimal)await ExecuteAsync(source.Provider, FinalExpression(source, sumDecimalSelectorMethodInfo.Value, selector), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -362,7 +362,7 @@ namespace ElasticLinq.Async
         /// <exception cref="T:System.OverflowException">The sum is larger than <see cref="F:System.Decimal.MaxValue"/>.</exception>
         public static async Task<decimal?> SumAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, decimal?>> selector, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (decimal?)await ExecuteAsync(source.Provider, FinalExpression(source, sumDecimalNullableSelectorMethodInfo.Value, selector), cancellationToken);
+            return (decimal?)await ExecuteAsync(source.Provider, FinalExpression(source, sumDecimalNullableSelectorMethodInfo.Value, selector), cancellationToken).ConfigureAwait(false);
         }
     }
 }

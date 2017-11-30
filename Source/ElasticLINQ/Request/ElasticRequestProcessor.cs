@@ -47,7 +47,7 @@ namespace ElasticLinq.Request
                     formatter.Body,
                     searchRequest,
                     token,
-                    log),
+                    log).ConfigureAwait(false),
                 (response, exception) => !cancellationToken.IsCancellationRequested && exception != null,
                 (response, additionalInfo) =>
                 {

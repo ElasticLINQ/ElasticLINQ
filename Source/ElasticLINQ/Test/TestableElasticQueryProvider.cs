@@ -53,13 +53,13 @@ namespace ElasticLinq.Test
         /// <inheritdoc/>
         public async Task<TResult> ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken = new CancellationToken())
         {
-            return (TResult)await ExecuteAsync(expression, cancellationToken);
+            return (TResult)await ExecuteAsync(expression, cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
         public async Task<object> ExecuteAsync(Expression expression, CancellationToken cancellationToken = new CancellationToken())
         {
-            return await Task.Run(() => Execute(expression), cancellationToken);
+            return await Task.Run(() => Execute(expression), cancellationToken).ConfigureAwait(false);
         }
 
         class TestableElasticQueryRewriter : ExpressionVisitor
