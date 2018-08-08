@@ -11,9 +11,9 @@ For information on getting started, [see the Wiki](https://github.com/CenturyLin
 
 ## Elasticsearch version compatibility
 
-* 0.9-1.x works great
-* 2.x facets fail, other queries usually work
-* 5.x-6.x [under development]
+* **0.9 to 1.x** works great
+* **2.x** facets fail, other queries usually work
+* **5.x and 6.x** [under development]
 
 ## Builds
 
