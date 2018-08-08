@@ -17,6 +17,6 @@ For information on getting started, [see the Wiki](https://github.com/CenturyLin
 
 ## Builds
 
-Binary releases are available via [NuGet](http://www.nuget.org/packages/ElasticLinq/). 
+Binary releases are available via [NuGet](http://www.nuget.org/packages/ElasticLinq/) or [direct downloads](https://github.com/ElasticLINQ/ElasticLINQ/releases)
 
 [![Build Status](https://ci.appveyor.com/api/projects/status/7p4c73ocmmwjc05q/branch/master?svg=true)](https://ci.appveyor.com/project/ElasticLINQ/elasticlinq/)![NuGet version](https://img.shields.io/nuget/v/elasticlinq.svg?style=flat)
