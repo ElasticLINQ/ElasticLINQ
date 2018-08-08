@@ -43,7 +43,7 @@ namespace ElasticLinq.Request.Criteria
         }
 
         /// <inheritdoc/>
-        public string Name => "not";
+        public string Name => "must_not";
 
         /// <summary>
         /// <see cref="ICriteria" /> that is being negated.

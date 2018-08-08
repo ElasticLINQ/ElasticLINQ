@@ -1,7 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using ElasticLinq.Request.Criteria;
-using ElasticLinq.Request.Facets;
 using System.Collections.Generic;
 
 namespace ElasticLinq.Request
@@ -18,7 +17,6 @@ namespace ElasticLinq.Request
         {
             Fields = new List<string>();
             SortOptions = new List<SortOption>();
-            Facets = new List<IFacet>();
         }
 
         /// <summary>
@@ -54,26 +52,8 @@ namespace ElasticLinq.Request
         /// Filter criteria for the documents.
         /// </summary>
         /// <remarks>Determined by the Where LINQ statements.</remarks>
-        public ICriteria Filter { get; set; }
-        
-        /// <summary>
-        /// Query criteria for the documents.
-        /// </summary>
-        /// <remarks>Determined by the Query extension methods.</remarks>
-        public ICriteria Query { get; set; }
-        
-        /// <summary>
-        /// Facet aggregations and statistical inform that should be included.
-        /// </summary>
-        /// <remarks>Determined by the GroupBy/Count/Sum/Average statements of LINQ.</remarks>
-        public List<IFacet> Facets { get; set; }
-        
-        /// <summary>
-        /// Type of search Elasticsearch should perform.
-        /// </summary>
-        /// <remarks>Is usually blank but can be set to Count when facets are required instead of hits.</remarks>
-        public string SearchType { get; set; }
-
+        public ICriteria Filter { get; set; }        
+               
         /// <summary>
         /// Minimum score of results to be returned.
         /// </summary>

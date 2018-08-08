@@ -25,7 +25,6 @@ namespace ElasticLinq.Request.Visitors
         Type finalItemType;
         Func<Hit, object> itemProjector;
         IElasticMaterializer materializer;
-        CriteriaWithin within = CriteriaWithin.Filter;
 
         ElasticQueryTranslator(IElasticMapping mapping, Type sourceType)
             : base(mapping, sourceType)
@@ -48,14 +47,8 @@ namespace ElasticLinq.Request.Visitors
         ElasticTranslateResult Translate(Expression e)
         {
             var evaluated = PartialEvaluator.Evaluate(e);
-            var aggregated = FacetExpressionVisitor.Rebind(Mapping, SourceType, evaluated);
+            CompleteHitTranslation(evaluated);
 
-            if (aggregated.Collected.Count > 0)
-                CompleteFacetTranslation(aggregated);
-            else
-                CompleteHitTranslation(evaluated);
-
-            searchRequest.Query = QueryCriteriaRewriter.Compensate(searchRequest.Query);
             searchRequest.Filter = ConstantCriteriaFilterReducer.Reduce(searchRequest.Filter);
             ApplyTypeSelectionCriteria();
 
@@ -82,17 +75,6 @@ namespace ElasticLinq.Request.Visitors
                 ((ChainMaterializer)materializer).Next = new ListHitsElasticMaterializer(itemProjector ?? DefaultItemProjector, finalItemType ?? SourceType);
         }
 
-        void CompleteFacetTranslation(FacetRebindCollectionResult aggregated)
-        {
-            Visit(aggregated.Expression);
-            searchRequest.DocumentType = Mapping.GetDocumentType(SourceType);
-
-            searchRequest.Facets = aggregated.Collected.ToList();
-            searchRequest.SearchType = "count"; // We only want facets, not hits
-
-            materializer = aggregated.Materializer;
-        }
-
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
             if (node.Method.DeclaringType == typeof(Queryable))
@@ -107,24 +89,10 @@ namespace ElasticLinq.Request.Visitors
             return base.VisitMethodCall(node);
         }
 
-        protected override Expression VisitStringPatternCheckMethodCall(Expression source, Expression match, string pattern, string methodName)
-        {
-            if (within != CriteriaWithin.Query)
-                throw new NotSupportedException(
-                    $"Method String.{methodName} can only be used within .Query() not in .Where()");
-
-            return base.VisitStringPatternCheckMethodCall(source, match, pattern, methodName);
-        }
-
         internal Expression VisitElasticQueryExtensionsMethodCall(MethodCallExpression m)
         {
             switch (m.Method.Name)
             {
-                case "Query":
-                    if (m.Arguments.Count == 2)
-                        return VisitQuery(m.Arguments[0], m.Arguments[1]);
-                    break;
-
                 case "QueryString":
                     if (m.Arguments.Count == 2)
                         return VisitQueryString(m.Arguments[0], m.Arguments[1]);
@@ -193,7 +161,7 @@ namespace ElasticLinq.Request.Visitors
             var constantFieldExpression = fieldsExpression as ConstantExpression;
             var constantFields = (string[]) constantFieldExpression?.Value;
             var criteriaExpression = new CriteriaExpression(new QueryStringCriteria(constantQueryExpression.Value.ToString(), constantFields));
-            searchRequest.Query = AndCriteria.Combine(searchRequest.Query, criteriaExpression.Criteria);
+            searchRequest.Filter = AndCriteria.Combine(searchRequest.Filter, criteriaExpression.Criteria);
 
             return Visit(source);
         }
@@ -272,7 +240,6 @@ namespace ElasticLinq.Request.Visitors
         Expression VisitAny(Expression source, Expression predicate)
         {
             materializer = new AnyElasticMaterializer();
-            searchRequest.SearchType = "count";
             searchRequest.Size = 1;
 
             return predicate != null
@@ -283,7 +250,7 @@ namespace ElasticLinq.Request.Visitors
         Expression VisitCount(Expression source, Expression predicate, Type returnType)
         {
             materializer = new CountElasticMaterializer(returnType);
-            searchRequest.SearchType = "count";
+            searchRequest.Size = 0;
             return predicate != null
                 ? VisitWhere(source, predicate)
                 : Visit(source);
@@ -320,23 +287,6 @@ namespace ElasticLinq.Request.Visitors
             }
 
             return base.VisitUnary(node);
-        }
-
-        Expression VisitQuery(Expression source, Expression predicate)
-        {
-            var lambda = predicate.GetLambda();
-            var wasWithin = within;
-            within = CriteriaWithin.Query;
-            var body = BooleanMemberAccessBecomesEquals(lambda.Body);
-
-            var criteriaExpression = body as CriteriaExpression;
-            if (criteriaExpression == null)
-                throw new NotSupportedException($"Query expression '{body}' could not be translated");
-
-            searchRequest.Query = AndCriteria.Combine(searchRequest.Query, criteriaExpression.Criteria);
-            within = wasWithin;
-
-            return Visit(source);
         }
 
         Expression VisitWhere(Expression source, Expression lambdaPredicate)

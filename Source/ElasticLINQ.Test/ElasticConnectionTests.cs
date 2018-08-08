@@ -295,26 +295,6 @@ namespace ElasticLinq.Test
         }
 
         [Fact]
-        public void SearchTypeAppearsOnUriWhenSpecified()
-        {
-            var uri = defaultConnection.GetSearchUri(new SearchRequest { SearchType = "count" });
-
-            var parameters = uri.GetComponents(UriComponents.Query, UriFormat.Unescaped).Split('&');
-
-            Assert.Single(parameters, p => p == "search_type=count");
-        }
-
-        [Fact]
-        public void SearchTypeDoesNotAppearOnUriWhenNotSpecified()
-        {
-            var uri = defaultConnection.GetSearchUri(new SearchRequest { SearchType = "" });
-
-            var parameters = uri.GetComponents(UriComponents.Query, UriFormat.Unescaped).Split('&');
-
-            Assert.DoesNotContain(parameters, p => p.StartsWith("search_type="));
-        }
-
-        [Fact]
         public static async void SearchAsyncThrowsTaskCancelledExceptionWithAlreadyCancelledCancellationToken()
         {
             var spyLog = new SpyLog();

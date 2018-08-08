@@ -25,7 +25,6 @@ namespace ElasticLinq.IntegrationTest
             }
             catch (Exception)
             {
-                var url = GetSearchUri(searchRequest);
                 Debugger.Break();
                 throw;
             }

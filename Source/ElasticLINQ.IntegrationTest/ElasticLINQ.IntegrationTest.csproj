@@ -72,7 +72,6 @@
     <Compile Include="Models\LastAccess.cs" />
     <Compile Include="Models\AccessLocation.cs" />
     <Compile Include="Models\WebUser.cs" />
-    <Compile Include="GroupByTests.cs" />
     <Compile Include="AsyncTests.cs" />
     <Compile Include="OrderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

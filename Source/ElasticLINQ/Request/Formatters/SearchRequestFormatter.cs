@@ -2,7 +2,6 @@
 
 using ElasticLinq.Mapping;
 using ElasticLinq.Request.Criteria;
-using ElasticLinq.Request.Facets;
 using ElasticLinq.Utility;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -62,15 +61,8 @@ namespace ElasticLinq.Request.Formatters
 
             var queryRoot = root;
 
-            // Filters cause a filtered query to be created
             if (searchRequest.Filter != null)
-            {
-                queryRoot = new JObject(new JProperty("filter", Build(searchRequest.Filter)));
-                root.Add("query", new JObject(new JProperty("filtered", queryRoot)));
-            }
-
-            if (searchRequest.Query != null)
-                queryRoot.Add("query", Build(searchRequest.Query));
+                queryRoot.Add("query", Build(searchRequest.Filter));
 
             if (searchRequest.SortOptions.Any())
                 root.Add("sort", Build(searchRequest.SortOptions));
@@ -82,86 +74,13 @@ namespace ElasticLinq.Request.Formatters
                 root.Add("highlight", Build(searchRequest.Highlight));
 
             long? size = searchRequest.Size ?? connection.Options.SearchSizeDefault;
-            if (size.HasValue && !searchRequest.Facets.Any())
-                root.Add("size", size.Value);
-
-            if (searchRequest.Facets.Any())
-                root.Add("facets", Build(searchRequest.Facets, size));
+            if (size.HasValue) 
+                root.Add("size", size.Value); 
 
             if (connection.Timeout != TimeSpan.Zero)
                 root.Add("timeout", Format(connection.Timeout));
 
             return root;
-        }
-
-        JToken Build(IEnumerable<IFacet> facets, long? defaultSize)
-        {
-            return new JObject(facets.Select(facet => Build(facet, defaultSize)));
-        }
-
-        JProperty Build(IFacet facet, long? defaultSize)
-        {
-            Argument.EnsureNotNull(nameof(facet), facet);
-
-            var specificBody = Build(facet);
-            if (facet is IOrderableFacet)
-            {
-                var facetSize = ((IOrderableFacet)facet).Size ?? defaultSize;
-                if (facetSize.HasValue)
-                    specificBody["size"] = facetSize.Value.ToString(transportCulture);
-            }
-
-            var namedBody = new JObject(new JProperty(facet.Type, specificBody));
-
-            if (facet.Filter != null)
-                namedBody["filter"] = Build(facet.Filter);
-
-            return new JProperty(facet.Name, namedBody);
-        }
-
-        static JToken Build(IFacet facet)
-        {
-            if (facet is StatisticalFacet)
-                return Build((StatisticalFacet)facet);
-
-            if (facet is TermsStatsFacet)
-                return Build((TermsStatsFacet)facet);
-
-            if (facet is TermsFacet)
-                return Build((TermsFacet)facet);
-
-            if (facet is FilterFacet)
-                return new JObject();
-
-            throw new InvalidOperationException(
-                $"Unknown implementation of IFacet '{facet.GetType().Name}' can not be formatted");
-        }
-
-        static JToken Build(StatisticalFacet statisticalFacet)
-        {
-            return new JObject(
-                BuildFieldProperty(statisticalFacet.Fields)
-            );
-        }
-
-        static JToken Build(TermsStatsFacet termStatsFacet)
-        {
-            return new JObject(
-                new JProperty("key_field", termStatsFacet.Key),
-                new JProperty("value_field", termStatsFacet.Value)
-            );
-        }
-
-        static JToken Build(TermsFacet termsFacet)
-        {
-            return new JObject(BuildFieldProperty(termsFacet.Fields));
-        }
-
-        static JToken BuildFieldProperty(ReadOnlyCollection<string> fields)
-        {
-            return fields.Count == 1
-                ? new JProperty("field", fields.First())
-                : new JProperty("fields", new JArray(fields));
         }
 
         static JArray Build(IEnumerable<SortOption> sortOptions)
@@ -301,7 +220,7 @@ namespace ElasticLinq.Request.Formatters
 
         JObject Build(NotCriteria criteria)
         {
-            return new JObject(new JProperty(criteria.Name, Build(criteria.Criteria)));
+            return new JObject(new JProperty("bool", new JObject(new JProperty(criteria.Name, Build(criteria.Criteria)))));
         }
 
         static JObject Build(MatchAllCriteria criteria)

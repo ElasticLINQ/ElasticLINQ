@@ -13,11 +13,11 @@ namespace ElasticLinq.IntegrationTest
 {
     class Data
     {
-        public static readonly Uri v1Endpoint = new Uri("http://integration.elasticlinq.net:9200");
+        public static readonly Uri Endpoint = new Uri("http://52.183.26.158:9200/");
 
         const string Index = "integrationtest";
-        static readonly ElasticConnectionOptions options = new ElasticConnectionOptions { SearchSizeDefault = 1000 };
-        static readonly ElasticConnection connection = new ElasticConnection(v1Endpoint, index: Index, options: options);
+        static readonly ElasticConnectionOptions options = new ElasticConnectionOptions { SearchSizeDefault = 1000, Pretty = true };
+        static readonly IElasticConnection connection = new BreakOnInvalidQueryConnection(Endpoint, index: Index, options: options);
 
         readonly ElasticContext elasticContext = new ElasticContext(connection, new TrivialElasticMapping(), retryPolicy: new NoRetryPolicy());
         readonly List<object> memory = new List<object>();
@@ -41,9 +41,7 @@ namespace ElasticLinq.IntegrationTest
             const int expectedDataCount = 200;
             if (memory.Count != expectedDataCount)
                 throw new InvalidOperationException(
-                    string.Format("Tests expect {0} entries but {1} loaded from Elasticsearch index '{2}' at {3}",
-                        expectedDataCount, memory.Count,
-                        elasticContext.Connection.Index, ((ElasticConnection)elasticContext.Connection).Endpoint));
+                    $"Tests expect {expectedDataCount} entries but {memory.Count} loaded from Elasticsearch index '{elasticContext.Connection.Index}' at {((ElasticConnection) elasticContext.Connection).Endpoint}");
         }
     }
 

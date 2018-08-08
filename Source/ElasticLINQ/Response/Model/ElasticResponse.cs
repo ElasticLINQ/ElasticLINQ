@@ -2,7 +2,6 @@
 
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
-using System.Net;
 
 namespace ElasticLinq.Response.Model
 {
@@ -31,10 +30,5 @@ namespace ElasticLinq.Response.Model
         /// The error received from Elasticsearch.
         /// </summary>
         public JValue error;
-
-        /// <summary>
-        /// The facets delivered in this response.
-        /// </summary>
-        public JObject facets;
     }
 }

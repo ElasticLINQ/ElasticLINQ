@@ -1,7 +1,6 @@
 ﻿// Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for more information.
 
 using ElasticLinq.Request.Criteria;
-using ElasticLinq.Request.Facets;
 using ElasticLinq.Request.Visitors;
 using ElasticLinq.Test.TestSupport;
 using System;
@@ -118,18 +117,18 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         }
 
         [Fact]
-        public void CountTranslatesToSearchTypeOfCount()
+        public void CountTranslatesToSizeOfZero()
         {
             var first = MakeQueryableExpression("Count", Robots);
 
             var request = ElasticQueryTranslator.Translate(CouchMapping, first).SearchRequest;
 
-            Assert.Equal("count", request.SearchType);
+            Assert.Equal(0, request.Size);
             Assert.IsType<ExistsCriteria>(request.Filter);
         }
 
         [Fact]
-        public void CountWithPredicateTranslatesToSearchTypeOfCount()
+        public void CountWithPredicateTranslatesToSizeOfZero()
         {
             const string expectedTermValue = "Josef";
             Expression<Func<Robot, bool>> lambda = r => r.Name == expectedTermValue;
@@ -137,39 +136,25 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
             var request = ElasticQueryTranslator.Translate(Mapping, first).SearchRequest;
 
-            Assert.Equal("count", request.SearchType);
+            Assert.Equal(0, request.Size);
             var termCriteria = Assert.IsType<TermCriteria>(request.Filter);
             Assert.Equal("name", termCriteria.Field);
             Assert.Equal(expectedTermValue, termCriteria.Value);
         }
 
         [Fact]
-        public void CountTranslatesToFacetWhenGroupBy()
-        {
-            var first = Robots.GroupBy(g => 1).Select(a => a.Count());
-
-            var request = ElasticQueryTranslator.Translate(CouchMapping, first.Expression).SearchRequest;
-
-            Assert.Equal("count", request.SearchType);
-            Assert.IsType<ExistsCriteria>(request.Filter);
-
-            var facet = Assert.Single(request.Facets);
-            Assert.IsType<FilterFacet>(facet);
-        }
-
-        [Fact]
-        public void LongCountTranslatesToSearchTypeOfCount()
+        public void LongCountTranslatesToSizeOfZero()
         {
             var first = MakeQueryableExpression("LongCount", Robots);
 
             var request = ElasticQueryTranslator.Translate(CouchMapping, first).SearchRequest;
 
-            Assert.Equal("count", request.SearchType);
+            Assert.Equal(0, request.Size);
             Assert.IsType<ExistsCriteria>(request.Filter);
         }
 
         [Fact]
-        public void LongCountWithPredicateTranslatesToSearchTypeOfCount()
+        public void LongCountWithPredicateTranslatesToSizeOfZero()
         {
             const string expectedTermValue = "Josef";
             Expression<Func<Robot, bool>> lambda = r => r.Name == expectedTermValue;
@@ -177,41 +162,26 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
             var request = ElasticQueryTranslator.Translate(Mapping, first).SearchRequest;
 
-            Assert.Equal("count", request.SearchType);
+            Assert.Equal(0, request.Size);
             var termCriteria = Assert.IsType<TermCriteria>(request.Filter);
             Assert.Equal("name", termCriteria.Field);
             Assert.Equal(expectedTermValue, termCriteria.Value);
         }
 
         [Fact]
-        public void LongCountTranslatesToFacetWhenGroupBy()
-        {
-            var first = Robots.GroupBy(g => 1).Select(a => a.LongCount());
-
-            var request = ElasticQueryTranslator.Translate(CouchMapping, first.Expression).SearchRequest;
-
-            Assert.Equal("count", request.SearchType);
-            Assert.IsType<ExistsCriteria>(request.Filter);
-
-            var facet = Assert.Single(request.Facets);
-            Assert.IsType<FilterFacet>(facet);
-        }
-
-        [Fact]
-        public void AnyTranslatesToSearchTypeCountWithSizeOfOneAndExistFilter()
+        public void AnyTranslatesToSizeOfOneAndExistFilter()
         {
             var first = MakeQueryableExpression("Any", Robots);
 
             var request = ElasticQueryTranslator.Translate(CouchMapping, first).SearchRequest;
 
-            Assert.Equal("count", request.SearchType);
             Assert.Equal(1, request.Size);
             var existsCriteria = Assert.IsType<ExistsCriteria>(request.Filter);
             Assert.Equal("doc.id", existsCriteria.Field);
         }
 
         [Fact]
-        public void AnyWithPredicateTranslatesToSearchTypeCountWithSizeOfOneAndExistFilter()
+        public void AnyWithPredicateTranslatesToSizeOfOneAndExistFilter()
         {
             const string expectedTermValue = "Josef";
             Expression<Func<Robot, bool>> lambda = r => r.Name == expectedTermValue;
@@ -219,7 +189,6 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
             var request = ElasticQueryTranslator.Translate(Mapping, first).SearchRequest;
 
-            Assert.Equal("count", request.SearchType);
             Assert.Equal(1, request.Size);
             var termCriteria = Assert.IsType<TermCriteria>(request.Filter);
             Assert.Equal("name", termCriteria.Field);
