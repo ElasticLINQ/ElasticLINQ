@@ -9,9 +9,9 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>LINQ provider for Elasticsearch</description>
     <dependencies>
-      <dependency id="Newtonsoft.Json" version="10.0.1" />
+      <dependency id="Newtonsoft.Json" version="10.0.2" />
     </dependencies>
-    <copyright>Copyright (c) 2013-2017 CenturyLink, Inc.</copyright>
+    <copyright>Copyright (c) 2013-2018 CenturyLink, Inc.</copyright>
     <licenseUrl>https://github.com/ElasticLINQ/ElasticLINQ/blob/dev/LICENCE.txt</licenseUrl>
     <projectUrl>https://github.com/ElasticLINQ/ElasticLINQ</projectUrl>
     <tags>Elasticsearch LINQ</tags>
