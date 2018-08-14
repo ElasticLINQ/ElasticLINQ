@@ -115,7 +115,7 @@ namespace ElasticLinq
             try
             {
                 ElasticResponse response;
-                if (translation.SearchRequest.Filter == ConstantCriteria.False)
+                if (translation.SearchRequest.Query == ConstantCriteria.False)
                 {
                     response = new ElasticResponse();
                 }

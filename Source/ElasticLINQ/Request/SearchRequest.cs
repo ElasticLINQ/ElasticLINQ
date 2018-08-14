@@ -38,7 +38,7 @@ namespace ElasticLinq.Request
         public string DocumentType { get; set; }
 
         /// <summary>
-        /// List of fields to return for each document instead of the
+        /// List of fields to return for each document instead of the document.
         /// </summary>
         public List<string> Fields { get; set; }
         
@@ -49,10 +49,10 @@ namespace ElasticLinq.Request
         public List<SortOption> SortOptions { get; set; }
         
         /// <summary>
-        /// Filter criteria for the documents.
+        /// Query criteria for the documents.
         /// </summary>
         /// <remarks>Determined by the Where LINQ statements.</remarks>
-        public ICriteria Filter { get; set; }        
+        public ICriteria Query { get; set; }        
                
         /// <summary>
         /// Minimum score of results to be returned.

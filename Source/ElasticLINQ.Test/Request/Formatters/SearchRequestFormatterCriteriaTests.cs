@@ -31,7 +31,7 @@ namespace ElasticLinq.Test.Request.Formatters
         {
             var termCriteria = TermsCriteria.Build(TermsExecutionMode.@bool, "term1", memberInfo, "singlecriteria");
 
-            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = termCriteria });
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Query = termCriteria });
             var body = JObject.Parse(formatter.Body);
 
             var result = body.TraverseWithAssert("query", "term");
@@ -45,7 +45,7 @@ namespace ElasticLinq.Test.Request.Formatters
         {
             var termCriteria = TermsCriteria.Build("term1", memberInfo, "criteria1", "criteria2");
 
-            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = termCriteria });
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Query = termCriteria });
             var body = JObject.Parse(formatter.Body);
 
             var result = body.TraverseWithAssert("query", "terms");
@@ -60,7 +60,7 @@ namespace ElasticLinq.Test.Request.Formatters
         {
             var termCriteria = TermsCriteria.Build(TermsExecutionMode.and, "term1", memberInfo, "criteria1", "criteria2");
 
-            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = termCriteria });
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Query = termCriteria });
             var body = JObject.Parse(formatter.Body);
 
             var result = body.TraverseWithAssert("query", "terms");
@@ -77,7 +77,7 @@ namespace ElasticLinq.Test.Request.Formatters
             const string expectedFieldName = "fieldShouldExist";
             var existsCriteria = new ExistsCriteria(expectedFieldName);
 
-            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = existsCriteria });
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Query = existsCriteria });
             var body = JObject.Parse(formatter.Body);
 
             var field = body.TraverseWithAssert("query", "exists", "field");
@@ -90,7 +90,7 @@ namespace ElasticLinq.Test.Request.Formatters
             const string expectedFieldName = "fieldShouldBeMissing";
             var termCriteria = new MissingCriteria(expectedFieldName);
 
-            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = termCriteria });
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Query = termCriteria });
             var body = JObject.Parse(formatter.Body);
 
             var field = body.TraverseWithAssert("query", "missing", "field");
@@ -103,7 +103,7 @@ namespace ElasticLinq.Test.Request.Formatters
             var termCriteria = TermsCriteria.Build("term1", memberInfo, "alpha", "bravo", "charlie", "delta", "echo");
             var notCriteria = NotCriteria.Create(termCriteria);
 
-            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = notCriteria });
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Query = notCriteria });
             var body = JObject.Parse(formatter.Body);
 
             var result = body.TraverseWithAssert("query", "bool", "must_not")[0]["terms"];
@@ -119,7 +119,7 @@ namespace ElasticLinq.Test.Request.Formatters
             var maxCriteria = new RangeCriteria("maxField", memberInfo, RangeComparison.LessThan, 32768);
             var orCriteria = OrCriteria.Combine(minCriteria, maxCriteria);
 
-            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = orCriteria });
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Query = orCriteria });
             var body = JObject.Parse(formatter.Body);
 
             var result = body.TraverseWithAssert("query", "bool", "should");
@@ -135,7 +135,7 @@ namespace ElasticLinq.Test.Request.Formatters
             const decimal expectedRange = 2.0m;
             var rangeCriteria = new RangeCriteria(expectedField, memberInfo, RangeComparison.GreaterThanOrEqual, expectedRange);
 
-            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = rangeCriteria });
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Query = rangeCriteria });
             var body = JObject.Parse(formatter.Body);
 
             var result = body.TraverseWithAssert("query", "range", expectedField, "gte");
@@ -149,7 +149,7 @@ namespace ElasticLinq.Test.Request.Formatters
             const string expectedRegexp = "SR20DET";
             var regexpCriteria = new RegexpCriteria(expectedField, expectedRegexp);
 
-            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = regexpCriteria });
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Query = regexpCriteria });
             var body = JObject.Parse(formatter.Body);
 
             var actualRegexp = body.TraverseWithAssert("query", "regexp", expectedField);
@@ -163,7 +163,7 @@ namespace ElasticLinq.Test.Request.Formatters
             const string expectedPrefix = "SR20";
             var prefixCriteria = new PrefixCriteria(expectedField, expectedPrefix);
 
-            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = prefixCriteria });
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Query = prefixCriteria });
             var body = JObject.Parse(formatter.Body);
 
             var actualRegexp = body.TraverseWithAssert("query", "prefix", expectedField);
@@ -175,7 +175,7 @@ namespace ElasticLinq.Test.Request.Formatters
         {
             var matchAllCriteria = MatchAllCriteria.Instance;
 
-            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = matchAllCriteria });
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Query = matchAllCriteria });
             var body = JObject.Parse(formatter.Body);
 
             body.TraverseWithAssert("query", "match_all");
@@ -188,7 +188,7 @@ namespace ElasticLinq.Test.Request.Formatters
             var existsCriteria = new ExistsCriteria(expectedFieldName);
             var orCriteria = OrCriteria.Combine(existsCriteria);
 
-            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = orCriteria });
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Query = orCriteria });
             var body = JObject.Parse(formatter.Body);
 
             var field = body.TraverseWithAssert("query", "exists", "field");
@@ -201,7 +201,7 @@ namespace ElasticLinq.Test.Request.Formatters
             var rangeCriteria = new RangeCriteria("ranged", memberInfo, RangeComparison.GreaterThanOrEqual, 88);
             var boolMust = new BoolCriteria(new[] { rangeCriteria }, null, null);
 
-            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = boolMust });
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Query = boolMust });
             var body = JObject.Parse(formatter.Body);
 
             var mustItems = body.TraverseWithAssert("query", "bool", "must");
@@ -215,7 +215,7 @@ namespace ElasticLinq.Test.Request.Formatters
             var rangeCriteria = new RangeCriteria("ranged", memberInfo, RangeComparison.GreaterThanOrEqual, 88);
             var boolMust = new BoolCriteria(null, null, new[] { rangeCriteria });
 
-            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = boolMust });
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Query = boolMust });
             var body = JObject.Parse(formatter.Body);
 
             var mustNotItems = body.TraverseWithAssert("query", "bool", "must_not");
@@ -230,7 +230,7 @@ namespace ElasticLinq.Test.Request.Formatters
             var range2 = new RangeCriteria("range2", memberInfo, RangeComparison.GreaterThanOrEqual, 88);
             var boolMust = new BoolCriteria(null, new[] { range1, range2 }, null);
 
-            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = boolMust });
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Query = boolMust });
             var body = JObject.Parse(formatter.Body);
 
             var boolBody = body.TraverseWithAssert("query", "bool");
@@ -246,7 +246,7 @@ namespace ElasticLinq.Test.Request.Formatters
         [Fact]
         public void ParseThrowsInvalidOperationForUnknownCriteriaTypes()
         {
-            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = new FakeCriteria() });
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Query = new FakeCriteria() });
             Assert.Throws<InvalidOperationException>(() => JObject.Parse(formatter.Body));
         }
 

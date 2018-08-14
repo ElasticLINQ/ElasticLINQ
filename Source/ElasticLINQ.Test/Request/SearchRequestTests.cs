@@ -16,7 +16,7 @@ namespace ElasticLinq.Test.Request
             Assert.Null(request.Size);
             Assert.Empty(request.Fields);
             Assert.Empty(request.SortOptions);
-            Assert.Null(request.Filter);
+            Assert.Null(request.Query);
         }
     }
 }

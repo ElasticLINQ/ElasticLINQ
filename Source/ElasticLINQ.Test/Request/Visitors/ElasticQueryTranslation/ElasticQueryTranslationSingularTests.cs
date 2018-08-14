@@ -20,7 +20,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var request = ElasticQueryTranslator.Translate(CouchMapping, first).SearchRequest;
 
             Assert.Equal(1, request.Size);
-            Assert.Equal("exists [doc.id]", request.Filter.ToString());
+            Assert.Equal("exists [doc.id]", request.Query.ToString());
         }
 
         [Fact]
@@ -31,7 +31,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var request = ElasticQueryTranslator.Translate(CouchMapping, first).SearchRequest;
 
             Assert.Equal(1, request.Size);
-            Assert.Equal("exists [doc.id]", request.Filter.ToString());
+            Assert.Equal("exists [doc.id]", request.Query.ToString());
         }
 
         [Fact]
@@ -44,7 +44,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var request = ElasticQueryTranslator.Translate(Mapping, first).SearchRequest;
 
             Assert.Equal(1, request.Size);
-            var termCriteria = Assert.IsType<TermCriteria>(request.Filter);
+            var termCriteria = Assert.IsType<TermCriteria>(request.Query);
             Assert.Equal("name", termCriteria.Field);
             Assert.Equal(expectedTermValue, termCriteria.Value);
         }
@@ -59,7 +59,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var request = ElasticQueryTranslator.Translate(Mapping, first).SearchRequest;
 
             Assert.Equal(1, request.Size);
-            var termCriteria = Assert.IsType<TermCriteria>(request.Filter);
+            var termCriteria = Assert.IsType<TermCriteria>(request.Query);
             Assert.Equal("name", termCriteria.Field);
             Assert.Equal(expectedTermValue, termCriteria.Value);
         }
@@ -72,7 +72,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var request = ElasticQueryTranslator.Translate(CouchMapping, first).SearchRequest;
 
             Assert.Equal(2, request.Size);
-            Assert.Equal("exists [doc.id]", request.Filter.ToString());
+            Assert.Equal("exists [doc.id]", request.Query.ToString());
         }
 
         [Fact]
@@ -83,7 +83,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var request = ElasticQueryTranslator.Translate(CouchMapping, first).SearchRequest;
 
             Assert.Equal(2, request.Size);
-            Assert.Equal("exists [doc.id]", request.Filter.ToString());
+            Assert.Equal("exists [doc.id]", request.Query.ToString());
         }
 
         [Fact]
@@ -96,7 +96,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var request = ElasticQueryTranslator.Translate(Mapping, first).SearchRequest;
 
             Assert.Equal(2, request.Size);
-            var termCriteria = Assert.IsType<TermCriteria>(request.Filter);
+            var termCriteria = Assert.IsType<TermCriteria>(request.Query);
             Assert.Equal("name", termCriteria.Field);
             Assert.Equal(expectedTermValue, termCriteria.Value);
         }
@@ -111,7 +111,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var request = ElasticQueryTranslator.Translate(Mapping, first).SearchRequest;
 
             Assert.Equal(2, request.Size);
-            var termCriteria = Assert.IsType<TermCriteria>(request.Filter);
+            var termCriteria = Assert.IsType<TermCriteria>(request.Query);
             Assert.Equal("name", termCriteria.Field);
             Assert.Equal(expectedTermValue, termCriteria.Value);
         }
@@ -124,7 +124,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var request = ElasticQueryTranslator.Translate(CouchMapping, first).SearchRequest;
 
             Assert.Equal(0, request.Size);
-            Assert.IsType<ExistsCriteria>(request.Filter);
+            Assert.IsType<ExistsCriteria>(request.Query);
         }
 
         [Fact]
@@ -137,7 +137,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var request = ElasticQueryTranslator.Translate(Mapping, first).SearchRequest;
 
             Assert.Equal(0, request.Size);
-            var termCriteria = Assert.IsType<TermCriteria>(request.Filter);
+            var termCriteria = Assert.IsType<TermCriteria>(request.Query);
             Assert.Equal("name", termCriteria.Field);
             Assert.Equal(expectedTermValue, termCriteria.Value);
         }
@@ -150,7 +150,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var request = ElasticQueryTranslator.Translate(CouchMapping, first).SearchRequest;
 
             Assert.Equal(0, request.Size);
-            Assert.IsType<ExistsCriteria>(request.Filter);
+            Assert.IsType<ExistsCriteria>(request.Query);
         }
 
         [Fact]
@@ -163,7 +163,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var request = ElasticQueryTranslator.Translate(Mapping, first).SearchRequest;
 
             Assert.Equal(0, request.Size);
-            var termCriteria = Assert.IsType<TermCriteria>(request.Filter);
+            var termCriteria = Assert.IsType<TermCriteria>(request.Query);
             Assert.Equal("name", termCriteria.Field);
             Assert.Equal(expectedTermValue, termCriteria.Value);
         }
@@ -176,7 +176,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var request = ElasticQueryTranslator.Translate(CouchMapping, first).SearchRequest;
 
             Assert.Equal(1, request.Size);
-            var existsCriteria = Assert.IsType<ExistsCriteria>(request.Filter);
+            var existsCriteria = Assert.IsType<ExistsCriteria>(request.Query);
             Assert.Equal("doc.id", existsCriteria.Field);
         }
 
@@ -190,7 +190,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var request = ElasticQueryTranslator.Translate(Mapping, first).SearchRequest;
 
             Assert.Equal(1, request.Size);
-            var termCriteria = Assert.IsType<TermCriteria>(request.Filter);
+            var termCriteria = Assert.IsType<TermCriteria>(request.Query);
             Assert.Equal("name", termCriteria.Field);
             Assert.Equal(expectedTermValue, termCriteria.Value);
         }

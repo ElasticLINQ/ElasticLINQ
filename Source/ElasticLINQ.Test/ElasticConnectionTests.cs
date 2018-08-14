@@ -262,7 +262,7 @@ namespace ElasticLinq.Test
         public void PrettySetsUriQueryWhenNoOtherQueryUriParameters()
         {
             var connection = new ElasticConnection(new Uri("http://coruscant.gov/some"), options: new ElasticConnectionOptions { Pretty = true });
-            var prettyUri = connection.GetSearchUri(new SearchRequest { DocumentType = "type1", Filter = criteria });
+            var prettyUri = connection.GetSearchUri(new SearchRequest { DocumentType = "type1", Query = criteria });
 
             Assert.Equal("pretty=true", prettyUri.GetComponents(UriComponents.Query, UriFormat.Unescaped));
         }
@@ -272,7 +272,7 @@ namespace ElasticLinq.Test
         {
             var connection = new ElasticConnection(new Uri("http://coruscant.gov/some?human=false"),
                 options: new ElasticConnectionOptions { Pretty = true });
-            var prettyUri = connection.GetSearchUri(new SearchRequest { DocumentType = "type1", Filter = criteria });
+            var prettyUri = connection.GetSearchUri(new SearchRequest { DocumentType = "type1", Query = criteria });
 
             var parameters = prettyUri.GetComponents(UriComponents.Query, UriFormat.Unescaped).Split('&');
             Assert.Equal(2, parameters.Length);
@@ -286,7 +286,7 @@ namespace ElasticLinq.Test
         {
             var connection = new ElasticConnection(new Uri("http://coruscant.gov/some?pretty=false&human=true"),
                 options: new ElasticConnectionOptions { Pretty = true });
-            var prettyUri = connection.GetSearchUri(new SearchRequest { DocumentType = "type1", Filter = criteria });
+            var prettyUri = connection.GetSearchUri(new SearchRequest { DocumentType = "type1", Query = criteria });
 
             var parameters = prettyUri.GetComponents(UriComponents.Query, UriFormat.Unescaped).Split('&');
             Assert.Equal(2, parameters.Length);

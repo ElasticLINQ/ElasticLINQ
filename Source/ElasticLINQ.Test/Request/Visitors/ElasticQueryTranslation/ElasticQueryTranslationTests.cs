@@ -28,7 +28,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             var translation = ElasticQueryTranslator.Translate(CouchMapping, Robots.Expression);
 
-            Assert.IsType<ExistsCriteria>(translation.SearchRequest.Filter);
+            Assert.IsType<ExistsCriteria>(translation.SearchRequest.Query);
         }
 
         [Fact]
@@ -37,7 +37,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var query = Robots.Where(r => r.Name == null);
             var translation = ElasticQueryTranslator.Translate(CouchMapping, query.Expression);
 
-            var andCriteria = Assert.IsType<AndCriteria>(translation.SearchRequest.Filter);
+            var andCriteria = Assert.IsType<AndCriteria>(translation.SearchRequest.Query);
             Assert.Equal(2, andCriteria.Criteria.Count);
             Assert.Single(andCriteria.Criteria, c => c is ExistsCriteria);
             Assert.Single(andCriteria.Criteria, c => c is MissingCriteria);
@@ -49,7 +49,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var query = Robots.Where(r => r.Name == "a" && r.Cost > 1);
             var translation = ElasticQueryTranslator.Translate(CouchMapping, query.Expression);
 
-            var andCriteria = Assert.IsType<AndCriteria>(translation.SearchRequest.Filter);
+            var andCriteria = Assert.IsType<AndCriteria>(translation.SearchRequest.Query);
             Assert.Equal(3, andCriteria.Criteria.Count);
             Assert.Single(andCriteria.Criteria, c => c is TermCriteria);
             Assert.Single(andCriteria.Criteria, c => c is RangeCriteria);
@@ -62,7 +62,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var query = Robots.Where(r => r.Name == "a" || r.Cost > 1);
             var translation = ElasticQueryTranslator.Translate(CouchMapping, query.Expression);
 
-            var andCriteria = Assert.IsType<AndCriteria>(translation.SearchRequest.Filter);
+            var andCriteria = Assert.IsType<AndCriteria>(translation.SearchRequest.Query);
             Assert.Equal(2, andCriteria.Criteria.Count);
             Assert.Single(andCriteria.Criteria, c => c is OrCriteria);
             Assert.Single(andCriteria.Criteria, c => c is ExistsCriteria);
@@ -74,7 +74,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var query = Robots.Where(r => true);
             var translation = ElasticQueryTranslator.Translate(Mapping, query.Expression);
 
-            Assert.Null(translation.SearchRequest.Filter);
+            Assert.Null(translation.SearchRequest.Query);
         }
 
         [Fact]
@@ -83,7 +83,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var query = Robots.Where(r => true);
             var translation = ElasticQueryTranslator.Translate(CouchMapping, query.Expression);
 
-            Assert.IsType<ExistsCriteria>(translation.SearchRequest.Filter);
+            Assert.IsType<ExistsCriteria>(translation.SearchRequest.Query);
         }
 
         [Fact]
@@ -142,7 +142,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
             var request = ElasticQueryTranslator.Translate(Mapping, query.Expression).SearchRequest;
 
-            Assert.NotNull(request.Filter);
+            Assert.NotNull(request.Query);
             Assert.Equal(expectedScore, request.MinScore);
         }
     }

@@ -44,7 +44,7 @@ namespace ElasticLinq.Test.Request.Formatters
             const string expectedQuery = "this is my query string";
             var queryString = new QueryStringCriteria(expectedQuery);
 
-            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = queryString });
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Query = queryString });
             var body = JObject.Parse(formatter.Body);
 
             var result = body.TraverseWithAssert("query", "query_string", "query");
@@ -58,7 +58,7 @@ namespace ElasticLinq.Test.Request.Formatters
             var expectedFields = new[] { "green", "brown", "yellow" };
             var queryString = new QueryStringCriteria(expectedQuery, expectedFields);
 
-            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = queryString });
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Query = queryString });
             var body = JObject.Parse(formatter.Body);
 
             var result = body.TraverseWithAssert("query", "query_string");
@@ -76,7 +76,7 @@ namespace ElasticLinq.Test.Request.Formatters
                     new RangeSpecificationCriteria(RangeComparison.GreaterThan, 200)
                 });
 
-            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = rangeCriteria });
+            var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Query = rangeCriteria });
             var body = JObject.Parse(formatter.Body);
 
             var result = body.TraverseWithAssert("query", "range");
@@ -140,11 +140,11 @@ namespace ElasticLinq.Test.Request.Formatters
         {
             var plainBody = new SearchRequestFormatter(
                 new ElasticConnection(defaultConnection.Endpoint, options: new ElasticConnectionOptions { Pretty = false }),
-                mapping, new SearchRequest { DocumentType = "type1", Filter = criteria }).Body;
+                mapping, new SearchRequest { DocumentType = "type1", Query = criteria }).Body;
 
             var prettyBody = new SearchRequestFormatter(
                 new ElasticConnection(defaultConnection.Endpoint, options: new ElasticConnectionOptions { Pretty = true }),
-                mapping, new SearchRequest { DocumentType = "type1", Filter = criteria }).Body;
+                mapping, new SearchRequest { DocumentType = "type1", Query = criteria }).Body;
 
             Assert.NotSame(plainBody, prettyBody);
 
@@ -158,7 +158,7 @@ namespace ElasticLinq.Test.Request.Formatters
             const int expectedSize = 1234;
             var connectionOptions = new ElasticConnectionOptions { SearchSizeDefault = expectedSize };
             var connection = new ElasticConnection(defaultConnection.Endpoint, options: connectionOptions);
-            var searchRequest = new SearchRequest { DocumentType = "type1", Filter = criteria };
+            var searchRequest = new SearchRequest { DocumentType = "type1", Query = criteria };
 
             var formatter = new SearchRequestFormatter(connection, mapping, searchRequest);
             var body = JObject.Parse(formatter.Body);
@@ -172,7 +172,7 @@ namespace ElasticLinq.Test.Request.Formatters
             const long expectedSize = 54321;
             var connectionOptions = new ElasticConnectionOptions { SearchSizeDefault = 111222 };
             var connection = new ElasticConnection(defaultConnection.Endpoint, options: connectionOptions);
-            var searchRequest = new SearchRequest { DocumentType = "type1", Filter = criteria, Size = expectedSize};
+            var searchRequest = new SearchRequest { DocumentType = "type1", Query = criteria, Size = expectedSize};
 
             var formatter = new SearchRequestFormatter(connection, mapping, searchRequest);
             var body = JObject.Parse(formatter.Body);

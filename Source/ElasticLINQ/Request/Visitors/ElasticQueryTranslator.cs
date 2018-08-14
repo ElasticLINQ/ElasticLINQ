@@ -49,7 +49,7 @@ namespace ElasticLinq.Request.Visitors
             var evaluated = PartialEvaluator.Evaluate(e);
             CompleteHitTranslation(evaluated);
 
-            searchRequest.Filter = ConstantCriteriaFilterReducer.Reduce(searchRequest.Filter);
+            searchRequest.Query = ConstantCriteriaFilterReducer.Reduce(searchRequest.Query);
             ApplyTypeSelectionCriteria();
 
             return new ElasticTranslateResult(searchRequest, materializer);
@@ -59,9 +59,9 @@ namespace ElasticLinq.Request.Visitors
         {
             var typeCriteria = Mapping.GetTypeSelectionCriteria(SourceType);
 
-            searchRequest.Filter = searchRequest.Filter == null || searchRequest.Filter == ConstantCriteria.True
+            searchRequest.Query = searchRequest.Query == null || searchRequest.Query == ConstantCriteria.True
                 ? typeCriteria
-                : AndCriteria.Combine(typeCriteria, searchRequest.Filter);
+                : AndCriteria.Combine(typeCriteria, searchRequest.Query);
         }
 
         void CompleteHitTranslation(Expression evaluated)
@@ -161,7 +161,7 @@ namespace ElasticLinq.Request.Visitors
             var constantFieldExpression = fieldsExpression as ConstantExpression;
             var constantFields = (string[]) constantFieldExpression?.Value;
             var criteriaExpression = new CriteriaExpression(new QueryStringCriteria(constantQueryExpression.Value.ToString(), constantFields));
-            searchRequest.Filter = AndCriteria.Combine(searchRequest.Filter, criteriaExpression.Criteria);
+            searchRequest.Query = AndCriteria.Combine(searchRequest.Query, criteriaExpression.Criteria);
 
             return Visit(source);
         }
@@ -298,7 +298,7 @@ namespace ElasticLinq.Request.Visitors
             if (criteriaExpression == null)
                 throw new NotSupportedException($"Where expression '{lambda.Body}' could not be translated");
 
-            searchRequest.Filter = AndCriteria.Combine(searchRequest.Filter, criteriaExpression.Criteria);
+            searchRequest.Query = AndCriteria.Combine(searchRequest.Query, criteriaExpression.Criteria);
 
             return Visit(source);
         }
