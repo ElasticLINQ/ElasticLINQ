@@ -107,10 +107,25 @@ namespace ElasticLinq
             log.Debug(null, null, "Request: POST {0}", uri);
             log.Debug(null, null, "Body:\n{0}", body);
 
-            using (var requestMessage = new HttpRequestMessage(HttpMethod.Post, uri) { Content = new StringContent(body) })
-            using (var response = await SendRequestAsync(requestMessage, token, log))
-            using (var responseStream = await response.Content.ReadAsStreamAsync())
-                return ParseResponse(responseStream, log);
+            using (var requestMessage = new HttpRequestMessage(HttpMethod.Post, uri) {Content = new StringContent(body)})
+            {
+                try
+                {
+                    using (var response = await SendRequestAsync(requestMessage, token, log))
+                    {
+                        using (var responseStream = await response.Content.ReadAsStreamAsync())
+                            return ParseResponse(responseStream, log);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    if (ex is HttpRequestException)
+                    {
+                    }
+
+                    throw;
+                }
+            }
         }
 
         /// <inheritdoc/>
