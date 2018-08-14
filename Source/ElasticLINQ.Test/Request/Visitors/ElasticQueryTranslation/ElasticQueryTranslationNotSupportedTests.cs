@@ -186,14 +186,6 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         }
 
         [Fact]
-        public static void QueryCannotTakeAFunc()
-        {
-            Func<Robot, bool> wherePredicateFunc = r => r.Name.Contains("a");
-            var ex = Assert.Throws<NotSupportedException>(() => Translate(Robots.Where(r => wherePredicateFunc(r))));
-            Assert.Contains("Query expression ", ex.Message);
-        }
-
-        [Fact]
         public static void SelectManyCannotBeTranslated()
         {
             var ex = Assert.Throws<NotSupportedException>(() => Translate(Robots.SelectMany(r => r.Aliases)));
