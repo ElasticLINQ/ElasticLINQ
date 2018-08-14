@@ -5,6 +5,7 @@ using ElasticLinq.Utility;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -186,6 +187,33 @@ namespace ElasticLinq.Mapping
         public virtual object Materialize(JToken sourceDocument, Type sourceType)
         {
             return sourceDocument.ToObject(sourceType);
+        }
+
+        /// <summary>
+        /// Basic set of mappings from CLR types to Elastic field types.
+        /// </summary>
+        public static Dictionary<Type, string> FieldTypeMappings = new Dictionary<Type, string>
+        {
+            { typeof(string), "text" },
+            { typeof(long), "long" },
+            { typeof(int), "integer" },
+            { typeof(short), "short" },
+            { typeof(byte), "byte" },
+            { typeof(double), "double" },
+            { typeof(decimal), "double" }, // Close enough for sorting purposes
+            { typeof(float), "float" },
+            { typeof(DateTime), "date" },
+            { typeof(DateTimeOffset), "date" },
+            { typeof(bool), "bool" }
+        };
+
+        /// <inheritedDoc />
+        public string GetElasticFieldType(Type type)
+        {
+            if (FieldTypeMappings.TryGetValue(type, out var fieldType))
+                return fieldType;
+
+            throw new NotSupportedException($"CLR Type {type} has no equivalent Elastic field type available");
         }
     }
 }

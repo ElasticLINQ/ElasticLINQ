@@ -310,8 +310,8 @@ namespace ElasticLinq.Request.Visitors
             if (final != null)
             {
                 var fieldName = Mapping.GetFieldName(SourceType, final);
-                var ignoreUnmapped = final.Type.IsNullable(); // Consider a config switch?
-                searchRequest.SortOptions.Insert(0, new SortOption(fieldName, ascending, ignoreUnmapped));
+                var sortFieldType = Mapping.GetElasticFieldType(final.Type);
+                searchRequest.SortOptions.Insert(0, new SortOption(fieldName, ascending, sortFieldType));
             }
 
             return Visit(source);

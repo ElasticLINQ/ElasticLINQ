@@ -90,12 +90,12 @@ namespace ElasticLinq.Request.Formatters
 
         static object Build(SortOption sortOption)
         {
-            if (!sortOption.IgnoreUnmapped)
+            if (String.IsNullOrEmpty(sortOption.UnmappedType))
                 return sortOption.Ascending
                     ? (object)sortOption.Name
                     : new JObject(new JProperty(sortOption.Name, "desc"));
 
-            var properties = new List<JProperty> { new JProperty("ignore_unmapped", true) };
+            var properties = new List<JProperty> { new JProperty("unmapped_type", sortOption.UnmappedType) };
             if (!sortOption.Ascending)
                 properties.Add(new JProperty("order", "desc"));
 

@@ -152,14 +152,14 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         }
 
         [Fact]
-        public void OrderByStringSpecifiesIgnoreUnmappedSortOption()
+        public void OrderByStringSpecifiesUnmappedTypeSortOption()
         {
             var ordered = Robots.OrderBy(e => e.Name);
             var sortOptions = ElasticQueryTranslator.Translate(Mapping, ordered.Expression).SearchRequest.SortOptions;
 
             Assert.NotNull(sortOptions);
             Assert.Equal(1, sortOptions.Count);
-            Assert.True(sortOptions[0].IgnoreUnmapped);
+            Assert.Equal("text", sortOptions[0].UnmappedType);
         }
 
         [Fact]
@@ -170,7 +170,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
             Assert.NotNull(sortOptions);
             Assert.Equal(1, sortOptions.Count);
-            Assert.False(sortOptions[0].IgnoreUnmapped);
+            Assert.Equal("double", sortOptions[0].UnmappedType);
         }
 
         [Fact]
@@ -181,7 +181,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
 
             Assert.NotNull(sortOptions);
             Assert.Equal(1, sortOptions.Count);
-            Assert.True(sortOptions[0].IgnoreUnmapped);
+            Assert.Equal("integer", sortOptions[0].UnmappedType);
         }
     }
 }

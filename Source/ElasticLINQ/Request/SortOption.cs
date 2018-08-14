@@ -14,14 +14,14 @@ namespace ElasticLinq.Request
         /// </summary>
         /// <param name="name">Name of the field to sort by.</param>
         /// <param name="ascending">True if this field should be in ascending order; false otherwise.</param>
-        /// <param name="ignoreUnmapped">Whether unmapped fields should be ignored or not.</param>
-        public SortOption(string name, bool ascending, bool ignoreUnmapped = false)
+        /// <param name="unmappedType">What ElasticSearch should unmapped values be treated as.</param>
+        public SortOption(string name, bool ascending, string unmappedType = null)
         {
             Argument.EnsureNotBlank(nameof(name), name);
 
             Name = name;
             Ascending = ascending;
-            IgnoreUnmapped = ignoreUnmapped;
+            UnmappedType = unmappedType;
         }
 
         /// <summary>
@@ -35,8 +35,8 @@ namespace ElasticLinq.Request
         public bool Ascending { get; }
 
         /// <summary>
-        /// Whether documents with unmapped fields should be ignored or not.
+        /// What ElasticSearch type should unmapped values be treated as.
         /// </summary>
-        public bool IgnoreUnmapped { get; }
+        public string UnmappedType { get; }
     }
 }

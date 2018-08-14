@@ -29,7 +29,7 @@ namespace ElasticLinq.Mapping
         /// using the Couchbase/Elasticsearch adapter yields documents with the document type
         /// "couchbaseDocument", regardless of the CLR type.
         /// </summary>
-        /// <param name="type">The type whose name is required.</param>
+        /// <param name="type">The CLR type whose name is required.</param>
         /// <returns>Returns the Elasticsearch document type name that matches the type; may
         /// return <c>null</c> or empty string to not limit searches to a document type.</returns>
         string GetDocumentType(Type type);
@@ -39,7 +39,7 @@ namespace ElasticLinq.Mapping
         /// mapping field names in the CLR to field names in Elasticsearch. Typically, these rules
         /// will need to match the serialization rules you use when storing your documents.
         /// </summary>
-        /// <param name="type">The type used in the source query.</param>
+        /// <param name="type">The CLR type used in the source query.</param>
         /// <param name="memberExpression">The member expression whose name is required.</param>
         /// <returns>Returns the Elasticsearch field name that matches the member.</returns>
         string GetFieldName(Type type, MemberExpression memberExpression);
@@ -50,7 +50,7 @@ namespace ElasticLinq.Mapping
         /// can unambiguously select documents of the given type. Typically this should return an 
         /// ExistsCriteria for a field that's known to always have a value.
         /// </summary>
-        /// <param name="type">The type that's being searched.</param>
+        /// <param name="type">The CLR type that's being searched.</param>
         /// <returns>The criteria for selecting documents of this type.</returns>
         ICriteria GetTypeSelectionCriteria(Type type);
 
@@ -61,5 +61,12 @@ namespace ElasticLinq.Mapping
         /// <param name="sourceType">Type of CLR object to materialize to.</param>
         /// <returns>Freshly materialized CLR object version of the source document.</returns>
         object Materialize(JToken sourceDocument, Type sourceType);
+
+        /// <summary>
+        /// Get the Elastic field type that corresponds with this CLR type.
+        /// </summary>
+        /// <param name="type">The CLR type to get the equivalent Elastic field type for.</param>
+        /// <returns>The corresponding Elastic field type.</returns>
+        string GetElasticFieldType(Type type);
     }
 }

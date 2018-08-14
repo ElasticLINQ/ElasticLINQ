@@ -29,13 +29,13 @@ namespace ElasticLinq.IntegrationTest
         [Fact]
         public void OrderByStringThenByDateTime()
         {
-            DataAssert.Same<WebUser>(q => q.OrderBy(w => w.Forename).ThenBy(w => w.Joined));
+            DataAssert.Same<WebUser>(q => q.OrderBy(w => w.Username).ThenBy(w => w.Joined));
         }
 
         [Fact]
         public void OrderByStringThenByDateTimeDescending()
         {
-            DataAssert.Same<WebUser>(q => q.OrderBy(w => w.Forename).ThenByDescending(w => w.Joined));
+            DataAssert.Same<WebUser>(q => q.OrderBy(w => w.Username).ThenByDescending(w => w.Joined));
         }
 
         [Fact]
@@ -59,13 +59,13 @@ namespace ElasticLinq.IntegrationTest
         [Fact]
         public void OrderByStringDescendingThenByDateTime()
         {
-            DataAssert.Same<WebUser>(q => q.OrderByDescending(w => w.Forename).ThenBy(w => w.Joined));
+            DataAssert.Same<WebUser>(q => q.OrderByDescending(w => w.Username).ThenBy(w => w.Joined));
         }
 
         [Fact]
         public void OrderByStringDescendingThenByDateTimeDescending()
         {
-            DataAssert.Same<WebUser>(q => q.OrderByDescending(w => w.Forename).ThenByDescending(w => w.Joined));
+            DataAssert.Same<WebUser>(q => q.OrderByDescending(w => w.Username).ThenByDescending(w => w.Joined));
         }
     }
 }

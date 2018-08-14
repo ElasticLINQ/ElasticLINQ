@@ -147,13 +147,6 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         }
 
         [Fact]
-        public static void StringContainsMustNotBeInAWhere()
-        {
-            var ex = Assert.Throws<NotSupportedException>(() => Translate(Robots.Where(r => r.Name.Contains("a"))));
-            Assert.Contains("String.Contains can only be used within .Query()", ex.Message);
-        }
-
-        [Fact]
         public static void ContainsOnEntityPropertyMustBeMatchedWithConstant()
         {
             var ex = Assert.Throws<NotSupportedException>(() => Translate(Robots.Where(r => r.Aliases.Contains(r.Name))));
@@ -208,15 +201,6 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             var first = MakeQueryableExpression(method, Robots);
             var ex = Assert.Throws<NotSupportedException>(() => ElasticQueryTranslator.Translate(Mapping, first));
             Assert.Contains("Queryable." + method + " method is not supported", ex.Message);
-        }
-
-        [Fact]
-        public static void WhereContainsFailsAfterQueryTransition()
-        {
-            var query = Robots.Where(r => r.Name.StartsWith("a")).Where(r => r.Name.Contains("b"));
-
-            var ex = Assert.Throws<NotSupportedException>(() => Translate(query));
-            Assert.Contains("String.Contains can only be used within .Query()", ex.Message);
         }
 
         static ElasticTranslateResult Translate(IQueryable query)

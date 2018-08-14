@@ -3,6 +3,7 @@
 using ElasticLinq.Request.Criteria;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -53,6 +54,12 @@ namespace ElasticLinq.Mapping
         public object Materialize(JToken sourceDocument, Type objectType)
         {
             return wrapped.Materialize(sourceDocument, objectType);
+        }
+
+        /// <inheritdoc/>
+        public string GetElasticFieldType(Type type)
+        {
+            return wrapped.GetElasticFieldType(type);
         }
     }
 }

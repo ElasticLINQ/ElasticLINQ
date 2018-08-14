@@ -88,7 +88,7 @@ namespace ElasticLinq.Test.Request.Formatters
         [Fact]
         public void BodyContainsSortOptions()
         {
-            var expectedSortOptions = new List<SortOption> { new SortOption("first", true), new SortOption("second", false), new SortOption("third", false, true) };
+            var expectedSortOptions = new List<SortOption> { new SortOption("first", true), new SortOption("second", false), new SortOption("third", false, "long") };
 
             var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", SortOptions = expectedSortOptions });
             var body = JObject.Parse(formatter.Body);
@@ -98,12 +98,12 @@ namespace ElasticLinq.Test.Request.Formatters
             {
                 var actualSort = result[i];
                 var desiredSort = expectedSortOptions[i];
-                if (desiredSort.IgnoreUnmapped)
+                if (!String.IsNullOrEmpty(desiredSort.UnmappedType))
                 {
                     var first = (JProperty)actualSort.First;
                     Assert.Equal(desiredSort.Name, first.Name);
                     var childProperties = first.First.Children().Cast<JProperty>().ToArray();
-                    Assert.Single(childProperties, f => f.Name == "ignore_unmapped" && f.Value.ToObject<bool>());
+                    Assert.Single(childProperties, f => f.Name == "unmapped_type");
                     Assert.Single(childProperties, f => f.Name == "order" && f.Value.ToObject<string>() == "desc");
                 }
                 else
