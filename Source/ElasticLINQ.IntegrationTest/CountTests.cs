@@ -75,7 +75,7 @@ namespace ElasticLinq.IntegrationTest
         public void QueryCount()
         {
             Assert.Equal(
-                data.Elastic<JobOpening>().Query(j => j.JobTitle.Contains("a")).Count(),
+                data.Elastic<JobOpening>().Where(j => j.JobTitle.Contains("a")).Count(),
                 data.Memory<JobOpening>().Where(j => j.JobTitle.ToLowerInvariant().Contains("a")).Count());
         }
 
@@ -83,7 +83,7 @@ namespace ElasticLinq.IntegrationTest
         public void QueryLongCount()
         {
             Assert.Equal(
-                data.Elastic<JobOpening>().Query(j => j.JobTitle.Contains("a")).LongCount(),
+                data.Elastic<JobOpening>().Where(j => j.JobTitle.Contains("a")).LongCount(),
                 data.Memory<JobOpening>().Where(j => j.JobTitle.ToLowerInvariant().Contains("a")).LongCount());
         }
 
@@ -91,7 +91,7 @@ namespace ElasticLinq.IntegrationTest
         public void QueryCountPredicate()
         {
             Assert.Equal(
-                data.Elastic<JobOpening>().Query(j => j.JobTitle.Contains("a")).Count(j => j.Id > MidPoint),
+                data.Elastic<JobOpening>().Where(j => j.JobTitle.Contains("a")).Count(j => j.Id > MidPoint),
                 data.Memory<JobOpening>().Where(j => j.JobTitle.ToLowerInvariant().Contains("a")).Count(j => j.Id > MidPoint));
         }
 
@@ -99,7 +99,7 @@ namespace ElasticLinq.IntegrationTest
         public void QueryLongCountPredicate()
         {
             Assert.Equal(
-                data.Elastic<JobOpening>().Query(j => j.JobTitle.Contains("a")).LongCount(j => j.Id > MidPoint),
+                data.Elastic<JobOpening>().Where(j => j.JobTitle.Contains("a")).LongCount(j => j.Id > MidPoint),
                 data.Memory<JobOpening>().Where(j => j.JobTitle.ToLowerInvariant().Contains("a")).LongCount(j => j.Id > MidPoint));
         }
     }
