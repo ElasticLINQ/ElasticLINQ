@@ -62,7 +62,7 @@ namespace ElasticLinq.Request.Formatters
             var queryRoot = root;
 
             if (searchRequest.Filter != null)
-                queryRoot.Add("query", Build(searchRequest.Filter));
+                queryRoot.Add("query", Build(QueryCriteriaRewriter.Compensate(searchRequest.Filter)));
 
             if (searchRequest.SortOptions.Any())
                 root.Add("sort", Build(searchRequest.SortOptions));
