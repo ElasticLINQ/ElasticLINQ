@@ -81,9 +81,9 @@ namespace ElasticLinq.Test.Request.Visitors
         {
             var expected = new Sample { Id = "T-900", Name = "Cameron" };
             const string key = "Summer";
-            var dictionary = new Dictionary<string, JToken> { { key, JToken.FromObject(expected) } };
+            var dictionary = new JObject(new Dictionary<string, JToken> { { key, JToken.FromObject(expected) } });
 
-            var actual = (Sample)MemberProjectionExpressionVisitor.GetDictionaryValueOrDefault(dictionary, key, typeof(Sample));
+            var actual = (Sample)MemberProjectionExpressionVisitor.GetKeyedValueOrDefault(dictionary, key, typeof(Sample));
 
             Assert.Equal(expected.Id, actual.Id);
             Assert.Equal(expected.Name, actual.Name);
@@ -93,9 +93,9 @@ namespace ElasticLinq.Test.Request.Visitors
         public void GetDictionaryValueOrDefaultReturnsSingleItemInArrayFromDictionaryKeyFound()
         {
             const string expected = "Cameron";
-            var dictionary = new Dictionary<string, JToken> { { "fields", JToken.Parse("[ \"" + expected + "\" ]") } };
+            var dictionary = new JObject(new Dictionary<string, JToken> { { "fields", JToken.Parse("[ \"" + expected + "\" ]") } });
 
-            var actual = MemberProjectionExpressionVisitor.GetDictionaryValueOrDefault(dictionary, "fields", typeof(string));
+            var actual = MemberProjectionExpressionVisitor.GetKeyedValueOrDefault(dictionary, "fields", typeof(string));
 
             Assert.Equal(expected, actual);
         }
@@ -104,9 +104,9 @@ namespace ElasticLinq.Test.Request.Visitors
         public void GetDictionaryValueOrDefaultReturnsArrayIfArrayDesiredFromDictionaryKeyFound()
         {
             var expected = new[] { "Cameron" };
-            var dictionary = new Dictionary<string, JToken> { { "fields", JToken.Parse("[ \"" + expected[0] + "\" ]") } };
+            var dictionary = new JObject(new Dictionary<string, JToken> { { "fields", JToken.Parse("[ \"" + expected[0] + "\" ]") } });
 
-            var actual = MemberProjectionExpressionVisitor.GetDictionaryValueOrDefault(dictionary, "fields", expected.GetType());
+            var actual = MemberProjectionExpressionVisitor.GetKeyedValueOrDefault(dictionary, "fields", expected.GetType());
 
             Assert.IsType(expected.GetType(), actual);
             Assert.Equal(expected, actual);
@@ -115,7 +115,7 @@ namespace ElasticLinq.Test.Request.Visitors
         [Fact]
         public void GetDictionaryValueOrDefaultReturnsDefaultObjectIfDictionaryIsNull()
         {
-            var actual = (DateTime)MemberProjectionExpressionVisitor.GetDictionaryValueOrDefault(null, "Any", typeof(DateTime));
+            var actual = (DateTime)MemberProjectionExpressionVisitor.GetKeyedValueOrDefault(null, "Any", typeof(DateTime));
 
             Assert.Equal(default(DateTime), actual);
         }
@@ -123,9 +123,9 @@ namespace ElasticLinq.Test.Request.Visitors
         [Fact]
         public void GetDictionaryValueOrDefaultReturnsDefaultObjectIfKeyNotFoundForValueType()
         {
-            var dictionary = new Dictionary<string, JToken>();
+            var dictionary = new JObject(new Dictionary<string, JToken>());
 
-            var actual = (int)MemberProjectionExpressionVisitor.GetDictionaryValueOrDefault(dictionary, "Any", typeof(int));
+            var actual = (int)MemberProjectionExpressionVisitor.GetKeyedValueOrDefault(dictionary, "Any", typeof(int));
 
             Assert.Equal(0, actual);
         }
@@ -133,9 +133,9 @@ namespace ElasticLinq.Test.Request.Visitors
         [Fact]
         public void GetDictionaryValueOrDefaultReturnsNullIfKeyNotFoundForReferenceType()
         {
-            var dictionary = new Dictionary<string, JToken>();
+            var dictionary = new JObject(new Dictionary<string, JToken>());
 
-            var actual = (Sample)MemberProjectionExpressionVisitor.GetDictionaryValueOrDefault(dictionary, "Any", typeof(Sample));
+            var actual = (Sample)MemberProjectionExpressionVisitor.GetKeyedValueOrDefault(dictionary, "Any", typeof(Sample));
 
             Assert.Null(actual);
         }
