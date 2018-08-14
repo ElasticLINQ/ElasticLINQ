@@ -130,7 +130,7 @@ namespace ElasticLinq.Test.Request.Formatters
             var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Fields = expectedFields });
             var body = JObject.Parse(formatter.Body);
 
-            var result = body.TraverseWithAssert("fields");
+            var result = body.TraverseWithAssert("_source");
             foreach (var field in expectedFields)
                 Assert.Contains(field, result);
         }

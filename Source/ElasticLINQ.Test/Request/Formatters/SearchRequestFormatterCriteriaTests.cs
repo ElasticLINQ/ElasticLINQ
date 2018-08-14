@@ -27,28 +27,28 @@ namespace ElasticLinq.Test.Request.Formatters
         }
 
         [Fact]
-        public void BodyContainsFilterTerm()
+        public void BodyContainsTerm()
         {
             var termCriteria = TermsCriteria.Build(TermsExecutionMode.@bool, "term1", memberInfo, "singlecriteria");
 
             var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = termCriteria });
             var body = JObject.Parse(formatter.Body);
 
-            var result = body.TraverseWithAssert("query", "filtered", "filter", "term");
+            var result = body.TraverseWithAssert("query", "term");
             Assert.Equal(1, result.Count());
             Assert.Equal("!!! singlecriteria !!!", result[termCriteria.Field].ToString());
             Assert.Null(result["execution"]);  // Only applicable to "terms" filters
         }
 
         [Fact]
-        public void BodyContainsFilterTerms()
+        public void BodyContainsTerms()
         {
             var termCriteria = TermsCriteria.Build("term1", memberInfo, "criteria1", "criteria2");
 
             var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = termCriteria });
             var body = JObject.Parse(formatter.Body);
 
-            var result = body.TraverseWithAssert("query", "filtered", "filter", "terms");
+            var result = body.TraverseWithAssert("query", "terms");
             var actualTerms = result.TraverseWithAssert(termCriteria.Field);
             foreach (var criteria in termCriteria.Values)
                 Assert.Contains("!!! " + criteria + " !!!", actualTerms.Select(t => t.ToString()).ToArray());
@@ -56,14 +56,14 @@ namespace ElasticLinq.Test.Request.Formatters
         }
 
         [Fact]
-        public void BodyContainsFilterTermsWithExecutionMode()
+        public void BodyContainsTermsWithExecutionMode()
         {
             var termCriteria = TermsCriteria.Build(TermsExecutionMode.and, "term1", memberInfo, "criteria1", "criteria2");
 
             var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = termCriteria });
             var body = JObject.Parse(formatter.Body);
 
-            var result = body.TraverseWithAssert("query", "filtered", "filter", "terms");
+            var result = body.TraverseWithAssert("query", "terms");
             var actualTerms = result.TraverseWithAssert(termCriteria.Field);
             foreach (var criteria in termCriteria.Values)
                 Assert.Contains("!!! " + criteria + " !!!", actualTerms.Select(t => t.ToString()).ToArray());
@@ -72,7 +72,7 @@ namespace ElasticLinq.Test.Request.Formatters
         }
 
         [Fact]
-        public void BodyContainsFilterExists()
+        public void BodyContainsExists()
         {
             const string expectedFieldName = "fieldShouldExist";
             var existsCriteria = new ExistsCriteria(expectedFieldName);
@@ -80,12 +80,12 @@ namespace ElasticLinq.Test.Request.Formatters
             var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = existsCriteria });
             var body = JObject.Parse(formatter.Body);
 
-            var field = body.TraverseWithAssert("query", "filtered", "filter", "exists", "field");
+            var field = body.TraverseWithAssert("query", "exists", "field");
             Assert.Equal(expectedFieldName, field);
         }
 
         [Fact]
-        public void BodyContainsFilterMissing()
+        public void BodyContainsMissing()
         {
             const string expectedFieldName = "fieldShouldBeMissing";
             var termCriteria = new MissingCriteria(expectedFieldName);
@@ -93,12 +93,12 @@ namespace ElasticLinq.Test.Request.Formatters
             var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = termCriteria });
             var body = JObject.Parse(formatter.Body);
 
-            var field = body.TraverseWithAssert("query", "filtered", "filter", "missing", "field");
+            var field = body.TraverseWithAssert("query", "missing", "field");
             Assert.Equal(expectedFieldName, field);
         }
 
         [Fact]
-        public void BodyContainsFilterNot()
+        public void BodyContainsBoolMustNot()
         {
             var termCriteria = TermsCriteria.Build("term1", memberInfo, "alpha", "bravo", "charlie", "delta", "echo");
             var notCriteria = NotCriteria.Create(termCriteria);
@@ -106,14 +106,14 @@ namespace ElasticLinq.Test.Request.Formatters
             var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = notCriteria });
             var body = JObject.Parse(formatter.Body);
 
-            var result = body.TraverseWithAssert("query", "filtered", "filter", "not", "terms");
+            var result = body.TraverseWithAssert("query", "bool", "must_not")[0]["terms"];
             var actualTerms = result.TraverseWithAssert(termCriteria.Field);
             foreach (var criteria in termCriteria.Values)
                 Assert.Contains("!!! " + criteria + " !!!", actualTerms.Select(t => t.ToString()).ToArray());
         }
 
         [Fact]
-        public void BodyContainsFilterOr()
+        public void BodyContainsBoolShould()
         {
             var minCriteria = new RangeCriteria("minField", memberInfo, RangeComparison.GreaterThanOrEqual, 100);
             var maxCriteria = new RangeCriteria("maxField", memberInfo, RangeComparison.LessThan, 32768);
@@ -122,14 +122,14 @@ namespace ElasticLinq.Test.Request.Formatters
             var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = orCriteria });
             var body = JObject.Parse(formatter.Body);
 
-            var result = body.TraverseWithAssert("query", "filtered", "filter", "or");
+            var result = body.TraverseWithAssert("query", "bool", "should");
             Assert.Equal(2, result.Children().Count());
             foreach (var child in result)
                 Assert.True(((JProperty)(child.First)).Name == "range");
         }
 
         [Fact]
-        public void BodyContainsRangeFilter()
+        public void BodyContainsRange()
         {
             const string expectedField = "capacity";
             const decimal expectedRange = 2.0m;
@@ -138,12 +138,12 @@ namespace ElasticLinq.Test.Request.Formatters
             var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = rangeCriteria });
             var body = JObject.Parse(formatter.Body);
 
-            var result = body.TraverseWithAssert("query", "filtered", "filter", "range", expectedField, "gte");
+            var result = body.TraverseWithAssert("query", "range", expectedField, "gte");
             Assert.Equal("!!! 2.0 !!!", result);
         }
 
         [Fact]
-        public void BodyContainsRegexFilter()
+        public void BodyContainsRegexp()
         {
             const string expectedField = "motor";
             const string expectedRegexp = "SR20DET";
@@ -152,12 +152,12 @@ namespace ElasticLinq.Test.Request.Formatters
             var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = regexpCriteria });
             var body = JObject.Parse(formatter.Body);
 
-            var actualRegexp = body.TraverseWithAssert("query", "filtered", "filter", "regexp", expectedField);
+            var actualRegexp = body.TraverseWithAssert("query", "regexp", expectedField);
             Assert.Equal(expectedRegexp, actualRegexp);
         }
 
         [Fact]
-        public void BodyContainsPrefixFilter()
+        public void BodyContainsPrefix()
         {
             const string expectedField = "motor";
             const string expectedPrefix = "SR20";
@@ -166,7 +166,7 @@ namespace ElasticLinq.Test.Request.Formatters
             var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = prefixCriteria });
             var body = JObject.Parse(formatter.Body);
 
-            var actualRegexp = body.TraverseWithAssert("query", "filtered", "filter", "prefix", expectedField);
+            var actualRegexp = body.TraverseWithAssert("query", "prefix", expectedField);
             Assert.Equal(expectedPrefix, actualRegexp);
         }
 
@@ -178,11 +178,11 @@ namespace ElasticLinq.Test.Request.Formatters
             var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = matchAllCriteria });
             var body = JObject.Parse(formatter.Body);
 
-            body.TraverseWithAssert("query", "filtered", "filter", "match_all");
+            body.TraverseWithAssert("query", "match_all");
         }
 
         [Fact]
-        public void BodyContainsFilterSingleCollapsedOr()
+        public void BodyContainsExistsFieldSingleCollapsedOr()
         {
             const string expectedFieldName = "fieldShouldExist";
             var existsCriteria = new ExistsCriteria(expectedFieldName);
@@ -191,7 +191,7 @@ namespace ElasticLinq.Test.Request.Formatters
             var formatter = new SearchRequestFormatter(defaultConnection, mapping, new SearchRequest { DocumentType = "type1", Filter = orCriteria });
             var body = JObject.Parse(formatter.Body);
 
-            var field = body.TraverseWithAssert("query", "filtered", "filter", "exists", "field");
+            var field = body.TraverseWithAssert("query", "exists", "field");
             Assert.Equal(expectedFieldName, field);
         }
 

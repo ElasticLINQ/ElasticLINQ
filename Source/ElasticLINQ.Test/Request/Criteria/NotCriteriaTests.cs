@@ -17,7 +17,7 @@ namespace ElasticLinq.Test.Request.Criteria
         {
             var criteria = NotCriteria.Create(sampleTerm);
 
-            Assert.Equal("not", criteria.Name);
+            Assert.Equal("must_not", criteria.Name);
         }
 
         [Fact]
