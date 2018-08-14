@@ -54,7 +54,7 @@ namespace ElasticLinq.Request.Formatters
             var root = new JObject();
 
             if (searchRequest.Fields.Any())
-                root.Add("fields", new JArray(searchRequest.Fields));
+                root.Add("_source", new JArray(searchRequest.Fields));
 
             if (searchRequest.MinScore.HasValue)
                 root.Add("min_score", searchRequest.MinScore.Value);

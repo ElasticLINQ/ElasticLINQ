@@ -22,7 +22,7 @@ namespace ElasticLinq.Test.Response.Materializers
         }
 
         public static readonly Func<Hit, SampleClass> ItemCreator =
-            h => new SampleClass { SampleField = (string)h.fields["someField"] };
+            h => new SampleClass { SampleField = (string)h._source["someField"] };
 
         internal static ElasticResponse CreateSampleResponse(int count)
         {
@@ -38,7 +38,7 @@ namespace ElasticLinq.Test.Response.Materializers
         {
             return new Hit
             {
-                fields = new Dictionary<string, JToken> { { "someField", new JProperty("a", sampleField).Value } }
+                _source = new JObject(new Dictionary<string, JToken> { { "someField", new JProperty("a", sampleField).Value } })
             };
         }
 

@@ -17,7 +17,7 @@ namespace ElasticLinq.Request.Visitors
     /// </summary>
     class MemberProjectionExpressionVisitor : ElasticFieldsExpressionVisitor
     {
-        protected static readonly MethodInfo GetDictionaryValueMethod = typeof(MemberProjectionExpressionVisitor).GetMethodInfo(m => m.Name == "GetDictionaryValueOrDefault");
+        protected static readonly MethodInfo GetKeyedValueMethod = typeof(MemberProjectionExpressionVisitor).GetMethodInfo(m => m.Name == "GetKeyedValueOrDefault");
 
         readonly HashSet<string> fieldNames = new HashSet<string>();
 
@@ -63,20 +63,15 @@ namespace ElasticLinq.Request.Visitors
         {
             var fieldName = Mapping.GetFieldName(SourceType, m);
             fieldNames.Add(fieldName);
-            var getFieldExpression = Expression.Call(null, GetDictionaryValueMethod, Expression.PropertyOrField(BindingParameter, "fields"), Expression.Constant(fieldName), Expression.Constant(m.Type));
+            var getFieldExpression = Expression.Call(null, GetKeyedValueMethod, Expression.PropertyOrField(BindingParameter, "_source"), Expression.Constant(fieldName), Expression.Constant(m.Type));
             return Expression.Convert(getFieldExpression, m.Type);
         }
 
-        internal static object GetDictionaryValueOrDefault(IDictionary<string, JToken> dictionary, string key, Type expectedType)
+        internal static object GetKeyedValueOrDefault(JObject hit, string key, Type expectedType)
         {
-            JToken token;
-            if (dictionary == null || !dictionary.TryGetValue(key, out token))
+            var token = hit[key];
+            if (token == null)
                 return TypeHelper.CreateDefault(expectedType);
-
-            // Elasticsearch 1.0+ puts fields in an array, unwrap it if necessary
-            var jArray = token as JArray;
-            if (jArray != null && jArray.Count == 1 && !expectedType.IsArray)
-                token = jArray[0];
 
             return token.ToObject(expectedType);
         }

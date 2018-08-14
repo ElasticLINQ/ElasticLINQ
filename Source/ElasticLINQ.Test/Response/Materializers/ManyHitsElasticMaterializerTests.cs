@@ -19,7 +19,7 @@ namespace ElasticLinq.Test.Response.Materializers
             Assert.Equal(hits.Count, materialized.Count);
             var index = 0;
             foreach (var hit in hits)
-                Assert.Equal(hit.fields["someField"], materialized[index++].SampleField);
+                Assert.Equal(hit._source["someField"], materialized[index++].SampleField);
         }
 
         [Fact]
@@ -36,7 +36,7 @@ namespace ElasticLinq.Test.Response.Materializers
             Assert.Equal(expected.Count, actualList.Count);
             var index = 0;
             foreach (var hit in expected)
-                Assert.Equal(hit.fields["someField"], actualList[index++].SampleField);
+                Assert.Equal(hit._source["someField"], actualList[index++].SampleField);
         }
 
         [Fact]

@@ -42,10 +42,5 @@ namespace ElasticLinq.Response.Model
         /// The actual document for this hit (not supplied if fields requested).
         /// </summary>
         public JObject _source;
-
-        /// <summary>
-        /// The list of fields for this hit extracted from the document (if fields requested).
-        /// </summary>
-        public Dictionary<string, JToken> fields;
     }
 }

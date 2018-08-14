@@ -13,7 +13,7 @@ namespace ElasticLinq.IntegrationTest
 {
     class Data
     {
-        public static readonly Uri Endpoint = new Uri("http://52.183.26.158:9200/");
+        public static readonly Uri Endpoint = new Uri("http://localhost:9200/");
 
         const string Index = "integrationtest";
         static readonly ElasticConnectionOptions options = new ElasticConnectionOptions { SearchSizeDefault = 1000, Pretty = true };

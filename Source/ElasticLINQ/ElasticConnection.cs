@@ -145,7 +145,16 @@ namespace ElasticLinq
 
             log.Debug(null, null, "Response: {0} {1} (in {2}ms)", (int)response.StatusCode, response.StatusCode, stopwatch.ElapsedMilliseconds);
 
-            response.EnsureSuccessStatusCode();
+            try
+            {
+                response.EnsureSuccessStatusCode();
+            }
+            catch (Exception)
+            {
+                string url = requestMessage.RequestUri.ToString();
+                string body = await requestMessage.Content.ReadAsStringAsync();
+            }
+
             return response;
         }
 
