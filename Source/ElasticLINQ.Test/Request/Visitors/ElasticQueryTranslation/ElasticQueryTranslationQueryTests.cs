@@ -14,7 +14,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         public void StringContainsWithinQueryGeneratesQueryStringCriteria()
         {
             const string expectedConstant = "Kryten";
-            var where = Robots.Query(e => e.Name.Contains(expectedConstant));
+            var where = Robots.Where(e => e.Name.Contains(expectedConstant));
             var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
             var queryStringCriteria = Assert.IsType<QueryStringCriteria>(criteria);
@@ -26,7 +26,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         public void StringStartsWithGeneratesQueryStringCriteria()
         {
             const string expectedConstant = "Kryten";
-            var where = Robots.Query(e => e.Name.StartsWith(expectedConstant));
+            var where = Robots.Where(e => e.Name.StartsWith(expectedConstant));
             var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
             var queryStringCriteria = Assert.IsType<QueryStringCriteria>(criteria);
@@ -38,7 +38,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         public void StringEndsWithGeneratesQueryStringCriteria()
         {
             const string expectedConstant = "Kryten";
-            var where = Robots.Query(e => e.Name.EndsWith(expectedConstant));
+            var where = Robots.Where(e => e.Name.EndsWith(expectedConstant));
             var criteria = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest.Filter;
 
             var queryStringCriteria = Assert.IsType<QueryStringCriteria>(criteria);
@@ -49,7 +49,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         [Fact]
         public void QueryAndWhereGeneratesQueryAndFilterCriteria()
         {
-            var query = Robots.Query(r => ElasticMethods.Regexp(r.Name, "r.*bot")).Where(r => r.Zone.HasValue);
+            var query = Robots.Where(r => ElasticMethods.Regexp(r.Name, "r.*bot")).Where(r => r.Zone.HasValue);
 
             var searchRequest = ElasticQueryTranslator.Translate(Mapping, query.Expression).SearchRequest;
 
@@ -61,7 +61,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         [Fact]
         public void QueryGeneratesQueryCriteria()
         {
-            var where = Robots.Query(r => r.Name == "IG-88" && r.Cost > 1);
+            var where = Robots.Where(r => r.Name == "IG-88" && r.Cost > 1);
             var request = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest;
 
             var boolCriteria = Assert.IsType<BoolCriteria>(request.Filter);
@@ -100,7 +100,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         public void QueryStringWithQueryCombinesToBoolQueryCriteria()
         {
             const string expectedQueryStringValue = "Data";
-            var where = Robots.QueryString(expectedQueryStringValue).Query(q => q.Cost > 0);
+            var where = Robots.QueryString(expectedQueryStringValue).Where(q => q.Cost > 0);
             var request = ElasticQueryTranslator.Translate(Mapping, where.Expression).SearchRequest;
 
             Assert.NotNull(request.Filter);
@@ -113,7 +113,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         [Fact]
         public void AndOrQueryGeneratesBoolQueryWithAndArgs()
         {
-            var query = Robots.Query(q => q.Cost > 0 && (q.EnergyUse > 0 || q.Started < DateTime.Now));
+            var query = Robots.Where(q => q.Cost > 0 && (q.EnergyUse > 0 || q.Started < DateTime.Now));
 
             var request = ElasticQueryTranslator.Translate(Mapping, query.Expression).SearchRequest;
 
@@ -123,7 +123,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         [Fact]
         public void BooleanTrueGeneratesMatchAllQuery()
         {
-            var query = Robots.Query(q => true);
+            var query = Robots.Where(q => true);
 
             var request = ElasticQueryTranslator.Translate(Mapping, query.Expression).SearchRequest;
 
@@ -133,7 +133,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         [Fact]
         public void EvaluatedTrueGeneratesMatchAllQuery()
         {
-            var query = Robots.Query(q => 1 == 1);
+            var query = Robots.Where(q => 1 == 1);
 
             var request = ElasticQueryTranslator.Translate(Mapping, query.Expression).SearchRequest;
 
@@ -143,7 +143,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         [Fact]
         public void BooleanFalseGeneratesNotMatchAllQuery()
         {
-            var query = Robots.Query(q => false);
+            var query = Robots.Where(q => false);
 
             var request = ElasticQueryTranslator.Translate(Mapping, query.Expression).SearchRequest;
 
@@ -154,7 +154,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         [Fact]
         public void EvaluatedFalseGeneratesNotMatchAllQuery()
         {
-            var query = Robots.Query(q => 1 > 1);
+            var query = Robots.Where(q => 1 > 1);
 
             var request = ElasticQueryTranslator.Translate(Mapping, query.Expression).SearchRequest;
 
@@ -165,7 +165,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         [Fact]
         public void BooleanConstantsGeneratesBoolMatchAllQueryAndNotMatchAllQuery()
         {
-            var query = Robots.Query(r => (r.Id > 1 && true) || (r.Id < 1 && false));
+            var query = Robots.Where(r => (r.Id > 1 && true) || (r.Id < 1 && false));
 
             var request = ElasticQueryTranslator.Translate(Mapping, query.Expression).SearchRequest;
 

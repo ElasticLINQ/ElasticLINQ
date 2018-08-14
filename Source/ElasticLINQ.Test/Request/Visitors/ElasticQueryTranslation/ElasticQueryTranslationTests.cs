@@ -138,7 +138,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         {
             const double expectedScore = 123.4;
 
-            var query = Robots.Query(q => q.Name.Contains("a")).MinScore(expectedScore);
+            var query = Robots.Where(q => q.Name.Contains("a")).MinScore(expectedScore);
 
             var request = ElasticQueryTranslator.Translate(Mapping, query.Expression).SearchRequest;
 

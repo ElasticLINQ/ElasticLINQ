@@ -18,22 +18,6 @@ namespace ElasticLinq
     public static class ElasticQueryExtensions
     {
         /// <summary>
-        /// Queries an Elasticsearch index based on a predicate.
-        /// </summary>
-        /// <returns>
-        /// An <see cref="T:System.Linq.IQueryable`1"/> that contains elements from the input sequence that satisfy the condition specified by <paramref name="predicate"/>.
-        /// </returns>
-        /// <param name="source">An <see cref="T:System.Linq.IQueryable`1"/> to query.</param>
-        /// <param name="predicate">A function to test each element for a condition.</param>
-        /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
-        /// <exception cref="T:System.ArgumentNullException"><paramref name="source"/> or <paramref name="predicate"/> is null.</exception>
-        public static IQueryable<TSource> Query<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, bool>> predicate)
-        {
-            Argument.EnsureNotNull(nameof(predicate), predicate);
-            return CreateQueryMethodCall(source, queryMethodInfo, Expression.Quote(predicate));
-        }
-
-        /// <summary>
         /// Queries an Elasticsearch index based on a query string.
         /// </summary>
         /// <returns>

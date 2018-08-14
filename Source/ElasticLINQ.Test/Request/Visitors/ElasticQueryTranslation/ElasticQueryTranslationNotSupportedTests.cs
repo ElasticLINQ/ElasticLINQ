@@ -142,7 +142,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         [Fact]
         public static void StringContainsMustBeBetweenMemberAndConstant()
         {
-            var ex = Assert.Throws<NotSupportedException>(() => Translate(Robots.Query(r => r.Name.Contains(r.Name))));
+            var ex = Assert.Throws<NotSupportedException>(() => Translate(Robots.Where(r => r.Name.Contains(r.Name))));
             Assert.Contains("Contains operation must be a constant", ex.Message);
         }
 
@@ -189,7 +189,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         public static void QueryCannotTakeAFunc()
         {
             Func<Robot, bool> wherePredicateFunc = r => r.Name.Contains("a");
-            var ex = Assert.Throws<NotSupportedException>(() => Translate(Robots.Query(r => wherePredicateFunc(r))));
+            var ex = Assert.Throws<NotSupportedException>(() => Translate(Robots.Where(r => wherePredicateFunc(r))));
             Assert.Contains("Query expression ", ex.Message);
         }
 
@@ -221,7 +221,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         [Fact]
         public static void WhereContainsFailsAfterQueryTransition()
         {
-            var query = Robots.Query(r => r.Name.StartsWith("a")).Where(r => r.Name.Contains("b"));
+            var query = Robots.Where(r => r.Name.StartsWith("a")).Where(r => r.Name.Contains("b"));
 
             var ex = Assert.Throws<NotSupportedException>(() => Translate(query));
             Assert.Contains("String.Contains can only be used within .Query()", ex.Message);

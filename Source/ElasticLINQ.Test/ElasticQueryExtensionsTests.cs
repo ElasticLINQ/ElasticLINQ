@@ -22,7 +22,7 @@ namespace ElasticLinq.Test
         [Fact]
         public static void QueryIsAddedToExpressionTree()
         {
-            var queried = fakeSample.Query(s => s.Property == "a");
+            var queried = fakeSample.Where(s => s.Property == "a");
 
             Assert.IsAssignableFrom<MethodCallExpression>(queried.Expression);
             var callExpression = (MethodCallExpression)queried.Expression;
