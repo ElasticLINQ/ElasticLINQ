@@ -163,18 +163,18 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
         }
 
         [Fact]
-        public void OrderByDecimalDoesNotSpecifyIgnoreUnmappedSortOption()
+        public void OrderByDecimalDoesNotSpecifyUnmappedTypeSortOption()
         {
             var ordered = Robots.OrderBy(e => e.EnergyUse);
             var sortOptions = ElasticQueryTranslator.Translate(Mapping, ordered.Expression).SearchRequest.SortOptions;
 
             Assert.NotNull(sortOptions);
             Assert.Equal(1, sortOptions.Count);
-            Assert.Equal("double", sortOptions[0].UnmappedType);
+            Assert.Null(sortOptions[0].UnmappedType);
         }
 
         [Fact]
-        public void OrderByNullableIntSpecifiesIgnoreUnmappedSortOption()
+        public void OrderByNullableIntSpecifiesUnmappedTypeSortOption()
         {
             var ordered = Robots.OrderBy(e => e.Zone);
             var sortOptions = ElasticQueryTranslator.Translate(Mapping, ordered.Expression).SearchRequest.SortOptions;

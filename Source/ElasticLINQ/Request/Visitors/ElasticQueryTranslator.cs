@@ -21,7 +21,7 @@ namespace ElasticLinq.Request.Visitors
     class ElasticQueryTranslator : CriteriaExpressionVisitor
     {
         readonly SearchRequest searchRequest = new SearchRequest();
-        
+
         Type finalItemType;
         Func<Hit, object> itemProjector;
         IElasticMaterializer materializer;
@@ -159,7 +159,7 @@ namespace ElasticLinq.Request.Visitors
         {
             var constantQueryExpression = (ConstantExpression)queryExpression;
             var constantFieldExpression = fieldsExpression as ConstantExpression;
-            var constantFields = (string[]) constantFieldExpression?.Value;
+            var constantFields = (string[])constantFieldExpression?.Value;
             var criteriaExpression = new CriteriaExpression(new QueryStringCriteria(constantQueryExpression.Value.ToString(), constantFields));
             searchRequest.Query = AndCriteria.Combine(searchRequest.Query, criteriaExpression.Criteria);
 
@@ -310,8 +310,15 @@ namespace ElasticLinq.Request.Visitors
             if (final != null)
             {
                 var fieldName = Mapping.GetFieldName(SourceType, final);
-                var sortFieldType = Mapping.GetElasticFieldType(final.Type);
-                searchRequest.SortOptions.Insert(0, new SortOption(fieldName, ascending, sortFieldType));
+
+                var sortFieldType = final.Type.IsGenericOf(typeof(Nullable<>))
+                    ? final.Type.GetGenericArguments()[0]
+                    : final.Type;
+
+                var sortOption = new SortOption(fieldName, ascending,
+                    final.Type.IsNullable() ? Mapping.GetElasticFieldType(sortFieldType) : null);
+
+                searchRequest.SortOptions.Insert(0, sortOption);
             }
 
             return Visit(source);
