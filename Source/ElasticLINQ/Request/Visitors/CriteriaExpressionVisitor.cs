@@ -12,8 +12,6 @@ using System.Linq.Expressions;
 
 namespace ElasticLinq.Request.Visitors
 {
-    enum CriteriaWithin { Query, Filter };
-
     /// <summary>
     /// Expression visitor to translate predicate expressions to criteria expressions.
     /// Used by Where, Query, Single, First, Count etc.

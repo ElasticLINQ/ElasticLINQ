@@ -81,7 +81,7 @@ namespace ElasticLinq.Test.Request.Visitors
         {
             var expected = new Sample { Id = "T-900", Name = "Cameron" };
             const string key = "Summer";
-            var dictionary = new JObject(new Dictionary<string, JToken> { { key, JToken.FromObject(expected) } });
+            var dictionary = JObject.FromObject(new Dictionary<string, JToken> { { key, JToken.FromObject(expected) } });
 
             var actual = (Sample)MemberProjectionExpressionVisitor.GetKeyedValueOrDefault(dictionary, key, typeof(Sample));
 
@@ -90,21 +90,10 @@ namespace ElasticLinq.Test.Request.Visitors
         }
 
         [Fact]
-        public void GetDictionaryValueOrDefaultReturnsSingleItemInArrayFromDictionaryKeyFound()
-        {
-            const string expected = "Cameron";
-            var dictionary = new JObject(new Dictionary<string, JToken> { { "fields", JToken.Parse("[ \"" + expected + "\" ]") } });
-
-            var actual = MemberProjectionExpressionVisitor.GetKeyedValueOrDefault(dictionary, "fields", typeof(string));
-
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
         public void GetDictionaryValueOrDefaultReturnsArrayIfArrayDesiredFromDictionaryKeyFound()
         {
             var expected = new[] { "Cameron" };
-            var dictionary = new JObject(new Dictionary<string, JToken> { { "fields", JToken.Parse("[ \"" + expected[0] + "\" ]") } });
+            var dictionary = JObject.FromObject(new Dictionary<string, JToken> { { "fields", JToken.Parse("[ \"" + expected[0] + "\" ]") } });
 
             var actual = MemberProjectionExpressionVisitor.GetKeyedValueOrDefault(dictionary, "fields", expected.GetType());
 
@@ -113,7 +102,7 @@ namespace ElasticLinq.Test.Request.Visitors
         }
 
         [Fact]
-        public void GetDictionaryValueOrDefaultReturnsDefaultObjectIfDictionaryIsNull()
+        public void GetDictionaryValueOrDefaultReturnsDefaultObjectIfObjectIsNull()
         {
             var actual = (DateTime)MemberProjectionExpressionVisitor.GetKeyedValueOrDefault(null, "Any", typeof(DateTime));
 
@@ -123,7 +112,7 @@ namespace ElasticLinq.Test.Request.Visitors
         [Fact]
         public void GetDictionaryValueOrDefaultReturnsDefaultObjectIfKeyNotFoundForValueType()
         {
-            var dictionary = new JObject(new Dictionary<string, JToken>());
+            var dictionary = JObject.FromObject(new Dictionary<string, JToken>());
 
             var actual = (int)MemberProjectionExpressionVisitor.GetKeyedValueOrDefault(dictionary, "Any", typeof(int));
 
@@ -133,7 +122,7 @@ namespace ElasticLinq.Test.Request.Visitors
         [Fact]
         public void GetDictionaryValueOrDefaultReturnsNullIfKeyNotFoundForReferenceType()
         {
-            var dictionary = new JObject(new Dictionary<string, JToken>());
+            var dictionary = JObject.FromObject(new Dictionary<string, JToken>());
 
             var actual = (Sample)MemberProjectionExpressionVisitor.GetKeyedValueOrDefault(dictionary, "Any", typeof(Sample));
 

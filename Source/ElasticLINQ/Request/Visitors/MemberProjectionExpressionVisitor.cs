@@ -69,11 +69,16 @@ namespace ElasticLinq.Request.Visitors
 
         internal static object GetKeyedValueOrDefault(JObject hit, string key, Type expectedType)
         {
-            var token = hit[key];
-            if (token == null)
-                return TypeHelper.CreateDefault(expectedType);
+            if (hit != null)
+            {
+                var token = hit[key];
+                if (token == null)
+                    return TypeHelper.CreateDefault(expectedType);
 
-            return token.ToObject(expectedType);
+                return token.ToObject(expectedType);
+            }
+
+            return Activator.CreateInstance(expectedType);
         }
     }
 }
