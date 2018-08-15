@@ -38,7 +38,7 @@ namespace ElasticLinq.Test.Response.Materializers
         {
             return new Hit
             {
-                _source = new JObject(new Dictionary<string, JToken> { { "someField", new JProperty("a", sampleField).Value } })
+                _source = JObject.FromObject(new Dictionary<string, JToken> { { "someField", new JProperty("a", sampleField).Value } })
             };
         }
 
