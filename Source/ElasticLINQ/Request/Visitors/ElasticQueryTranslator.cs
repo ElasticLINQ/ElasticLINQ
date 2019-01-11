@@ -312,7 +312,7 @@ namespace ElasticLinq.Request.Visitors
                 var fieldName = Mapping.GetFieldName(SourceType, final);
 
                 var sortFieldType = final.Type.IsGenericOf(typeof(Nullable<>))
-                    ? final.Type.GetGenericArguments()[0]
+                    ? final.Type.GenericTypeArguments[0]
                     : final.Type;
 
                 var sortOption = new SortOption(fieldName, ascending,
