@@ -35,7 +35,7 @@ namespace ElasticLinq.Async
         /// <exception cref="InvalidOperationException">The source sequence is empty.</exception>
         public static async Task<TSource> FirstAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (TSource)await ExecuteAsync(source.Provider, FinalExpression(source, firstMethodInfo.Value), cancellationToken);
+            return (TSource)await ExecuteAsync(source.Provider, FinalExpression(source, firstMethodInfo.Value), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace ElasticLinq.Async
         /// <exception cref="InvalidOperationException">No element satisfies the condition in <paramref name="predicate"/>.-or-The source sequence is empty.</exception>
         public static async Task<TSource> FirstAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (TSource)await ExecuteAsync(source.Provider, FinalExpression(source, firstPredicateMethodInfo.Value, predicate), cancellationToken);
+            return (TSource)await ExecuteAsync(source.Provider, FinalExpression(source, firstPredicateMethodInfo.Value, predicate), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> is null.</exception>
         public static async Task<TSource> FirstOrDefaultAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (TSource)await ExecuteAsync(source.Provider, FinalExpression(source, firstOrDefaultMethodInfo.Value), cancellationToken);
+            return (TSource)await ExecuteAsync(source.Provider, FinalExpression(source, firstOrDefaultMethodInfo.Value), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> or <paramref name="predicate"/> is null.</exception>
         public static async Task<TSource> FirstOrDefaultAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (TSource)await ExecuteAsync(source.Provider, FinalExpression(source, firstOrDefaultPredicateMethodInfo.Value, predicate), cancellationToken);
+            return (TSource)await ExecuteAsync(source.Provider, FinalExpression(source, firstOrDefaultPredicateMethodInfo.Value, predicate), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> has more than one element.</exception>
         public static async Task<TSource> SingleAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (TSource)await ExecuteAsync(source.Provider, FinalExpression(source, singleMethodInfo.Value), cancellationToken);
+            return (TSource)await ExecuteAsync(source.Provider, FinalExpression(source, singleMethodInfo.Value), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace ElasticLinq.Async
         /// <exception cref="InvalidOperationException">No element satisfies the condition in <paramref name="predicate"/>.-or-More than one element satisfies the condition in <paramref name="predicate"/>.-or-The source sequence is empty.</exception>
         public static async Task<TSource> SingleAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (TSource)await ExecuteAsync(source.Provider, FinalExpression(source, singlePredicateMethodInfo.Value, predicate), cancellationToken);
+            return (TSource)await ExecuteAsync(source.Provider, FinalExpression(source, singlePredicateMethodInfo.Value, predicate), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -140,7 +140,7 @@ namespace ElasticLinq.Async
         /// <paramref name="source"/> has more than one element.</exception>
         public static async Task<TSource> SingleOrDefaultAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (TSource)await ExecuteAsync(source.Provider, FinalExpression(source, singleOrDefaultMethodInfo.Value), cancellationToken);
+            return (TSource)await ExecuteAsync(source.Provider, FinalExpression(source, singleOrDefaultMethodInfo.Value), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -158,7 +158,7 @@ namespace ElasticLinq.Async
         /// <exception cref="InvalidOperationException">More than one element satisfies the condition in <paramref name="predicate"/>.</exception>
         public static async Task<TSource> SingleOrDefaultAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (TSource)await ExecuteAsync(source.Provider, FinalExpression(source, singleOrDefaultPredicateMethodInfo.Value, predicate), cancellationToken);
+            return (TSource)await ExecuteAsync(source.Provider, FinalExpression(source, singleOrDefaultPredicateMethodInfo.Value, predicate), cancellationToken).ConfigureAwait(false);
         }
     }
 }

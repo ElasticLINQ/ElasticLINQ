@@ -111,9 +111,9 @@ namespace ElasticLinq
             {
                 try
                 {
-                    using (var response = await SendRequestAsync(requestMessage, token, log))
+                    using (var response = await SendRequestAsync(requestMessage, token, log).ConfigureAwait(false))
                     {
-                        using (var responseStream = await response.Content.ReadAsStreamAsync())
+                        using (var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
                             return ParseResponse(responseStream, log);
                     }
                 }
@@ -155,7 +155,7 @@ namespace ElasticLinq
         private async Task<HttpResponseMessage> SendRequestAsync(HttpRequestMessage requestMessage, CancellationToken token, ILog log)
         {
             var stopwatch = Stopwatch.StartNew();
-            var response = await HttpClient.SendAsync(requestMessage, token);
+            var response = await HttpClient.SendAsync(requestMessage, token).ConfigureAwait(false);
             stopwatch.Stop();
 
             log.Debug(null, null, "Response: {0} {1} (in {2}ms)", (int)response.StatusCode, response.StatusCode, stopwatch.ElapsedMilliseconds);
