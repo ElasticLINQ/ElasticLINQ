@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace ElasticLinq.Async
 {
     /// <summary>
-    /// Provides a set of static methods for querying data structures that implement <see cref="T:System.Linq.IQueryable`1"/> in an asynchronous manner.
+    /// Provides a set of static methods for querying data structures that implement <see cref="IQueryable{T}"/> in an asynchronous manner.
     /// </summary>
     public static partial class AsyncQueryable
     {
@@ -30,15 +30,15 @@ namespace ElasticLinq.Async
         /// <returns>
         /// A task that returns the number of elements in the input sequence.
         /// </returns>
-        /// <param name="source">The <see cref="T:System.Linq.IQueryable`1"/> that contains the elements to be counted.</param>
-        /// <param name="cancellationToken">The optional <see cref="T:System.Threading.CancellationToken"/> which can be used to cancel this task.</param>
+        /// <param name="source">The <see cref="IQueryable{T}"/> that contains the elements to be counted.</param>
+        /// <param name="cancellationToken">The optional <see cref="CancellationToken"/> which can be used to cancel this task.</param>
         /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="ArgumentNullException">
         /// <paramref name="source"/> is null.</exception>
-        /// <exception cref="T:System.OverflowException">The number of elements in <paramref name="source"/> is larger than <see cref="F:System.Int32.MaxValue"/>.</exception>
+        /// <exception cref="OverflowException">The number of elements in <paramref name="source"/> is larger than <see cref="Int32.MaxValue"/>.</exception>
         public static async Task<int> CountAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (int)await ExecuteAsync(source.Provider, FinalExpression(source, countMethodInfo.Value), cancellationToken);
+            return (int)await ExecuteAsync(source.Provider, FinalExpression(source, countMethodInfo.Value), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -47,189 +47,189 @@ namespace ElasticLinq.Async
         /// <returns>
         /// A task that returns the number of elements in the sequence that satisfies the condition in the predicate function.
         /// </returns>
-        /// <param name="source">An <see cref="T:System.Linq.IQueryable`1"/> that contains the elements to be counted.</param>
+        /// <param name="source">An <see cref="IQueryable{T}"/> that contains the elements to be counted.</param>
         /// <param name="predicate">A function to test each element for a condition.</param>
-        /// <param name="cancellationToken">The optional <see cref="T:System.Threading.CancellationToken"/> which can be used to cancel this task.</param>
+        /// <param name="cancellationToken">The optional <see cref="CancellationToken"/> which can be used to cancel this task.</param>
         /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="ArgumentNullException">
         /// <paramref name="source"/> or <paramref name="predicate"/> is null.</exception>
-        /// <exception cref="T:System.OverflowException">The number of elements in <paramref name="source"/> is larger than <see cref="F:System.Int32.MaxValue"/>.</exception>
+        /// <exception cref="OverflowException">The number of elements in <paramref name="source"/> is larger than <see cref="Int32.MaxValue"/>.</exception>
         public static async Task<int> CountAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (int)await ExecuteAsync(source.Provider, FinalExpression(source, countPredicateMethodInfo.Value, predicate), cancellationToken);
+            return (int)await ExecuteAsync(source.Provider, FinalExpression(source, countPredicateMethodInfo.Value, predicate), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
-        /// Asynchronously returns an <see cref="T:System.Int64"/> that represents the total number of elements in a sequence.
+        /// Asynchronously returns an <see cref="Int64"/> that represents the total number of elements in a sequence.
         /// </summary>
         /// <returns>
         /// A task that returns the number of elements in <paramref name="source"/>.
         /// </returns>
-        /// <param name="source">An <see cref="T:System.Linq.IQueryable`1"/> that contains the elements to be counted.</param>
-        /// <param name="cancellationToken">The optional <see cref="T:System.Threading.CancellationToken"/> which can be used to cancel this task.</param>
+        /// <param name="source">An <see cref="IQueryable{T}"/> that contains the elements to be counted.</param>
+        /// <param name="cancellationToken">The optional <see cref="CancellationToken"/> which can be used to cancel this task.</param>
         /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="ArgumentNullException">
         /// <paramref name="source"/> is null.</exception>
-        /// <exception cref="T:System.OverflowException">The number of elements exceeds <see cref="F:System.Int64.MaxValue"/>.</exception>
+        /// <exception cref="OverflowException">The number of elements exceeds <see cref="Int64.MaxValue"/>.</exception>
         public static async Task<long> LongCountAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (long)await ExecuteAsync(source.Provider, FinalExpression(source, longCountMethodInfo.Value), cancellationToken);
+            return (long)await ExecuteAsync(source.Provider, FinalExpression(source, longCountMethodInfo.Value), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
-        /// Asynchronously returns an <see cref="T:System.Int64"/> that represents the number of elements in a sequence that satisfy a condition.
+        /// Asynchronously returns an <see cref="Int64"/> that represents the number of elements in a sequence that satisfy a condition.
         /// </summary>
         /// <returns>
         /// A task that returns the number of elements in <paramref name="source"/> that satisfy the condition in the predicate function.
         /// </returns>
-        /// <param name="source">An <see cref="T:System.Linq.IQueryable`1"/> that contains the elements to be counted.</param>
+        /// <param name="source">An <see cref="IQueryable{T}"/> that contains the elements to be counted.</param>
         /// <param name="predicate">A function to test each element for a condition.</param>
-        /// <param name="cancellationToken">The optional <see cref="T:System.Threading.CancellationToken"/> which can be used to cancel this task.</param>
+        /// <param name="cancellationToken">The optional <see cref="CancellationToken"/> which can be used to cancel this task.</param>
         /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="ArgumentNullException">
         /// <paramref name="source"/> or <paramref name="predicate"/> is null.</exception>
-        /// <exception cref="T:System.OverflowException">The number of matching elements exceeds <see cref="F:System.Int64.MaxValue"/>.</exception>
+        /// <exception cref="OverflowException">The number of matching elements exceeds <see cref="Int64.MaxValue"/>.</exception>
         public static async Task<long> LongCountAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (long)await ExecuteAsync(source.Provider, FinalExpression(source, longCountPredicateMethodInfo.Value, predicate), cancellationToken);
+            return (long)await ExecuteAsync(source.Provider, FinalExpression(source, longCountPredicateMethodInfo.Value, predicate), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
-        /// Asynchronously returns the minimum value of a generic <see cref="T:System.Linq.IQueryable`1"/>.
+        /// Asynchronously returns the minimum value of a generic <see cref="IQueryable{T}"/>.
         /// </summary>
         /// <returns>
         /// A task that returns the minimum value in the sequence.
         /// </returns>
         /// <param name="source">A sequence of values to determine the minimum of.</param>
-        /// <param name="cancellationToken">The optional <see cref="T:System.Threading.CancellationToken"/> which can be used to cancel this task.</param>
+        /// <param name="cancellationToken">The optional <see cref="CancellationToken"/> which can be used to cancel this task.</param>
         /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="ArgumentNullException">
         /// <paramref name="source"/> is null.</exception>
         public static async Task<TSource> MinAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (TSource)await ExecuteAsync(source.Provider, FinalExpression(source, minMethodInfo.Value), cancellationToken);
+            return (TSource)await ExecuteAsync(source.Provider, FinalExpression(source, minMethodInfo.Value), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
-        /// Invokes a projection function on each element of a generic <see cref="T:System.Linq.IQueryable`1"/> and returns the minimum resulting value.
+        /// Invokes a projection function on each element of a generic <see cref="IQueryable{T}"/> and returns the minimum resulting value.
         /// </summary>
         /// <returns>
         /// A task that returns the minimum value in the sequence.
         /// </returns>
         /// <param name="source">A sequence of values to determine the minimum of.</param>
         /// <param name="selector">A projection function to apply to each element.</param>
-        /// <param name="cancellationToken">The optional <see cref="T:System.Threading.CancellationToken"/> which can be used to cancel this task.</param>
+        /// <param name="cancellationToken">The optional <see cref="CancellationToken"/> which can be used to cancel this task.</param>
         /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
         /// <typeparam name="TResult">The type of the value returned by the function represented by <paramref name="selector"/>.</typeparam>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="ArgumentNullException">
         /// <paramref name="source"/> or <paramref name="selector"/> is null.</exception>
         public static async Task<TResult> MinAsync<TSource, TResult>(this IQueryable<TSource> source, Expression<Func<TSource, TResult>> selector, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (TResult)await ExecuteAsync(source.Provider, FinalExpression<TSource, TResult>(source, minSelectorMethodInfo.Value, selector), cancellationToken);
+            return (TResult)await ExecuteAsync(source.Provider, FinalExpression<TSource, TResult>(source, minSelectorMethodInfo.Value, selector), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
-        /// Asynchronously returns the maximum value in a generic <see cref="T:System.Linq.IQueryable`1"/>.
+        /// Asynchronously returns the maximum value in a generic <see cref="IQueryable{T}"/>.
         /// </summary>
         /// <returns>
         /// A task that returns the maximum value in the sequence.
         /// </returns>
         /// <param name="source">A sequence of values to determine the maximum of.</param>
-        /// <param name="cancellationToken">The optional <see cref="T:System.Threading.CancellationToken"/> which can be used to cancel this task.</param>
+        /// <param name="cancellationToken">The optional <see cref="CancellationToken"/> which can be used to cancel this task.</param>
         /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="ArgumentNullException">
         /// <paramref name="source"/> is null.</exception>
         public static async Task<TSource> MaxAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (TSource)await ExecuteAsync(source.Provider, FinalExpression(source, maxMethodInfo.Value), cancellationToken);
+            return (TSource)await ExecuteAsync(source.Provider, FinalExpression(source, maxMethodInfo.Value), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
-        /// Invokes a projection function on each element of a generic <see cref="T:System.Linq.IQueryable`1"/> and returns the maximum resulting value.
+        /// Invokes a projection function on each element of a generic <see cref="IQueryable{T}"/> and returns the maximum resulting value.
         /// </summary>
         /// <returns>
         /// A task that returns the maximum value in the sequence.
         /// </returns>
         /// <param name="source">A sequence of values to determine the maximum of.</param>
         /// <param name="selector">A projection function to apply to each element.</param>
-        /// <param name="cancellationToken">The optional <see cref="T:System.Threading.CancellationToken"/> which can be used to cancel this task.</param>
+        /// <param name="cancellationToken">The optional <see cref="CancellationToken"/> which can be used to cancel this task.</param>
         /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
         /// <typeparam name="TResult">The type of the value returned by the function represented by <paramref name="selector"/>.</typeparam>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="ArgumentNullException">
         /// <paramref name="source"/> or <paramref name="selector"/> is null.</exception>
         public static async Task<TResult> MaxAsync<TSource, TResult>(this IQueryable<TSource> source, Expression<Func<TSource, TResult>> selector, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (TResult)await ExecuteAsync(source.Provider, FinalExpression<TSource, TResult>(source, maxSelectorMethodInfo.Value, selector), cancellationToken);
+            return (TResult)await ExecuteAsync(source.Provider, FinalExpression<TSource, TResult>(source, maxSelectorMethodInfo.Value, selector), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
-        /// Creates a <see cref="T:System.Collection.List`1"/> from an <see cref="T:System.Linq.IQueryable`1"/> that is executed asyncronously.
+        /// Creates a <see cref="List{T}"/> from an <see cref="IQueryable{T}"/> that is executed asyncronously.
         /// </summary>
         /// <returns>
         /// A task that returns the newly created list.
         /// </returns>
         /// <param name="source">A sequence of values to create a list from.</param>
-        /// <param name="cancellationToken">The optional <see cref="T:System.Threading.CancellationToken"/> which can be used to cancel this task.</param>
+        /// <param name="cancellationToken">The optional <see cref="CancellationToken"/> which can be used to cancel this task.</param>
         /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
         public static async Task<List<TSource>> ToListAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return ((IEnumerable<TSource>)await ExecuteAsync(source.Provider, source.Expression, cancellationToken)).ToList();
+            return ((IEnumerable<TSource>)await ExecuteAsync(source.Provider, source.Expression, cancellationToken).ConfigureAwait(false)).ToList();
         }
 
         /// <summary>
-        /// Creates an array from an <see cref="T:System.Linq.IQueryable`1"/> that is executed asyncronously.
+        /// Creates an array from an <see cref="IQueryable{T}"/> that is executed asyncronously.
         /// </summary>
         /// <returns>
         /// A task that returns the newly created array.
         /// </returns>
         /// <param name="source">A sequence of values to create an array from.</param>
-        /// <param name="cancellationToken">The optional <see cref="T:System.Threading.CancellationToken"/> which can be used to cancel this task.</param>
+        /// <param name="cancellationToken">The optional <see cref="CancellationToken"/> which can be used to cancel this task.</param>
         /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
         public static async Task<TSource[]> ToArrayAsync<TSource>(this IQueryable<TSource> source, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return ((IEnumerable<TSource>)await ExecuteAsync(source.Provider, source.Expression, cancellationToken)).ToArray();
+            return ((IEnumerable<TSource>)await ExecuteAsync(source.Provider, source.Expression, cancellationToken).ConfigureAwait(false)).ToArray();
         }
 
         /// <summary>
-        /// Creates a <see cref="T:System.Collections.Generic.Dictionary`2" /> from an <see cref="T:System.Collections.Generic.IEnumerable`1" /> according to a specified key selector function.
+        /// Creates a <see cref="Dictionary{TKey, TValue}" /> from an <see cref="IEnumerable{T}" /> according to a specified key selector function.
         /// </summary>
         /// <returns>
-        /// A <see cref="T:System.Collections.Generic.Dictionary`2" /> that contains keys and values.
+        /// A <see cref="Dictionary{TKey, TValue}" /> that contains keys and values.
         /// </returns>
-        /// <param name="source">An <see cref="T:System.Collections.Generic.IEnumerable`1" /> to create a <see cref="T:System.Collections.Generic.Dictionary`2" /> from.</param>
+        /// <param name="source">An <see cref="IEnumerable{T}" /> to create a <see cref="Dictionary{TKey, TValue}" /> from.</param>
         /// <param name="keySelector">A function to extract a key from each element.</param>
-        /// <param name="cancellationToken">The optional <see cref="T:System.Threading.CancellationToken"/> which can be used to cancel this task.</param>
+        /// <param name="cancellationToken">The optional <see cref="CancellationToken"/> which can be used to cancel this task.</param>
         /// <typeparam name="TSource">The type of the elements of <paramref name="source" />.</typeparam>
         /// <typeparam name="TKey">The type of the key returned by <paramref name="keySelector" />.</typeparam>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="ArgumentNullException">
         /// <paramref name="source" /> or <paramref name="keySelector" /> is null.-or-<paramref name="keySelector" /> produces a key that is null.</exception>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="ArgumentException">
         /// <paramref name="keySelector" /> produces duplicate keys for two elements.</exception>
         public static async Task<Dictionary<TKey, TSource>> ToDictionaryAsync<TSource, TKey>(this IQueryable<TSource> source, Func<TSource, TKey> keySelector, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return ((IEnumerable<TSource>)await ExecuteAsync(source.Provider, source.Expression, cancellationToken)).ToDictionary(keySelector);
+            return ((IEnumerable<TSource>)await ExecuteAsync(source.Provider, source.Expression, cancellationToken).ConfigureAwait(false)).ToDictionary(keySelector);
         }
 
         /// <summary>
-        /// Creates a <see cref="T:System.Collections.Generic.Dictionary`2" /> from an <see cref="T:System.Collections.Generic.IEnumerable`1" /> according to specified key selector and element selector functions.
+        /// Creates a <see cref="Dictionary{TKey, TValue}" /> from an <see cref="IEnumerable{T}" /> according to specified key selector and element selector functions.
         /// </summary>
         /// <returns>
-        /// A <see cref="T:System.Collections.Generic.Dictionary`2" /> that contains values of type <typeparamref name="TElement" /> selected from the input sequence.
+        /// A <see cref="Dictionary{TKey, TValue}" /> that contains values of type <typeparamref name="TElement" /> selected from the input sequence.
         /// </returns>
-        /// <param name="source">An <see cref="T:System.Collections.Generic.IEnumerable`1" /> to create a <see cref="T:System.Collections.Generic.Dictionary`2" /> from.</param>
+        /// <param name="source">An <see cref="IEnumerable{T}" /> to create a <see cref="Dictionary{TKey, TValue}" /> from.</param>
         /// <param name="keySelector">A function to extract a key from each element.</param>
         /// <param name="elementSelector">A transform function to produce a result element value from each element.</param>
-        /// <param name="cancellationToken">The optional <see cref="T:System.Threading.CancellationToken"/> which can be used to cancel this task.</param>
+        /// <param name="cancellationToken">The optional <see cref="CancellationToken"/> which can be used to cancel this task.</param>
         /// <typeparam name="TSource">The type of the elements of <paramref name="source" />.</typeparam>
         /// <typeparam name="TKey">The type of the key returned by <paramref name="keySelector" />.</typeparam>
         /// <typeparam name="TElement">The type of the value returned by <paramref name="elementSelector" />.</typeparam>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="ArgumentNullException">
         /// <paramref name="source" /> or <paramref name="keySelector" /> or <paramref name="elementSelector" /> is null.-or-<paramref name="keySelector" /> produces a key that is null.</exception>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="ArgumentException">
         /// <paramref name="keySelector" /> produces duplicate keys for two elements.</exception>
         public static async Task<Dictionary<TKey, TElement>> ToDictionaryAsync<TSource, TKey, TElement>(this IQueryable<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return ((IEnumerable<TSource>)await ExecuteAsync(source.Provider, source.Expression, cancellationToken)).ToDictionary(keySelector, elementSelector);
+            return ((IEnumerable<TSource>)await ExecuteAsync(source.Provider, source.Expression, cancellationToken).ConfigureAwait(false)).ToDictionary(keySelector, elementSelector);
         }
 
         static Lazy<MethodInfo> QueryableMethodByArgs(string name, int parameterCount, Type secondParameterType = null)
