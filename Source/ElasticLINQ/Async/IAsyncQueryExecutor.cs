@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace ElasticLinq.Async
 {
     /// <summary>
-    /// Defines methods to asyncronously execute queries that are described by an <see cref="T:System.Linq.IQueryable" /> object.
+    /// Defines methods to asyncronously execute queries that are described by an <see cref="System.Linq.IQueryable" /> object.
     /// </summary>
     public interface IAsyncQueryExecutor
     {
