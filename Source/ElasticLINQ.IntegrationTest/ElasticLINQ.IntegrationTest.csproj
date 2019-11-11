@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
+    <OutputType>library</OutputType>
   </PropertyGroup>
 
   <ItemGroup>

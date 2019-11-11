@@ -394,7 +394,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             Assert.Equal("range", rangeCriteria.Name);
             Assert.Equal("cost", rangeCriteria.Field);
             Assert.Single(rangeCriteria.Specifications, s => s.Comparison == RangeComparison.LessThan && Equals(s.Value, expectedConstant));
-            Assert.Equal(1, rangeCriteria.Specifications.Count);
+            Assert.Single(rangeCriteria.Specifications);
         }
 
         [Fact]
@@ -409,7 +409,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             Assert.Equal("range", rangeCriteria.Name);
             Assert.Equal("stats.pricing.invoicePrice", rangeCriteria.Field);
             Assert.Single(rangeCriteria.Specifications, s => s.Comparison == RangeComparison.LessThan && Equals(s.Value, expectedConstant));
-            Assert.Equal(1, rangeCriteria.Specifications.Count);
+            Assert.Single(rangeCriteria.Specifications);
         }
 
         [Fact]
@@ -423,7 +423,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             Assert.Equal("range", rangeCriteria.Name);
             Assert.Equal("cost", rangeCriteria.Field);
             Assert.Single(rangeCriteria.Specifications, s => s.Comparison == RangeComparison.LessThanOrEqual && Equals(s.Value, expectedConstant));
-            Assert.Equal(1, rangeCriteria.Specifications.Count);
+            Assert.Single(rangeCriteria.Specifications);
         }
 
         [Fact]
@@ -437,7 +437,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             Assert.Equal("range", rangeCriteria.Name);
             Assert.Equal("stats.pricing.invoicePrice", rangeCriteria.Field);
             Assert.Single(rangeCriteria.Specifications, s => s.Comparison == RangeComparison.LessThanOrEqual && Equals(s.Value, expectedConstant));
-            Assert.Equal(1, rangeCriteria.Specifications.Count);
+            Assert.Single(rangeCriteria.Specifications);
         }
 
         [Fact]
@@ -451,7 +451,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             Assert.Equal("range", rangeCriteria.Name);
             Assert.Equal("cost", rangeCriteria.Field);
             Assert.Single(rangeCriteria.Specifications, s => s.Comparison == RangeComparison.GreaterThan && Equals(s.Value, expectedConstant));
-            Assert.Equal(1, rangeCriteria.Specifications.Count);
+            Assert.Single(rangeCriteria.Specifications);
         }
 
         [Fact]
@@ -466,7 +466,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             Assert.Equal("range", rangeCriteria.Name);
             Assert.Equal("stats.pricing.invoicePrice", rangeCriteria.Field);
             Assert.Single(rangeCriteria.Specifications, s => s.Comparison == RangeComparison.GreaterThan && Equals(s.Value, expectedConstant));
-            Assert.Equal(1, rangeCriteria.Specifications.Count);
+            Assert.Single(rangeCriteria.Specifications);
         }
 
         [Fact]
@@ -481,7 +481,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             Assert.Equal("range", rangeCriteria.Name);
             Assert.Equal("cost", rangeCriteria.Field);
             Assert.Single(rangeCriteria.Specifications, s => s.Comparison == RangeComparison.GreaterThanOrEqual && Equals(s.Value, expectedConstant));
-            Assert.Equal(1, rangeCriteria.Specifications.Count);
+            Assert.Single(rangeCriteria.Specifications);
         }
 
         [Fact]
@@ -496,7 +496,7 @@ namespace ElasticLinq.Test.Request.Visitors.ElasticQueryTranslation
             Assert.Equal("range", rangeCriteria.Name);
             Assert.Equal("stats.pricing.invoicePrice", rangeCriteria.Field);
             Assert.Single(rangeCriteria.Specifications, s => s.Comparison == RangeComparison.GreaterThanOrEqual && Equals(s.Value, expectedConstant));
-            Assert.Equal(1, rangeCriteria.Specifications.Count);
+            Assert.Single(rangeCriteria.Specifications);
         }
 
         [Fact]

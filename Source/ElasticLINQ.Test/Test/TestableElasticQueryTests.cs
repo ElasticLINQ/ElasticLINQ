@@ -41,7 +41,7 @@ namespace ElasticLinq.Test.Test
 
             var dummy = new TestableElasticQuery<FakeClass>(context).Where(f => f.Name == expectedBody).ToArray();
 
-            Assert.Equal(1, context.Requests.Count);
+            Assert.Single(context.Requests);
             Assert.Contains(expectedBody, context.Requests[0].Query);
         }
 
@@ -52,7 +52,7 @@ namespace ElasticLinq.Test.Test
 
             var dummy = ((IEnumerable) new TestableElasticQuery<FakeClass>(context).Where(f => f.Name == "a")).GetEnumerator();
 
-            Assert.Equal(1, context.Requests.Count);
+            Assert.Single(context.Requests);
         }
 
         class FakeClass

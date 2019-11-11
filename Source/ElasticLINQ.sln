@@ -3,10 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29209.62
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElasticLINQ", "ElasticLINQ\ElasticLINQ.csproj", "{875E1599-5B7F-4084-BBE0-0D70C3C80428}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElasticLINQ.Test", "ElasticLINQ.Test\ElasticLINQ.Test.csproj", "{752ADF39-9F6D-4FE3-8EEF-3266EF584C2A}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{99B0D181-5D19-4E30-96EA-F8E42C81F8E6}"
 	ProjectSection(SolutionItems) = preProject
 		..\build.ps1 = ..\build.ps1
@@ -24,15 +20,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{DF49DB26
 		..\Build\Tests.proj = ..\Build\Tests.proj
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{133702A6-7E01-4ED3-B390-8D613C087A5E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElasticLINQ", "ElasticLINQ\ElasticLINQ.csproj", "{FFBF69C0-56EC-4EE8-BACF-08D05B8CE096}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElasticLINQ.IntegrationTest", "ElasticLINQ.IntegrationTest\ElasticLINQ.IntegrationTest.csproj", "{7D45D260-6B9A-40EB-8259-7D68E25B2EE3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElasticLINQ.ElasticsearchNet", "ElasticLINQ.ElasticsearchNet\ElasticLINQ.ElasticsearchNet.csproj", "{5E58BDEC-D37B-4AB8-BB31-0E50605326C0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElasticLINQ.ElasticsearchNet", "ElasticLINQ.ElasticsearchNet\ElasticLINQ.ElasticsearchNet.csproj", "{26EF8DBF-D804-464E-8D0A-A52211764C18}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElasticLINQ.Test", "ElasticLINQ.Test\ElasticLINQ.Test.csproj", "{1F39816B-A9F0-4A12-BC82-3DD0E1D7772F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElasticLINQ.ElasticsearchNet.Test", "ElasticLINQ.ElasticsearchNet.Test\ElasticLINQ.ElasticsearchNet.Test.csproj", "{70CF57CF-5701-4930-9044-482D8C832FE1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElasticLINQ.IntegrationTest", "ElasticLINQ.IntegrationTest\ElasticLINQ.IntegrationTest.csproj", "{7E86F166-D7B5-444F-9E54-41F62813BC29}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Elasticsearch.Net", "Elasticsearch.Net", "{E1CB6D8E-72C3-4F47-8D06-C6C0C3B813CC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElasticLINQ.ElasticsearchNet.Test", "ElasticLINQ.ElasticsearchNet.Test\ElasticLINQ.ElasticsearchNet.Test.csproj", "{B683E994-F194-4AEE-81DC-B51435606614}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -40,34 +36,32 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{875E1599-5B7F-4084-BBE0-0D70C3C80428}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{875E1599-5B7F-4084-BBE0-0D70C3C80428}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{875E1599-5B7F-4084-BBE0-0D70C3C80428}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{875E1599-5B7F-4084-BBE0-0D70C3C80428}.Release|Any CPU.Build.0 = Release|Any CPU
-		{752ADF39-9F6D-4FE3-8EEF-3266EF584C2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{752ADF39-9F6D-4FE3-8EEF-3266EF584C2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{752ADF39-9F6D-4FE3-8EEF-3266EF584C2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{752ADF39-9F6D-4FE3-8EEF-3266EF584C2A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7D45D260-6B9A-40EB-8259-7D68E25B2EE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7D45D260-6B9A-40EB-8259-7D68E25B2EE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7D45D260-6B9A-40EB-8259-7D68E25B2EE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7D45D260-6B9A-40EB-8259-7D68E25B2EE3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{26EF8DBF-D804-464E-8D0A-A52211764C18}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{26EF8DBF-D804-464E-8D0A-A52211764C18}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{26EF8DBF-D804-464E-8D0A-A52211764C18}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{26EF8DBF-D804-464E-8D0A-A52211764C18}.Release|Any CPU.Build.0 = Release|Any CPU
-		{70CF57CF-5701-4930-9044-482D8C832FE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{70CF57CF-5701-4930-9044-482D8C832FE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{70CF57CF-5701-4930-9044-482D8C832FE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{70CF57CF-5701-4930-9044-482D8C832FE1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FFBF69C0-56EC-4EE8-BACF-08D05B8CE096}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FFBF69C0-56EC-4EE8-BACF-08D05B8CE096}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FFBF69C0-56EC-4EE8-BACF-08D05B8CE096}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FFBF69C0-56EC-4EE8-BACF-08D05B8CE096}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E58BDEC-D37B-4AB8-BB31-0E50605326C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E58BDEC-D37B-4AB8-BB31-0E50605326C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E58BDEC-D37B-4AB8-BB31-0E50605326C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E58BDEC-D37B-4AB8-BB31-0E50605326C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F39816B-A9F0-4A12-BC82-3DD0E1D7772F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F39816B-A9F0-4A12-BC82-3DD0E1D7772F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F39816B-A9F0-4A12-BC82-3DD0E1D7772F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F39816B-A9F0-4A12-BC82-3DD0E1D7772F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E86F166-D7B5-444F-9E54-41F62813BC29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E86F166-D7B5-444F-9E54-41F62813BC29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E86F166-D7B5-444F-9E54-41F62813BC29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E86F166-D7B5-444F-9E54-41F62813BC29}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B683E994-F194-4AEE-81DC-B51435606614}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B683E994-F194-4AEE-81DC-B51435606614}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B683E994-F194-4AEE-81DC-B51435606614}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B683E994-F194-4AEE-81DC-B51435606614}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{DF49DB26-2CDA-437B-94C5-62200CB0ACFC} = {99B0D181-5D19-4E30-96EA-F8E42C81F8E6}
-		{26EF8DBF-D804-464E-8D0A-A52211764C18} = {E1CB6D8E-72C3-4F47-8D06-C6C0C3B813CC}
-		{70CF57CF-5701-4930-9044-482D8C832FE1} = {E1CB6D8E-72C3-4F47-8D06-C6C0C3B813CC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FDA4F69A-9FB1-42A0-B57C-45EA2BED7CC0}

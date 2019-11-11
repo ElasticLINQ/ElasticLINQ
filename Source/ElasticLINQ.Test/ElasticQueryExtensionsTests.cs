@@ -208,7 +208,7 @@ namespace ElasticLinq.Test
             var afterMethod = method(source);
             var final = afterMethod.ToList();
 
-            Assert.NotSame(source, afterMethod);
+            Assert.NotEqual(source, afterMethod);
             Assert.NotNull(final);
 
             var finalExpression = Assert.IsType<FakeQueryProvider>(source.Provider).FinalExpression;
