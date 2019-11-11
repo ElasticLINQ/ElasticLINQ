@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -9,7 +10,6 @@ using ElasticLinq.Mapping;
 using ElasticLinq.Request;
 using ElasticLinq.Request.Formatters;
 using Elasticsearch.Net;
-using Elasticsearch.Net.Connection;
 using NSubstitute;
 using Xunit;
 
@@ -29,7 +29,7 @@ namespace ElasticLinq.ElasticsearchNet.Test
         [Fact]
         public void GuardClauses_Timeout()
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => new ElasticNetConnection(Substitute.For<IElasticsearchClient>(), timeout: TimeSpan.FromDays(-1)));
+            Assert.Throws<ArgumentOutOfRangeException>(() => new ElasticNetConnection(Substitute.For<IElasticLowLevelClient>(), timeout: TimeSpan.FromDays(-1)));
         }
 
         [Fact]
@@ -39,7 +39,7 @@ namespace ElasticLinq.ElasticsearchNet.Test
             const string expectedIndex = "h2g2";
             var expectedOptions = new ElasticConnectionOptions { Pretty = true };
 
-            var actual = new ElasticNetConnection(Substitute.For<IElasticsearchClient>(), expectedIndex, expectedTimeout, expectedOptions);
+            var actual = new ElasticNetConnection(Substitute.For<IElasticLowLevelClient>(), expectedIndex, expectedTimeout, expectedOptions);
 
             Assert.Equal(expectedTimeout, actual.Timeout);
             Assert.Equal(expectedIndex, actual.Index);
@@ -49,7 +49,7 @@ namespace ElasticLinq.ElasticsearchNet.Test
         [Fact]
         public void ConstructorCreatesDefaultOptions()
         {
-            var actual = new ElasticNetConnection(Substitute.For<IElasticsearchClient>());
+            var actual = new ElasticNetConnection(Substitute.For<IElasticLowLevelClient>());
 
             Assert.NotNull(actual.Options);
         }
@@ -57,19 +57,14 @@ namespace ElasticLinq.ElasticsearchNet.Test
         [Fact]
         public static async void NonSuccessfulHttpRequestThrows()
         {
-            var client = Substitute.For<IElasticsearchClient>();
+            var client = Substitute.For<IElasticLowLevelClient>();
 
             client.SearchAsync<string>(
                     "_all",
                     "docType",
                     @"{""timeout"":""10s""}",
                     Arg.Any<Func<SearchRequestParameters, SearchRequestParameters>>())
-                .Returns(Task.FromResult(ElasticsearchResponse<string>.Create(
-                    new ConnectionConfiguration(),
-                    404,
-                    "_search",
-                    "_all",
-                    new byte[0])));
+                .Returns(Task.FromResult(new ElasticsearchResponse<string>(404, new [] {200})));
 
             var localConnection = new ElasticNetConnection(client);
             var request = new SearchRequest { DocumentType = "docType" };
@@ -88,23 +83,16 @@ namespace ElasticLinq.ElasticsearchNet.Test
         [Fact]
         public static async Task LogsDebugMessagesDuringExecution()
         {
-            var client = Substitute.For<IElasticsearchClient>();
+            var client = Substitute.For<IElasticLowLevelClient>();
 
             var responseString = BuildResponseString(2, 1, 1, 0.3141, "testIndex", "testType", "testId");
             var spyLog = new SpyLog();
-
             client.SearchAsync<string>(
                     "SearchIndex",
                     "abc123",
                     @"{""size"":2112,""timeout"":""10s""}",
                     Arg.Any<Func<SearchRequestParameters, SearchRequestParameters>>())
-                .Returns(Task.FromResult(ElasticsearchResponse<string>.Create(
-                    new ConnectionConfiguration(),
-                    200,
-                    "_search",
-                    "http://localhost/SearchIndex/abc123/_search",
-                    new byte[0],
-                    responseString)));
+                .Returns(Task.FromResult(new ElasticsearchResponse<string>(200, new []{200})));
 
             var localConnection = new ElasticNetConnection(client, index: "SearchIndex");
             var request = new SearchRequest { DocumentType = "abc123", Size = 2112 };
@@ -152,7 +140,7 @@ namespace ElasticLinq.ElasticsearchNet.Test
         [Fact]
         public static async void SearchAsyncThrowsTaskCancelledExceptionWithAlreadyCancelledCancellationToken()
         {
-            var client = Substitute.For<IElasticsearchClient>();
+            var client = Substitute.For<IElasticLowLevelClient>();
 
             var spyLog = new SpyLog();
             var localConnection = new ElasticNetConnection(client, "SearchIndex");

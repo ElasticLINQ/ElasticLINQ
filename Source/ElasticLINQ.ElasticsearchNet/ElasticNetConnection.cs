@@ -22,7 +22,7 @@ namespace ElasticLinq.ElasticsearchNet
     /// </summary>
     public class ElasticNetConnection : BaseElasticConnection
     {
-        private readonly IElasticsearchClient client;
+        private readonly IElasticLowLevelClient client;
 
         /// <summary>
         /// Create a new ElasticNetConnection with the given parameters defining its properties.
@@ -32,7 +32,7 @@ namespace ElasticLinq.ElasticsearchNet
         /// <param name="index">Name of the index to use on the server (optional).</param>
         /// <param name="options">Additional options that specify how this connection should behave.</param>
         public ElasticNetConnection(
-            IElasticsearchClient client,
+            IElasticLowLevelClient client,
             string index = null,
             TimeSpan? timeout = null,
             ElasticConnectionOptions options = null)
@@ -61,14 +61,14 @@ namespace ElasticLinq.ElasticsearchNet
 
             stopwatch.Stop();
 
-            log.Log(TraceEventType.Verbose, null, null, "Request: POST {0}", response.RequestUrl);
+            log.Log(TraceEventType.Verbose, null, null, "Request: POST {0}", response.Uri);
             log.Log(TraceEventType.Verbose, null, null, "Body:\n{0}", body);
             log.Log(TraceEventType.Verbose, null, null, "Response: {0} {1} (in {2}ms)", response.HttpStatusCode, response.HttpStatusCode.HasValue ? ((HttpStatusCode)response.HttpStatusCode).ToString() : "", stopwatch.ElapsedMilliseconds);
 
             if (!response.Success)
                 throw new HttpRequestException($"Response status code does not indicate success: {response.HttpStatusCode}");
 
-            return ParseResponse(response.Response, log);
+            return ParseResponse(response.Body, log);
         }
 
         /// <inheritdoc/>

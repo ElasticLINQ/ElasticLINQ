@@ -13,7 +13,6 @@ using ElasticLinq.Mapping;
 using ElasticLinq.Request;
 using ElasticLinq.Request.Criteria;
 using ElasticLinq.Request.Formatters;
-using ElasticLinq.Retry;
 using ElasticLinq.Test.Utility;
 using Xunit;
 
