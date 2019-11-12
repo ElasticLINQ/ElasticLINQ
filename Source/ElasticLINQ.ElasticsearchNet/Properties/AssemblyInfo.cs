@@ -1,7 +1,3 @@
-﻿using System.Reflection;
-using System.Runtime.CompilerServices;
-
-[assembly: AssemblyTitle("ElasticLINQ.ElasticsearchNet")]
-[assembly: AssemblyDescription("ElasticLINQ connection provider for ElasticsearchNet")]
+﻿using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("ElasticLinq.ElasticsearchNet.Test")]
