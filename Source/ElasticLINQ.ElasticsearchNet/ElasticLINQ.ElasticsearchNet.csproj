@@ -9,11 +9,5 @@
     <ProjectReference Include="..\ElasticLINQ\ElasticLINQ.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="Elasticsearch.Net">
-      <HintPath>..\..\..\..\Users\Jlalonde1\.nuget\packages\elasticsearch.net\7.4.0\lib\netstandard2.0\Elasticsearch.Net.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
 
 </Project>
