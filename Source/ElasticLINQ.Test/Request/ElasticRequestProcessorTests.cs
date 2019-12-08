@@ -65,7 +65,7 @@ namespace ElasticLinq.Test.Request
 
             var ex = await Record.ExceptionAsync(() => processor.SearchAsync(request, new CancellationTokenSource(500).Token));
 
-            Assert.IsType<TaskCanceledException>(ex);
+            Assert.IsType<OperationCanceledException>(ex);
         }
 
         [Fact]

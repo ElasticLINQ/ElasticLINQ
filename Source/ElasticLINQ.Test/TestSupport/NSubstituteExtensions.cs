@@ -50,7 +50,7 @@ public static class NSubstituteExtensions
             var methodParameter = methodParameters[i];
             var argumentIndex = i;
 
-            //arguments[i] = new Argument(new Call(() => argumentValues[argumentIndex], _ => { }), methodParameter.ParameterType, );
+            arguments[i] = new Argument(methodParameter.ParameterType, () => argumentValues[argumentIndex], _ => { });
         }
 
         return new CallInfo(arguments);

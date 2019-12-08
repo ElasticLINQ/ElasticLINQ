@@ -179,7 +179,8 @@ namespace ElasticLinq.Test.Retry
 
         static Dictionary<string, object> AssertInfoLog(ILog logger, int callInstance, int operationRetryDelayMs, int operationAttempt)
         {
-            var logCapture = logger.Captured(callInstance, x => x.Log(TraceEventType.Information, null, null, null));
+            var traceEventType = Arg.Any<TraceEventType>(); // below lambda can't allow a ref in the closure
+            var logCapture = logger.Captured(callInstance, x => x.Log(traceEventType, null, null, null));
             Assert.Equal(TraceEventType.Information, logCapture.Arg<TraceEventType>());
             var fields = logCapture.Arg<Dictionary<string, object>>();
             Assert.Equal("retry", fields["category"]);
