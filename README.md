@@ -12,9 +12,9 @@ For information on getting started, [see the Wiki](https://github.com/CenturyLin
 ## Elasticsearch version compatibility
 
 * **0.9 to 1.x** works great
-* **2.x** facets fail, other queries usually work
-* **5.x** under development
-* **6.x** not supported at this time
+* **2.x** GroupBy not supported
+
+Beyond 2.x is unsupported.
 
 ## Builds
 
