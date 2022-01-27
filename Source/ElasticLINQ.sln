@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26228.10
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32113.165
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElasticLINQ", "ElasticLINQ\ElasticLINQ.csproj", "{875E1599-5B7F-4084-BBE0-0D70C3C80428}"
 EndProject
@@ -23,12 +23,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{DF49DB26
 		..\Build\Tasks.proj = ..\Build\Tasks.proj
 		..\Build\Tests.proj = ..\Build\Tests.proj
 	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElasticLINQ.Portable", "ElasticLINQ.Portable\ElasticLINQ.Portable.csproj", "{8633ADE5-6F63-4008-8AA4-BE8E8A387809}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Portable", "Portable", "{5F0CC4DE-B1CB-49A4-B448-53CAE930F5AD}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElasticLINQ.Portable.Test", "ElasticLINQ.Portable.Test\ElasticLINQ.Portable.Test.csproj", "{DA488B7B-BA05-4F15-9F19-EA1FDB57DA44}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{133702A6-7E01-4ED3-B390-8D613C087A5E}"
 EndProject
@@ -54,14 +48,6 @@ Global
 		{752ADF39-9F6D-4FE3-8EEF-3266EF584C2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{752ADF39-9F6D-4FE3-8EEF-3266EF584C2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{752ADF39-9F6D-4FE3-8EEF-3266EF584C2A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8633ADE5-6F63-4008-8AA4-BE8E8A387809}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8633ADE5-6F63-4008-8AA4-BE8E8A387809}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8633ADE5-6F63-4008-8AA4-BE8E8A387809}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8633ADE5-6F63-4008-8AA4-BE8E8A387809}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DA488B7B-BA05-4F15-9F19-EA1FDB57DA44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DA488B7B-BA05-4F15-9F19-EA1FDB57DA44}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DA488B7B-BA05-4F15-9F19-EA1FDB57DA44}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DA488B7B-BA05-4F15-9F19-EA1FDB57DA44}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7D45D260-6B9A-40EB-8259-7D68E25B2EE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7D45D260-6B9A-40EB-8259-7D68E25B2EE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D45D260-6B9A-40EB-8259-7D68E25B2EE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -80,9 +66,10 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{DF49DB26-2CDA-437B-94C5-62200CB0ACFC} = {99B0D181-5D19-4E30-96EA-F8E42C81F8E6}
-		{8633ADE5-6F63-4008-8AA4-BE8E8A387809} = {5F0CC4DE-B1CB-49A4-B448-53CAE930F5AD}
-		{DA488B7B-BA05-4F15-9F19-EA1FDB57DA44} = {5F0CC4DE-B1CB-49A4-B448-53CAE930F5AD}
 		{26EF8DBF-D804-464E-8D0A-A52211764C18} = {E1CB6D8E-72C3-4F47-8D06-C6C0C3B813CC}
 		{70CF57CF-5701-4930-9044-482D8C832FE1} = {E1CB6D8E-72C3-4F47-8D06-C6C0C3B813CC}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F3826ED7-FDDF-4126-83ED-F45C6E5D2D25}
 	EndGlobalSection
 EndGlobal
