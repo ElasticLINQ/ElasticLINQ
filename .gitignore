@@ -206,3 +206,6 @@ FakesAssemblies/
 *.opt
 *.ncrunchproject
 *.ncrunchsolution
+
+# Rider/IntelliJ
+.idea/
